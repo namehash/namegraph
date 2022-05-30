@@ -71,6 +71,7 @@ def generate_names(name, count):
 def generate(config : DictConfig) -> None:
     nltk.download("wordnet")
     nltk.download("omw-1.4")
+    wn.synsets('dog') # init wordnet
 
     root = Path(os.path.abspath(__file__)).parents[1]
     domains = read_domains(root / config.generator.domains)
