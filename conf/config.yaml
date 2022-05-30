@@ -1,0 +1,4 @@
+generator:
+  domains: data/domains.head.csv
+  query: mydomain
+  suggestions: 10
