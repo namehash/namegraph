@@ -17,8 +17,7 @@ class WordnetGenerator:
             counts = [t[1] for t in synset_tuple]
             result.append((''.join(tokens), sum(counts)))
 
-        names = [x[0] for x in sorted(result, key=lambda x: x[1], reverse=True)]
-        return names
+        return result
 
     def _get_lemmas_for_word(self, word):
         synsets = wn.synsets(word)

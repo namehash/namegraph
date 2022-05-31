@@ -6,3 +6,4 @@ from .suffix_generator import SuffixGenerator
 from .wordnet_synonyms_generator import WordNetSynonymsGenerator
 from .w2v_generator import W2VGenerator
 from .categories_generator import CategoriesGenerator
+from .wordnet_generator import WordnetGenerator
