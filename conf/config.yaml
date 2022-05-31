@@ -5,3 +5,6 @@ generator:
   query: mydomain
   # the number of generated suggestions
   suggestions: 10
+filtering:
+  # List of already registered domains
+  domains: data/domains.head.csv
