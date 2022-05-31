@@ -8,6 +8,8 @@ from generator.tokenization import (
 )
 
 
+# repeatable, braverest, semisoft, chinamen
+
 def test_two_word_wordnet_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="config")
