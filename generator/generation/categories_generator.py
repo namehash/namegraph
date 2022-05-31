@@ -1,6 +1,6 @@
 import itertools, collections
 from typing import List, Dict
-from .generation import NameGenerator
+from . import NameGenerator
 
 class CategoriesGenerator(NameGenerator):
     """

@@ -4,7 +4,8 @@ from generator.generation import (
         PrefixGenerator,
         SuffixGenerator,
         WordNetSynonymsGenerator,
-        W2VGenerator
+        W2VGenerator,
+        CategoriesGenerator,
 )
 
 import pytest
@@ -51,3 +52,10 @@ def test_w2vsimilarity():
     generated_names = strategy.apply(tokenized_name)
     assert ['your', 'pikachu', '123'] in [x.tokens for x in generated_names]
     assert ['my', 'mickey', '123'] in [x.tokens for x in generated_names]
+
+def test_categories():
+    strategy = CategoriesGenerator({'Pokemon': ['pikachu', 'bulbazaur']})
+    tokenized_name = GeneratedName(['my', 'pikachu', '123'])
+    generated_names = strategy.apply(tokenized_name)
+    assert ['my', 'pikachu', '123'] in [x.tokens for x in generated_names]
+    assert ['my', 'bulbazaur', '123'] in [x.tokens for x in generated_names]
