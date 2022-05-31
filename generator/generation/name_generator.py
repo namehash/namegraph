@@ -12,6 +12,11 @@ class GeneratedName:
         return ''.join(self.tokens)
 
 class NameGenerator:
+    """
+    Base class for generating names. The class is reposnsible for generating new
+    names based on the already tokenized input. It provides the apply method,
+    responsible for registering the applied generators.
+    """
     def __init__(self):
         pass
 

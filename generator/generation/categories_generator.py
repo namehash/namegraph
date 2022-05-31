@@ -1,9 +1,6 @@
-# Although the name is a generator, a category generator has a different behaviour from
-# the other generators, thus is placed in a different space
-
 import itertools, collections
 from typing import List, Dict
-from ..generation import NameGenerator
+from .generation import NameGenerator
 
 class CategoriesGenerator(NameGenerator):
     """

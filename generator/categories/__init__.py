@@ -1,1 +1,0 @@
-from .categories_generator import CategoriesGenerator

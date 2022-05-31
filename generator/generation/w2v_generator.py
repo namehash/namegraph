@@ -7,7 +7,7 @@ from .name_generator import NameGenerator
 
 class W2VGenerator(NameGenerator):
     """
-    Replace tokens using w2v similarity.
+    Replace tokens using word2vec similarity.
     """
 
     def __init__(self, model_path='glove-twitter-25'):
