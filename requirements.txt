@@ -1,2 +1,5 @@
 hydra-core==1.2.0
 nltk==3.6.7
+gensim==4.0.0
+pytest==7.0.1
+python-Levenshtein==40.6.2
