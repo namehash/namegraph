@@ -1,8 +1,16 @@
-from generator.strategies import Permute, GeneratedName, Prefix, Suffix, WordNetSynonyms, Categories, W2VSimilarity
+from generator.generation import (
+        PermuteGenerator,
+        GeneratedName,
+        PrefixGenerator,
+        SuffixGenerator,
+        WordNetSynonymsGenerator,
+        W2VGenerator
+)
+
 import pytest
 
 def test_permuter():
-    strategy = Permute()
+    strategy = PermuteGenerator()
     tokenized_name = GeneratedName(['asd', 'qwe', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert len(generated_names) == 6
@@ -11,7 +19,7 @@ def test_permuter():
 
 def test_prefix():
     prefixes = ['top', 'best']
-    strategy = Prefix(prefixes)
+    strategy = PrefixGenerator(prefixes)
     tokenized_name = GeneratedName(['asd', 'qwe', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert len(generated_names) == 2
@@ -20,8 +28,8 @@ def test_prefix():
 
 
 def test_suffix():
-    prefixes = ['top', 'best']
-    strategy = Suffix(prefixes)
+    suffixes = ['top', 'best']
+    strategy = SuffixGenerator(suffixes)
     tokenized_name = GeneratedName(['asd', 'qwe', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert len(generated_names) == 2
@@ -30,23 +38,15 @@ def test_suffix():
 
 
 def test_wordnetsynonyms():
-    strategy = WordNetSynonyms()
+    strategy = WordNetSynonymsGenerator()
     tokenized_name = GeneratedName(['my', 'domain', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert ['my', 'domain', '123'] in [x.tokens for x in generated_names]
     assert ['my', 'area', '123'] in [x.tokens for x in generated_names]
 
-
-def test_categories():
-    strategy = Categories({'Pokemon': ['pikachu', 'bulbazaur']})
-    tokenized_name = GeneratedName(['my', 'pikachu', '123'])
-    generated_names = strategy.apply(tokenized_name)
-    assert ['my', 'pikachu', '123'] in [x.tokens for x in generated_names]
-    assert ['my', 'bulbazaur', '123'] in [x.tokens for x in generated_names]
-
 @pytest.mark.slow
 def test_w2vsimilarity():
-    strategy = W2VSimilarity()
+    strategy = W2VGenerator()
     tokenized_name = GeneratedName(['my', 'pikachu', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert ['your', 'pikachu', '123'] in [x.tokens for x in generated_names]
