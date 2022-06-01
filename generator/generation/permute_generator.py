@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import itertools
 
 from .name_generator import NameGenerator
@@ -11,5 +11,5 @@ class PermuteGenerator(NameGenerator):
     def __init__(self):
         super().__init__()
 
-    def generate(self, tokens: List[str]) -> List[List[str]]:
+    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
         return itertools.permutations(tokens)

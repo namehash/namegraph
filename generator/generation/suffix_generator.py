@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from .name_generator import NameGenerator
 
@@ -11,5 +11,5 @@ class SuffixGenerator(NameGenerator):
         super().__init__()
         self.suffixes = suffixes
 
-    def generate(self, tokens: List[str]) -> List[List[str]]:
-        return [tokens + [suffix] for suffix in self.suffixes]
+    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
+        return [tuple(list(tokens) + [suffix]) for suffix in self.suffixes]

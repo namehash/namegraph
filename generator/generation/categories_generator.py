@@ -1,5 +1,5 @@
 import itertools, collections
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from . import NameGenerator
 
 class CategoriesGenerator(NameGenerator):
@@ -15,12 +15,12 @@ class CategoriesGenerator(NameGenerator):
             for token in tokens:
                 self.inverted_categories[token].append(category)
 
-    def generate(self, tokens: List[str]) -> List[List[str]]:
+    def generate(self, tokens: List[str]) -> List[Tuple[str]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
 
         names = []
         for asc in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
-            names.append(([token[0] for token in asc], sum([token[1] for token in asc])))
+            names.append((tuple([token[0] for token in asc]), sum([token[1] for token in asc])))
 
         return [x[0] for x in sorted(names, key=lambda x: x[1], reverse=True)]
 
