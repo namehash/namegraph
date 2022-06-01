@@ -26,7 +26,6 @@ def generate(config : DictConfig) -> List[str]:
     tokenizer = BigramTokenizer(config)
     generator = WordnetSynonymsGenerator(config)
     filter = DomainFilter(config, root)
-    sorter = CountSorter(config)
 
     start = timer()
 
@@ -34,7 +33,8 @@ def generate(config : DictConfig) -> List[str]:
     suggestions = []
     for decomposition in decomposition_list:
         suggestions.extend(generator.generate(decomposition))
-    suggestions = sorter.sort(suggestions)
+
+    suggestions = [''.join(tokens) for tokens in suggestions]
     suggestions = filter.apply(suggestions)
 
     end = timer()

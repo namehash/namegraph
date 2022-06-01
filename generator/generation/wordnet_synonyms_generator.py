@@ -24,7 +24,8 @@ class WordnetSynonymsGenerator(NameGenerator):
             counts = [t[1] for t in synset_tuple]
             result.append((tokens, sum(counts)))
 
-        return [x[0] for x in sorted(result, key=lambda x: x[1], reverse=True)]
+        result = [x[0] for x in sorted(result, key=lambda x: x[1], reverse=True)]
+        return result
 
     def _get_lemmas_for_word(self, word: str) -> Dict[str, int]:
         synsets = wn.synsets(word)
