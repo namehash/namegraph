@@ -11,33 +11,26 @@ if __name__ == "__main__":
     from tokenization import BigramTokenizer
     from filtering import DomainFilter
     from generation import WordnetSynonymsGenerator
+    from pipeline import Pipeline
 else:
     from .sorting import CountSorter
     from .tokenization import BigramTokenizer
     from .filtering import DomainFilter
     from .generation import WordnetSynonymsGenerator
+    from .pipeline import Pipeline
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
 def generate(config : DictConfig) -> List[str]:
 
-    root = Path(os.path.abspath(__file__)).parents[1]
-
-    tokenizer = BigramTokenizer(config)
-    generator = WordnetSynonymsGenerator(config)
-    filter = DomainFilter(config, root)
-
     start = timer()
 
-    decomposition_list = tokenizer.tokenize(config.generator.query)
     suggestions = []
-    for decomposition in decomposition_list:
-        suggestions.extend(generator.generate(decomposition))
-
-    suggestions = [''.join(tokens) for tokens in suggestions]
-    suggestions = filter.apply(suggestions)
+    for definition in config.app.pipelines:
+        suggestions.extend(Pipeline(definition, config).apply(config.app.query))
 
     end = timer()
+
     print(f"Generation time (s): {timedelta(seconds=end-start)}")
     print(suggestions)
     return suggestions

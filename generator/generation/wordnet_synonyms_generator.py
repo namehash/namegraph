@@ -1,6 +1,6 @@
 import nltk
 from nltk.corpus import wordnet as wn
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import itertools
 import collections
 
@@ -16,7 +16,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         wn.synsets('dog')  # init wordnet
 
 
-    def generate(self, tokens: List[str]) -> List[List[str]]:
+    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
         result = []
         synsets = [self._get_lemmas_for_word(t).items() for t in tokens]
         for synset_tuple in itertools.product(*synsets):

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 class GeneratedName:
     def __init__(self, tokens: List[str], applied_strategies=None):
@@ -24,5 +24,5 @@ class NameGenerator:
         return [GeneratedName(changed, tokenized_name.applied_strategies + [self.__class__.__name__]) for changed in
                 self.generate(tokenized_name.tokens)]
 
-    def generate(self, tokens: List[str]) -> List[List[str]]:
+    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
         pass

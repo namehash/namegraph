@@ -1,4 +1,4 @@
-generator:
+app:
   # the list of the domains, that are already registered
   domains: data/domains.head.csv
   # the query the names are generated for

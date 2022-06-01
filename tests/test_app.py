@@ -8,7 +8,7 @@ from typing import List
 @mark.parametrize(
     "overrides, expected",
     [
-        (["generator.query=firepower"], ["fireability", "fireforce", "firemight"]),
+        (["app.query=firepower"], ["fireability", "fireforce", "firemight"]),
     ],
 )
 def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
