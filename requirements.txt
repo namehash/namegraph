@@ -3,3 +3,4 @@ nltk==3.6.7
 gensim==4.0.0
 pytest==7.0.1
 python-Levenshtein==40.6.2
+wordninja
