@@ -5,6 +5,15 @@ generator:
   query: mydomain
   # the number of generated suggestions
   suggestions: 10
+  pipelines:
+    - 
+      tokenizers:
+        - BigramTokenizer
+      generators:
+        - WordnetSynonymsGenerator
+      filters:
+        - DomainFilter
 filtering:
   # List of already registered domains
   domains: data/domains.head.csv
+  root_path: ./

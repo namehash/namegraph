@@ -1,7 +1,9 @@
+from pathlib import Path
+
 class DomainFilter:
-    def __init__(self, config, root_path):
+    def __init__(self, config):
         self.domains = set()
-        with open(root_path / config.filtering.domains) as domains_file:
+        with open(Path(config.filtering.root_path) / config.filtering.domains) as domains_file:
             for line in domains_file:
                 self.domains.add(line.strip()[:-4])
 
