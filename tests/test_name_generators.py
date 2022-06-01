@@ -3,7 +3,7 @@ from generator.generation import (
         GeneratedName,
         PrefixGenerator,
         SuffixGenerator,
-        WordNetSynonymsGenerator,
+        WordnetSynonymsGenerator,
         W2VGenerator,
         CategoriesGenerator,
 )
@@ -39,7 +39,7 @@ def test_suffix():
 
 
 def test_wordnetsynonyms():
-    strategy = WordNetSynonymsGenerator()
+    strategy = WordnetGenerator({})
     tokenized_name = GeneratedName(['my', 'domain', '123'])
     generated_names = strategy.apply(tokenized_name)
     assert ['my', 'domain', '123'] in [x.tokens for x in generated_names]

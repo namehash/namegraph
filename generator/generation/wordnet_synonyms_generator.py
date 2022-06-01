@@ -1,34 +1,33 @@
 import nltk
 from nltk.corpus import wordnet as wn
 from typing import List, Dict
-import collections
 import itertools
+import collections
 
 from .name_generator import NameGenerator
 
-class WordNetSynonymsGenerator(NameGenerator):
+class WordnetSynonymsGenerator(NameGenerator):
     """
-    Replace tokens with synonyms. #TODO hypernyms
+    Replace tokens with synonyms.
     """
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, config):
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
 
 
     def generate(self, tokens: List[str]) -> List[List[str]]:
-        tokens_synsets = [self.get_lemmas(token) for token in tokens]
+        result = []
+        synsets = [self._get_lemmas_for_word(t).items() for t in tokens]
+        for synset_tuple in itertools.product(*synsets):
+            tokens = [t[0] for t in synset_tuple]
+            counts = [t[1] for t in synset_tuple]
+            result.append((tokens, sum(counts)))
 
-        names=[]
-        for asc in  itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
-            names.append(([token[0] for token in asc], sum([token[1] for token in asc])))
+        return [x[0] for x in sorted(result, key=lambda x: x[1], reverse=True)]
 
-        return [x[0] for x in sorted(names, key=lambda x: x[1], reverse=True)]
-
-    def get_lemmas(self, token: str) -> Dict[str, int]:
-        synsets=wn.synsets(token)
+    def _get_lemmas_for_word(self, word: str) -> Dict[str, int]:
+        synsets = wn.synsets(word)
         lemmas = []
         for synset in synsets:
             lemmas.extend([str(lemma.name()) for lemma in synset.lemmas()])
@@ -38,6 +37,8 @@ class WordNetSynonymsGenerator(NameGenerator):
         for l in lemmas:
             stats[l] += 1
 
-        stats[token]+=1 # keep token if lemma not found TODO: create version without?
+        # keep the original token in the output
+        stats[word] += 1
 
         return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+
