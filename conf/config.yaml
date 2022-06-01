@@ -3,8 +3,10 @@ app:
   domains: data/domains.head.csv
   # the query the names are generated for
   query: mydomain
-  # the number of generated suggestions
+  # the number of generated suggestions (TODO: implement)
   suggestions: 10
+  # the pipelines used to generate the suggestions
+  # Make sure the required class is imported in generator/pipeline/pipeline.py
   pipelines:
     - 
       tokenizers:
@@ -13,6 +15,8 @@ app:
         - WordnetSynonymsGenerator
       filters:
         - DomainFilter
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
 filtering:
   # List of already registered domains
   domains: data/domains.head.csv

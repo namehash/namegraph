@@ -3,7 +3,7 @@
 The application can be run with
 
 ```
-python ./utils/generator.py
+python ./generator/app.py
 ```
 
 It will generate suggestions for the default query.
@@ -12,7 +12,7 @@ The default parameteras are defined in `conf/config.yaml`. Any of the parameters
 parameter, with dot-seprated fragments, e.g.
 
 ```
-python ./utils/generator.py generator.query=firepower
+python ./generator/app.py app.query=firepower
 ```
 
 will substitute the default query with the provided one.
