@@ -18,7 +18,7 @@ def generate_from_file(file):
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> List[List[str]]:
+def generate(config: DictConfig) -> List[str]:
     generator = Generator(config)
 
     if config.app.input == 'query':
@@ -39,7 +39,6 @@ def generate(config: DictConfig) -> List[List[str]]:
         print(suggestions)
 
     return all_suggestions
-
 
 if __name__ == "__main__":
     generate()

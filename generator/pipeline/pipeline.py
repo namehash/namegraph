@@ -1,6 +1,7 @@
-from ..generation import WordnetSynonymsGenerator
-from ..tokenization import BigramWordnetTokenizer
-from ..filtering import DomainFilter
+from generator.tokenization import *
+from generator.generation import *
+from generator.filtering import *
+from generator.sorting import *
 
 class Pipeline:
     def __init__(self, definition, config):
