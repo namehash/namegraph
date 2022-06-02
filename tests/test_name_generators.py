@@ -45,6 +45,7 @@ def test_suffix():
         assert ('asd', 'qwe', '123', 'man') in [x.tokens for x in generated_names]
         assert ('asd', 'qwe', '123', 'coin') in [x.tokens for x in generated_names]
 
+
 def test_wordnetsynonyms():
     strategy = WordnetSynonymsGenerator({})
     tokenized_name = GeneratedName(('my', 'domain', '123'))

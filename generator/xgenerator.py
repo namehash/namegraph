@@ -1,7 +1,6 @@
 from typing import List
 
 from generator.pipeline import Pipeline
-from generator.utils import uniq
 from omegaconf import DictConfig
 
 

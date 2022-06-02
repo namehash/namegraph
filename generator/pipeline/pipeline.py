@@ -7,6 +7,7 @@ from generator.generation import *
 from generator.filtering import *
 from generator.sorting import *
 
+
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
@@ -31,7 +32,7 @@ class Pipeline:
                 generator_suggestions.update(dict.fromkeys(generator.generate(decomposition)))
 
             suggestions = generator_suggestions
-            
+
         suggestions = [''.join(tokens) for tokens in suggestions]
         # the filters are applied sequentially
         for filter in self.filters:

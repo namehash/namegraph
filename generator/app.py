@@ -18,7 +18,7 @@ def generate_from_file(file):
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> List[str]:
+def generate(config: DictConfig) -> List[List[str]]:
     generator = Generator(config)
 
     if config.app.input == 'query':
@@ -26,7 +26,7 @@ def generate(config: DictConfig) -> List[str]:
     elif config.app.input == 'stdin':
         queries = generate_from_file(sys.stdin)
     else:
-        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}")
+        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}", file=sys.stderr)
         exit(1)
 
     all_suggestions = []
@@ -39,6 +39,7 @@ def generate(config: DictConfig) -> List[str]:
         print(suggestions)
 
     return all_suggestions
+
 
 if __name__ == "__main__":
     generate()
