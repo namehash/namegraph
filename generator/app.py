@@ -11,17 +11,31 @@ from typing import List
 from generator.xgenerator import Generator
 
 
+def generate_from_file(file):
+    for line in file:
+        query = line.strip()
+        yield query
+
+
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> List[str]:
+def generate(config: DictConfig) -> List[List[str]]:
     generator = Generator(config)
 
-    start = timer()
-    suggestions = generator.generate_names(config.app.query, config.app.suggestions)
-    end = timer()
+    if config.app.input == 'query':
+        queries = [config.app.query]
+    elif config.app.input == 'stdin':
+        queries = generate_from_file(sys.stdin)
 
-    print(f"Generation time (s): {timedelta(seconds=end - start)}", file=sys.stderr)
-    print(suggestions)
-    return suggestions
+    all_suggestions = []
+    for query in queries:
+        start = timer()
+        suggestions = generator.generate_names(query, config.app.suggestions)
+        end = timer()
+        all_suggestions.append(suggestions)
+        print(f"Generation time (s): {timedelta(seconds=end - start)}", file=sys.stderr)
+        print(suggestions)
+
+    return all_suggestions
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ The first run will download additional resources (e.g. dictionaries).
 ## Queries from stdin
 
 ```
-python ./generator/app_stdin.py
+python ./generator/app.py app.input=stdin
 ```
 
 ## Query as an argument
