@@ -6,6 +6,7 @@ from typing import List
 
 from generator.pipeline import Pipeline
 
+
 @mark.parametrize(
     "overrides, expected",
     [

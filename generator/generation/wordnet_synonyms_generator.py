@@ -6,17 +6,19 @@ import collections
 
 from .name_generator import NameGenerator
 
+
 class WordnetSynonymsGenerator(NameGenerator):
     """
     Replace tokens with synonyms.
     """
+
     def __init__(self, config):
+        super().__init__()
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
 
-
-    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
         synsets = [self._get_lemmas_for_word(t).items() for t in tokens]
         for synset_tuple in itertools.product(*synsets):
@@ -42,4 +44,3 @@ class WordnetSynonymsGenerator(NameGenerator):
         stats[word] += 1
 
         return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
-

@@ -1,4 +1,5 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
+
 
 class GeneratedName:
     def __init__(self, tokens: List[str], applied_strategies=None):
@@ -20,6 +21,7 @@ class NameGenerator:
     names based on the already tokenized input. It provides the apply method,
     responsible for registering the applied generators.
     """
+
     def __init__(self):
         pass
 
@@ -27,5 +29,5 @@ class NameGenerator:
         return [GeneratedName(changed, tokenized_name.applied_strategies + [self.__class__.__name__]) for changed in
                 self.generate(tokenized_name.tokens)]
 
-    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         pass
