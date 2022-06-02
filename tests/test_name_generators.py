@@ -32,14 +32,14 @@ def test_prefix():
 
 
 def test_suffix():
-    suffixes = ('top', 'best')
-    strategy = SuffixGenerator(suffixes)
-    tokenized_name = GeneratedName(('asd', 'qwe', '123'))
-    generated_names = strategy.apply(tokenized_name)
-    assert len(generated_names) == 2
-    assert ('asd', 'qwe', '123', 'top') in [x.tokens for x in generated_names]
-    assert ('asd', 'qwe', '123', 'best') in [x.tokens for x in generated_names]
-
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SuffixGenerator(config)
+        tokenized_name = GeneratedName(('asd', 'qwe', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        assert len(generated_names) == 2
+        assert ('asd', 'qwe', '123', 'man') in [x.tokens for x in generated_names]
+        assert ('asd', 'qwe', '123', 'coin') in [x.tokens for x in generated_names]
 
 def test_wordnetsynonyms():
     strategy = WordnetSynonymsGenerator({})
