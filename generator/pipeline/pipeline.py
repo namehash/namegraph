@@ -24,14 +24,14 @@ class Pipeline:
             decomposition_set.update(tokenizer.tokenize(word))
 
         # the generators are applied sequentially
-        suggestions = decomposition_set
+        suggestions = dict.fromkeys(decomposition_set)
         for generator in self.generators:
-            generator_suggestions = set()
+            generator_suggestions = {}
             for decomposition in suggestions:
-                generator_suggestions.update(generator.generate(decomposition))
+                generator_suggestions.update(dict.fromkeys(generator.generate(decomposition)))
 
             suggestions = generator_suggestions
-
+            
         suggestions = [''.join(tokens) for tokens in suggestions]
         # the filters are applied sequentially
         for filter in self.filters:
