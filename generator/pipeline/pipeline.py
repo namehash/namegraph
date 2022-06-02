@@ -1,10 +1,14 @@
+from typing import Set, Tuple
+
+from omegaconf import DictConfig
+
 from generator.tokenization import *
 from generator.generation import *
 from generator.filtering import *
 from generator.sorting import *
 
 class Pipeline:
-    def __init__(self, definition, config):
+    def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.config = config
         self.tokenizers = []
@@ -12,10 +16,10 @@ class Pipeline:
         self.filters = []
         self._build()
 
-    def apply(self, word):
+    def apply(self, word: str):
 
         # the tokenizers are applied in parallel
-        decomposition_set = set()
+        decomposition_set: Set[Tuple[str]] = set()
         for tokenizer in self.tokenizers:
             decomposition_set.update(tokenizer.tokenize(word))
 

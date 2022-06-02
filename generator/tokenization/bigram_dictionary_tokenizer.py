@@ -17,7 +17,7 @@ class BigramDictionaryTokenizer():
                 if re.match(r'^\w+$', word):
                     self.words.add(word.lower())
 
-    def tokenize(self, name: str) -> List[Tuple[str,...]]:
+    def tokenize(self, name: str) -> List[Tuple[str, ...]]:
         result = []
         if name in self.words:
             result.append((name,))

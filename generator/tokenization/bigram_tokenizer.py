@@ -12,4 +12,3 @@ class BigramTokenizer:
             result.append((prefix, suffix))
 
         return result
-
