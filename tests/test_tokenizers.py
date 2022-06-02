@@ -29,7 +29,7 @@ def test_two_word_tokenizer():
 
 
 # def test_two_word_tokenizer2():
-#     tokenizer=TwoWordTokenizer()
+#     tokenizer = TwoWordTokenizer()
 #     tokenized_names = tokenizer.tokenize('yorknewyork')
 #     assert ['york', 'new', 'york'] in tokenized_names
 
