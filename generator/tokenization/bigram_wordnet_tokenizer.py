@@ -11,7 +11,7 @@ class BigramWordnetTokenizer():
     def tokenize(self, word: str) -> List[Tuple[str, ...]]:
         result = []
         if wn.synsets(word):
-            result.append((word))
+            result.append((word,))
 
         for i in range(1, len(word)):
             prefix_synsets = wn.synsets(word[:i])

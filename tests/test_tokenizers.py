@@ -13,9 +13,9 @@ def test_two_word_wordnet_tokenizer():
         config = compose(config_name="config")
         tokenizer = BigramWordnetTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
-        assert ['repeatable'] in tokenized_names
-        assert ['rep', 'eatable'] in tokenized_names
-        assert ['repeat', 'able'] in tokenized_names
+        assert ('repeatable',) in tokenized_names
+        assert ('rep', 'eatable') in tokenized_names
+        assert ('repeat', 'able') in tokenized_names
 
 
 def test_two_word_tokenizer():
@@ -23,9 +23,9 @@ def test_two_word_tokenizer():
         config = compose(config_name="config")
         tokenizer = BigramDictionaryTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
-        assert ['repeatable'] in tokenized_names
-        assert ['rep', 'eatable'] in tokenized_names
-        assert ['repeat', 'able'] in tokenized_names
+        assert ('repeatable',) in tokenized_names
+        assert ('rep', 'eatable') in tokenized_names
+        assert ('repeat', 'able') in tokenized_names
 
 
 # def test_two_word_tokenizer2():

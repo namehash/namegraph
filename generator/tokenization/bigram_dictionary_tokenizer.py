@@ -20,7 +20,7 @@ class BigramDictionaryTokenizer():
     def tokenize(self, name: str) -> List[Tuple[str,...]]:
         result = []
         if name in self.words:
-            result.append((name))
+            result.append((name,))
 
         for i in range(1, len(name)):
             if name[:i] in self.words and name[i:] in self.words:
