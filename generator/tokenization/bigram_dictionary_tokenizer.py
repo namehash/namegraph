@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Tuple
 
 
 class BigramDictionaryTokenizer():
@@ -17,13 +17,13 @@ class BigramDictionaryTokenizer():
                 if re.match(r'^\w+$', word):
                     self.words.add(word.lower())
 
-    def tokenize(self, name: str) -> List[List[str]]:
+    def tokenize(self, name: str) -> List[Tuple[str,...]]:
         result = []
         if name in self.words:
-            result.append([name])
+            result.append((name))
 
         for i in range(1, len(name)):
             if name[:i] in self.words and name[i:] in self.words:
-                result.append([name[:i], name[i:]])
+                result.append((name[:i], name[i:]))
 
         return result

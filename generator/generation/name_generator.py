@@ -11,6 +11,9 @@ class GeneratedName:
     def __str__(self):
         return ''.join(self.tokens)
 
+    def __repr__(self):
+        return self.__str__()
+
 class NameGenerator:
     """
     Base class for generating names. The class is reposnsible for generating new

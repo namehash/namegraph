@@ -14,6 +14,6 @@ from typing import List
 )
 def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="config", overrides=overrides)
+        cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
         assert len(set(result).intersection(set(expected))) == len(expected)

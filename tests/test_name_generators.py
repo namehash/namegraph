@@ -1,3 +1,4 @@
+from hydra import initialize, compose
 from generator.generation import (
         PermuteGenerator,
         GeneratedName,
@@ -19,13 +20,15 @@ def test_permuter():
 
 
 def test_prefix():
-    prefixes = ('top', 'best')
-    strategy = PrefixGenerator(prefixes)
-    tokenized_name = GeneratedName(('asd', 'qwe', '123'))
-    generated_names = strategy.apply(tokenized_name)
-    assert len(generated_names) == 2
-    assert ('top', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
-    assert ('best', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = PrefixGenerator(config)
+        tokenized_name = GeneratedName(('asd', 'qwe', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
+        assert len(generated_names) == 2
+        assert ('0x', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
+        assert ('the', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
 
 
 def test_suffix():
