@@ -1,5 +1,5 @@
 from ..generation import WordnetSynonymsGenerator
-from ..tokenization import BigramTokenizer
+from ..tokenization import BigramWordnetTokenizer
 from ..filtering import DomainFilter
 
 class Pipeline:
