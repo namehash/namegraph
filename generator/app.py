@@ -1,3 +1,5 @@
+import sys
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 from pathlib import Path
@@ -6,34 +8,38 @@ from timeit import default_timer as timer
 from datetime import timedelta
 from typing import List
 
-if __name__ == "__main__":
-    from sorting import CountSorter
-    from tokenization import BigramTokenizer
-    from filtering import DomainFilter
-    from generation import WordnetSynonymsGenerator
-    from pipeline import Pipeline
-else:
-    from .sorting import CountSorter
-    from .tokenization import BigramTokenizer
-    from .filtering import DomainFilter
-    from .generation import WordnetSynonymsGenerator
-    from .pipeline import Pipeline
+from generator.xgenerator import Generator
+
+
+def generate_from_file(file):
+    for line in file:
+        query = line.strip()
+        yield query
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config : DictConfig) -> List[str]:
+def generate(config: DictConfig) -> List[List[str]]:
+    generator = Generator(config)
 
-    start = timer()
+    if config.app.input == 'query':
+        queries = [config.app.query]
+    elif config.app.input == 'stdin':
+        queries = generate_from_file(sys.stdin)
+    else:
+        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}")
+        exit(1)
 
-    suggestions = []
-    for definition in config.app.pipelines:
-        suggestions.extend(Pipeline(definition, config).apply(config.app.query))
+    all_suggestions = []
+    for query in queries:
+        start = timer()
+        suggestions = generator.generate_names(query, config.app.suggestions)
+        end = timer()
+        all_suggestions.append(suggestions)
+        print(f"Generation time (s): {timedelta(seconds=end - start)}", file=sys.stderr)
+        print(suggestions)
 
-    end = timer()
+    return all_suggestions
 
-    print(f"Generation time (s): {timedelta(seconds=end-start)}")
-    print(suggestions)
-    return suggestions
 
 if __name__ == "__main__":
     generate()

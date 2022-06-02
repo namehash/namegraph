@@ -4,3 +4,4 @@ gensim==4.0.0
 pytest==7.0.1
 python-Levenshtein==0.12.2
 wordninja==2.0.0
+
