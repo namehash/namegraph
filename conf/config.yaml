@@ -12,11 +12,12 @@ app:
   pipelines:
     - 
       tokenizers:
-        - BigramTokenizer
+        - BigramWordnetTokenizer
       generators:
         - WordnetSynonymsGenerator
       filters:
         - DomainFilter
+  categories: data/categories/
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
 filtering:
@@ -25,3 +26,7 @@ filtering:
   root_path: ./
 tokenization:
   dictionary: /usr/share/dict/words
+generation:
+  word2vec_model: glove-twitter-25
+  suffixes_path: data/suffixes.txt
+  prefixes_path: data/prefixes.txt
