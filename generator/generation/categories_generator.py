@@ -1,6 +1,7 @@
 import glob
 import itertools, collections
 import logging
+from functools import reduce
 from pathlib import Path
 from typing import List, Dict, Tuple
 from . import NameGenerator
@@ -34,6 +35,9 @@ class CategoriesGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
 
+        synset_lengths = [len(synset.keys()) for synset in tokens_synsets]
+        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        logger.debug(f'CategoriesGenerator synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
             f'CategoriesGenerator synsets: {[synset.keys() for synset in tokens_synsets]}')
 

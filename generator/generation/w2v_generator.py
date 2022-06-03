@@ -1,6 +1,6 @@
 import logging
+from functools import reduce
 from typing import List, Dict, Tuple
-import math
 import gensim.downloader
 import itertools
 
@@ -28,6 +28,9 @@ class W2VGenerator(NameGenerator):
             except KeyError:  # token not in embedding dictionary
                 tokens_synsets.append([(token, 1.0)])
 
+        synset_lengths = [len(synset) for synset in tokens_synsets]
+        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        logger.debug(f'Word2vec synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
             f'Word2vec synsets: {[[synset_tuple[0] for synset_tuple in synset] for synset in tokens_synsets]}')
 

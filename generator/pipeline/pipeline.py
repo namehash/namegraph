@@ -39,6 +39,8 @@ class Pipeline:
             suggestions = generator_suggestions
 
         suggestions = [''.join(tokens) for tokens in suggestions]
+        logger.info(f'Generated suggestions: {len(suggestions)}')
+
         # the filters are applied sequentially
         for filter in self.filters:
             suggestions = filter.apply(suggestions)
