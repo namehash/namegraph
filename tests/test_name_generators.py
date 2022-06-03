@@ -47,11 +47,13 @@ def test_suffix():
 
 
 def test_wordnetsynonyms():
-    strategy = WordnetSynonymsGenerator({})
-    tokenized_name = GeneratedName(('my', 'domain', '123'))
-    generated_names = strategy.apply(tokenized_name)
-    assert ('my', 'domain', '123') in [x.tokens for x in generated_names]
-    assert ('my', 'area', '123') in [x.tokens for x in generated_names]
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = WordnetSynonymsGenerator(config)
+        tokenized_name = GeneratedName(('my', 'domain', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        assert ('my', 'domain', '123') in [x.tokens for x in generated_names]
+        assert ('my', 'area', '123') in [x.tokens for x in generated_names]
 
 
 @pytest.mark.slow

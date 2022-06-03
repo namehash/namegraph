@@ -25,8 +25,10 @@ class W2VGenerator(NameGenerator):
             except KeyError:  # token not in embedding dictionary
                 tokens_synsets.append([(token, 1.0)])
 
-        names = []
-        for asc in itertools.product(*tokens_synsets):
-            names.append(([token[0] for token in asc], sum([token[1] for token in asc])))  # TODO
+        result = []
+        for synset_tuple in itertools.product(*tokens_synsets):
+            tokens = [t[0] for t in synset_tuple]
+            distances = [t[1] for t in synset_tuple]
+            result.append((tokens, sum(distances)))  # TODO multiply distances?
 
-        return [tuple(x[0]) for x in sorted(names, key=lambda x: x[1], reverse=True)]
+        return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
