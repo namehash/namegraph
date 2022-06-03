@@ -12,12 +12,13 @@ app:
   pipelines:
     - 
       tokenizers:
-        - BigramWordnetTokenizer
+        - WordNinjaTokenizer
       generators:
-        - WordnetSynonymsGenerator
+        - CategoriesGenerator
       filters:
         - DomainFilter
   categories: data/categories/
+  logging_level: INFO
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
 filtering:

@@ -22,6 +22,10 @@ def generate_from_file(file):
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
 def generate(config: DictConfig) -> List[List[str]]:
+    logger.setLevel(config.app.logging_level)
+    for handler in logger.handlers:
+        handler.setLevel(config.app.logging_level)
+        
     generator = Generator(config)
 
     if config.app.input == 'query':
