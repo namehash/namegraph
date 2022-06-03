@@ -1,9 +1,12 @@
+import logging
 from typing import List, Dict, Tuple
 import math
 import gensim.downloader
 import itertools
 
 from .name_generator import NameGenerator
+
+logger = logging.getLogger('generator')
 
 
 class W2VGenerator(NameGenerator):
@@ -24,6 +27,9 @@ class W2VGenerator(NameGenerator):
                 tokens_synsets.append([(token, 1.0)] + self.model.most_similar(token, topn=topn))
             except KeyError:  # token not in embedding dictionary
                 tokens_synsets.append([(token, 1.0)])
+
+        logger.debug(
+            f'Word2vec synsets: {[[synset_tuple[0] for synset_tuple in synset] for synset in tokens_synsets]}')
 
         result = []
         for synset_tuple in itertools.product(*tokens_synsets):

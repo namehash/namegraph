@@ -1,8 +1,11 @@
 import glob
 import itertools, collections
+import logging
 from pathlib import Path
 from typing import List, Dict, Tuple
 from . import NameGenerator
+
+logger = logging.getLogger('generator')
 
 
 def load_categories(config):
@@ -30,6 +33,9 @@ class CategoriesGenerator(NameGenerator):
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
+
+        logger.debug(
+            f'CategoriesGenerator synsets: {[synset.keys() for synset in tokens_synsets]}')
 
         result = []
         for synset_tuple in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):

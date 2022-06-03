@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import hydra
@@ -9,6 +10,8 @@ from datetime import timedelta
 from typing import List
 
 from generator.xgenerator import Generator
+
+logger = logging.getLogger('generator')
 
 
 def generate_from_file(file):
@@ -26,16 +29,17 @@ def generate(config: DictConfig) -> List[List[str]]:
     elif config.app.input == 'stdin':
         queries = generate_from_file(sys.stdin)
     else:
-        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}", file=sys.stderr)
-        exit(1)
+        logger.error(f"ERROR: Invalid input type (app.input parameter): {config.app.input}")
+        sys.exit(1)
 
     all_suggestions = []
     for query in queries:
+        logger.info(f"Generating names for: {query}")
         start = timer()
         suggestions = generator.generate_names(query, config.app.suggestions)
         end = timer()
         all_suggestions.append(suggestions)
-        print(f"Generation time (s): {timedelta(seconds=end - start)}", file=sys.stderr)
+        logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
         print(suggestions)
 
     return all_suggestions
