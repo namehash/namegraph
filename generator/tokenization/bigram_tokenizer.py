@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+
 class BigramTokenizer:
     def __init__(self, config):
         pass
@@ -12,4 +13,3 @@ class BigramTokenizer:
             result.append((prefix, suffix))
 
         return result
-

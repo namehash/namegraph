@@ -3,13 +3,14 @@ import itertools
 
 from .name_generator import NameGenerator
 
+
 class PermuteGenerator(NameGenerator):
     """
     Generate permutations of tokens.
     """
 
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
 
-    def generate(self, tokens: Tuple[str]) -> List[Tuple[str]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         return itertools.permutations(tokens)

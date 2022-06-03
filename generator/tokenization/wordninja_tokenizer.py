@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 import wordninja
 
 
@@ -8,5 +8,5 @@ class WordNinjaTokenizer():
     def __init__(self, config):
         pass
 
-    def tokenize(self, name: str) -> List[List[str]]:
-        return [wordninja.split(name)]
+    def tokenize(self, name: str) -> List[Tuple[str, ...]]:
+        return [tuple(wordninja.split(name))]

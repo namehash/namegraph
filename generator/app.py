@@ -26,7 +26,7 @@ def generate(config: DictConfig) -> List[List[str]]:
     elif config.app.input == 'stdin':
         queries = generate_from_file(sys.stdin)
     else:
-        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}")
+        print(f"ERROR: Invalid input type (app.input parameter): {config.app.input}", file=sys.stderr)
         exit(1)
 
     all_suggestions = []
