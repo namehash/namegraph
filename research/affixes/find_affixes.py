@@ -1,4 +1,4 @@
-"""Finds prefixes of registered domains, which were registered without prefixes too."""
+"""Finds prefixes/suffixes of registered domains, which were registered without prefixes/suffixes too."""
 import argparse
 import collections
 import re
@@ -9,14 +9,13 @@ parser.add_argument('path', help='path to text file with names')
 parser.add_argument('-s', action='store_true', help='find suffixes instead of prefixes')
 args = parser.parse_args()
 
-
 path = args.path
 domains = []
 with open(path) as domains_file:
     for line in domains_file:
-        name=line.strip()
+        name = line.strip()
         if name.endswith('.eth'):
-            name=name[:-4]
+            name = name[:-4]
         domains.append(name)
 
 print('Names:', len(domains), file=sys.stderr)
