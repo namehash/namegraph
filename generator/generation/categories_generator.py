@@ -31,11 +31,13 @@ class CategoriesGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
 
-        names = []
-        for asc in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
-            names.append((tuple([token[0] for token in asc]), sum([token[1] for token in asc])))
+        result = []
+        for synset_tuple in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
+            tokens = [t[0] for t in synset_tuple]
+            counts = [t[1] for t in synset_tuple]
+            result.append((tokens, sum(counts)))
 
-        return [x[0] for x in sorted(names, key=lambda x: x[1], reverse=True)]
+        return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)

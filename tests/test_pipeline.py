@@ -15,7 +15,7 @@ from generator.pipeline import Pipeline
 )
 def test_basic_pipeline(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config", overrides=overrides)
+        config = compose(config_name="test_config", overrides=overrides)
         pipeline = Pipeline(config.app.pipelines[0], config)
         result = pipeline.apply(config.app.query)
         assert len(set(result).intersection(set(expected))) == len(expected)

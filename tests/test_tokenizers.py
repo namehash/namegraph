@@ -12,7 +12,7 @@ from generator.tokenization import (
 
 def test_two_word_wordnet_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config")
+        config = compose(config_name="test_config")
         tokenizer = BigramWordnetTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
         assert ('repeatable',) in tokenized_names
@@ -22,7 +22,7 @@ def test_two_word_wordnet_tokenizer():
 
 def test_two_word_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config")
+        config = compose(config_name="test_config")
         tokenizer = BigramDictionaryTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
         assert ('repeatable',) in tokenized_names
@@ -37,7 +37,7 @@ def test_two_word_tokenizer():
 
 def test_word_ninja_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config")
+        config = compose(config_name="test_config")
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('braverest')
         assert ('brave', 'rest') in tokenized_names
@@ -45,7 +45,7 @@ def test_word_ninja_tokenizer():
 
 def test_word_ninja_tokenizer2():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config")
+        config = compose(config_name="test_config")
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert ('york', 'new', 'york', '123') in tokenized_names
