@@ -1,0 +1,63 @@
+app:
+  # read input from argument (query) or stdin
+  input: query
+  # the list of the domains, that are already registered
+  domains: data/domains.head.csv
+  # the query the names are generated for
+  query: mydomain
+  # the number of generated suggestions (TODO: implement)
+  suggestions: 100
+  # the pipelines used to generate the suggestions
+  # Make sure the required class is imported in generator/pipeline/pipeline.py
+  pipelines:
+    - 
+      tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - PermuteGenerator
+      filters:
+        - DomainFilter
+    - tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - PrefixGenerator
+      filters:
+        - DomainFilter
+    - tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - SuffixGenerator
+      filters:
+        - DomainFilter
+    - tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - CategoriesGenerator
+      filters:
+        - DomainFilter
+    - tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - WordnetSynonymsGenerator
+      filters:
+        - DomainFilter
+    - tokenizers:
+        - WordNinjaTokenizer
+      generators:
+        - W2VGenerator
+      filters:
+        - DomainFilter
+  categories: data/categories/
+  logging_level: INFO
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
+filtering:
+  # List of already registered domains
+  domains: data/domains.head.csv
+  root_path: ./
+tokenization:
+  dictionary: /usr/share/dict/words
+generation:
+  word2vec_model: glove-twitter-25
+  suffixes_path: data/suffixes.txt
+  prefixes_path: data/prefixes.txt
