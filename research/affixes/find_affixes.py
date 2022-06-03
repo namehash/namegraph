@@ -13,10 +13,10 @@ path = args.path
 domains = []
 with open(path) as domains_file:
     for line in domains_file:
-        name = line.strip()
-        if name.endswith('.eth'):
-            name = name[:-4]
-        domains.append(name)
+        affix = line.strip()
+        if affix.endswith('.eth'):
+            affix = affix[:-4]
+        domains.append(affix)
 
 print('Names:', len(domains), file=sys.stderr)
 
@@ -30,16 +30,16 @@ import marisa_trie
 
 trie = marisa_trie.Trie(domains)
 
-suffixes = collections.defaultdict(int)
+affixes = collections.defaultdict(int)
 
-for name in domains:
-    for name2 in trie.keys(name):
-        if name == name2: continue
-        suffix = name2[len(name):]
-        suffixes[suffix] += 1
+for affix in domains:
+    for longer_name in trie.keys(affix):
+        if affix == longer_name: continue
+        affix = longer_name[len(affix):]
+        affixes[affix] += 1
 
-for name, count in sorted(suffixes.items(), key=lambda x: x[1], reverse=True)[:1000]:
+for affix, count in sorted(affixes.items(), key=lambda x: x[1], reverse=True)[:1000]:
     if args.s:
-        print(name, count)
+        print(affix, count)
     else:
-        print(name[::-1], count)
+        print(affix[::-1], count)
