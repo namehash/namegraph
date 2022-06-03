@@ -49,3 +49,10 @@ or without slow tests:
 ```
 pytest -m "not slow"
 ```
+
+## Debugging
+
+Run app with `app.logging_level=DEBUG` to see debug information:
+```
+python generator/app.py app.input=stdin app.logging_level=DEBUG
+```

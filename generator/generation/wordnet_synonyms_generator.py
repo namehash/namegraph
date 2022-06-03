@@ -30,7 +30,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         synset_lengths = [len(synset) for synset in synsets]
         combinations = reduce((lambda x, y: x * y), synset_lengths)
         logger.debug(f'Wordnet synsets lengths: {synset_lengths} gives {combinations}')
-        logger.debug(f'Wordnet synsets: {[[synset_tuple[0] for synset_tuple in synset] for synset in synsets]}')
+        logger.debug(f'Wordnet synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in synsets]}')
 
         for synset_tuple in itertools.product(*synsets):
             tokens = [t[0] for t in synset_tuple]

@@ -39,7 +39,7 @@ class CategoriesGenerator(NameGenerator):
         combinations = reduce((lambda x, y: x * y), synset_lengths)
         logger.debug(f'CategoriesGenerator synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
-            f'CategoriesGenerator synsets: {[synset.keys() for synset in tokens_synsets]}')
+            f'CategoriesGenerator synsets: {[list(synset.keys())[:100] for synset in tokens_synsets]}')
 
         result = []
         for synset_tuple in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
