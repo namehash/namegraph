@@ -14,7 +14,7 @@ app:
       tokenizers:
         - WordNinjaTokenizer
       generators:
-        - CategoriesGenerator
+        - WordnetSynonymsGenerator
       filters:
         - DomainFilter
   categories: data/categories/
