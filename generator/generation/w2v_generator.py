@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple
 import gensim.downloader
 import itertools
 
+from .combination_limiter import CombinationLimiter
 from numpy import prod
 
 from .name_generator import NameGenerator
@@ -19,6 +20,7 @@ class W2VGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__()
         self.model = gensim.downloader.load(config.generation.word2vec_model)
+        self.combination_limiter = CombinationLimiter(config.generation.limit_generator)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         topn = int(10000 ** (1 / len(tokens)) + 1)
@@ -35,6 +37,8 @@ class W2VGenerator(NameGenerator):
         logger.debug(f'Word2vec synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
             f'Word2vec synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in tokens_synsets]}')
+
+        tokens_synsets = self.combination_limiter.limit(tokens_synsets)
 
         result = []
         for synset_tuple in itertools.product(*tokens_synsets):
