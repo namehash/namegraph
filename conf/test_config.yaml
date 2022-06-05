@@ -17,6 +17,7 @@ app:
 filtering:
   # List of already registered domains
   domains: tests/data/domains.head.csv
+  subnames: tests/data/subnames.txt
   root_path: ./
 tokenization:
   dictionary: /usr/share/dict/words
