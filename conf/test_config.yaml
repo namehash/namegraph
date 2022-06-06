@@ -24,4 +24,4 @@ generation:
   word2vec_model: glove-twitter-25
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
-  limit_generator: 10000
+  limit: 10000

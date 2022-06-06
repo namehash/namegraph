@@ -23,7 +23,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
-        self.combination_limiter = CombinationLimiter(config.generation.limit_generator)
+        self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []

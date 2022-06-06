@@ -30,7 +30,7 @@ def test_permuter_limit():
         strategy = PermuteGenerator(config)
         tokenized_name = GeneratedName(list(range(10)))  # 3628800 permutations
         generated_names = strategy.apply(tokenized_name)
-        assert len(generated_names) == config.generation.limit_generator
+        assert len(generated_names) == config.generation.limit
 
 
 def test_prefix():

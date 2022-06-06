@@ -25,8 +25,7 @@ class CombinationLimiter:
     def compute_limits(self, counts: List[int]):
         # sort counts in decrease order and save indexes
         counts_with_indexes = sorted([[count, index] for index, count in enumerate(counts)], reverse=True)
-        # print(counts_with_indexes)
-        # print(prod_with_indexes(counts_with_indexes))
+
         n = len(counts_with_indexes)
         for i in range(n):
             combinations = prod_with_indexes(counts_with_indexes)
@@ -38,14 +37,11 @@ class CombinationLimiter:
                 new_count1 = 1
             new_count2 = int(self.max_limit ** (1 / n))
             new_count3 = int((self.max_limit / prod_with_indexes(counts_with_indexes[i + 1:])) ** (1 / (i + 1)))
-            # print((self.max_limit / prod_with_indexes(counts_with_indexes[i + 1:])), (1 / (i + 1)), (self.max_limit / prod_with_indexes(counts_with_indexes[i + 1:])) ** (1 / (i + 1)))
             new_count = max(new_count1, new_count2, new_count3)
-            # print(i, new_count1, new_count2, new_count3, new_count)
 
             # set new limit for i and previous counts
             for j in range(i + 1):
                 counts_with_indexes[j][0] = new_count
-            # print(counts_with_indexes)
 
         # increment limits separately
         for i in range(n):

@@ -32,7 +32,7 @@ class CategoriesGenerator(NameGenerator):
         for category, tokens in self.categories.items():
             for token in tokens:
                 self.inverted_categories[token].append(category)
-        self.combination_limiter = CombinationLimiter(config.generation.limit_generator)
+        self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]

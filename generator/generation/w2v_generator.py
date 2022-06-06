@@ -20,7 +20,7 @@ class W2VGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__()
         self.model = gensim.downloader.load(config.generation.word2vec_model)
-        self.combination_limiter = CombinationLimiter(config.generation.limit_generator)
+        self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         topn = int(10000 ** (1 / len(tokens)) + 1)
