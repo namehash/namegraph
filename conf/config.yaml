@@ -17,6 +17,7 @@ app:
         - WordnetSynonymsGenerator
       filters:
         - DomainFilter
+        - ValidNameFilter
   categories: data/categories/
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
