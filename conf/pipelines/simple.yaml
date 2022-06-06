@@ -1,5 +1,10 @@
 # the pipelines used to generate the suggestions
-- 
+-  
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
