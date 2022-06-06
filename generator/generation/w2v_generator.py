@@ -4,6 +4,8 @@ from typing import List, Dict, Tuple
 import gensim.downloader
 import itertools
 
+from numpy import prod
+
 from .name_generator import NameGenerator
 
 logger = logging.getLogger('generator')
@@ -19,7 +21,7 @@ class W2VGenerator(NameGenerator):
         self.model = gensim.downloader.load(config.generation.word2vec_model)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        topn = int(100 ** (1 / len(tokens)) + 1)
+        topn = int(10000 ** (1 / len(tokens)) + 1)
 
         tokens_synsets = []
         for token in tokens:
@@ -38,6 +40,6 @@ class W2VGenerator(NameGenerator):
         for synset_tuple in itertools.product(*tokens_synsets):
             tokens = [t[0] for t in synset_tuple]
             distances = [t[1] for t in synset_tuple]
-            result.append((tokens, sum(distances)))  # TODO multiply distances?
+            result.append((tokens, prod(distances)))
 
         return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
