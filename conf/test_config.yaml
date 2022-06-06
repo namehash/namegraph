@@ -1,3 +1,5 @@
+defaults:
+  - pipelines: test
 app:
   input: query
   # the list of the domains, that are already registered
@@ -8,15 +10,6 @@ app:
   suggestions: 10
   # the pipelines used to generate the suggestions
   # Make sure the required class is imported in generator/pipeline/pipeline.py
-  pipelines:
-    - 
-      tokenizers:
-        - BigramWordnetTokenizer
-      generators:
-        - WordnetSynonymsGenerator
-      filters:
-        - DomainFilter
-        - ValidNameFilter
   categories: tests/data/categories/
   logging_level: INFO
 # Configuration for the individual modules. So far all modules share the same config.

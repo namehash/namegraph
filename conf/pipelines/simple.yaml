@@ -1,0 +1,9 @@
+# the pipelines used to generate the suggestions
+- 
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - WordnetSynonymsGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
