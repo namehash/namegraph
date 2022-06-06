@@ -35,6 +35,17 @@ def test_prefix():
         assert ('the', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
 
 
+def test_prefix_prefixed():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = PrefixGenerator(config)
+        tokenized_name = GeneratedName(('0', 'xqwe', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        assert len(generated_names) == 1
+        assert ('0x', '0', 'xqwe', '123') not in [x.tokens for x in generated_names]
+        assert ('the', '0', 'xqwe', '123') in [x.tokens for x in generated_names]
+
+
 def test_suffix():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -44,6 +55,17 @@ def test_suffix():
         assert len(generated_names) == 2
         assert ('asd', 'qwe', '123', 'man') in [x.tokens for x in generated_names]
         assert ('asd', 'qwe', '123', 'coin') in [x.tokens for x in generated_names]
+
+
+def test_suffix_suffixed():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SuffixGenerator(config)
+        tokenized_name = GeneratedName(('asd', 'qwem', 'an'))
+        generated_names = strategy.apply(tokenized_name)
+        assert len(generated_names) == 1
+        assert ('asd', 'qwem', 'an', 'man') not in [x.tokens for x in generated_names]
+        assert ('asd', 'qwem', 'an', 'coin') in [x.tokens for x in generated_names]
 
 
 def test_wordnetsynonyms():
