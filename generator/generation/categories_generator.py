@@ -40,11 +40,11 @@ class CategoriesGenerator(NameGenerator):
 
         tokens_synsets = self.combination_limiter.limit(tokens_synsets)
 
-        synset_lengths = [len(synset.keys()) for synset in tokens_synsets]
+        synset_lengths = [len(synset) for synset in tokens_synsets]
         combinations = reduce((lambda x, y: x * y), synset_lengths)
         logger.debug(f'CategoriesGenerator synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
-            f'CategoriesGenerator synsets: {[list(synset.keys())[:100] for synset in tokens_synsets]}')
+            f'CategoriesGenerator synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in tokens_synsets]}')
 
         result = []
         for synset_tuple in itertools.product(*tokens_synsets):
