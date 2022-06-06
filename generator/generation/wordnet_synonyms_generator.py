@@ -1,3 +1,6 @@
+import logging
+from functools import reduce
+
 import nltk
 from nltk.corpus import wordnet as wn
 from typing import List, Dict, Tuple
@@ -5,6 +8,8 @@ import itertools
 import collections
 
 from .name_generator import NameGenerator
+
+logger = logging.getLogger('generator')
 
 
 class WordnetSynonymsGenerator(NameGenerator):
@@ -21,6 +26,12 @@ class WordnetSynonymsGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
         synsets = [self._get_lemmas_for_word(t).items() for t in tokens]
+
+        synset_lengths = [len(synset) for synset in synsets]
+        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        logger.debug(f'Wordnet synsets lengths: {synset_lengths} gives {combinations}')
+        logger.debug(f'Wordnet synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in synsets]}')
+
         for synset_tuple in itertools.product(*synsets):
             tokens = [t[0] for t in synset_tuple]
             counts = [t[1] for t in synset_tuple]

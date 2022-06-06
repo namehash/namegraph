@@ -1,3 +1,4 @@
+import logging
 from typing import Set, Tuple
 
 from omegaconf import DictConfig
@@ -6,6 +7,8 @@ from generator.tokenization import *
 from generator.generation import *
 from generator.filtering import *
 from generator.sorting import *
+
+logger = logging.getLogger('generator')
 
 
 class Pipeline:
@@ -24,6 +27,8 @@ class Pipeline:
         for tokenizer in self.tokenizers:
             decomposition_set.update(tokenizer.tokenize(word))
 
+        logger.debug(f'Tokenization: {decomposition_set}')
+
         # the generators are applied sequentially
         suggestions = dict.fromkeys(decomposition_set)
         for generator in self.generators:
@@ -34,6 +39,8 @@ class Pipeline:
             suggestions = generator_suggestions
 
         suggestions = [''.join(tokens) for tokens in suggestions]
+        logger.info(f'Generated suggestions: {len(suggestions)}')
+
         # the filters are applied sequentially
         for filter in self.filters:
             suggestions = filter.apply(suggestions)
