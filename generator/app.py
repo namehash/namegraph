@@ -25,7 +25,7 @@ def generate(config: DictConfig) -> List[List[str]]:
     logger.setLevel(config.app.logging_level)
     for handler in logger.handlers:
         handler.setLevel(config.app.logging_level)
-        
+
     generator = Generator(config)
 
     if config.app.input == 'query':
@@ -33,9 +33,10 @@ def generate(config: DictConfig) -> List[List[str]]:
     elif config.app.input == 'stdin':
         queries = generate_from_file(sys.stdin)
     else:
-        logger.error(f"ERROR: Invalid input type (app.input parameter): {config.app.input}")
+        logger.error(f"Invalid input type (app.input parameter): {config.app.input}")
         sys.exit(1)
 
+    logger.info(f"Processing queries: {queries}")
     all_suggestions = []
     for query in queries:
         logger.info(f"Generating names for: {query}")
@@ -44,7 +45,6 @@ def generate(config: DictConfig) -> List[List[str]]:
         end = timer()
         all_suggestions.append(suggestions)
         logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
-        print(suggestions)
 
     return all_suggestions
 
