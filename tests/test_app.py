@@ -29,7 +29,7 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
 )
 def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="config", overrides=overrides)
+        cfg = compose(config_name="test_config", overrides=overrides)
         monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
         result = generate(cfg, )[0]
         assert len(set(result).intersection(set(expected))) == len(expected)
