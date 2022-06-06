@@ -1,0 +1,43 @@
+- 
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PermuteGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PrefixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SuffixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - CategoriesGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - WordnetSynonymsGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - W2VGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter

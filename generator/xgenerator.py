@@ -9,7 +9,7 @@ class Generator():
         self.config = config
 
         self.pipelines = []
-        for definition in self.config.app.pipelines:
+        for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
     def generate_names(self, name: str, count: int) -> List[str]:

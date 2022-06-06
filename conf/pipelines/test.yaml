@@ -1,0 +1,8 @@
+- 
+  tokenizers:
+    - BigramWordnetTokenizer
+  generators:
+    - WordnetSynonymsGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
