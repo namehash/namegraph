@@ -5,6 +5,7 @@
     - PermuteGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
 - tokenizers:
     - WordNinjaTokenizer
@@ -12,6 +13,7 @@
     - PrefixGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
 - tokenizers:
     - WordNinjaTokenizer
@@ -19,6 +21,7 @@
     - SuffixGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
 - tokenizers:
     - WordNinjaTokenizer
@@ -26,6 +29,7 @@
     - CategoriesGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
 - tokenizers:
     - WordNinjaTokenizer
@@ -33,6 +37,7 @@
     - WordnetSynonymsGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
 - tokenizers:
     - WordNinjaTokenizer
@@ -40,4 +45,5 @@
     - W2VGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
