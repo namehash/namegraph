@@ -97,3 +97,20 @@ def test_categories():
         generated_names = strategy.apply(tokenized_name)
         assert ('my', 'ukr', '123') in [x.tokens for x in generated_names]
         assert ('my', 'usa', '123') in [x.tokens for x in generated_names]
+
+
+def test_categories_csv():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = GeneratedName(('my', '0x8', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        assert ('my', '0x1', '123') in [x.tokens for x in generated_names]
+        assert ('my', '0x2', '123') in [x.tokens for x in generated_names]
+
+
+def test_duplicated_categories():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = CategoriesGenerator(config)
+        assert len(strategy.categories) == 3

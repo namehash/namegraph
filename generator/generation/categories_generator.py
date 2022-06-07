@@ -1,3 +1,4 @@
+import csv
 import glob
 import itertools, collections
 import logging
@@ -11,12 +12,28 @@ logger = logging.getLogger('generator')
 
 def load_categories(config):
     categories = collections.defaultdict(list)
-    pattern = str(Path(config.app.categories) / '**/*.txt')
+    pattern = str(Path(config.app.categories) / '**/*.*')
     for path in glob.iglob(pattern, recursive=True):
-        with open(path) as category_file:
-            for line in category_file:
-                categories[path].append(line.strip())
+        if path.endswith('.txt'):
+            with open(path) as category_file:
+                for line in category_file:
+                    categories[path].append(line.strip())
+        elif path.endswith('.csv'):
+            with open(path, newline='') as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    categories[path].append(row[0].strip())
     return categories
+
+
+def remove_duplicated_categories(categories):
+    s = collections.defaultdict(list)
+    for path, tokens in categories.items():
+        s[tuple(sorted(tokens))].append(path)
+
+    for paths in s.values():
+        for path in paths[1:]:
+            del categories[path]
 
 
 class CategoriesGenerator(NameGenerator):
@@ -27,6 +44,8 @@ class CategoriesGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__()
         self.categories: Dict[str, List[str]] = load_categories(config)
+        remove_duplicated_categories(self.categories)
+
         self.inverted_categories = collections.defaultdict(list)
         for category, tokens in self.categories.items():
             for token in tokens:
