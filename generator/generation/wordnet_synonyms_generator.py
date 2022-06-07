@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple
 import itertools
 import collections
 
+from .combination_limiter import CombinationLimiter
 from .name_generator import NameGenerator
 
 logger = logging.getLogger('generator')
@@ -22,10 +23,13 @@ class WordnetSynonymsGenerator(NameGenerator):
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
+        self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
-        synsets = [self._get_lemmas_for_word(t).items() for t in tokens]
+        synsets = [list(self._get_lemmas_for_word(t).items()) for t in tokens]
+
+        synsets = self.combination_limiter.limit(synsets)
 
         synset_lengths = [len(synset) for synset in synsets]
         combinations = reduce((lambda x, y: x * y), synset_lengths)

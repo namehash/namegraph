@@ -5,6 +5,7 @@ from functools import reduce
 from pathlib import Path
 from typing import List, Dict, Tuple
 from . import NameGenerator
+from .combination_limiter import CombinationLimiter
 
 logger = logging.getLogger('generator')
 
@@ -31,18 +32,22 @@ class CategoriesGenerator(NameGenerator):
         for category, tokens in self.categories.items():
             for token in tokens:
                 self.inverted_categories[token].append(category)
+        self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
+        tokens_synsets = [list(lemmas.items()) for lemmas in tokens_synsets]
 
-        synset_lengths = [len(synset.keys()) for synset in tokens_synsets]
+        tokens_synsets = self.combination_limiter.limit(tokens_synsets)
+
+        synset_lengths = [len(synset) for synset in tokens_synsets]
         combinations = reduce((lambda x, y: x * y), synset_lengths)
         logger.debug(f'CategoriesGenerator synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
-            f'CategoriesGenerator synsets: {[list(synset.keys())[:100] for synset in tokens_synsets]}')
+            f'CategoriesGenerator synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in tokens_synsets]}')
 
         result = []
-        for synset_tuple in itertools.product(*[lemmas.items() for lemmas in tokens_synsets]):
+        for synset_tuple in itertools.product(*tokens_synsets):
             tokens = [t[0] for t in synset_tuple]
             counts = [t[1] for t in synset_tuple]
             result.append((tokens, sum(counts)))
