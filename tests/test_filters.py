@@ -16,7 +16,11 @@ def test_valid_name_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = ValidNameFilter(config)
-        filtered = filter.apply(['dog', 'dog.cat', 'do'])
+        filtered = filter.apply(['dog', 'dog.cat', 'do', 'dog-cat', '-dog', 'dog-', 'dog--cat'])
         assert 'dog.cat' not in filtered
         assert 'do' not in filtered
         assert 'dog' in filtered
+        assert 'dog-cat' in filtered
+        assert '-dog' not in filtered
+        assert 'dog-' not in filtered
+        assert 'dog--cat' in filtered
