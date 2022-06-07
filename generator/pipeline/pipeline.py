@@ -3,6 +3,7 @@ from typing import Set, Tuple
 
 from omegaconf import DictConfig
 
+from generator.normalization import *
 from generator.tokenization import *
 from generator.generation import *
 from generator.filtering import *
@@ -15,12 +16,16 @@ class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.config = config
+        self.normalizers = []
         self.tokenizers = []
         self.generators = []
         self.filters = []
         self._build()
 
     def apply(self, word: str):
+        # the normalizers are applied sequentially
+        for normalizer in self.normalizers:
+            word = normalizer.normalize(word)
 
         # the tokenizers are applied in parallel
         decomposition_set: Set[Tuple[str]] = set()
@@ -48,6 +53,9 @@ class Pipeline:
         return suggestions
 
     def _build(self):
+        for normalizer_class in self.definition.normalizers:
+            self.normalizers.append(globals()[normalizer_class](self.config))
+
         for tokenizer_class in self.definition.tokenizers:
             self.tokenizers.append(globals()[tokenizer_class](self.config))
 

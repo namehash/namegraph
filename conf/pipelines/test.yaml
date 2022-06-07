@@ -1,4 +1,9 @@
 - 
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
   tokenizers:
     - BigramWordnetTokenizer
   generators:
