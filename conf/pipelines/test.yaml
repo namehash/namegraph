@@ -5,4 +5,6 @@
     - WordnetSynonymsGenerator
   filters:
     - DomainFilter
+    - SubnameFilter
     - ValidNameFilter
+

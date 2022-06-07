@@ -1,6 +1,11 @@
-from hydra import initialize, compose
-
 from generator.filtering import DomainFilter, ValidNameFilter
+from hydra import compose, initialize_config_module, initialize
+
+import pytest
+from pytest import mark
+from typing import List
+
+from generator.filtering import DomainFilter, SubnameFilter
 
 
 def test_domain_filter():
@@ -10,6 +15,15 @@ def test_domain_filter():
         filtered = filter.apply(['00002', '00003'])
         assert '00002' not in filtered
         assert '00003' in filtered
+
+
+def test_subname_filter():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        filter = SubnameFilter(config)
+        result = filter.apply(['dog', 'theshit'])
+        assert 'theshit' not in result
+        assert 'dog' in result
 
 
 def test_valid_name_filter():
