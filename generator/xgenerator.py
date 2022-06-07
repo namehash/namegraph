@@ -1,7 +1,12 @@
+from itertools import zip_longest, chain
 from typing import List
 
 from generator.pipeline import Pipeline
 from omegaconf import DictConfig
+
+
+def by_one_iterator(lists):
+    return [x for x in chain(*zip_longest(*lists)) if x is not None]
 
 
 class Generator():
@@ -16,6 +21,9 @@ class Generator():
         suggestions = []
 
         for pipeline in self.pipelines:
-            suggestions.extend(pipeline.apply(name))
+            suggestions.append(pipeline.apply(name))
 
-        return suggestions[:count]
+        combined_suggestions = list(by_one_iterator(suggestions))
+        # TODO uniq
+
+        return combined_suggestions[:count]
