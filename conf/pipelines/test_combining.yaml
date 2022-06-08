@@ -1,0 +1,16 @@
+- 
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PrefixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- 
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SuffixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
