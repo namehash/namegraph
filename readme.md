@@ -39,6 +39,18 @@ will substitute the default query with the provided one.
 
 The parameters are documented in the config.
 
+# REST API
+
+Start server:
+```
+uvicorn app_rest:app --reload
+```
+
+Query with POST:
+```
+curl -d '{"name":"fire"}' -H "Content-Type: application/json" -X POST http://localhost:8000
+```
+
 # Tests
 
 Run:
