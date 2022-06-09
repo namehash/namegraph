@@ -2,12 +2,16 @@ the
 0x
 crypto
 meta
-eth
 nft
+my
+eth
+mr
 bit
-ether
-block
+web3
 coin
+block
+big
+ether
 super
 smart
 digital
@@ -16,4 +20,3 @@ blockchain
 bitcoin
 metaverse
 virtual
-web3
