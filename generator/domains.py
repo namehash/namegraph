@@ -5,11 +5,19 @@ from typing import Set, Dict
 
 class Domains:
     def __init__(self, config):
-        # self.config = config
         self.registered: Set[str] = self.read_txt(Path(config.filtering.root_path) / config.filtering.domains)
         self.secondary_market: Dict[str, int] = self.read_json(config.app.secondary_market_names)
         self.advertised: Dict[str, int] = self.read_json(config.app.advertised_names)
         self.internet: Set[str] = self.read_txt(config.app.internet_domains)
+
+        for k in self.advertised:
+            self.secondary_market.pop(k, None)
+        self.registered -= self.secondary_market.keys()
+        self.registered -= self.advertised.keys()
+
+        self.internet -= self.registered
+        self.internet -= self.secondary_market.keys()
+        self.internet -= self.advertised.keys()
 
     def read_txt(self, path):
         domains: Set[str] = set()
