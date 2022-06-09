@@ -1,5 +1,5 @@
 from itertools import zip_longest, chain
-from typing import List
+from typing import List, Dict
 
 from generator.pipeline import Pipeline
 from omegaconf import DictConfig
@@ -17,7 +17,7 @@ class Generator():
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
-    def generate_names(self, name: str, count: int) -> List[str]:
+    def generate_names(self, name: str, count: int) -> Dict[str, List[str]]:
         suggestions = []
 
         for pipeline in self.pipelines:
@@ -26,4 +26,5 @@ class Generator():
         combined_suggestions = list(by_one_iterator(suggestions))
         # TODO uniq
 
-        return combined_suggestions[:count]
+        results = {'advertised': [], 'secondary': [], 'primary': combined_suggestions[:count], 'random': []}
+        return results

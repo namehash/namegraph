@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 from timeit import default_timer as timer
 from datetime import timedelta
-from typing import List
+from typing import List, Dict
 
 from generator.xgenerator import Generator
 
@@ -21,7 +21,7 @@ def generate_from_file(file):
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> List[List[str]]:
+def generate(config: DictConfig) -> List[Dict[str, List[str]]]:
     logger.setLevel(config.app.logging_level)
     for handler in logger.handlers:
         handler.setLevel(config.app.logging_level)
