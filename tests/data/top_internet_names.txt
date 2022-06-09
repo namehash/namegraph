@@ -1,0 +1,10 @@
+google
+youtube
+facebook
+baidu
+yahoo
+amazon
+wikipedia
+qq
+twitter
+live
