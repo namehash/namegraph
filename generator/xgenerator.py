@@ -26,7 +26,8 @@ class Generator():
 
         self.domains = Domains(config)
 
-    def generate_names(self, name: str, count: int) -> Dict[str, List[str]]:
+    def generate_names(self, name: str) -> Dict[str, List[str]]:
+        count = self.config.app.suggestions
         suggestions = []
 
         for pipeline in self.pipelines:
@@ -36,40 +37,13 @@ class Generator():
 
         combined_suggestions = uniq(combined_suggestions)
 
-        advertised, remaining_suggestions = self.get_advertised(combined_suggestions)
-        secondary, remaining_suggestions = self.get_secondary(remaining_suggestions)
-        primary = self.get_primary(remaining_suggestions)
-        random_names = self.get_random(combined_suggestions)
+        advertised, remaining_suggestions = self.domains.get_advertised(combined_suggestions)
+        secondary, remaining_suggestions = self.domains.get_secondary(remaining_suggestions)
+        primary = self.domains.get_primary(remaining_suggestions)
+        random_names = self.domains.get_random(combined_suggestions)
 
-        results = {'advertised': advertised[:count], 'secondary': secondary[:count], 'primary': primary[:count],
+        results = {'advertised': advertised[:count],
+                   'secondary': secondary[:count],
+                   'primary': primary[:count],
                    'random': random_names[:count]}
         return results
-
-    def get_advertised(self, suggestions: List[str]) -> Tuple[List[str], List[str]]:
-        advertised = {}
-        remaining_suggestions = []
-        for suggestion in suggestions:
-            if suggestion in self.domains.advertised:
-                advertised[suggestion] = self.domains.advertised[suggestion]
-            else:
-                remaining_suggestions.append(suggestion)
-        return [name_price[0] for name_price in
-                sorted(advertised.items(), key=lambda name_price: name_price[1], reverse=True)], remaining_suggestions
-
-    def get_secondary(self, suggestions: List[str]) -> Tuple[List[str], List[str]]:
-        secondary = {}
-        remaining_suggestions = []
-        for suggestion in suggestions:
-            if suggestion in self.domains.secondary_market:
-                secondary[suggestion] = self.domains.secondary_market[suggestion]
-            else:
-                remaining_suggestions.append(suggestion)
-        return [name_price[0] for name_price in secondary.items()], remaining_suggestions
-
-    def get_primary(self, remaining_suggestions: List[str]) -> List[str]:
-        return [s for s in remaining_suggestions if s not in self.domains.registered]
-
-    def get_random(self, remaining_suggestions: List[str]) -> List[str]:
-        result = list(self.domains.internet - set(remaining_suggestions))
-        random.shuffle(result)
-        return result[:self.config.app.suggestions]
