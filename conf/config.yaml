@@ -14,6 +14,9 @@ app:
   # by default no pipelines are defined
   categories: data/categories/
   logging_level: INFO
+  secondary_market_names: data/secondary.json
+  advertised_names: data/advertised.json
+  internet_domains: data/top_internet_names.txt
 filtering:
   # List of already registered domains
   domains: data/domains.head.csv
