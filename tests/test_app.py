@@ -18,7 +18,8 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
+
 
 @pytest.mark.slow
 @mark.parametrize(
@@ -31,7 +32,7 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
 
 
 @mark.parametrize(
@@ -45,4 +46,4 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
         result = generate(cfg, )[0]
-        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
