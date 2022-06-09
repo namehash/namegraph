@@ -20,7 +20,7 @@ filtering:
   subnames: tests/data/subnames.txt
   root_path: ./
 tokenization:
-  dictionary: /usr/share/dict/words
+  dictionary: tests/data/words.txt
 generation:
   word2vec_model: glove-twitter-25
   suffixes_path: tests/data/suffixes.txt
