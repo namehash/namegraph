@@ -23,6 +23,8 @@ def load_categories(config):
                 reader = csv.reader(csvfile)
                 for row in reader:
                     categories[path].append(row[0].strip())
+        else:
+            logger.warning(f"Categories cannot be read from file: {path}")
     return categories
 
 
