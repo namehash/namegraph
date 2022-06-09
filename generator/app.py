@@ -41,7 +41,7 @@ def generate(config: DictConfig) -> List[Dict[str, List[str]]]:
     for query in queries:
         logger.info(f"Generating names for: {query}")
         start = timer()
-        suggestions = generator.generate_names(query, config.app.suggestions)
+        suggestions = generator.generate_names(query)
         end = timer()
         all_suggestions.append(suggestions)
         logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
