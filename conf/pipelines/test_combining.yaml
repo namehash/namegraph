@@ -22,5 +22,4 @@
   generators:
     - SuffixGenerator
   filters:
-    - DomainFilter
     - ValidNameFilter
