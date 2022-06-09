@@ -9,7 +9,6 @@
   generators:
     - WordnetSynonymsGenerator
   filters:
-    - DomainFilter
     - SubnameFilter
     - ValidNameFilter
 
