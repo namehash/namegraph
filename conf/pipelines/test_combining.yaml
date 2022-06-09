@@ -1,4 +1,9 @@
 - 
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -7,6 +12,11 @@
     - DomainFilter
     - ValidNameFilter
 - 
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:

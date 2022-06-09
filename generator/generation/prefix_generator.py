@@ -10,7 +10,7 @@ class PrefixGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__()
-        self.prefixes = set([line.strip() for line in open(config.generation.prefixes_path)])
+        self.prefixes = [line.strip() for line in open(config.generation.prefixes_path)]
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         name = ''.join(tokens)

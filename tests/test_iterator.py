@@ -15,7 +15,6 @@ def test_iterator1():
     assert combined == ['a1', 'b1', 'c1', 'a2', 'c2', 'a3', 'c3']
 
 
-@pytest.mark.slow
 @mark.parametrize(
     "overrides",
     [
@@ -26,4 +25,5 @@ def test_pipeline_override(overrides: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert result == ['thedog', 'dogcoin', '0xdog', 'dogman']
+        print(result)
+        assert result == ['thedog', 'dogman', '0xdog', 'dogcoin']
