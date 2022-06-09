@@ -43,7 +43,7 @@ The parameters are documented in the config.
 
 Start server:
 ```
-uvicorn app_rest:app --reload
+python -m uvicorn web_api:app --reload
 ```
 
 Query with POST:
