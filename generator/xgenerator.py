@@ -33,7 +33,7 @@ class Generator():
             suggestions.append(pipeline.apply(name))
 
         combined_suggestions = list(by_one_iterator(suggestions))
-        
+
         combined_suggestions = uniq(combined_suggestions)
 
         advertised, remaining_suggestions = self.get_advertised(combined_suggestions)
@@ -66,10 +66,10 @@ class Generator():
                 remaining_suggestions.append(suggestion)
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
 
-    def get_primary(self, remaining_suggestions):
+    def get_primary(self, remaining_suggestions: List[str]) -> List[str]:
         return [s for s in remaining_suggestions if s not in self.domains.registered]
 
-    def get_random(self, remaining_suggestions):
+    def get_random(self, remaining_suggestions: List[str]) -> List[str]:
         result = list(self.domains.internet - set(remaining_suggestions))
         random.shuffle(result)
         return result[:self.config.app.suggestions]
