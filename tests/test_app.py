@@ -19,7 +19,10 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
         assert len(set(result['primary']).intersection(set(expected))) == len(expected)
-
+        assert 'primary' in result
+        assert 'secondary' in result
+        assert 'advertised' in result
+        assert 'random' in result
 
 @pytest.mark.slow
 @mark.parametrize(
