@@ -11,6 +11,11 @@ def by_one_iterator(lists):
     return [x for x in chain(*zip_longest(*lists)) if x is not None]
 
 
+def uniq(l: List):
+    used = set()
+    return [x for x in l if x not in used and (used.add(x) or True)]
+
+
 class Generator():
     def __init__(self, config: DictConfig):
         self.config = config
@@ -28,13 +33,16 @@ class Generator():
             suggestions.append(pipeline.apply(name))
 
         combined_suggestions = list(by_one_iterator(suggestions))
-        # TODO uniq
+        
+        combined_suggestions = uniq(combined_suggestions)
+
         advertised, remaining_suggestions = self.get_advertised(combined_suggestions)
         secondary, remaining_suggestions = self.get_secondary(remaining_suggestions)
-        random_names = self.get_random(remaining_suggestions)
+        primary = self.get_primary(remaining_suggestions)
+        random_names = self.get_random(combined_suggestions)
 
-        results = {'advertised': advertised, 'secondary': secondary, 'primary': remaining_suggestions[:count],
-                   'random': random_names}
+        results = {'advertised': advertised[:count], 'secondary': secondary[:count], 'primary': primary[:count],
+                   'random': random_names[:count]}
         return results
 
     def get_advertised(self, suggestions: List[str]) -> Tuple[List[str], List[str]]:
@@ -57,6 +65,9 @@ class Generator():
             else:
                 remaining_suggestions.append(suggestion)
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
+
+    def get_primary(self, remaining_suggestions):
+        return [s for s in remaining_suggestions if s not in self.domains.registered]
 
     def get_random(self, remaining_suggestions):
         result = list(self.domains.internet - set(remaining_suggestions))

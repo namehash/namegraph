@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from typing import Set, Dict
 
+from generator.filtering import SubnameFilter, ValidNameFilter
+
 
 class Domains:
     def __init__(self, config):
@@ -18,6 +20,10 @@ class Domains:
         self.internet -= self.registered
         self.internet -= self.secondary_market.keys()
         self.internet -= self.advertised.keys()
+
+        subname_filter = SubnameFilter(config)
+        validname_filter = ValidNameFilter(config)
+        self.internet = set(validname_filter.apply(subname_filter.apply(self.internet)))
 
     def read_txt(self, path):
         domains: Set[str] = set()
