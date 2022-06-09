@@ -1,7 +1,9 @@
-man
+s
+er
+nft
+ing
 coin
 bank
-nft
 vault
 group
 chain
