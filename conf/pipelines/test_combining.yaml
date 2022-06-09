@@ -1,0 +1,26 @@
+- 
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PrefixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
+- 
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - ReplaceInvalidNormalizer
+    - NamehashNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SuffixGenerator
+  filters:
+    - DomainFilter
+    - ValidNameFilter
