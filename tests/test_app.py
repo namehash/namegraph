@@ -19,6 +19,8 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
         assert len(set(result['primary']).intersection(set(expected))) == len(expected)
+        assert result['random']
+
         assert 'primary' in result
         assert 'secondary' in result
         assert 'advertised' in result
@@ -36,6 +38,7 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
         assert len(set(result['primary']).intersection(set(expected))) == len(expected)
+        assert result['random']
 
 
 @mark.parametrize(
@@ -50,3 +53,30 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
         monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
         result = generate(cfg, )[0]
         assert len(set(result['primary']).intersection(set(expected))) == len(expected)
+        assert result['random']
+
+
+@mark.parametrize(
+    "overrides, expected",
+    [
+        (["app.query=panda", "app.suggestions=1000"], ["panda"]),
+    ],
+)
+def test_advertised(overrides: List[str], expected: List[str]) -> None:
+    with initialize(version_base=None, config_path="../conf/"):
+        cfg = compose(config_name="test_config", overrides=overrides)
+        result = generate(cfg, )[0]
+        assert len(set(result['advertised']).intersection(set(expected))) == len(expected)
+
+
+@mark.parametrize(
+    "overrides, expected",
+    [
+        (["app.query=fire", "app.suggestions=1000"], ["fire"]),
+    ],
+)
+def test_secondary(overrides: List[str], expected: List[str]) -> None:
+    with initialize(version_base=None, config_path="../conf/"):
+        cfg = compose(config_name="test_config", overrides=overrides)
+        result = generate(cfg, )[0]
+        assert len(set(result['secondary']).intersection(set(expected))) == len(expected)
