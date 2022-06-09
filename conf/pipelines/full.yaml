@@ -9,7 +9,6 @@
   generators:
     - PermuteGenerator
   filters:
-    - DomainFilter
     - SubnameFilter
     - ValidNameFilter
 -
