@@ -1,5 +1,6 @@
 defaults:
   - pipelines: simple
+  - _self_
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
 app:

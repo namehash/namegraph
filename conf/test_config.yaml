@@ -1,5 +1,6 @@
 defaults:
   - pipelines: test
+  - _self_
 app:
   input: query
   # the list of the domains, that are already registered
