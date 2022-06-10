@@ -1,0 +1,38 @@
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GENSIM_DATA_DIR: ./cache/gensim
+      NLTK_DATA: ./cache/nltk
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install -e .
+      - name: Show installed dependencies
+        run: pip freeze
+      - name: Install flake8
+        run: |
+            pip install flake8
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Cache downloaded data
+        uses: actions/cache@v3
+        with:
+          path: ./cache
+          key: cache-v1.1
+      - name: Run tests
+        run: pytest -vv

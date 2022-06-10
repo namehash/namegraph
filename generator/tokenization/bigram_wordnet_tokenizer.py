@@ -1,4 +1,6 @@
 from typing import List, Tuple
+
+import nltk
 from nltk.corpus import wordnet as wn
 
 
@@ -6,6 +8,8 @@ class BigramWordnetTokenizer():
     """Tokenize concatenation of two words from WordNet."""
 
     def __init__(self, config):
+        nltk.download("wordnet")
+        nltk.download("omw-1.4")
         wn.synsets('dog')
 
     def tokenize(self, word: str) -> List[Tuple[str, ...]]:
