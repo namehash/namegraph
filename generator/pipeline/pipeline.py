@@ -8,6 +8,9 @@ from generator.tokenization import *
 from generator.generation import *
 from generator.filtering import *
 from generator.sorting import *
+from generator.filtering.subname_filter import SubnameFilter
+from generator.filtering.valid_name_filter import ValidNameFilter
+from generator.filtering.domain_filter import DomainFilter
 
 logger = logging.getLogger('generator')
 
@@ -48,7 +51,9 @@ class Pipeline:
 
         # the filters are applied sequentially
         for filter in self.filters:
+            logger.debug(f'{filter} filtering')
             suggestions = filter.apply(suggestions)
+            logger.debug(f'{filter} done')
 
         return suggestions
 

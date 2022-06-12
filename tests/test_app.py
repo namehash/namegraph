@@ -7,6 +7,14 @@ import pytest
 from pytest import mark
 from typing import List
 
+from generator.domains import Domains
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    Domains.remove_self()
+    yield
+
 
 @mark.parametrize(
     "overrides, expected",
@@ -25,6 +33,7 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
         assert 'secondary' in result
         assert 'advertised' in result
         assert 'random' in result
+
 
 @pytest.mark.slow
 @mark.parametrize(

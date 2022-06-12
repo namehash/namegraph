@@ -45,7 +45,8 @@ def generate(config: DictConfig) -> List[Dict[str, List[str]]]:
         end = timer()
         all_suggestions.append(suggestions)
         logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
-
+        print(suggestions)
+        
     return all_suggestions
 
 
