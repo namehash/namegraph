@@ -7,7 +7,20 @@ from generator.filtering import SubnameFilter, ValidNameFilter
 from generator.normalization.strip_eth_normalizer import strip_eth
 
 
-class Domains:
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+    def remove_self(cls):
+        if cls in cls._instances:
+            del cls._instances[cls]
+
+
+class Domains(metaclass=Singleton):
     def __init__(self, config):
         self.config = config
         self.subname_filter = SubnameFilter(config)
