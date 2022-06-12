@@ -26,3 +26,13 @@ def test_domains_filtering():
         assert '00002' not in domains.internet
         assert '000' in domains.secondary_market
         assert '002' not in domains.registered
+
+def test_domains_singleton():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        domains = Domains(config)
+        domains2 = Domains(config)
+        assert domains == domains2
+        Domains.remove_self()
+        domains3 = Domains(config)
+        assert domains3 != domains
