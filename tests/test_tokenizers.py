@@ -7,8 +7,9 @@ from generator.tokenization import (
     BigramDictionaryTokenizer
 )
 
-
 # repeatable, braverest, semisoft, chinamen
+from generator.tokenization.none_tokenizer import NoneTokenizer
+
 
 def test_two_word_wordnet_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
@@ -49,3 +50,11 @@ def test_word_ninja_tokenizer2():
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert ('york', 'new', 'york', '123') in tokenized_names
+
+
+def test_none_tokenizer():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        tokenizer = NoneTokenizer(config)
+        tokenized_names = tokenizer.tokenize('yorknewyork123')
+        assert [('yorknewyork123',)] == tokenized_names

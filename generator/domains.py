@@ -3,7 +3,9 @@ import random
 from pathlib import Path
 from typing import Set, Dict, List, Tuple
 
-from generator.filtering import SubnameFilter, ValidNameFilter
+# from generator.filtering import SubnameFilter, ValidNameFilter
+from generator.filtering.subname_filter import SubnameFilter
+from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.normalization.strip_eth_normalizer import strip_eth
 
 
@@ -31,10 +33,10 @@ class Domains(metaclass=Singleton):
         self.advertised: Dict[str, float] = self.read_json(config.app.advertised_names)
         self.internet: Set[str] = self.read_txt(config.app.internet_domains)
 
-        # for k in self.advertised:
-        #     self.secondary_market.pop(k, None)
-        # self.registered -= self.secondary_market.keys()
-        # self.registered -= self.advertised.keys()
+        for k in self.advertised:
+            self.secondary_market.pop(k, None)
+        self.registered -= self.secondary_market.keys()
+        self.registered -= self.advertised.keys()
 
         self.internet -= self.registered
         self.internet -= self.secondary_market.keys()

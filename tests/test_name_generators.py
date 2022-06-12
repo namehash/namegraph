@@ -13,6 +13,8 @@ from generator.generation import (
 
 import pytest
 
+from generator.generation.random_generator import RandomGenerator
+
 
 def test_permuter():
     with initialize(version_base=None, config_path="../conf/"):
@@ -123,3 +125,15 @@ def test_duplicated_categories():
         config = compose(config_name="test_config")
         strategy = CategoriesGenerator(config)
         assert len(strategy.categories) == 3
+
+
+def test_random():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = RandomGenerator(config)
+        tokenized_name = GeneratedName(('my', 'domain', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        assert len(
+            set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
+                                                           'wikipedia', 'qq',
+                                                           'twitter', 'live', 'global', '00002'}) == 9
