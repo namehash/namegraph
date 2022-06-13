@@ -1,9 +1,23 @@
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - CategoriesGenerator
+  filters:
+    - DomainFilter
+    - SubnameFilter
+    - ValidNameFilter
 -  
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -15,8 +29,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -29,8 +43,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -43,8 +57,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -57,8 +71,8 @@
   normalizers:
       - StripEthNormalizer
       - UnicodeNormalizer
-      - ReplaceInvalidNormalizer
       - NamehashNormalizer
+      - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -71,12 +85,26 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
     - W2VGenerator
+  filters:
+    - DomainFilter
+    - SubnameFilter
+    - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - RandomGenerator
   filters:
     - DomainFilter
     - SubnameFilter

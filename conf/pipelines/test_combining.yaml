@@ -2,8 +2,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:
@@ -15,8 +15,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - WordNinjaTokenizer
   generators:

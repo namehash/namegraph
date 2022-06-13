@@ -82,10 +82,3 @@ class Domains(metaclass=Singleton):
 
     def get_primary(self, remaining_suggestions: List[str]) -> List[str]:
         return [s for s in remaining_suggestions if s not in self.registered]
-
-    def get_random(self, remaining_suggestions: List[str]) -> List[str]:
-        result = list(self.internet - set(remaining_suggestions))
-        if len(result) >= self.config.app.suggestions:
-            result = random.sample(result, self.config.app.suggestions)
-
-        return result
