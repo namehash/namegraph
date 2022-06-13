@@ -15,6 +15,7 @@ app:
   logging_level: INFO
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
+  use_multiprocessing: false
 filtering:
   # List of already registered domains
   domains: tests/data/domains.head.csv

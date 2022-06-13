@@ -15,6 +15,7 @@ app:
   # by default no pipelines are defined
   categories: data/categories/
   logging_level: INFO
+  use_multiprocessing: false
 filtering:
   # List of already registered domains
   domains: data/domains.head.csv
