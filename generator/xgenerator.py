@@ -1,3 +1,4 @@
+import logging
 import random
 from itertools import zip_longest, chain
 from typing import List, Dict, Tuple
@@ -5,6 +6,8 @@ from typing import List, Dict, Tuple
 from generator.domains import Domains
 from generator.pipeline import Pipeline
 from omegaconf import DictConfig
+
+logger = logging.getLogger('generator')
 
 
 def by_one_iterator(lists):
@@ -31,7 +34,9 @@ class Generator():
         suggestions = []
 
         for pipeline in self.pipelines:
-            suggestions.append(pipeline.apply(name))
+            pipeline_suggestions = pipeline.apply(name)
+            logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
+            suggestions.append(pipeline_suggestions)
 
         combined_suggestions = list(by_one_iterator(suggestions))
 
@@ -40,10 +45,8 @@ class Generator():
         advertised, remaining_suggestions = self.domains.get_advertised(combined_suggestions)
         secondary, remaining_suggestions = self.domains.get_secondary(remaining_suggestions)
         primary = self.domains.get_primary(remaining_suggestions)
-        random_names = self.domains.get_random(combined_suggestions)
 
         results = {'advertised': advertised[:count],
                    'secondary': secondary[:count],
-                   'primary': primary[:count],
-                   'random': random_names[:count]}
+                   'primary': primary[:count]}
         return results

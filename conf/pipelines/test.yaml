@@ -2,8 +2,8 @@
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
-    - ReplaceInvalidNormalizer
     - NamehashNormalizer
+    - ReplaceInvalidNormalizer
   tokenizers:
     - BigramWordnetTokenizer
   generators:
