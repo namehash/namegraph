@@ -18,4 +18,5 @@ def test_basic_pipeline(overrides: List[str], expected: List[str]) -> None:
         config = compose(config_name="test_config", overrides=overrides)
         pipeline = Pipeline(config.pipelines[0], config)
         result = pipeline.apply(config.app.query)
+        result = [str(r) for r in result]
         assert len(set(result).intersection(set(expected))) == len(expected)

@@ -3,11 +3,14 @@ from typing import List, Tuple
 import nltk
 from nltk.corpus import wordnet as wn
 
+from .tokenizer import Tokenizer
 
-class BigramWordnetTokenizer():
+
+class BigramWordnetTokenizer(Tokenizer):
     """Tokenize concatenation of two words from WordNet."""
 
     def __init__(self, config):
+        super().__init__()
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         wn.synsets('dog')

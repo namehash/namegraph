@@ -1,0 +1,23 @@
+from typing import List, Tuple, Iterable
+
+from generator.generated_name import GeneratedName
+
+
+class Filter:
+
+    def __init__(self):
+        pass
+
+    def apply(self, tokenized_names: List[GeneratedName]) -> List[GeneratedName]:
+        result = []
+        for tokenized_name in tokenized_names:
+            if self.filter_name(str(tokenized_name)):
+                result.append(tokenized_name)
+                tokenized_name.applied_strategies += [self.__class__.__name__]
+        return result
+
+    def filter(self, names: Iterable[str]):
+        return [n for n in names if self.filter_name(n)]
+
+    def filter_name(self, name: str) -> bool:
+        raise NotImplementedError

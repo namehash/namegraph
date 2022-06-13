@@ -1,13 +1,15 @@
 from typing import Iterable
 
 from generator.domains import Domains
+from .filter import Filter
 
 
-class DomainFilter:
+class DomainFilter(Filter):
     """Filter registered domains."""
 
     def __init__(self, config):
+        super().__init__()
         self.domains = Domains(config)
 
-    def apply(self, names: Iterable[str]):
-        return [n for n in names if n not in self.domains.registered]
+    def filter_name(self, name: str) -> bool:
+        return name not in self.domains.registered

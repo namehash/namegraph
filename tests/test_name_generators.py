@@ -3,13 +3,13 @@ from hydra import initialize, compose
 
 from generator.generation import (
     PermuteGenerator,
-    GeneratedName,
     PrefixGenerator,
     SuffixGenerator,
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
 )
+from generator.generated_name import GeneratedName
 
 import pytest
 

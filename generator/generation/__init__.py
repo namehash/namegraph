@@ -1,4 +1,4 @@
-from .name_generator import GeneratedName, NameGenerator
+from .name_generator import NameGenerator
 
 from .permute_generator import PermuteGenerator
 from .prefix_generator import PrefixGenerator

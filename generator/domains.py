@@ -42,7 +42,7 @@ class Domains(metaclass=Singleton):
         self.internet -= self.secondary_market.keys()
         self.internet -= self.advertised.keys()
 
-        self.internet = set(self.validname_filter.apply(self.subname_filter.apply(self.internet)))
+        self.internet = set(self.validname_filter.filter(self.subname_filter.filter(self.internet)))
 
     def read_txt(self, path: str) -> Set[str]:
         domains: Set[str] = set()

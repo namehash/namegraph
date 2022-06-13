@@ -1,14 +1,17 @@
 import re
 from typing import List, Tuple
 
+from .tokenizer import Tokenizer
 
-class BigramDictionaryTokenizer():
+
+class BigramDictionaryTokenizer(Tokenizer):
     """Tokenize concatenation of two words from list of words."""
 
     # TODO: make recursive
     # TODO: use trie
 
     def __init__(self, config):
+        super().__init__()
         path = config.tokenization.dictionary
         self.words = set()
         with open(path) as f:

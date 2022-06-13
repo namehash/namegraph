@@ -1,11 +1,13 @@
 from typing import List, Tuple
 
+from .tokenizer import Tokenizer
 
-class NoneTokenizer():
+
+class NoneTokenizer(Tokenizer):
     """Return the input withopout tokenization."""
 
     def __init__(self, config):
-        pass
+        super().__init__()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
         return [(name,)]
