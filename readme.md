@@ -75,15 +75,15 @@ python generator/app.py app.input=stdin app.logging_level=DEBUG
 
 Set image TAG:
 
-`export TAG=0.1.0
+`export TAG=0.1.0`
 
 Build a Docker image locally
 
 `docker compose -f docker-compose.build.yml build`
 
-Authorize to Amazon:
+Authorize to Amazon (if you are using MFA you have to take temporary ACCESS keys from AWS STS):
 
-aws-conf xxxxxx (MFA code)
+`aws configure`
 
 Authorize to ECR:
 
