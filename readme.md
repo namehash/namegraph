@@ -68,3 +68,37 @@ Run app with `app.logging_level=DEBUG` to see debug information:
 ```
 python generator/app.py app.input=stdin app.logging_level=DEBUG
 ```
+
+# Deployment
+
+## Build Docker image locally
+
+Set image TAG:
+
+`export TAG=0.1.0
+
+Build a Docker image locally
+
+`docker compose -f docker-compose.build.yml build`
+
+Authorize to Amazon:
+
+aws-conf xxxxxx (MFA code)
+
+Authorize to ECR:
+
+`./authorize-ecr.sh`
+
+Push image to ECR:
+
+`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+
+## Deploy image on remote instance
+
+Authorize EC2 instance in ECR:
+
+`aws ecr get-login-password | docker login --username AWS --password-stdin 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator`
+
+(Re-Deploy) image:
+
+`docker compose up -d`
