@@ -1,4 +1,4 @@
 version: "3.9"
 services:
   generator:
-    image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:0.1.0
+    image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
