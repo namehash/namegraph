@@ -106,3 +106,7 @@ Authorize EC2 instance in ECR:
 (Re-Deploy) image:
 
 `docker compose up -d`
+
+Check if service works:
+
+`curl -d '{"name":"firestarter"}' -H "Content-Type: application/json" -X POST http://44.203.61.202`
