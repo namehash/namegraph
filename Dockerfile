@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip3 install -e .
+RUN pip3 install --no-cache-dir -e .
 
 RUN python3 generator/download.py
 
