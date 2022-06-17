@@ -3,6 +3,14 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
+from generator.domains import Domains
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    Domains.remove_self()
+    yield
+
 
 def test_read_main():
     os.environ['CONFIG_NAME'] = 'test_config'
