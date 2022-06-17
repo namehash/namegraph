@@ -31,14 +31,14 @@ class Pipeline:
             word = normalizer.normalize(word)
 
         # the tokenizers are applied in parallel
-        decomposition_set: Set[Tuple[str]] = set()
+        decomposition_set = {}
         for tokenizer in self.tokenizers:
-            decomposition_set.update(tokenizer.tokenize(word))
+            decomposition_set.update(dict.fromkeys(tokenizer.tokenize(word)))
 
         logger.debug(f'Tokenization: {decomposition_set}')
 
         # the generators are applied sequentially
-        suggestions = dict.fromkeys(decomposition_set)
+        suggestions = decomposition_set
         for generator in self.generators:
             generator_suggestions = {}
             for decomposition in suggestions:

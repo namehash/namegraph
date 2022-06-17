@@ -1,0 +1,33 @@
+defaults:
+  - pipelines: prod
+  - _self_
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
+app:
+  # read input from argument (query) or stdin
+  input: query
+  # the list of the domains, that are already registered
+  domains: data/domains.sorted.csv
+  # the query the names are generated for
+  query: mydomain
+  # the number of generated suggestions (TODO: implement)
+  suggestions: 100
+  # by default no pipelines are defined
+  categories: data/categories/
+  logging_level: INFO
+  secondary_market_names: data/empty.json
+  advertised_names: data/empty.json
+  internet_domains: data/top_internet_names.txt
+filtering:
+  # List of already registered domains
+  domains: data/domains.sorted.csv
+  subnames: data/subnames.txt
+  root_path: ./
+tokenization:
+  dictionary: tests/data/words.txt
+generation:
+  word2vec_model: glove-twitter-25
+  suffixes_path: data/suffixes.txt
+  prefixes_path: data/prefixes.txt
+  limit: 10000
+  
