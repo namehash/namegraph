@@ -1,0 +1,79 @@
+#-
+#  normalizers:
+#    - StripEthNormalizer
+#    - UnicodeNormalizer
+#    - NamehashNormalizer
+#    - ReplaceInvalidNormalizer
+#  tokenizers:
+#    - NoneTokenizer
+#  generators:
+#    - CategoriesGenerator
+#  filters:
+#    - SubnameFilter
+#    - ValidNameFilter
+-  
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PermuteGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PrefixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SuffixGenerator
+  filters:
+    - DomainFilter
+    - SubnameFilter
+    - ValidNameFilter
+-  
+  normalizers:
+      - StripEthNormalizer
+      - UnicodeNormalizer
+      - NamehashNormalizer
+      - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - WordnetSynonymsGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+#-
+#  normalizers:
+#    - StripEthNormalizer
+#    - UnicodeNormalizer
+#    - NamehashNormalizer
+#    - ReplaceInvalidNormalizer
+#  tokenizers:
+#    - WordNinjaTokenizer
+#  generators:
+#    - W2VGenerator
+#  filters:
+#    - SubnameFilter
+#    - ValidNameFilter
