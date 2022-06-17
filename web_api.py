@@ -25,7 +25,7 @@ generator = init()
 
 @app.get("/")
 async def root(name: str):
-    return generator.generate_names(name, 10)
+    return generator.generate_names(name)
 
 
 class Name(BaseModel):
@@ -34,4 +34,4 @@ class Name(BaseModel):
 
 @app.post("/")
 async def root(name: Name):
-    return generator.generate_names(name.name, 10)
+    return generator.generate_names(name.name)
