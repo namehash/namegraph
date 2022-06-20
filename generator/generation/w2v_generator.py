@@ -29,7 +29,7 @@ class W2VGenerator(NameGenerator):
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        topn = int(10000 ** (1 / len(tokens)) + 1)
+        topn = int(10000 ** (1 / max(len(tokens),1)) + 1)
 
         tokens_synsets = []
         for token in tokens:
