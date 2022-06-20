@@ -33,7 +33,7 @@ class W2VGenerator(NameGenerator):
                 tokens_synsets.append([(token, 1.0)])
 
         synset_lengths = [len(synset) for synset in tokens_synsets]
-        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        combinations = prod(synset_lengths)
         logger.debug(f'Word2vec synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
             f'Word2vec synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in tokens_synsets]}')

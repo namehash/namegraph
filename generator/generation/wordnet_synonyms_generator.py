@@ -7,7 +7,7 @@ from typing import List, Dict, Tuple
 import itertools
 import collections
 
-from .combination_limiter import CombinationLimiter
+from .combination_limiter import CombinationLimiter, prod
 from .name_generator import NameGenerator
 
 logger = logging.getLogger('generator')
@@ -32,7 +32,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         synsets = self.combination_limiter.limit(synsets)
 
         synset_lengths = [len(synset) for synset in synsets]
-        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        combinations = prod(synset_lengths)
         logger.debug(f'Wordnet synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(f'Wordnet synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in synsets]}')
 
