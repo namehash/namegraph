@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from fastapi import FastAPI
 from hydra import initialize, compose
@@ -31,15 +32,21 @@ def init():
 generator = init()
 
 
-@app.get("/")
-async def root(name: str):
-    return generator.generate_names(name)
-
-
 class Name(BaseModel):
     name: str
 
 
-@app.post("/")
+class Result(BaseModel):
+    advertised: List[str] = []
+    secondary: List[str] = []
+    primary: List[str] = []
+    
+
+@app.get("/", response_model=Result)
+async def root(name: str):
+    return generator.generate_names(name)
+
+
+@app.post("/", response_model=Result)
 async def root(name: Name):
     return generator.generate_names(name.name)
