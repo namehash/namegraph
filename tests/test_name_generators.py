@@ -124,7 +124,7 @@ def test_duplicated_categories():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = CategoriesGenerator(config)
-        assert len(strategy.categories) == 3
+        assert len(strategy.categories) == 2
 
 
 def test_random():
