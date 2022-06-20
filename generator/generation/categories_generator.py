@@ -6,7 +6,7 @@ from functools import reduce
 from pathlib import Path
 from typing import List, Dict, Tuple
 from . import NameGenerator
-from .combination_limiter import CombinationLimiter
+from .combination_limiter import CombinationLimiter, prod
 
 logger = logging.getLogger('generator')
 
@@ -62,7 +62,7 @@ class CategoriesGenerator(NameGenerator):
         tokens_synsets = self.combination_limiter.limit(tokens_synsets)
 
         synset_lengths = [len(synset) for synset in tokens_synsets]
-        combinations = reduce((lambda x, y: x * y), synset_lengths)
+        combinations = prod(synset_lengths)
         logger.debug(f'CategoriesGenerator synsets lengths: {synset_lengths} gives {combinations}')
         logger.debug(
             f'CategoriesGenerator synsets: {[[synset_tuple[0] for synset_tuple in synset][:100] for synset in tokens_synsets]}')
