@@ -13,8 +13,13 @@ logger = logging.getLogger('generator')
 
 def load_categories(config):
     categories = collections.defaultdict(list)
+
+    ignored = [line.strip() for line in open(config.app.categories_ignored)]
     pattern = str(Path(config.app.categories) / '**/*.*')
     for path in glob.iglob(pattern, recursive=True):
+        if any([i in path for i in ignored]): 
+            logger.debug(f'Ignore category {path}')
+            continue
         if path.endswith('.txt'):
             with open(path) as category_file:
                 for line in category_file:

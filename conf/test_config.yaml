@@ -12,6 +12,7 @@ app:
   # the pipelines used to generate the suggestions
   # Make sure the required class is imported in generator/pipeline/pipeline.py
   categories: tests/data/categories/
+  categories_ignored: tests/data/categories/ignore.txt
   logging_level: INFO
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.

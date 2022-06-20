@@ -1,0 +1,10 @@
+ignore.txt
+20kWords/20kWordClub.txt
+20kWords/Prepunk.txt
+ens-collections/pre-punk-club.csv
+ens-collections/english-nouns.csv
+ens-collections/english-verbs.csv
+ens-collections/english-adjectives.csv
+20kWords/TopDomains.txt
+ens-collections/4-letter-dictionary.csv
+ens-collections/5-letter-dictionary.csv

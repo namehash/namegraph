@@ -1,16 +1,16 @@
-#-
-#  normalizers:
-#    - StripEthNormalizer
-#    - UnicodeNormalizer
-#    - NamehashNormalizer
-#    - ReplaceInvalidNormalizer
-#  tokenizers:
-#    - NoneTokenizer
-#  generators:
-#    - CategoriesGenerator
-#  filters:
-#    - SubnameFilter
-#    - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - CategoriesGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
 -  
   normalizers:
     - StripEthNormalizer

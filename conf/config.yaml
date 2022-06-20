@@ -14,6 +14,7 @@ app:
   suggestions: 10
   # by default no pipelines are defined
   categories: data/categories/
+  categories_ignored: data/categories/ignore.txt
   logging_level: INFO
   secondary_market_names: data/secondary.json
   advertised_names: data/advertised.json
