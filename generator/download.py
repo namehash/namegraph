@@ -1,8 +1,7 @@
 import hydra
 from omegaconf import DictConfig
 import gensim.downloader as api
-import gensim
-from generator.generation import W2VGenerator, WordnetSynonymsGenerator
+from generator.generation import WordnetSynonymsGenerator
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")

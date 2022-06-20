@@ -76,9 +76,13 @@ class Generator():
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
+        self.init_objects()
+
+    def init_objects(self):
+        Domains(self.config)
+
     def generate_names(self, name: str) -> Dict[str, List[str]]:
         count = self.config.app.suggestions
-
         result = Result(self.config)
 
         for pipeline in self.pipelines:
