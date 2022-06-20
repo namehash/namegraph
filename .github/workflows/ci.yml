@@ -34,5 +34,7 @@ jobs:
         with:
           path: ./cache
           key: cache-v1.1
+      - name: Download data
+        run: python3 generator/download.py
       - name: Run tests
         run: pytest -vv
