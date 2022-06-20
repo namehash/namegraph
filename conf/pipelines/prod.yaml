@@ -48,7 +48,6 @@
   generators:
     - SuffixGenerator
   filters:
-    - DomainFilter
     - SubnameFilter
     - ValidNameFilter
 -  
@@ -64,16 +63,16 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
-#-
-#  normalizers:
-#    - StripEthNormalizer
-#    - UnicodeNormalizer
-#    - NamehashNormalizer
-#    - ReplaceInvalidNormalizer
-#  tokenizers:
-#    - WordNinjaTokenizer
-#  generators:
-#    - W2VGenerator
-#  filters:
-#    - SubnameFilter
-#    - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - W2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
