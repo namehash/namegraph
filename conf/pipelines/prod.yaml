@@ -11,6 +11,19 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SecondaryMatcher
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
 -  
   normalizers:
     - StripEthNormalizer
