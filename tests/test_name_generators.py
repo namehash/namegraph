@@ -14,6 +14,7 @@ from generator.generation import (
 import pytest
 
 from generator.generation.random_generator import RandomGenerator
+from generator.generation.secondary_matcher import SecondaryMatcher
 
 
 def test_permuter():
@@ -137,3 +138,17 @@ def test_random():
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
                                                            'wikipedia', 'qq',
                                                            'twitter', 'live', 'global', '00002'}) == 9
+
+
+def test_secondary_matcher():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SecondaryMatcher(config)
+        tokenized_name = GeneratedName(('pay', 'fire', '123'))
+        generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
+        assert ('pay', 'share') in [x.tokens for x in generated_names]
+        assert ('pay', 'fix') in [x.tokens for x in generated_names]
+        assert ('pay', 'green') in [x.tokens for x in generated_names]
+        assert ('pay', 'trust') in [x.tokens for x in generated_names]
+        assert ('fire',) in [x.tokens for x in generated_names]
