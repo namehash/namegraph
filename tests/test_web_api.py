@@ -27,6 +27,20 @@ def test_read_main():
     primary = json['primary']
     assert "discharge" in primary
 
+def test_get():
+    os.environ['CONFIG_NAME'] = 'test_config'
+    import web_api
+
+    client = TestClient(web_api.app)
+    response = client.get("/?name=firę")
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
+
+    primary = json['primary']
+    assert "discharge" in primary
 
 @pytest.mark.slow
 def test_prod():
