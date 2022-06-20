@@ -1,4 +1,5 @@
 import logging
+import sys
 from functools import reduce
 from typing import List, Dict, Tuple
 import gensim.downloader
@@ -19,7 +20,12 @@ class W2VGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__()
-        self.model = gensim.downloader.load(config.generation.word2vec_model)
+        # self.model = gensim.downloader.load(config.generation.word2vec_model)
+        try:
+            self.model = gensim.models.keyedvectors.KeyedVectors.load('data/embeddings.pkl')
+        except FileNotFoundError as e:
+            print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
+            raise FileNotFoundError('No embeddings in binary format. Run generator/download.py.')
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:

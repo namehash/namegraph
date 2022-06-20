@@ -9,7 +9,6 @@
   generators:
     - PrefixGenerator
   filters:
-    - DomainFilter
     - ValidNameFilter
 - 
   normalizers:
