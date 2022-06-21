@@ -1,3 +1,4 @@
+import csv
 import json
 import random
 from pathlib import Path
@@ -28,10 +29,10 @@ class Domains(metaclass=Singleton):
         self.subname_filter = SubnameFilter(config)
         self.validname_filter = ValidNameFilter(config)
 
-        self.registered: Set[str] = self.read_txt(Path(config.filtering.root_path) / config.filtering.domains)
-        self.secondary_market: Dict[str, float] = self.read_json(config.app.secondary_market_names)
-        self.advertised: Dict[str, float] = self.read_json(config.app.advertised_names)
-        self.internet: Set[str] = self.read_txt(config.app.internet_domains)
+        self.registered: Set[str] = self.read_csv(Path(config.filtering.root_path) / config.filtering.domains)
+        self.secondary_market: Dict[str, float] = self.read_csv_with_prices(config.app.secondary_market_names)
+        self.advertised: Dict[str, float] = self.read_csv_with_prices(config.app.advertised_names)
+        self.internet: Set[str] = self.read_csv(config.app.internet_domains)
 
         for k in self.advertised:
             self.secondary_market.pop(k, None)
@@ -43,6 +44,28 @@ class Domains(metaclass=Singleton):
         self.internet -= self.advertised.keys()
 
         self.internet = set(self.validname_filter.apply(self.subname_filter.apply(self.internet)))
+
+    def read_csv(self, path: str) -> Set[str]:
+        domains: Set[str] = set()
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            for row in reader:
+                assert len(row) == 1
+                name = strip_eth(row[0])
+                domains.add(name)
+        return domains
+
+    def read_csv_with_prices(self, path: str) -> Dict[str, float]:
+        names_prices: Dict[str, float] = {}
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            for row in reader:
+                assert len(row) == 2
+                name = strip_eth(row[0])
+                names_prices[name] = float(row[1])
+        return names_prices
 
     def read_txt(self, path: str) -> Set[str]:
         domains: Set[str] = set()
