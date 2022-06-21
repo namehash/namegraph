@@ -1,5 +1,13 @@
+import pytest
+
 from generator.domains import Domains
 from hydra import compose, initialize
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    Domains.remove_self()
+    yield
 
 
 def test_domains():
@@ -26,6 +34,7 @@ def test_domains_filtering():
         assert '00002' not in domains.internet
         assert '000' in domains.secondary_market
         assert '002' not in domains.registered
+
 
 def test_domains_singleton():
     with initialize(version_base=None, config_path="../conf/"):

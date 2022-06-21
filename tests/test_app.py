@@ -26,8 +26,9 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
-        assert len(result['primary']) >= 100
+        primary=[str(gn) for gn in result['primary']]
+        assert len(set(primary).intersection(set(expected))) == len(expected)
+        assert len(primary) >= 100
 
         assert 'primary' in result
         assert 'secondary' in result
@@ -47,8 +48,9 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
-        assert len(result['primary']) == cfg.app.suggestions
+        primary = [str(gn) for gn in result['primary']]
+        assert len(set(primary).intersection(set(expected))) == len(expected)
+        assert len(primary) == cfg.app.suggestions
 
 
 @mark.parametrize(
@@ -62,8 +64,9 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
         result = generate(cfg, )[0]
-        assert len(set(result['primary']).intersection(set(expected))) == len(expected)
-        assert len(result['primary']) >= 100
+        primary = [str(gn) for gn in result['primary']]
+        assert len(set(primary).intersection(set(expected))) == len(expected)
+        assert len(primary) >= 100
 
 
 @mark.parametrize(
@@ -76,7 +79,8 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result['advertised']).intersection(set(expected))) == len(expected)
+        advertised = [str(gn) for gn in result['advertised']]
+        assert len(set(advertised).intersection(set(expected))) == len(expected)
 
 
 @mark.parametrize(
@@ -89,4 +93,5 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        assert len(set(result['secondary']).intersection(set(expected))) == len(expected)
+        secondary = [str(gn) for gn in result['secondary']]
+        assert len(set(secondary).intersection(set(expected))) == len(expected)

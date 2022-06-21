@@ -2,6 +2,8 @@ from typing import Tuple
 
 
 class GeneratedName:
+    __slots__ = ['tokens', 'applied_strategies']
+
     def __init__(self, tokens: Tuple[str, ...], applied_strategies=None):
         self.tokens = tokens
         if applied_strategies is None:
@@ -14,3 +16,6 @@ class GeneratedName:
 
     def __repr__(self):
         return self.__str__()
+
+    def __json__(self):
+        return ''.join(self.tokens)

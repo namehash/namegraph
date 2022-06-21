@@ -1,11 +1,12 @@
 import logging
-from typing import List
+from typing import List, Dict
 
 from fastapi import FastAPI
 from hydra import initialize, compose
 from pydantic import BaseModel
 from pydantic import BaseSettings
 
+from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
@@ -40,13 +41,22 @@ class Result(BaseModel):
     advertised: List[str] = []
     secondary: List[str] = []
     primary: List[str] = []
-    
+
+
+def convert_to_str(result: Dict[str, List[GeneratedName]]):
+    for list_name, gns in result.items():
+        result[list_name] = [str(gn) for gn in gns]
+
 
 @app.get("/", response_model=Result)
 async def root(name: str):
-    return generator.generate_names(name)
+    result = generator.generate_names(name)
+    convert_to_str(result)
+    return result
 
 
 @app.post("/", response_model=Result)
 async def root(name: Name):
-    return generator.generate_names(name.name)
+    result = generator.generate_names(name.name)
+    convert_to_str(result)
+    return result
