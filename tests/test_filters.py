@@ -14,9 +14,9 @@ def test_domain_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = DomainFilter(config)
-        filtered = filter.apply(['00002', '00003'])
+        filtered = filter.apply(['00002', '000436'])
         assert '00002' not in filtered
-        assert '00003' in filtered
+        assert '000436' in filtered
 
 
 def test_subname_filter():

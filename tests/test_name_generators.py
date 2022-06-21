@@ -134,10 +134,11 @@ def test_random():
         strategy = RandomGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
         generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
         assert len(
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
                                                            'wikipedia', 'qq',
-                                                           'twitter', 'live', 'global', '00002'}) == 9
+                                                           'twitter', 'live', 'global', '00002'}) == 8
 
 
 def test_secondary_matcher():

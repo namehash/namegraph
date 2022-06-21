@@ -7,7 +7,7 @@ app:
   # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered
-  domains: data/domains.sorted.csv
+  domains: data/primary.csv
   # the query the names are generated for
   query: mydomain
   # the number of generated suggestions (TODO: implement)
@@ -16,12 +16,12 @@ app:
   categories: data/categories/
   categories_ignored: data/categories/ignore.txt
   logging_level: INFO
-  secondary_market_names: data/empty.json
-  advertised_names: data/empty.json
-  internet_domains: data/top_internet_names.txt
+  secondary_market_names: data/secondary.csv
+  advertised_names: data/empty.csv
+  internet_domains: data/top_internet_names.csv
 filtering:
   # List of already registered domains
-  domains: data/domains.sorted.csv
+  domains: data/primary.csv
   subnames: data/subnames.txt
   root_path: ./
 tokenization:
