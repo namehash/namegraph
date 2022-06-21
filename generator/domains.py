@@ -67,23 +67,6 @@ class Domains(metaclass=Singleton):
                 names_prices[name] = float(row[1])
         return names_prices
 
-    def read_txt(self, path: str) -> Set[str]:
-        domains: Set[str] = set()
-        with open(path) as domains_file:
-            for line in domains_file:
-                domain = strip_eth(line.strip())
-                domains.add(domain)
-        return domains
-
-    def read_json(self, path: str) -> Dict[str, float]:
-        names_prices: Dict[str, float] = json.load(open(path))
-        names_prices = {strip_eth(name): price for name, price in names_prices.items()}
-        # names = self.subname_filter.apply(names_prices.keys())
-
-        # result = {name: names_prices[name] for name in names}
-
-        return names_prices
-
     def split(self, suggestions: List[str], to_match: Dict[str, float]):
         matched: Dict[str, float] = {}
         remaining_suggestions: List[str] = []
