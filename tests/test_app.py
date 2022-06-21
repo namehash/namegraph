@@ -33,6 +33,8 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
         assert 'secondary' in result
         assert 'advertised' in result
 
+        assert 'wikipedia' in result['primary']  # from random
+
 
 @pytest.mark.slow
 @mark.parametrize(

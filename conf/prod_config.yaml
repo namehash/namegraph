@@ -31,4 +31,13 @@ generation:
   suffixes_path: data/suffixes.txt
   prefixes_path: data/prefixes.txt
   limit: 10000
-  
+random_pipeline:
+  normalizers:
+    - StripEthNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - RandomGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
