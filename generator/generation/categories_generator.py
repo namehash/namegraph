@@ -2,7 +2,6 @@ import csv
 import glob
 import itertools, collections
 import logging
-from functools import reduce
 from pathlib import Path
 from typing import List, Dict, Tuple
 from . import NameGenerator
