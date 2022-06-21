@@ -1,12 +1,10 @@
 import logging
 import sys
-from functools import reduce
 from typing import List, Dict, Tuple
 import gensim.downloader
 import itertools
 
-from .combination_limiter import CombinationLimiter
-from numpy import prod
+from .combination_limiter import CombinationLimiter, prod
 
 from .name_generator import NameGenerator
 
@@ -29,7 +27,7 @@ class W2VGenerator(NameGenerator):
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        topn = int(10000 ** (1 / max(len(tokens),1)) + 1)
+        topn = int(10000 ** (1 / max(len(tokens), 1)) + 1)
 
         tokens_synsets = []
         for token in tokens:
