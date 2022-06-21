@@ -17,18 +17,20 @@ def load_categories(config):
     ignored = [line.strip() for line in open(config.app.categories_ignored)]
     pattern = str(Path(config.app.categories) / '**/*.*')
     for path in glob.iglob(pattern, recursive=True):
-        if any([i in path for i in ignored]): 
+        if any([i in path for i in ignored]):
             logger.debug(f'Ignore category {path}')
             continue
         if path.endswith('.txt'):
             with open(path) as category_file:
                 for line in category_file:
-                    categories[path].append(line.strip())
+                    name = line.strip()
+                    if name: categories[path].append(name)
         elif path.endswith('.csv'):
             with open(path, newline='') as csvfile:
                 reader = csv.reader(csvfile)
                 for row in reader:
-                    categories[path].append(row[0].strip())
+                    name = row[0].strip()
+                    if name: categories[path].append(name)
         else:
             logger.warning(f"Categories cannot be read from file: {path}")
     return categories

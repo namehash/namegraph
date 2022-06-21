@@ -24,7 +24,7 @@ def test_iterator_uniq():
 @mark.parametrize(
     "overrides",
     [
-        (["app.query=dog", "pipelines=test_combining"]),
+        (["app.query=dog", "app.suggestions=4", "pipelines=test_combining"]),
     ],
 )
 def test_pipeline_override(overrides: List[str]) -> None:

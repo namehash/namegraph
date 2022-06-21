@@ -76,6 +76,8 @@ class Generator():
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
+        self.random_pipeline = Pipeline(self.config.random_pipeline, self.config)
+
         self.init_objects()
 
     def init_objects(self):
@@ -92,6 +94,16 @@ class Generator():
 
         result.split()
         advertised, secondary, primary = result.combine()
+
+        if len(primary) < count:
+            # generate using random pipeline
+            logger.debug('Generate random')
+            random_suggestions = self.random_pipeline.apply(name)
+            result_random = Result(self.config)
+            result_random.add_pipeline_suggestions(random_suggestions)
+            result_random.split()
+            _, _, random_names = result_random.combine()
+            primary += random_names
 
         results = {'advertised': advertised[:count],
                    'secondary': secondary[:count],
