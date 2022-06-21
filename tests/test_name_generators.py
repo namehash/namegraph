@@ -148,8 +148,8 @@ def test_secondary_matcher():
         tokenized_name = GeneratedName(('pay', 'fire', '123'))
         generated_names = strategy.apply(tokenized_name)
         print(generated_names)
-        assert ('pay', 'share') in [x.tokens for x in generated_names]
-        assert ('pay', 'fix') in [x.tokens for x in generated_names]
-        assert ('pay', 'green') in [x.tokens for x in generated_names]
-        assert ('pay', 'trust') in [x.tokens for x in generated_names]
+        assert ('payshare',) in [x.tokens for x in generated_names]
+        assert ('payfix',) in [x.tokens for x in generated_names]
+        assert ('paygreen',) in [x.tokens for x in generated_names]
+        assert ('paytrust',) in [x.tokens for x in generated_names]
         assert ('fire',) in [x.tokens for x in generated_names]

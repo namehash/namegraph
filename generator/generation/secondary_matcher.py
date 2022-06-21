@@ -20,7 +20,7 @@ class SecondaryMatcher(NameGenerator):
         for name in self.domains.secondary_market:
             tokenized = tuple(wordninja.split(name))
             for token in tokenized:
-                self.index[token].add(tokenized)
+                self.index[token].add((name,))
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
