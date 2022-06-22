@@ -19,6 +19,10 @@ app:
   secondary_market_names: tests/data/secondary.csv
   advertised_names: tests/data/advertised.csv
   internet_domains: tests/data/top_internet_names.csv
+  primary_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/primary.csv
+  secondary_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/secondary.csv
+  advertised_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/advertised.json
+  subnames_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/subnames.txt
 filtering:
   # List of already registered domains
   domains: tests/data/primary.csv
