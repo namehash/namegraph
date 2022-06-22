@@ -8,3 +8,8 @@ ens-collections/english-adjectives.csv
 20kWords/TopDomains.txt
 ens-collections/4-letter-dictionary.csv
 ens-collections/5-letter-dictionary.csv
+20kWords/LastNames.txt
+20kWords/TopCelebrityTwitters.txt
+20kWords/Fortune1000Domains.txt
+ens-collections/3-letters.csv
+20kWords/ThreeLetterClub.txt
