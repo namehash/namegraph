@@ -1,13 +1,17 @@
+import sys
+
 import hydra
 from omegaconf import DictConfig
+import urllib.request
 
 
 def download_names(config):
-    import urllib.request
+    print('Downloading names', file=sys.stderr)
     urllib.request.urlretrieve(config.app.primary_url, config.app.domains)
     urllib.request.urlretrieve(config.app.secondary_url, config.app.secondary_market_names)
     urllib.request.urlretrieve(config.app.advertised_url, config.app.advertised_names)
     urllib.request.urlretrieve(config.app.subnames_url, config.filtering.subnames)
+    print('Downloaded names', file=sys.stderr)
     # urllib.request.urlcleanup()
 
 
