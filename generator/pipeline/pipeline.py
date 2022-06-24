@@ -26,6 +26,8 @@ class Pipeline:
         self._build()
 
     def apply(self, word: str):
+        input_word = word
+
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
             word = normalizer.normalize(word)
@@ -54,6 +56,9 @@ class Pipeline:
             logger.debug(f'{filter} filtering')
             suggestions = filter.apply(suggestions)
             logger.debug(f'{filter} done')
+
+        # remove input name from suggestions
+        suggestions = [s for s in suggestions if s != input_word]
 
         return suggestions
 

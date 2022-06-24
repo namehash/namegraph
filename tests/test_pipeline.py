@@ -19,3 +19,4 @@ def test_basic_pipeline(overrides: List[str], expected: List[str]) -> None:
         pipeline = Pipeline(config.pipelines[0], config)
         result = pipeline.apply(config.app.query)
         assert len(set(result).intersection(set(expected))) == len(expected)
+        assert config.app.query not in result
