@@ -11,6 +11,7 @@ def download_names(config):
     urllib.request.urlretrieve(config.app.secondary_url, config.app.secondary_market_names)
     urllib.request.urlretrieve(config.app.advertised_url, config.app.advertised_names)
     urllib.request.urlretrieve(config.app.subnames_url, config.filtering.subnames)
+    urllib.request.urlretrieve(config.app.clubs_url, config.app.clubs)
     print('Downloaded names', file=sys.stderr)
     # urllib.request.urlcleanup()
 
