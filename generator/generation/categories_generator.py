@@ -10,6 +10,17 @@ from .combination_limiter import CombinationLimiter, prod
 
 logger = logging.getLogger('generator')
 
+def load_categories_from_csv(config):
+    path=config.app.clubs
+    categories = collections.defaultdict(list)
+    with open(path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)
+        for row in reader:
+            assert len(row) == 2
+            name, category = row
+            categories[category].append(name)
+    return categories
 
 def load_categories(config):
     categories = collections.defaultdict(list)
@@ -53,8 +64,8 @@ class CategoriesGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__()
-        self.categories: Dict[str, List[str]] = load_categories(config)
-        remove_duplicated_categories(self.categories)
+        self.categories: Dict[str, List[str]] = load_categories_from_csv(config)
+        # remove_duplicated_categories(self.categories)
 
         self.inverted_categories = collections.defaultdict(list)
         for category, tokens in self.categories.items():

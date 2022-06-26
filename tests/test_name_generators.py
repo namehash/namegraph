@@ -121,13 +121,6 @@ def test_categories_csv():
         assert ('my', '0x2', '123') in [x.tokens for x in generated_names]
 
 
-def test_duplicated_categories():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        strategy = CategoriesGenerator(config)
-        assert len(strategy.categories) == 2
-
-
 def test_random():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
