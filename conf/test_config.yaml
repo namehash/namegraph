@@ -1,5 +1,6 @@
 defaults:
   - pipelines: test
+  - inspector: prod
   - _self_
 app:
   input: query
