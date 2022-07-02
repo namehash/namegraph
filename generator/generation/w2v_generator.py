@@ -20,7 +20,7 @@ class W2VGenerator(NameGenerator):
         super().__init__()
         # self.model = gensim.downloader.load(config.generation.word2vec_model)
         try:
-            self.model = gensim.models.keyedvectors.KeyedVectors.load('data/embeddings.pkl')
+            self.model = gensim.models.keyedvectors.KeyedVectors.load(config.generation.word2vec_path)
         except FileNotFoundError as e:
             print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
             raise FileNotFoundError('No embeddings in binary format. Run generator/download.py.')

@@ -4,14 +4,23 @@ import hydra
 from omegaconf import DictConfig
 import urllib.request
 
+from pathlib import Path
+
+
+def download_file(url, path, override=True):
+    print('Downloading?', url, path, file=sys.stderr)
+    if not Path(path).exists() or override:
+        print('Downloading', url, path, file=sys.stderr)
+        urllib.request.urlretrieve(url, path)
+
 
 def download_names(config):
     print('Downloading names', file=sys.stderr)
-    urllib.request.urlretrieve(config.app.primary_url, config.app.domains)
-    urllib.request.urlretrieve(config.app.secondary_url, config.app.secondary_market_names)
-    urllib.request.urlretrieve(config.app.advertised_url, config.app.advertised_names)
-    urllib.request.urlretrieve(config.app.subnames_url, config.filtering.subnames)
-    urllib.request.urlretrieve(config.app.clubs_url, config.app.clubs)
+    download_file(config.app.primary_url, config.app.domains)
+    download_file(config.app.secondary_url, config.app.secondary_market_names)
+    download_file(config.app.advertised_url, config.app.advertised_names)
+    download_file(config.app.subnames_url, config.filtering.subnames)
+    download_file(config.app.clubs_url, config.app.clubs)
     print('Downloaded names', file=sys.stderr)
     # urllib.request.urlcleanup()
 

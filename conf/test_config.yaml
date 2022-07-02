@@ -31,10 +31,13 @@ filtering:
 tokenization:
   dictionary: tests/data/words.txt
 generation:
-  word2vec_model: glove-twitter-25
+  word2vec_url: https://namegen-resources-dgpstnjyliwzhlhp.s3.amazonaws.com/embeddings.pkl
+  word2vec_path: data/embeddings.pkl
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
   limit: 10000
+  wikipedia2vec_url:
+  wikipedia2vec_path: tests/data/wikipedia2vec.pkl
 random_pipeline:
   normalizers:
     - StripEthNormalizer

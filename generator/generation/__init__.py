@@ -8,3 +8,4 @@ from .w2v_generator import W2VGenerator
 from .categories_generator import CategoriesGenerator
 from .random_generator import RandomGenerator
 from .secondary_matcher import SecondaryMatcher
+from .wikipedia2v_generator import Wikipedia2VGenerator

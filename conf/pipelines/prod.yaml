@@ -89,3 +89,16 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - Wikipedia2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter

@@ -9,6 +9,7 @@ from generator.generation import (
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
+    Wikipedia2VGenerator,
 )
 
 import pytest
@@ -146,3 +147,13 @@ def test_secondary_matcher():
         assert ('paygreen',) in [x.tokens for x in generated_names]
         assert ('paytrust',) in [x.tokens for x in generated_names]
         assert ('fire',) in [x.tokens for x in generated_names]
+
+
+def test_wikipedia2vsimilarity():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = Wikipedia2VGenerator(config)
+        tokenized_name = GeneratedName(('billy', 'corgan'))
+        generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
+        assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]
