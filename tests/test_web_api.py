@@ -43,12 +43,19 @@ def test_get():
     primary = json['primary']
     assert "discharge" in primary
 
-
-def test_get_namehash():
+@pytest.fixture(scope="module")
+def prod_test_client():
+    # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config'
     import web_api
-
+    import importlib
+    importlib.reload(web_api)
     client = TestClient(web_api.app)
+    return client
+    
+@pytest.mark.slow
+def test_get_namehash(prod_test_client):
+    client = prod_test_client
     response = client.get("/?name=[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth")
 
     assert response.status_code == 200
@@ -59,15 +66,10 @@ def test_get_namehash():
     primary = json['primary']
 
 
+    
 @pytest.mark.slow
-def test_prod():
-    os.environ['CONFIG_NAME'] = 'prod_config'
-
-    import web_api
-    import importlib
-    importlib.reload(web_api)
-
-    client = TestClient(web_api.app)
+def test_prod(prod_test_client):
+    client = prod_test_client
     response = client.post("/", json={"name": "fire"})
 
     assert response.status_code == 200
