@@ -2,3 +2,5 @@ version: "3.9"
 services:
   generator:
     image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+    ports:
+      - 80:8000
