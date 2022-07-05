@@ -2,8 +2,6 @@ import regex
 from omegaconf import DictConfig
 
 
-
-
 class Confusables:
     """https://www.unicode.org/Public/security/latest/confusablesSummary.txt"""
 
@@ -18,7 +16,7 @@ class Confusables:
             # print(line)
             confusable = line.split('\t')
             # print(confusable)
-            confusable = [c for c  in confusable if len(c)==1]
+            confusable = [c for c in confusable if len(c) == 1]
             self.confusable_sets.append(confusable)
 
         self.confusable_chars = {}
@@ -30,19 +28,25 @@ class Confusables:
                 self.confusable_chars[char] = confusable_set[0]
 
     def build(self):
-        """Build confusables dict by iterrating over all characters and stripping accents."""
+        """Build confusables dict by iterating over all characters and stripping accents."""
+        pass
+
+    def is_confusable(self, character):
+        if regex.match(r'[a-z0-9-]', character):
+            return False
+        return character in self.confusable_chars
+
+    def get_confusables(self, character):
+        if self.is_confusable(character):
+            return self.confusable_chars[character]
+        else:
+            return None
+
+    def get_canonical(self, character):
+        if self.is_confusable(character):
+            return self.confusable_chars[character][0]
+        else:
+            return None
 
     def analyze(self, character):
-        if regex.match(r'[a-z0-9-]', character):
-            return False, None
-        
-        # without_accents=remove_accents(character)
-        
-        
-        is_confusable = character in self.confusable_chars
-        if is_confusable:
-            confusables = self.confusable_chars[character]
-            canonical = confusables[0]
-            return is_confusable, canonical
-        else:
-            return False, None
+        return self.is_confusable(character), self.get_canonical(character)
