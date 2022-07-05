@@ -212,4 +212,4 @@ class Features:
         for c, func in self.classes_config.items():
             if func(name):
                 result.append(c)
-        return tuple(result)  # TODO
+        return result

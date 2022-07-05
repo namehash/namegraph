@@ -27,23 +27,46 @@ class Inspector:
     def __init__(self, config: DictConfig):
         self.config = config
         self.f = Features(config)
+        self.aggregate_config = {
+            'any_emoji': ('is_emoji', 'any'),
+            'any_invisible': ('is_invisible', 'any'),
+            'all_unicodeblock': ('unicodeblock', 'all'),
+            'any_confusable': ('confusable', 'any'),
+        }
         self.features_config: Dict[str, Dict[str, Tuple[Callable, bool]]] = {
             'string': {
+                'name': (self.f.name, True),
                 'length': (self.f.length, True),
                 'emoji_count': (self.f.emoji_count, False),
                 'bytes': (self.f.bytes, False),
+                'all_class': (self.f.classes, True),
+                'script': (self.f.script_name, True),
+                'all_letter': (self.f.is_letter, True),
+                'all_number': (self.f.is_number, True),
+                'all_emoji': (self.f.is_emoji, True),
+                'all_basic': (self.f.latin_alpha_numeric, True),
             },
             'char': {
+                'char': (self.f.name, True),
+                'script': (self.f.script_name, True),
+                'name': (self.f.unicodedata_name, True),
+                'codepoint': (self.f.codepoint_hex, True),
+                'link': (self.f.link, True),
+                'class': (self.f.classes, True),
+
+                'is_letter': (self.f.is_letter, True),
+                'is_number': (self.f.is_number, True),
+                'is_hyphen': (self.f.is_hyphen, True),
+                'is_emoji': (self.f.is_emoji, True),
+                'is_basic': (self.f.latin_alpha_numeric, True),
+                'is_invisible': (self.f.invisible, True),
+
                 'latin-alpha': (self.f.latin_alpha, True),
                 'numeric': (self.f.numeric, True),
                 'latin-alpha-numeric': (self.f.latin_alpha_numeric, True),
-                'is_basic': (self.f.simple, True),
-                'is_emoji': (self.f.is_emoji, True),
                 'simple-emoji': (self.f.simple_emoji, True),
-                'is_letter': (self.f.is_letter, True),
                 'zwj': (self.f.zwj, True),
                 'zwnj': (self.f.zwnj, True),
-                'unicodedata.name': (self.f.unicodedata_name, True),
                 'unicodedata.category': (self.f.unicodedata_category, True),
                 'unicodedata.bidirectional': (self.f.unicodedata_bidirectional, True),
                 'unicodedata.combining': (self.f.unicodedata_combining, True),
@@ -54,29 +77,21 @@ class Inspector:
                 'confusable_with': (self.f.get_confusables, True),
                 'canonical': (self.f.get_canonical, True),
                 'ascii': (self.f.is_ascii, False),
-                'codepoint': (self.f.codepoint, True),
                 'codepoint_int': (self.f.codepoint_int, False),
-                'codepoint_hex': (self.f.codepoint_hex, False),
-                'link': (self.f.link, True),
-                'name': (self.f.name, True),
+                'codepoint_hex': (self.f.codepoint, False),
                 'bytes': (self.f.bytes, False),
                 'unidecode': (self.f.unidecode, True),
                 'NFKD_ascii': (self.f.NFKD_ascii, True),
                 'NFD_ascii': (self.f.NFD_ascii, True),
                 'NFKD': (self.f.NFKD, True),
                 'NFD': (self.f.NFD, True),
-                'is_invisible': (self.f.invisible, True),
-                'script_name': (self.f.script_name, True),
-                'is_hyphen': (self.f.is_hyphen, True),
-                'is_number': (self.f.is_number, True),
-                'class': (self.f.classes, True),
             },
             'token': {},
-            'confusables': {
+            'confusable': {
                 'char': (self.f.name, True),
-                'script_name': (self.f.script_name, True),
-                'unicodedata.name': (self.f.unicodedata_name, True),
-                'codepoint': (self.f.codepoint, True),
+                'script': (self.f.script_name, True),
+                'name': (self.f.unicodedata_name, True),
+                'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
                 'class': (self.f.classes, True),
             },
@@ -101,22 +116,52 @@ class Inspector:
 
         return result
 
+    def analyze_confusable(self, name):
+        result = {}
+        for feature, (func, in_filtering) in self.features_config['confusable'].items():
+            if in_filtering: result[feature] = func(name)
+
+        return result
+
+    def agg(self, vs, mode):
+        if all([isinstance(x, bool) for x in vs]):
+            if mode == 'all':
+                return all(vs)
+            elif mode == 'any':
+                return any(vs)
+        else:
+            try:
+                if len(set(vs)) == 1:
+                    return vs[0]
+                else:
+                    return None
+            except TypeError:
+                pass
+        return None
+
     def aggregate(self, characters_analysis):
+
         result = collections.defaultdict(list)
         for char_analysis in characters_analysis:
             for k, v in char_analysis.items():
                 result[k].append(v)
 
         aggregated = {}
-        for k, vs in result.items():
-            if all([isinstance(x, bool) for x in vs]):
-                aggregated[f'allTrue_{k}'] = all(vs)
-                aggregated[f'anyTrue_{k}'] = any(vs)
-            else:
-                if len(set(vs)) == 1:
-                    aggregated[f'all_{k}'] = vs[0]
-                else:
-                    aggregated[f'all_{k}'] = None
+        for name, (feature, mode) in self.aggregate_config.items():
+            aggregated[name] = self.agg(result[feature], mode)
+
+        # for k, vs in result.items():
+        #     if all([isinstance(x, bool) for x in vs]):
+        #         aggregated[f'allTrue_{k}'] = all(vs)
+        #         aggregated[f'anyTrue_{k}'] = any(vs)
+        #     else:
+        #         try:
+        #             if len(set(vs)) == 1:
+        #                 aggregated[f'all_{k}'] = vs[0]
+        #             else:
+        #                 aggregated[f'all_{k}'] = None
+        #         except TypeError:
+        #             pass
         return aggregated
 
     # TODO: valid according to ens
@@ -132,17 +177,24 @@ class Inspector:
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
             # char_analysis['index'] = i
+            confusable_chars_analysis = []
+            for confusable_char in char_analysis['confusable_with']:
+                confusable_char_analysis = self.analyze_confusable(confusable_char)
+                confusable_chars_analysis.append(confusable_char_analysis)
+            char_analysis['confusable_with'] = confusable_chars_analysis
             chars_analysis.append(char_analysis)
         name_analysis['chars'] = chars_analysis
 
-        tokenized = wordninja.split(name)
-        name_analysis['tokens'] = len(tokenized)
-        tokens_analysis = []
-        for i, token in enumerate(tokenized):  # TODO: wordninja is ok?
-            token_analysis = self.analyze_string(token)
-            token_analysis['index'] = i
-            tokens_analysis.append(token_analysis)
-        name_analysis['tokens'] = tokens_analysis
+        tokenizeds = [wordninja.split(name)]
+        # name_analysis['tokens'] = len(tokenized)
+        name_analysis['tokens'] = []
+        for tokenized in tokenizeds:
+            tokens_analysis = []
+            for i, token in enumerate(tokenized):  # TODO: wordninja is ok?
+                token_analysis = self.analyze_string(token)
+                # token_analysis['index'] = i
+                tokens_analysis.append(token_analysis)
+            name_analysis['tokens'].append(tokens_analysis)
 
         aggregated = self.aggregate(chars_analysis)
         name_analysis['aggregated'] = aggregated
