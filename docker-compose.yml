@@ -4,3 +4,8 @@ services:
     image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
     ports:
       - 80:8000
+    healthcheck:
+      test: "wget -qO- http://127.0.0.1:8000/?name=dog > /dev/null || exit 1"
+      interval: 100s
+      timeout: 10s
+      retries: 3
