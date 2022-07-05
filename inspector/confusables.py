@@ -25,7 +25,7 @@ class Confusables:
                 if not char: continue
                 # if char in self.confusable_chars:
                 #     print('warning', [char, self.confusable_chars[char], confusable_set])
-                self.confusable_chars[char] = confusable_set[0]
+                self.confusable_chars[char] = confusable_set
 
     def build(self):
         """Build confusables dict by iterating over all characters and stripping accents."""
@@ -40,7 +40,7 @@ class Confusables:
         if self.is_confusable(character):
             return self.confusable_chars[character]
         else:
-            return None
+            return ()
 
     def get_canonical(self, character):
         if self.is_confusable(character):
