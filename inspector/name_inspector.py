@@ -1,21 +1,17 @@
 import collections
 import unicodedata
+from typing import Dict, Callable, List, Tuple
 
 import hydra
-import regex
-import unicodeblock.blocks
 
 # print(ens.main.ENS.is_valid_name('🅜🅜🅜.eth'))
 import wordninja
 from omegaconf import DictConfig
-from unidecode import unidecode
-
-from inspector.confusables import Confusables
-from emoji import emoji_count, unicode_codes
-
 
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
 # cat Scripts.txt | grep -v -P "^#" | cut -d ";" -f 2 | cut -d ' ' -f 2 | sort -u > script_names.txt
+from inspector.features import Features
+
 
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
@@ -30,67 +26,78 @@ def strip_accents(s):
 class Inspector:
     def __init__(self, config: DictConfig):
         self.config = config
-        emojis = sorted(unicode_codes.EMOJI_DATA, key=len, reverse=True)
-        emoji_pattern = u'(' + u'|'.join(regex.escape(u) for u in emojis) + u')'
-        _EMOJI_REGEXP = regex.compile(emoji_pattern)
-        EMOJI_REGEXP_AZ09 = regex.compile('^(' + emoji_pattern + '|[a-z0-9-])+$')
+        self.f = Features(config)
+        self.features_config: Dict[str, Dict[str, Tuple[Callable, bool]]] = {
+            'string': {
+                'length': (self.f.length, True),
+                'emoji_count': (self.f.emoji_count, False),
+                'bytes': (self.f.bytes, False),
+            },
+            'char': {
+                'latin-alpha': (self.f.latin_alpha, True),
+                'numeric': (self.f.numeric, True),
+                'latin-alpha-numeric': (self.f.latin_alpha_numeric, True),
+                'is_basic': (self.f.simple, True),
+                'is_emoji': (self.f.is_emoji, True),
+                'simple-emoji': (self.f.simple_emoji, True),
+                'is_letter': (self.f.is_letter, True),
+                'zwj': (self.f.zwj, True),
+                'zwnj': (self.f.zwnj, True),
+                'unicodedata.name': (self.f.unicodedata_name, True),
+                'unicodedata.category': (self.f.unicodedata_category, True),
+                'unicodedata.bidirectional': (self.f.unicodedata_bidirectional, True),
+                'unicodedata.combining': (self.f.unicodedata_combining, True),
+                'unicodedata.mirrored': (self.f.unicodedata_mirrored, True),
+                'unicodedata.decomposition': (self.f.unicodedata_decomposition, True),
+                'unicodeblock': (self.f.unicodeblock, True),
+                'confusable': (self.f.is_confusable, True),
+                'confusable_with': (self.f.get_confusables, True),
+                'canonical': (self.f.get_canonical, True),
+                'ascii': (self.f.is_ascii, False),
+                'codepoint': (self.f.codepoint, True),
+                'codepoint_int': (self.f.codepoint_int, False),
+                'codepoint_hex': (self.f.codepoint_hex, False),
+                'link': (self.f.link, True),
+                'name': (self.f.name, True),
+                'bytes': (self.f.bytes, False),
+                'unidecode': (self.f.unidecode, True),
+                'NFKD_ascii': (self.f.NFKD_ascii, True),
+                'NFD_ascii': (self.f.NFD_ascii, True),
+                'NFKD': (self.f.NFKD, True),
+                'NFD': (self.f.NFD, True),
+                'is_invisible': (self.f.invisible, True),
+                'script_name': (self.f.script_name, True),
+                'is_hyphen': (self.f.is_hyphen, True),
+                'is_number': (self.f.is_number, True),
+                'class': (self.f.classes, True),
+            },
+            'token': {},
+            'confusables': {
+                'char': (self.f.name, True),
+                'script_name': (self.f.script_name, True),
+                'unicodedata.name': (self.f.unicodedata_name, True),
+                'codepoint': (self.f.codepoint, True),
+                'link': (self.f.link, True),
+                'class': (self.f.classes, True),
+            },
 
-        self.regexp_patterns = {
-            'latin-alpha': '^[a-z]+$',
-            'numeric': '^[0-9]+$',
-            'latin-alpha-numeric': '^[a-z0-9]+$',
-            'simple': '^[a-z0-9-]+$',
-            'emoji': emoji_pattern,
-            'simple-emoji': '^(' + emoji_pattern + '|[a-z0-9-])+$',
-            'literals': r'^\p{Ll}+$',  # include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
         }
+        # TODO: MODE: filtering, ML
 
-        self.script_names = [line.strip() for line in open(config.inspector.script_names)]
-        self.confusables = Confusables(config)
+        # name of feature, function, if in filtering mode
 
     def analyze_string(self, name):
-        result = self.analyze_both(name)
-        result['chars'] = len(name)
-        # result['emoji_count'] = emoji_count(name)
+        result = {}
+
+        for feature, (func, in_filtering) in self.features_config['string'].items():
+            if in_filtering: result[feature] = func(name)
 
         return result
 
     def analyze_character(self, name):
-        result = self.analyze_both(name)
-
-        # result['ascii'] = self._is_ascii(name)
-
-        for pattern_name, pattern in self.regexp_patterns.items():
-            result[pattern_name] = bool(regex.match(pattern, name, regex.UNICODE)) #TODO flags
-
-        result['script_name'] = None
-        for script_name in self.script_names:
-            if regex.match(r'^\p{' + script_name + r'}+$', name):
-                result['script_name'] = script_name
-
-        result['zwj'] = '‍' == name
-        result['zwnj'] = '‌' == name
-
-        try:
-            result['unicodedata.name'] = unicodedata.name(name)
-        except ValueError:
-            result['unicodedata.name'] = None
-        result['unicodedata.category'] = unicodedata.category(name)
-        result['unicodedata.bidirectional'] = unicodedata.bidirectional(name)
-        result['unicodedata.combining'] = unicodedata.combining(name)
-        result['unicodedata.mirrored'] = unicodedata.mirrored(name)
-        result['unicodedata.decomposition'] = unicodedata.decomposition(name)
-        result['unicodeblock'] = unicodeblock.blocks.of(name)
-
-        is_confusable, canonical = self.confusables.analyze(name)
-        result['confusables'] = is_confusable
-        result['canonical'] = canonical
-
-        # TODO codepoint
-        result['codepoint'] = ord(name)
-        result['codepoint_hex'] = hex(ord(name))
-
-        result['link'] = f'https://unicode.link/codepoint/{ord(name):x}'
+        result = {}
+        for feature, (func, in_filtering) in self.features_config['char'].items():
+            if in_filtering: result[feature] = func(name)
 
         return result
 
@@ -112,27 +119,6 @@ class Inspector:
                     aggregated[f'all_{k}'] = None
         return aggregated
 
-    @staticmethod
-    def _is_ascii(name):
-        try:
-            name.encode('ascii')
-            return True
-        except UnicodeEncodeError:
-            return False
-
-    def analyze_both(self, name):
-        result = {}
-        result['name'] = name
-        result['bytes'] = len(name.encode('utf-8'))
-
-        result['unidecode'] = unidecode(name, errors='ignore')
-        result['NFKD_ascii'] = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('utf-8')
-        result['NFD_ascii'] = unicodedata.normalize('NFD', name).encode('ascii', 'ignore').decode('utf-8')
-        result['NFKD'] = unicodedata.normalize('NFKD', name)
-        result['NFD'] = unicodedata.normalize('NFD', name)
-
-        return result
-
     # TODO: valid according to ens
 
     # TODO token analysis
@@ -145,9 +131,9 @@ class Inspector:
         chars_analysis = []
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
-            char_analysis['index'] = i
+            # char_analysis['index'] = i
             chars_analysis.append(char_analysis)
-        name_analysis['characters_analysis'] = chars_analysis
+        name_analysis['chars'] = chars_analysis
 
         tokenized = wordninja.split(name)
         name_analysis['tokens'] = len(tokenized)
@@ -156,7 +142,7 @@ class Inspector:
             token_analysis = self.analyze_string(token)
             token_analysis['index'] = i
             tokens_analysis.append(token_analysis)
-        name_analysis['tokens_analysis'] = tokens_analysis
+        name_analysis['tokens'] = tokens_analysis
 
         aggregated = self.aggregate(chars_analysis)
         name_analysis['aggregated'] = aggregated
