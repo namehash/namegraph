@@ -10,6 +10,7 @@ from omegaconf import DictConfig
 
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
 # cat Scripts.txt | grep -v -P "^#" | cut -d ";" -f 2 | cut -d ' ' -f 2 | sort -u > script_names.txt
+from generator.tokenization import AllTokenizer
 from inspector.features import Features
 
 
@@ -100,6 +101,7 @@ class Inspector:
         # TODO: MODE: filtering, ML
 
         # name of feature, function, if in filtering mode
+        self.tokenizer=AllTokenizer(config)
 
     def analyze_string(self, name):
         result = {}
@@ -185,7 +187,8 @@ class Inspector:
             chars_analysis.append(char_analysis)
         name_analysis['chars'] = chars_analysis
 
-        tokenizeds = [wordninja.split(name)]
+        # tokenizeds = [wordninja.split(name)]
+        tokenizeds = self.tokenizer.tokenize(name)
         # name_analysis['tokens'] = len(tokenized)
         name_analysis['tokens'] = []
         for tokenized in tokenizeds:
