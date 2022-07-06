@@ -4,9 +4,10 @@ import ahocorasick
 
 
 class DFS:
-    def __init__(self, automaton, name):
+    def __init__(self, automaton, name, skip_non_words=False):
         self.automaton = automaton
         self.name = name
+        self.skip_non_words = skip_non_words
 
         # create graph
         self.g_out = collections.defaultdict(list)
@@ -36,11 +37,12 @@ class DFS:
             for end in self.g_out[index]:
                 self.dfs(end, result + [(index, end)])
 
-        for potential_index in self.g_out.keys():
-            if potential_index <= index: continue
-            if index == 0 and potential_index == len(self.name): continue
-            if potential_index not in self.g_in:
-                self.dfs(potential_index, result + [(index, potential_index)])
+        if not self.skip_non_words:
+            for potential_index in self.g_out.keys():
+                if potential_index <= index: continue
+                if index == 0 and potential_index == len(self.name): continue
+                if potential_index not in self.g_in:
+                    self.dfs(potential_index, result + [(index, potential_index)])
 
 
 class AllTokenizer():
@@ -48,17 +50,20 @@ class AllTokenizer():
 
     def __init__(self, config):
         path = config.tokenization.dictionary
-        self.automaton = ahocorasick.Automaton()
+        self.skip_non_words = config.tokenization.skip_non_words
 
+        self.automaton = ahocorasick.Automaton()
+        skip_one_letter_words = config.tokenization.skip_one_letter_words
         with open(path) as f:
             for line in f:
                 word = line.strip().lower()
+                if skip_one_letter_words and len(word) == 1: continue
                 # if re.match(r'^\w+$', word):
                 self.automaton.add_word(word, word)
 
         self.automaton.make_automaton()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
-        dfs = DFS(self.automaton, name)
+        dfs = DFS(self.automaton, name, self.skip_non_words)
         tokenizations = list(dfs.all_paths())
         return tokenizations

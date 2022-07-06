@@ -1,3 +1,6 @@
+from typing import List
+
+from pytest import mark
 from hydra import initialize, compose
 
 from generator.tokenization import (
@@ -60,10 +63,71 @@ def test_none_tokenizer():
         assert [('yorknewyork123',)] == tokenized_names
 
 
-def test_all_tokenizer():
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=false", "tokenization.skip_non_words=false"]),
+    ],
+)
+def test_all_tokenizer(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="config")
+        config = compose(config_name="test_config", overrides=overrides)
         tokenizer = AllTokenizer(config)
-        tokenized_names = tokenizer.tokenize('yorknewŁyork123')
+        tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 455 tokenizations
+        print(len(tokenized_names))
         assert ('york', 'new', 'Ł', 'york', '123',) in tokenized_names
+        assert ('y', 'o', 'r', 'k', 'new', 'Ł', 'york', '123',) in tokenized_names
         assert ('yorknewŁyork123',) not in tokenized_names
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=true", "tokenization.skip_non_words=false"]),
+    ],
+)
+def test_all_tokenizer_skip_one_letter_words(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        tokenizer = AllTokenizer(config)
+        tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 63 tokenizations
+
+        assert ('york', 'new', 'Ł', 'york', '123',) in tokenized_names
+        assert ('y', 'o', 'r', 'k', 'new', 'Ł', 'york', '123',) not in tokenized_names
+        assert ('yorknewŁyork123',) not in tokenized_names
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=false", "tokenization.skip_non_words=true"]),
+    ],
+)
+def test_all_tokenizer_skip_non_words(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        tokenizer = AllTokenizer(config)
+        tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 0 tokenizations
+        assert tokenized_names == []
+
+        tokenized_names = tokenizer.tokenize('laptop')  # 13 tokenizations
+        assert ('laptop',) in tokenized_names
+        assert ('lap', 'top',) in tokenized_names
+        assert ('l', 'a', 'p', 'top',) in tokenized_names
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=true", "tokenization.skip_non_words=true"]),
+    ],
+)
+def test_all_tokenizer_skip_one_letter_words_and_non_words(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        tokenizer = AllTokenizer(config)
+        tokenized_names = tokenizer.tokenize('laptop')  # 2 tokenizations
+        
+        assert ('laptop',) in tokenized_names
+        assert ('lap', 'top',) in tokenized_names
+        assert ('l', 'a', 'p', 'top',) not in tokenized_names
