@@ -118,7 +118,7 @@ class Features:
             return None
 
     def unicodedata_category(self, name):
-        """Returns the general category assigned to the character."""
+        """Returns the general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table"""
         return unicodedata.category(name)
 
     def unicodedata_bidirectional(self, name):
