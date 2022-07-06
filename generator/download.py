@@ -15,6 +15,9 @@ def download_convert_embeddings(model):
     model.save('data/embeddings.pkl')
     del model
 
+def download_spacy(config):
+    from spacy.cli.download import download
+    download('en_core_web_sm')
 
 def download_embeddings(url, path):
     download_file(url, path, override=False)
@@ -28,6 +31,7 @@ def init(config: DictConfig):
     # download_convert_embeddings(config.generation.word2vec_model)
     download_embeddings(config.generation.word2vec_url, config.generation.word2vec_path)
     download_embeddings(config.generation.wikipedia2vec_url, config.generation.wikipedia2vec_path)
+    download_spacy(config)
 
 
 if __name__ == "__main__":
