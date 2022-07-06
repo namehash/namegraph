@@ -2,6 +2,7 @@ import unicodedata
 from typing import Dict, Callable
 
 import regex
+import spacy
 import unicodeblock.blocks
 from emoji import unicode_codes
 from emoji.core import emoji_count
@@ -43,6 +44,20 @@ class Features:
 
         self.script_names = [line.strip() for line in open(config.inspector.script_names)]
         self.confusables = Confusables(config)
+
+        self.nlp = spacy.load('en_core_web_sm')
+
+        self.dictionary = set()
+        skip_one_letter_words = config.tokenization.skip_one_letter_words
+        with open(config.tokenization.dictionary) as f:
+            for line in f:
+                word = line.strip().lower()
+                if skip_one_letter_words and len(word) == 1: continue
+                # if re.match(r'^\w+$', word):
+                self.dictionary.add(word)
+        if config.tokenization.add_letters_ias:
+            for char in 'ias':
+                self.dictionary.add(char)
 
     def length(self, name):
         """Returns number of Unicode chars in the string."""
@@ -179,6 +194,22 @@ class Features:
 
     def name(self, name):
         return name
+
+    # def lemma(self, name):
+    #     """Returns lemma of word."""
+    #     sentence = self.nlp(name)
+    #     for word in sentence:
+    #         print([word.text, word.lemma_, word.pos_])
+    # 
+    #     return name
+    # 
+    # def pos(self, name):
+    #     """Returns part of speech of word."""
+    #     return name
+
+    def in_dictionary(self, name):
+        """Checks if string is in dictionary."""
+        return name in self.dictionary
 
     def bytes(self, name):
         """Number of bytes in UTF8 encoding."""

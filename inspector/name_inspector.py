@@ -3,7 +3,8 @@ import unicodedata
 from typing import Dict, Callable, List, Tuple
 
 import hydra
-
+import spacy
+from spacy.tokens import Doc
 # print(ens.main.ENS.is_valid_name('🅜🅜🅜.eth'))
 import wordninja
 from omegaconf import DictConfig
@@ -46,6 +47,7 @@ class Inspector:
                 'all_number': (self.f.is_number, True),
                 'all_emoji': (self.f.is_emoji, True),
                 'all_basic': (self.f.latin_alpha_numeric, True),
+                'in_dictionary': (self.f.in_dictionary, True),
             },
             'char': {
                 'char': (self.f.name, True),
@@ -87,7 +89,22 @@ class Inspector:
                 'NFKD': (self.f.NFKD, True),
                 'NFD': (self.f.NFD, True),
             },
-            'token': {},
+            'token': {
+                'token': (self.f.name, True),
+                'length': (self.f.length, True),
+                'all_class': (self.f.classes, True),
+                'script': (self.f.script_name, True),
+                'all_letter': (self.f.is_letter, True),
+                'all_number': (self.f.is_number, True),
+                'all_emoji': (self.f.is_emoji, True),
+                'all_basic': (self.f.latin_alpha_numeric, True),
+                'in_dictionary': (self.f.in_dictionary, True),
+                # 'lemma': (self.f.lemma, True),
+                # 'pos': (self.f.pos, True),
+                # 'tense': (self.f.name, True),
+                # 'wiki-entities': (self.f.name, True),
+                # 'categories': (self.f.name, True),
+            },
             'confusable': {
                 'char': (self.f.name, True),
                 'script': (self.f.script_name, True),
@@ -98,15 +115,32 @@ class Inspector:
             },
 
         }
+        # “token”:”laptop”,
+        # “lemma”:”laptop”,
+        # “parts - of - speech”:”noun, verb”,
+        # “tense”:”???”,
+        # “wiki - entities”:”a, b, c, d???”,
+        # “categories”:”???”
+
         # TODO: MODE: filtering, ML
 
         # name of feature, function, if in filtering mode
-        self.tokenizer=AllTokenizer(config)
+        self.tokenizer = AllTokenizer(config)
+
+        self.nlp = spacy.load("en_core_web_sm")
 
     def analyze_string(self, name):
         result = {}
 
         for feature, (func, in_filtering) in self.features_config['string'].items():
+            if in_filtering: result[feature] = func(name)
+
+        return result
+
+    def analyze_token(self, name):
+        result = {}
+
+        for feature, (func, in_filtering) in self.features_config['token'].items():
             if in_filtering: result[feature] = func(name)
 
         return result
@@ -193,15 +227,30 @@ class Inspector:
         name_analysis['tokens'] = []
         for tokenized in tokenizeds:
             tokens_analysis = []
-            for i, token in enumerate(tokenized):  # TODO: wordninja is ok?
-                token_analysis = self.analyze_string(token)
+            for i, token in enumerate(tokenized):
+                token_analysis = self.analyze_token(token)
                 # token_analysis['index'] = i
                 tokens_analysis.append(token_analysis)
+
+            # TODO spacy on tokenized form
+            self.spacy(tokens_analysis)
+
             name_analysis['tokens'].append(tokens_analysis)
 
         aggregated = self.aggregate(chars_analysis)
         name_analysis['aggregated'] = aggregated
         return name_analysis
+
+    def spacy(self, tokens_analysis):
+        tokens = [token_analysis['token'] for token_analysis in tokens_analysis]
+        # print(tokens)
+
+        doc = Doc(self.nlp.vocab, tokens)
+        for token, token_analysis in zip(self.nlp(doc), tokens_analysis):
+            # print(token.text, token.pos_, token.dep_, token.lemma_)
+            token_analysis['pos'] = token.pos_
+            token_analysis['lemma'] = token.lemma_
+            token_analysis['dep'] = token.dep_
 
 
 # for name in names:
@@ -215,7 +264,7 @@ def main(config: DictConfig):
     print('Unicode version', unicodedata.unidata_version)
 
     names = ['🅜🅜🅜', 'ന്‌മ', 'a‌b.eth', '1a〆.eth', 'аррӏе.eth', 'as', '.', 'ASD', 'Bloß.de', 'xn--0.pt', 'u¨.com',
-             'a⒈com', 'a_a', 'a👍a', 'a‍a', 'łąść', 'ᴄeo', 'ǉeto', 'pаypаl', 'ѕсоре']
+             'a⒈com', 'a_a', 'a👍a', 'a‍a', 'łąść', 'ᴄeo', 'ǉeto', 'pаypаl', 'ѕсоре', 'laptop']
 
     inspector = Inspector(config)
     for name in names:
