@@ -31,6 +31,8 @@ filtering:
   root_path: ./
 tokenization:
   dictionary: /usr/share/dict/words
+  skip_one_letter_words: false
+  skip_non_words: false
 generation:
   word2vec_url: https://namegen-resources-dgpstnjyliwzhlhp.s3.amazonaws.com/embeddings.pkl
   word2vec_path: data/embeddings.pkl
