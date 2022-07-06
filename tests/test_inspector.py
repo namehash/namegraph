@@ -34,6 +34,7 @@ def test_confusable():
             'ś': (True, 's'),
             'ó': (True, 'o'),
             'ź': (True, 'z'),
+            'ł': (True, 'l'),
             'ώ': (True, 'ω'),
             'ῴ': (True, 'ω'),
             'ω': (True, 'ω'),
@@ -41,6 +42,7 @@ def test_confusable():
             's': (False, None),
             '1': (False, None),
             'l': (False, None),
+            '⒀': (True, None),
         }
         # chars.update({'ł':'l','ό':'o'}) #dont work
         for char, expected in chars.items():
