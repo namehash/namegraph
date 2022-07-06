@@ -127,7 +127,33 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words(overrides: List[str])
         config = compose(config_name="test_config", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('laptop')  # 2 tokenizations
-        
+
         assert ('laptop',) in tokenized_names
         assert ('lap', 'top',) in tokenized_names
         assert ('l', 'a', 'p', 'top',) not in tokenized_names
+
+        tokenized_names = tokenizer.tokenize('ilaptop')
+        assert ('i', 'laptop',) in tokenized_names
+        assert ('i', 'lap', 'top',) in tokenized_names
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=true", "tokenization.skip_non_words=true",
+          "tokenization.add_letters_ias=false"]),
+    ],
+)
+def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        tokenizer = AllTokenizer(config)
+        tokenized_names = tokenizer.tokenize('laptop')  # 2 tokenizations
+
+        assert ('laptop',) in tokenized_names
+        assert ('lap', 'top',) in tokenized_names
+        assert ('l', 'a', 'p', 'top',) not in tokenized_names
+
+        tokenized_names = tokenizer.tokenize('ilaptop')
+        assert ('i', 'laptop',) not in tokenized_names
+        assert ('i', 'lap', 'top',) not in tokenized_names

@@ -61,6 +61,10 @@ class AllTokenizer():
                 # if re.match(r'^\w+$', word):
                 self.automaton.add_word(word, word)
 
+        if config.tokenization.add_letters_ias:
+            for char in 'ias':
+                self.automaton.add_word(char, char)
+
         self.automaton.make_automaton()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:

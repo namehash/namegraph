@@ -31,8 +31,9 @@ filtering:
   root_path: ./
 tokenization:
   dictionary: tests/data/words.txt
-  skip_one_letter_words: false
-  skip_non_words: false
+  skip_one_letter_words: true
+  skip_non_words: true
+  add_letters_ias: true
 generation:
   word2vec_url: embeddings.pkl
   word2vec_path: data/embeddings.pkl
