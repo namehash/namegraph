@@ -34,6 +34,9 @@ class Inspector:
             'all_unicodeblock': ('unicodeblock', 'all'),
             'any_confusable': ('confusable', 'any'),
         }
+        # TODO: MODE: filtering, ML
+
+        # name of feature, function, if in filtering mode
         self.features_config: Dict[str, Dict[str, Tuple[Callable, bool]]] = {
             'string': {
                 'name': (self.f.name, True),
@@ -125,9 +128,7 @@ class Inspector:
         # “wiki - entities”:”a, b, c, d???”,
         # “categories”:”???”
 
-        # TODO: MODE: filtering, ML
 
-        # name of feature, function, if in filtering mode
         self.tokenizer = AllTokenizer(config)
 
         self.nlp = spacy.load("en_core_web_sm")
@@ -203,9 +204,6 @@ class Inspector:
         #             pass
         return aggregated
 
-    # TODO: valid according to ens
-
-    # TODO token analysis
 
     # assume we got normalized and valid name
     def analyse_name(self, name: str):
@@ -280,8 +278,3 @@ def main(config: DictConfig):
 
 if __name__ == "__main__":
     main()
-
-# TODO: And for each token, in each possible tokenization, to also include some metadata fields.
-# TODO: documentation of fields
-# TODO: ZWJ in emojis?
-# TODO: add version of name inspector

@@ -133,7 +133,7 @@ class InspectorCharResult(BaseModel):
     NFD_ascii: str = Field(title="string after decomposition with removed non-ascii chars")
     NFKD: str = Field(title="string after decomposition in compatible mode")
     NFD: str = Field(title="string after decomposition")
-    confusable: bool = Field(title="if the character is confusable")  # TODO: remove?
+    # confusable: bool = Field(title="if the character is confusable")  # TODO: remove?
     confusable_with: List[List[InspectorConfusableCharResult]] = \
         Field(title="set of confusable characters",
               description='If the character is not confusable then empty list is returned. '
