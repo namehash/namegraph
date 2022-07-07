@@ -13,3 +13,4 @@ emoji==1.7.0
 pyahocorasick==1.4.4
 spacy
 pytest-benchmark
+web3

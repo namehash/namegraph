@@ -1,3 +1,5 @@
+from typing import Iterable
+
 import regex
 from omegaconf import DictConfig
 
@@ -36,7 +38,7 @@ class Confusables:
             return False
         return character in self.confusable_chars
 
-    def get_confusables(self, character):
+    def get_confusables(self, character) -> Iterable[str]:
         if self.is_confusable(character):
             return self.confusable_chars[character]
         else:
