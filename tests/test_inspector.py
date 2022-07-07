@@ -5,6 +5,7 @@ import regex
 from hydra import compose, initialize
 
 from inspector.confusables import Confusables
+from inspector.features import Features
 from inspector.name_inspector import Inspector, remove_accents, strip_accents
 
 
@@ -14,6 +15,15 @@ def test_inspector():
         inspector = Inspector(config)
         result = inspector.analyse_name('asd')
         print(result)
+
+def test_inspector_character_name():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        f = Features(config)
+        assert f.unicodedata_name('a') == 'LATIN SMALL LETTER A'
+        assert f.unicodedata_name('🟢') == 'LARGE GREEN CIRCLE'
+        assert f.script_name('🩷') == None
+        assert f.unicodeblock('🧽') == None
 
 
 def test_remove_accents():

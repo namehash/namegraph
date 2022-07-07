@@ -5,8 +5,7 @@ from typing import Dict, Callable, List, Tuple
 import hydra
 import spacy
 from spacy.tokens import Doc
-# print(ens.main.ENS.is_valid_name('🅜🅜🅜.eth'))
-import wordninja
+
 from omegaconf import DictConfig
 
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
@@ -41,8 +40,8 @@ class Inspector:
                 'length': (self.f.length, True),
                 'emoji_count': (self.f.emoji_count, False),
                 'bytes': (self.f.bytes, False),
-                'all_class': (self.f.classes, True),
-                'script': (self.f.script_name, True),
+                'all_classes': (self.f.classes, True),
+                'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
                 'all_number': (self.f.is_number, True),
                 'all_emoji': (self.f.is_emoji, True),
@@ -55,7 +54,7 @@ class Inspector:
                 'name': (self.f.unicodedata_name, True),
                 'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
-                'class': (self.f.classes, True),
+                'classes': (self.f.classes, True),
 
                 'is_letter': (self.f.is_letter, True),
                 'is_number': (self.f.is_number, True),
@@ -70,11 +69,11 @@ class Inspector:
                 'simple-emoji': (self.f.simple_emoji, True),
                 'zwj': (self.f.zwj, True),
                 'zwnj': (self.f.zwnj, True),
-                'unicodedata.category': (self.f.unicodedata_category, True),
-                'unicodedata.bidirectional': (self.f.unicodedata_bidirectional, True),
-                'unicodedata.combining': (self.f.unicodedata_combining, True),
-                'unicodedata.mirrored': (self.f.unicodedata_mirrored, True),
-                'unicodedata.decomposition': (self.f.unicodedata_decomposition, True),
+                'unicodedata_category': (self.f.unicodedata_category, True),
+                'unicodedata_bidirectional': (self.f.unicodedata_bidirectional, True),
+                'unicodedata_combining': (self.f.unicodedata_combining, True),
+                'unicodedata_mirrored': (self.f.unicodedata_mirrored, True),
+                'unicodedata_decomposition': (self.f.unicodedata_decomposition, True),
                 'unicodeblock': (self.f.unicodeblock, True),
                 'confusable': (self.f.is_confusable, True),
                 'confusable_with': (self.f.get_confusables, True),
@@ -92,8 +91,8 @@ class Inspector:
             'token': {
                 'token': (self.f.name, True),
                 'length': (self.f.length, True),
-                'all_class': (self.f.classes, True),
-                'script': (self.f.script_name, True),
+                'all_classes': (self.f.classes, True),
+                'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
                 'all_number': (self.f.is_number, True),
                 'all_emoji': (self.f.is_emoji, True),
@@ -111,7 +110,7 @@ class Inspector:
                 'name': (self.f.unicodedata_name, True),
                 'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
-                'class': (self.f.classes, True),
+                'classes': (self.f.classes, True),
             },
 
         }
@@ -278,3 +277,4 @@ if __name__ == "__main__":
 # TODO: And for each token, in each possible tokenization, to also include some metadata fields.
 # TODO: documentation of fields
 # TODO: ZWJ in emojis?
+# TODO: add version of name inspector

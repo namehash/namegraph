@@ -1,5 +1,5 @@
 import unicodedata
-from typing import Dict, Callable
+from typing import Dict, Callable, Union, List
 
 import regex
 import spacy
@@ -59,48 +59,48 @@ class Features:
             for char in 'ias':
                 self.dictionary.add(char)
 
-    def length(self, name):
+    def length(self, name) -> int:
         """Returns number of Unicode chars in the string."""
         return len(name)
 
-    def emoji_count(self, name):
+    def emoji_count(self, name) -> int:
         """Returns number of emojis in the string."""
         return emoji_count(name)
 
-    def latin_alpha(self, name):
+    def latin_alpha(self, name) -> bool:
         """Checks if whole string matches regular expression of lowercase Latin letters."""
         return bool(self.compiled_regexp_patterns['latin-alpha'].match(name))
 
-    def numeric(self, name):
+    def numeric(self, name) -> bool:
         """Checks if whole string matches regular expression of Latin digits."""
         return bool(self.compiled_regexp_patterns['numeric'].match(name))
 
-    def latin_alpha_numeric(self, name):
+    def latin_alpha_numeric(self, name) -> bool:
         """Checks if whole string matches regular expression of Latin lowercase letters or digits."""
         return bool(self.compiled_regexp_patterns['latin-alpha-numeric'].match(name))
 
-    def simple(self, name):
+    def simple(self, name) -> bool:
         """Checks if whole string matches regular expression of Latin lowercase letters or digits or hyphen."""
         return bool(self.compiled_regexp_patterns['simple'].match(name))
 
-    def is_emoji(self, name):
+    def is_emoji(self, name) -> bool:
         """Checks if whole string matches regular expression of emojis."""
         return bool(self.compiled_regexp_patterns['is_emoji'].match(name))
 
-    def simple_emoji(self, name):
+    def simple_emoji(self, name) -> bool:
         """Checks if whole string matches regular expression of Latin lowercase letters or digits or hyphen or 
         emojis. """
         return bool(self.compiled_regexp_patterns['simple-emoji'].match(name))
 
-    def is_letter(self, name):
+    def is_letter(self, name) -> bool:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_letter'].match(name))
 
-    def is_number(self, name):
+    def is_number(self, name) -> bool:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_number'].match(name))
 
-    def script_name(self, name):
+    def script_name(self, name) -> Union[str, None]:
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""
         result = None
         for script_name in self.script_names:
@@ -109,54 +109,54 @@ class Features:
                 break
         return result
 
-    def is_hyphen(self, name):
+    def is_hyphen(self, name) -> bool:
         """Detects hyphen"""
         return '-' == name
 
-    def zwj(self, name):
+    def zwj(self, name) -> bool:
         """Detects zero width joiner"""
         return '‍' == name
 
-    def zwnj(self, name):
+    def zwnj(self, name) -> bool:
         """Detects zero width non-joiner"""
         return '‌' == name
 
-    def invisible(self, name):
+    def invisible(self, name) -> bool:
         """Detects zero width joiner or non-joiner"""
         return name in ('‍', '‌')
 
-    def unicodedata_name(self, name):
+    def unicodedata_name(self, name) -> Union[str, None]:
         """Returns the name assigned to the character."""
         try:
             return unicodedata.name(name)
         except ValueError:
             return None
 
-    def unicodedata_category(self, name):
+    def unicodedata_category(self, name) -> str:
         """Returns the general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table"""
         return unicodedata.category(name)
 
-    def unicodedata_bidirectional(self, name):
-        """Returns the bidirectional class assigned to the character."""
+    def unicodedata_bidirectional(self, name) -> str:
+        """Returns the bidirectional class assigned to the character or empty string."""
         return unicodedata.bidirectional(name)
 
-    def unicodedata_combining(self, name):
-        """Returns the canonical combining class assigned to the character"""
+    def unicodedata_combining(self, name) -> int:
+        """Returns the canonical combining class assigned to the character. Returns 0 if no combining class is defined.."""
         return unicodedata.combining(name)
 
-    def unicodedata_mirrored(self, name):
+    def unicodedata_mirrored(self, name) -> int:
         """Returns the mirrored property assigned to the character"""
         return unicodedata.mirrored(name)
 
-    def unicodedata_decomposition(self, name):
+    def unicodedata_decomposition(self, name) -> str:
         """Returns the character decomposition mapping assigned to the character"""
         return unicodedata.decomposition(name)
 
-    def unicodeblock(self, name):
-        """Return a name of Unicode block in which the character is."""
+    def unicodeblock(self, name) -> Union[str, None]:
+        """Return a name of Unicode block in which the character is or None"""
         return unicodeblock.blocks.of(name)
 
-    def is_confusable(self, name):
+    def is_confusable(self, name) -> bool:
         """Indicates if a character is confusable."""
         return self.confusables.is_confusable(name)
 
@@ -168,7 +168,7 @@ class Features:
         """Returns canonical character from confusable set."""
         return self.confusables.get_canonical(name)
 
-    def is_ascii(self, name):
+    def is_ascii(self, name) -> bool:
         """Detects if name is all ASCII."""
         try:
             name.encode('ascii')
@@ -176,23 +176,23 @@ class Features:
         except UnicodeEncodeError:
             return False
 
-    def codepoint(self, name):
+    def codepoint(self, name) -> str:
         """Codepoint of Unicode char as hex with 0x prefix."""
         return f'{ord(name):x}'
 
-    def codepoint_int(self, name):
+    def codepoint_int(self, name) -> int:
         """Codepoint of Unicode char as integer."""
         return ord(name)
 
-    def codepoint_hex(self, name):
+    def codepoint_hex(self, name) -> str:
         """Codepoint of Unicode char as hex."""
         return hex(ord(name))
 
-    def link(self, name):
+    def link(self, name) -> str:
         """Link to external page with Unicode character information."""
         return f'https://unicode.link/codepoint/{ord(name):x}'
 
-    def name(self, name):
+    def name(self, name) -> str:
         return name
 
     # def lemma(self, name):
@@ -207,37 +207,37 @@ class Features:
     #     """Returns part of speech of word."""
     #     return name
 
-    def in_dictionary(self, name):
+    def in_dictionary(self, name) -> bool:
         """Checks if string is in dictionary."""
         return name in self.dictionary
 
-    def bytes(self, name):
+    def bytes(self, name) -> int:
         """Number of bytes in UTF8 encoding."""
         return len(name.encode('utf-8'))
 
-    def unidecode(self, name):
+    def unidecode(self, name) -> str:
         """https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.
         It converts 'ł' to 'l', 'ω' (omega) to 'o'.
         """
         return unidecode(name, errors='ignore')
 
-    def NFKD_ascii(self, name):
+    def NFKD_ascii(self, name) -> str:
         """Returns string after decomposition in compatible mode with removed non-ascii chars."""
         return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('utf-8')
 
-    def NFD_ascii(self, name):
+    def NFD_ascii(self, name) -> str:
         """Returns string after decomposition with removed non-ascii chars."""
         return unicodedata.normalize('NFD', name).encode('ascii', 'ignore').decode('utf-8')
 
-    def NFKD(self, name):
+    def NFKD(self, name) -> str:
         """Returns string after decomposition in compatible mode."""
         return unicodedata.normalize('NFKD', name)
 
-    def NFD(self, name):
+    def NFD(self, name) -> str:
         """Returns string after decomposition."""
         return unicodedata.normalize('NFD', name)
 
-    def classes(self, name):
+    def classes(self, name) -> List[str]:
         """Return classes of string: letter,number,hyphen,emoji,basic,invisible"""
         result = []
         for c, func in self.classes_config.items():
