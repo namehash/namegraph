@@ -73,15 +73,30 @@ class InspectorConfusableCharResult(BaseModel):
                                    description="can be null if script is not assigned for a character")
     codepoint: str = Field(title="codepoint of the character as hex with 0x prefix")
     link: str = Field(title="link to external page with information about the character")
-    classes: List[str] = Field(title="list of classes in which the character is")
+    classes: List[str] = \
+        Field(title="list of classes in which the character is",
+              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check - not working, in unicode.link is numeric field 
+                          '* hyphen - a hyphen'
+                          '* emoji - an emoji'
+                          '* basic - [a-z0-9-]'
+                          '* invisible - zero width joiner or non-joiner')
 
 
 class InspectorTokenResult(BaseModel):
     token: str = Field(title="the token")
     length: int = Field(title="number of Unicode characters")
-    all_classes: List[str] = Field(title="list of classes in which all characters are")
-    all_script: Union[str, None] = Field(title="script name of all characters",
-                                         description="can be null if characters are in different scripts or script is not assigned for a character")
+    all_classes: List[str] = \
+        Field(title="list of classes in which all characters are",
+              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+                          '* hyphen - a hyphen'
+                          '* emoji - an emoji'
+                          '* basic - [a-z0-9-]'
+                          '* invisible - zero width joiner or non-joiner')
+    all_script: Union[str, None] = \
+        Field(title="script name of all characters",
+              description="can be null if characters are in different scripts or script is not assigned for a character")
     in_dictionary: bool = Field(title="if the token is in dictionary")
     pos: str = Field(title="part of speech of the token")
     lemma: str = Field(title="lemma of the word")
@@ -95,13 +110,21 @@ class InspectorCharResult(BaseModel):
                                    description="can be null if script is not assigned for a character")
     codepoint: str = Field(title="codepoint of the character as hex with 0x prefix")
     link: str = Field(title="link to external page with information about the character")
-    classes: List[str] = Field(title="list of classes in which the character is")
+    classes: List[str] = \
+        Field(title="list of classes in which the character is",
+              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+                          '* hyphen - a hyphen'
+                          '* emoji - an emoji'
+                          '* basic - [a-z0-9-]'
+                          '* invisible - zero width joiner or non-joiner')
     unicodedata_category: str = Field(
         title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table")
     unicodedata_bidirectional: str = Field(title="bidirectional class assigned to the character or empty string")
     unicodedata_combining: int = Field(title="canonical combining class assigned to the character")
     unicodedata_mirrored: int = Field(title="mirrored property assigned to the character")
-    unicodedata_decomposition: str = Field(title="character decomposition mapping assigned to the character")
+    unicodedata_decomposition: str = Field(
+        title="character decomposition mapping assigned to the character or empty string")
     unicodeblock: Union[str, None] = Field(title="name of Unicode block in which the character is or null")
     unidecode: str = Field(
         title="https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.",
@@ -110,14 +133,25 @@ class InspectorCharResult(BaseModel):
     NFD_ascii: str = Field(title="string after decomposition with removed non-ascii chars")
     NFKD: str = Field(title="string after decomposition in compatible mode")
     NFD: str = Field(title="string after decomposition")
-    confusable: bool = Field(title="if the character is confusable")
-    confusable_with: List[InspectorConfusableCharResult] = Field(title="set of confusable characters")
+    confusable: bool = Field(title="if the character is confusable")  # TODO: remove?
+    confusable_with: List[List[InspectorConfusableCharResult]] = \
+        Field(title="set of confusable characters",
+              description='If the character is not confusable then empty list is returned. '
+                          'The list also includes the original character. '
+                          'The first element is usually a canonical form.')
 
 
 class InspectorResult(BaseModel):
     name: str = Field(title="input string")
     length: int = Field(title="number of Unicode characters")
-    all_classes: List[str] = Field(title="list of classes in which all characters are")
+    all_classes: List[str] = \
+        Field(title="list of classes in which all characters are",
+              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+                          '* hyphen - a hyphen'
+                          '* emoji - an emoji'
+                          '* basic - [a-z0-9-]'
+                          '* invisible - zero width joiner or non-joiner')
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")
     # all_letter: bool
@@ -127,6 +161,10 @@ class InspectorResult(BaseModel):
     chars: List[InspectorCharResult]
     tokens: List[List[InspectorTokenResult]]
     aggregated: Dict
+    ens_is_valid_name: bool = Field()
+    ens_nameprep: Union[str, None] = Field()
+    uts46_remap: Union[str, None] = Field()
+    idna_encode: Union[str, None] = Field()
     version: str = Field(default='0.0.1', title="version of the name inspector",
                          description="version can be used for updating cache")
 

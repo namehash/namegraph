@@ -47,6 +47,10 @@ class Inspector:
                 'all_emoji': (self.f.is_emoji, True),
                 'all_basic': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
+                'ens_is_valid_name': (self.f.ens_is_valid_name, True),
+                'ens_nameprep': (self.f.ens_nameprep, True),
+                'uts46_remap': (self.f.uts46_remap, True),
+                'idna_encode': (self.f.idna_encode, True),
             },
             'char': {
                 'char': (self.f.name, True),
@@ -212,11 +216,14 @@ class Inspector:
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
             # char_analysis['index'] = i
-            confusable_chars_analysis = []
-            for confusable_char in char_analysis['confusable_with']:
-                confusable_char_analysis = self.analyze_confusable(confusable_char)
-                confusable_chars_analysis.append(confusable_char_analysis)
-            char_analysis['confusable_with'] = confusable_chars_analysis
+            confusable_strings_analysis = []
+            for confusable_string in char_analysis['confusable_with']:
+                confusable_string_analysis = []
+                for confusable_char in confusable_string:
+                    confusable_char_analysis = self.analyze_confusable(confusable_char)
+                    confusable_string_analysis.append(confusable_char_analysis)
+                confusable_strings_analysis.append(confusable_string_analysis)
+            char_analysis['confusable_with'] = confusable_strings_analysis
             chars_analysis.append(char_analysis)
         name_analysis['chars'] = chars_analysis
 
