@@ -1,8 +1,10 @@
 import unicodedata
-from typing import Dict, Callable, Union, List
+from typing import Dict, Callable, Union, List, Iterable
 
 import regex
 import spacy
+import ens
+import idna
 import unicodeblock.blocks
 from emoji import unicode_codes
 from emoji.core import emoji_count
@@ -36,7 +38,7 @@ class Features:
             'number': self.is_number,
             'hyphen': self.is_hyphen,
             'emoji': self.is_emoji,
-            'basic': self.simple,
+            'simple': self.simple,
             'invisible': self.invisible
         }
 
@@ -115,15 +117,15 @@ class Features:
 
     def zwj(self, name) -> bool:
         """Detects zero width joiner"""
-        return '‍' == name
+        return '\u200d' == name  # '‍'
 
     def zwnj(self, name) -> bool:
         """Detects zero width non-joiner"""
-        return '‌' == name
+        return '\u200c' == name  # '‌'
 
     def invisible(self, name) -> bool:
         """Detects zero width joiner or non-joiner"""
-        return name in ('‍', '‌')
+        return name in ('\u200d', '\u200c')  # ('‍', '‌')
 
     def unicodedata_name(self, name) -> Union[str, None]:
         """Returns the name assigned to the character."""
@@ -160,7 +162,7 @@ class Features:
         """Indicates if a character is confusable."""
         return self.confusables.is_confusable(name)
 
-    def get_confusables(self, name):
+    def get_confusables(self, name) -> Iterable[str]:
         """Return set of confusable characters."""
         return self.confusables.get_confusables(name)
 
@@ -244,3 +246,30 @@ class Features:
             if func(name):
                 result.append(c)
         return result
+
+    def ens_is_valid_name(self, name) -> bool:
+        return ens.main.ENS.is_valid_name(name)
+
+    def ens_nameprep(self, name) -> Union[str, None]:
+        try:
+            nameprep = ens.main.ENS.nameprep(name)
+        except ens.exceptions.InvalidName:
+            nameprep = None
+        return nameprep
+
+    def uts46_remap(self, name) -> Union[str, None]:
+        try:
+            uts46_remap = idna.uts46_remap(name, std3_rules=True, transitional=False)
+        except idna.core.InvalidCodepoint:
+            uts46_remap = None
+        return uts46_remap
+
+    def idna_encode(self, name) -> Union[str, None]:
+        try:
+            encode = idna.encode(name, uts46=True, std3_rules=True, transitional=False)
+        except idna.core.InvalidCodepoint:
+            encode = None
+        except idna.core.IDNAError as e:
+            # print(e)
+            encode = None
+        return encode
