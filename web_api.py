@@ -13,8 +13,8 @@ logger = logging.getLogger('generator')
 
 
 class Settings(BaseSettings):
-    config_name: str = "test_config"
-    # config_name: str = "prod_config"
+    # config_name: str = "test_config"
+    config_name: str = "prod_config"
 
 
 settings = Settings()
@@ -79,8 +79,12 @@ class InspectorConfusableCharResult(BaseModel):
                           '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check - not working, in unicode.link is numeric field 
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
-                          '* basic - [a-z0-9-]'
+                          '* simple - [a-z0-9-]'
                           '* invisible - zero width joiner or non-joiner')
+
+
+class InspectorEmptyTokenResult(BaseModel):
+    token: str = Field(default='', const=True, title="always empty string")
 
 
 class InspectorTokenResult(BaseModel):
@@ -92,7 +96,7 @@ class InspectorTokenResult(BaseModel):
                           '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
-                          '* basic - [a-z0-9-]'
+                          '* simple - [a-z0-9-]'
                           '* invisible - zero width joiner or non-joiner')
     all_script: Union[str, None] = \
         Field(title="script name of all characters",
@@ -100,6 +104,10 @@ class InspectorTokenResult(BaseModel):
     in_dictionary: bool = Field(title="if the token is in dictionary")
     pos: str = Field(title="part of speech of the token")
     lemma: str = Field(title="lemma of the word")
+
+
+class InspectorTokenizedResult(BaseModel):
+    tokens: List[Union[InspectorTokenResult, InspectorEmptyTokenResult]]
 
 
 class InspectorCharResult(BaseModel):
@@ -116,7 +124,7 @@ class InspectorCharResult(BaseModel):
                           '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
-                          '* basic - [a-z0-9-]'
+                          '* simple - [a-z0-9-]'
                           '* invisible - zero width joiner or non-joiner')
     unicodedata_category: str = Field(
         title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table")
@@ -129,16 +137,19 @@ class InspectorCharResult(BaseModel):
     unidecode: str = Field(
         title="https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.",
         description="e.g. it converts 'ł' to 'l', 'ω' (omega) to 'o'.")
-    NFKD_ascii: str = Field(title="string after decomposition in compatible mode with removed non-ascii chars")
-    NFD_ascii: str = Field(title="string after decomposition with removed non-ascii chars")
-    NFKD: str = Field(title="string after decomposition in compatible mode")
-    NFD: str = Field(title="string after decomposition")
+    # NFKD_ascii: str = Field(title="string after decomposition in compatible mode with removed non-ascii chars")
+    # NFD_ascii: str = Field(title="string after decomposition with removed non-ascii chars")
+    # NFKD: str = Field(title="string after decomposition in compatible mode")
+    # NFD: str = Field(title="string after decomposition")
     # confusable: bool = Field(title="if the character is confusable")  # TODO: remove?
-    confusable_with: List[List[InspectorConfusableCharResult]] = \
-        Field(title="set of confusable characters",
+    confusables: List[List[InspectorConfusableCharResult]] = \
+        Field(title="set of confusable strings, each string is represented as a list of its characters",
               description='If the character is not confusable then empty list is returned. '
                           'The list also includes the original character. '
-                          'The first element is usually a canonical form.')
+                          'The first element is usually a canonical form.'
+                          'E.g. `ą` is confusable with `a`, and for `ą` returned will be `ą` and `a`.'
+                          'However [a-z0-9] are always not confusable.'
+                          'E.g. `ω` is confusable with `ώ` and on the first place in the list will be `ω` (the same), because its the canonical form.')
 
 
 class InspectorResult(BaseModel):
@@ -150,21 +161,27 @@ class InspectorResult(BaseModel):
                           '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
-                          '* basic - [a-z0-9-]'
+                          '* simple - [a-z0-9-]'
                           '* invisible - zero width joiner or non-joiner')
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")
     # all_letter: bool
     # all_number: bool
     # all_emoji: bool
-    # all_basic: bool
+    # all_simple: bool
     chars: List[InspectorCharResult]
-    tokens: List[List[InspectorTokenResult]]
-    aggregated: Dict
-    ens_is_valid_name: bool = Field()
-    ens_nameprep: Union[str, None] = Field()
-    uts46_remap: Union[str, None] = Field()
-    idna_encode: Union[str, None] = Field()
+    tokenizations: List[InspectorTokenizedResult]
+    # aggregated: Dict
+    any_emoji: bool = Field(title='true if the string contains any emoji')
+    any_invisible: bool = Field(title='true if the string contains any invisible character')
+    all_unicodeblock: Union[str, None] = Field(
+        title="Unicode block of all characters",
+        description="can be null if characters are in different blocks or block is not assigned for a character")
+    any_confusable: bool = Field(title='true if the string contains any confusable character')
+    ens_is_valid_name: bool = Field(title='ens.main.ENS.is_valid_name(name)')
+    ens_nameprep: Union[str, None] = Field(title='ens.main.ENS.nameprep(name)')
+    uts46_remap: Union[str, None] = Field(title='idna.uts46_remap(name, std3_rules=True, transitional=False)')
+    idna_encode: Union[str, None] = Field(title='idna.encode(name, uts46=True, std3_rules=True, transitional=False)')
     version: str = Field(default='0.0.1', title="version of the name inspector",
                          description="version can be used for updating cache")
 
