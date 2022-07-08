@@ -4,10 +4,11 @@ import ahocorasick
 
 
 class DFS:
-    def __init__(self, automaton, name, skip_non_words=False):
+    def __init__(self, automaton, name, skip_non_words=False, with_gaps=False):
         self.automaton = automaton
         self.name = name
         self.skip_non_words = skip_non_words
+        self.with_gaps = with_gaps  # change non dictionary words into empty string
 
         # create graph
         self.g_out = collections.defaultdict(list)
@@ -24,8 +25,11 @@ class DFS:
         self.dfs(0, [])
         for r in self.result:
             t = []
-            for start, end in r:
-                t.append(self.name[start:end])
+            for start, end, in_dictionary in r:
+                if not in_dictionary and self.with_gaps:
+                    t.append('')
+                else:
+                    t.append(self.name[start:end])
             yield tuple(t)
 
     def dfs(self, index, result):
@@ -35,14 +39,14 @@ class DFS:
 
         if index in self.g_out:
             for end in self.g_out[index]:
-                self.dfs(end, result + [(index, end)])
+                self.dfs(end, result + [(index, end, True)])
 
         if not self.skip_non_words:
             for potential_index in self.g_out.keys():
                 if potential_index <= index: continue
                 if index == 0 and potential_index == len(self.name): continue
                 if potential_index not in self.g_in:
-                    self.dfs(potential_index, result + [(index, potential_index)])
+                    self.dfs(potential_index, result + [(index, potential_index, False)])
 
 
 class AllTokenizer():
@@ -51,6 +55,7 @@ class AllTokenizer():
     def __init__(self, config):
         path = config.tokenization.dictionary
         self.skip_non_words = config.tokenization.skip_non_words
+        self.with_gaps = config.tokenization.with_gaps
 
         self.automaton = ahocorasick.Automaton()
         skip_one_letter_words = config.tokenization.skip_one_letter_words
@@ -68,6 +73,6 @@ class AllTokenizer():
         self.automaton.make_automaton()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
-        dfs = DFS(self.automaton, name, self.skip_non_words)
+        dfs = DFS(self.automaton, name, self.skip_non_words, self.with_gaps)
         tokenizations = list(dfs.all_paths())
         return tokenizations

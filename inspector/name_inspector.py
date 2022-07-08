@@ -11,6 +11,7 @@ from omegaconf import DictConfig
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
 # cat Scripts.txt | grep -v -P "^#" | cut -d ";" -f 2 | cut -d ' ' -f 2 | sort -u > script_names.txt
 from generator.tokenization import AllTokenizer
+from generator.xgenerator import uniq
 from inspector.features import Features
 
 
@@ -22,6 +23,20 @@ def remove_accents(input_str):
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
                    if unicodedata.category(c) != 'Mn')
+
+
+def uniq_gaps(tokenized):
+    result = []
+    before_empty = False
+    for token in tokenized:
+        if token != '':
+            result.append(token)
+            before_empty = False
+        else:
+            if not before_empty:
+                before_empty = True
+                result.append('')
+    return result
 
 
 class Inspector:
@@ -128,7 +143,6 @@ class Inspector:
         # “wiki - entities”:”a, b, c, d???”,
         # “categories”:”???”
 
-
         self.tokenizer = AllTokenizer(config)
 
         self.nlp = spacy.load("en_core_web_sm")
@@ -204,7 +218,6 @@ class Inspector:
         #             pass
         return aggregated
 
-
     # assume we got normalized and valid name
     def analyse_name(self, name: str):
         # result = {}
@@ -227,8 +240,12 @@ class Inspector:
 
         # tokenizeds = [wordninja.split(name)]
         tokenizeds = self.tokenizer.tokenize(name)
+        tokenizeds = [tuple(uniq_gaps(tokenized)) for tokenized in tokenizeds]
+        #remove duplicates after empty duplicates removal
+        tokenizeds=uniq(tokenizeds)
+
         # name_analysis['tokens'] = len(tokenized)
-        name_analysis['tokens'] = []
+        name_analysis['tokenizations'] = []
         for tokenized in tokenizeds:
             tokens_analysis = []
             for i, token in enumerate(tokenized):
@@ -239,22 +256,36 @@ class Inspector:
             # TODO spacy on tokenized form
             self.spacy(tokens_analysis)
 
-            name_analysis['tokens'].append(tokens_analysis)
+            name_analysis['tokenizations'].append({'tokens':tokens_analysis})
 
         aggregated = self.aggregate(chars_analysis)
-        name_analysis['aggregated'] = aggregated
+        name_analysis.update(aggregated)
+        # name_analysis['aggregated'] = aggregated
         return name_analysis
 
     def spacy(self, tokens_analysis):
-        tokens = [token_analysis['token'] for token_analysis in tokens_analysis]
+        mapping = {}
+        tokens = []
+        for i, token_analysis in enumerate(tokens_analysis):
+            if token_analysis['token'] != '':
+                mapping[len(tokens)] = i
+                tokens.append(token_analysis['token'])
+
+        # tokens = [token_analysis['token'] for token_analysis in tokens_analysis]
         # print(tokens)
 
         doc = Doc(self.nlp.vocab, tokens)
-        for token, token_analysis in zip(self.nlp(doc), tokens_analysis):
-            # print(token.text, token.pos_, token.dep_, token.lemma_)
+        for i, token in enumerate(self.nlp(doc)):
+            token_analysis=tokens_analysis[mapping[i]]
             token_analysis['pos'] = token.pos_
             token_analysis['lemma'] = token.lemma_
             token_analysis['dep'] = token.dep_
+
+        # for token, token_analysis in zip(self.nlp(doc), tokens_analysis):
+        #     # print(token.text, token.pos_, token.dep_, token.lemma_)
+        #     token_analysis['pos'] = token.pos_
+        #     token_analysis['lemma'] = token.lemma_
+        #     token_analysis['dep'] = token.dep_
 
 
 # for name in names:
