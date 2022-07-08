@@ -63,7 +63,7 @@ class Inspector:
                 'all_letter': (self.f.is_letter, True),
                 'all_number': (self.f.is_number, True),
                 'all_emoji': (self.f.is_emoji, True),
-                'all_basic': (self.f.latin_alpha_numeric, True),
+                'all_simple': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
                 'ens_is_valid_name': (self.f.ens_is_valid_name, True),
                 'ens_nameprep': (self.f.ens_nameprep, True),
@@ -82,7 +82,7 @@ class Inspector:
                 'is_number': (self.f.is_number, True),
                 'is_hyphen': (self.f.is_hyphen, True),
                 'is_emoji': (self.f.is_emoji, True),
-                'is_basic': (self.f.latin_alpha_numeric, True),
+                'is_simple': (self.f.latin_alpha_numeric, True),
                 'is_invisible': (self.f.invisible, True),
 
                 'latin-alpha': (self.f.latin_alpha, True),
@@ -97,18 +97,18 @@ class Inspector:
                 'unicodedata_mirrored': (self.f.unicodedata_mirrored, True),
                 'unicodedata_decomposition': (self.f.unicodedata_decomposition, True),
                 'unicodeblock': (self.f.unicodeblock, True),
-                'confusable': (self.f.is_confusable, True),
-                'confusable_with': (self.f.get_confusables, True),
-                'canonical': (self.f.get_canonical, True),
+                'confusable': (self.f.is_confusable, False),
+                'confusables': (self.f.get_confusables, True),
+                'canonical': (self.f.get_canonical, False),
                 'ascii': (self.f.is_ascii, False),
                 'codepoint_int': (self.f.codepoint_int, False),
                 'codepoint_hex': (self.f.codepoint, False),
                 'bytes': (self.f.bytes, False),
                 'unidecode': (self.f.unidecode, True),
-                'NFKD_ascii': (self.f.NFKD_ascii, True),
-                'NFD_ascii': (self.f.NFD_ascii, True),
-                'NFKD': (self.f.NFKD, True),
-                'NFD': (self.f.NFD, True),
+                'NFKD_ascii': (self.f.NFKD_ascii, False),
+                'NFD_ascii': (self.f.NFD_ascii, False),
+                'NFKD': (self.f.NFKD, False),
+                'NFD': (self.f.NFD, False),
             },
             'token': {
                 'token': (self.f.name, True),
@@ -118,7 +118,7 @@ class Inspector:
                 'all_letter': (self.f.is_letter, True),
                 'all_number': (self.f.is_number, True),
                 'all_emoji': (self.f.is_emoji, True),
-                'all_basic': (self.f.latin_alpha_numeric, True),
+                'all_simple': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
                 # 'lemma': (self.f.lemma, True),
                 # 'pos': (self.f.pos, True),
@@ -228,13 +228,13 @@ class Inspector:
             char_analysis = self.analyze_character(char)
             # char_analysis['index'] = i
             confusable_strings_analysis = []
-            for confusable_string in char_analysis['confusable_with']:
+            for confusable_string in char_analysis['confusables']:
                 confusable_string_analysis = []
                 for confusable_char in confusable_string:
                     confusable_char_analysis = self.analyze_confusable(confusable_char)
                     confusable_string_analysis.append(confusable_char_analysis)
                 confusable_strings_analysis.append(confusable_string_analysis)
-            char_analysis['confusable_with'] = confusable_strings_analysis
+            char_analysis['confusables'] = confusable_strings_analysis
             chars_analysis.append(char_analysis)
         name_analysis['chars'] = chars_analysis
 

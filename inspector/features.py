@@ -240,7 +240,7 @@ class Features:
         return unicodedata.normalize('NFD', name)
 
     def classes(self, name) -> List[str]:
-        """Return classes of string: letter,number,hyphen,emoji,basic,invisible"""
+        """Return classes of string: letter,number,hyphen,emoji,simple,invisible"""
         result = []
         for c, func in self.classes_config.items():
             if func(name):
