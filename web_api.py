@@ -127,13 +127,17 @@ class InspectorCharResult(BaseModel):
                           '* simple - [a-z0-9-]'
                           '* invisible - zero width joiner or non-joiner')
     unicodedata_category: str = Field(
-        title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table")
-    unicodedata_bidirectional: str = Field(title="bidirectional class assigned to the character or empty string")
+        title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table",
+        description='unicodedata_* uses library https://docs.python.org/3/library/unicodedata.html and is compiled with specific version of Unicode depending on Python version')
+    unicodedata_bidirectional: str = Field(
+        title="bidirectional class assigned to the character or empty string")  # TODO document those files
     unicodedata_combining: int = Field(title="canonical combining class assigned to the character")
     unicodedata_mirrored: int = Field(title="mirrored property assigned to the character")
     unicodedata_decomposition: str = Field(
         title="character decomposition mapping assigned to the character or empty string")
-    unicodeblock: Union[str, None] = Field(title="name of Unicode block in which the character is or null")
+    unicodeblock: Union[str, None] = \
+        Field(title="name of Unicode block in which the character is or null",
+              description='the unicodeblock library is not maintained, it uses some old Unicode version')
     unidecode: str = Field(
         title="https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.",
         description="e.g. it converts 'ł' to 'l', 'ω' (omega) to 'o'.")
@@ -178,10 +182,17 @@ class InspectorResult(BaseModel):
         title="Unicode block of all characters",
         description="can be null if characters are in different blocks or block is not assigned for a character")
     any_confusable: bool = Field(title='true if the string contains any confusable character')
-    ens_is_valid_name: bool = Field(title='ens.main.ENS.is_valid_name(name)')
-    ens_nameprep: Union[str, None] = Field(title='ens.main.ENS.nameprep(name)')
-    uts46_remap: Union[str, None] = Field(title='idna.uts46_remap(name, std3_rules=True, transitional=False)')
-    idna_encode: Union[str, None] = Field(title='idna.encode(name, uts46=True, std3_rules=True, transitional=False)')
+    ens_is_valid_name: bool = Field(title='true if idna.uts46_remap(name, std3_rules=True) not raise errors',
+                                    description='ens.main.ENS.is_valid_name(name)')
+    ens_nameprep: Union[str, None] = Field(title='should be the same as idna.uts46_remap(name, std3_rules=True)',
+                                           description='ens.main.ENS.nameprep(name)')
+    uts46_remap: Union[str, None] = \
+        Field(titile='Re-map the characters in the string according to UTS46 processing.',
+              description='https://docs.ens.domains/contract-api-reference/name-processing#normalising-names'
+                          'idna.uts46_remap(name, std3_rules=True)')
+    idna_encode: Union[str, None] = Field(
+        title='it does the same as uts46_remap(name, std3_rules=True), but do additional cheks regarding doots (subdomains), length, punycode, NFC, hyphens, combining characters',
+        description='idna.encode(name, uts46=True, std3_rules=True, transitional=False)')
     version: str = Field(default='0.0.1', title="version of the name inspector",
                          description="version can be used for updating cache")
 
