@@ -85,7 +85,8 @@ class Inspector:
                 'is_simple': (self.f.latin_alpha_numeric, True),
                 'is_invisible': (self.f.invisible, True),
 
-                'latin-alpha': (self.f.latin_alpha, True),
+                'simple_letter': (self.f.simple_letter, True),
+                'simple_letter_emoji': (self.f.simple_letter_emoji, True),
                 'numeric': (self.f.numeric, True),
                 'latin-alpha-numeric': (self.f.latin_alpha_numeric, True),
                 'simple-emoji': (self.f.simple_emoji, True),

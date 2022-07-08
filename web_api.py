@@ -75,12 +75,16 @@ class InspectorConfusableCharResult(BaseModel):
     link: str = Field(title="link to external page with information about the character")
     classes: List[str] = \
         Field(title="list of classes in which the character is",
-              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check - not working, in unicode.link is numeric field 
+              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
                           '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner')
+                          '* invisible - zero width joiner or non-joiner'
+                          '* simple_letter - [a-z]'
+                          '* simple_number - [0-9]'
+                          '* simple_letter_emoji - an emoji or [a-z]'
+              )
 
 
 class InspectorEmptyTokenResult(BaseModel):
@@ -92,12 +96,16 @@ class InspectorTokenResult(BaseModel):
     length: int = Field(title="number of Unicode characters")
     all_classes: List[str] = \
         Field(title="list of classes in which all characters are",
-              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
                           '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner')
+                          '* invisible - zero width joiner or non-joiner'
+                          '* simple_letter - [a-z]'
+                          '* simple_number - [0-9]'
+                          '* simple_letter_emoji - an emoji or [a-z]'
+              )
     all_script: Union[str, None] = \
         Field(title="script name of all characters",
               description="can be null if characters are in different scripts or script is not assigned for a character")
@@ -120,21 +128,28 @@ class InspectorCharResult(BaseModel):
     link: str = Field(title="link to external page with information about the character")
     classes: List[str] = \
         Field(title="list of classes in which the character is",
-              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
                           '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner')
+                          '* invisible - zero width joiner or non-joiner'
+                          '* simple_letter - [a-z]'
+                          '* simple_number - [0-9]'
+                          '* simple_letter_emoji - an emoji or [a-z]'
+              )
     unicodedata_category: str = Field(
         title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table",
         description='unicodedata_* uses library https://docs.python.org/3/library/unicodedata.html and is compiled with specific version of Unicode depending on Python version')
-    unicodedata_bidirectional: str = Field(
-        title="bidirectional class assigned to the character or empty string")  # TODO document those files
-    unicodedata_combining: int = Field(title="canonical combining class assigned to the character")
-    unicodedata_mirrored: int = Field(title="mirrored property assigned to the character")
-    unicodedata_decomposition: str = Field(
-        title="character decomposition mapping assigned to the character or empty string")
+    # unicodedata_bidirectional: str = Field(
+    #     title="bidirectional class assigned to the character or empty string",
+    #     description='it specifies how the character should behave in e.g. right-to-left texts') 
+    # unicodedata_combining: int = Field(title="canonical combining class assigned to the character",
+    #                                    description='specifies how the mark can be combined with other characters')
+    # unicodedata_mirrored: int = Field(title="mirrored property assigned to the character",
+    #                                   description='some characters need to be mirrored in e.g. right-to-left texts')
+    # unicodedata_decomposition: str = Field(
+    #     title="character decomposition mapping assigned to the character or empty string")
     unicodeblock: Union[str, None] = \
         Field(title="name of Unicode block in which the character is or null",
               description='the unicodeblock library is not maintained, it uses some old Unicode version')
@@ -161,12 +176,16 @@ class InspectorResult(BaseModel):
     length: int = Field(title="number of Unicode characters")
     all_classes: List[str] = \
         Field(title="list of classes in which all characters are",
-              description='* letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
                           '* hyphen - a hyphen'
                           '* emoji - an emoji'
                           '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner')
+                          '* invisible - zero width joiner or non-joiner'
+                          '* simple_letter - [a-z]'
+                          '* simple_number - [0-9]'
+                          '* simple_letter_emoji - an emoji or [a-z]'
+              )
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")
     # all_letter: bool
