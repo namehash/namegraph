@@ -102,7 +102,7 @@ class Features:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_number'].match(name))
 
-    def script_name(self, name) -> Union[str, None]:
+    def script_name(self, name) -> Union[str, None]: #TODO does it need to depend on script names?
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""
         result = None
         for script_name in self.script_names:
