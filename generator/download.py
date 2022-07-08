@@ -1,23 +1,20 @@
 import hydra
+import nltk
 from omegaconf import DictConfig
-import gensim.downloader as api
 
 from generator.download_names import download_file
-from generator.generation import WordnetSynonymsGenerator
 
 
 def download_wordnet(config):
-    WordnetSynonymsGenerator(config)
+    # WordnetSynonymsGenerator(config)
+    nltk.download("wordnet")
+    nltk.download("omw-1.4")
 
-
-def download_convert_embeddings(model):
-    model = api.load(model)
-    model.save('data/embeddings.pkl')
-    del model
 
 def download_spacy(config):
     from spacy.cli.download import download
     download('en_core_web_sm')
+
 
 def download_embeddings(url, path):
     download_file(url, path, override=False)
