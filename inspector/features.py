@@ -22,24 +22,30 @@ class Features:
         # EMOJI_REGEXP_AZ09 = regex.compile('^(' + emoji_pattern + '|[a-z0-9-])+$')
 
         self.regexp_patterns = {
-            'latin-alpha': '^[a-z]+$',
+            'simple_letter': '^[a-z]+$',
             'numeric': '^[0-9]+$',
             'latin-alpha-numeric': '^[a-z0-9]+$',
             'simple': '^[a-z0-9-]+$',
             'is_emoji': emoji_pattern,
             'simple-emoji': '^(' + emoji_pattern + '|[a-z0-9-])+$',
+            'simple_letter-emoji': '^(' + emoji_pattern + '|[a-z])+$',
             'is_letter': r'^\p{LC}+$',
             # TODO: is it correct? or Ll or L? include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
             'is_number': r'^\p{N}+$',  # TODO: Nd | Nl | No?
         }
 
         self.classes_config: Dict[str, Callable] = {
-            'letter': self.is_letter,
-            'number': self.is_number,
+            'any_letter': self.is_letter,
+            'any_number': self.is_number,
             'hyphen': self.is_hyphen,
             'emoji': self.is_emoji,
             'simple': self.simple,
-            'invisible': self.invisible
+            'invisible': self.invisible,
+            'simple_letter': self.simple_letter,
+            'simple_number': self.is_number,
+            'simple_letter_emoji': self.simple_letter_emoji,
+            # 'other_letter': self.other_letter,
+            # 'other_number': self.other_number,
         }
 
         self.compiled_regexp_patterns = {k: regex.compile(v) for k, v in self.regexp_patterns.items()}  # TODO: flags?
@@ -69,9 +75,13 @@ class Features:
         """Returns number of emojis in the string."""
         return emoji_count(name)
 
-    def latin_alpha(self, name) -> bool:
+    def simple_letter(self, name) -> bool:
         """Checks if whole string matches regular expression of lowercase Latin letters."""
-        return bool(self.compiled_regexp_patterns['latin-alpha'].match(name))
+        return bool(self.compiled_regexp_patterns['simple_letter'].match(name))
+
+    def simple_letter_emoji(self, name) -> bool:
+        """Checks if whole string matches regular expression of lowercase Latin letters."""
+        return bool(self.compiled_regexp_patterns['simple_letter-emoji'].match(name))
 
     def numeric(self, name) -> bool:
         """Checks if whole string matches regular expression of Latin digits."""
@@ -102,7 +112,7 @@ class Features:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_number'].match(name))
 
-    def script_name(self, name) -> Union[str, None]: #TODO does it need to depend on script names?
+    def script_name(self, name) -> Union[str, None]:  # TODO does it need to depend on script names?
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""
         result = None
         for script_name in self.script_names:
