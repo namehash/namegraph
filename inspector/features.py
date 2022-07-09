@@ -26,10 +26,10 @@ class Features:
             'numeric': '^[0-9]+$',
             'latin-alpha-numeric': '^[a-z0-9]+$',
             'simple': '^[a-z0-9-]+$',
-            'is_emoji': emoji_pattern,
+            'is_emoji': '^(' + emoji_pattern + ')+$',
             'simple-emoji': '^(' + emoji_pattern + '|[a-z0-9-])+$',
             'simple_letter-emoji': '^(' + emoji_pattern + '|[a-z])+$',
-            'is_letter': r'^\p{LC}+$',
+            'is_letter': r'^(\p{Lu}|\p{Ll}|\p{Lt})+$', #\p{LC} not work properly in regex
             # TODO: is it correct? or Ll or L? include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
             'is_number': r'^\p{N}+$',  # TODO: Nd | Nl | No?
         }
