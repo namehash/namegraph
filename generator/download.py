@@ -11,23 +11,29 @@ from omegaconf import DictConfig
 
 class S3Downloader:
     def __init__(self):
-        load_dotenv()
-
-        S3_ACCESS_KEY_ID = os.getenv('S3_ACCESS_KEY_ID')
-        S3_SECRET_ACCESS_KEY = os.getenv('S3_SECRET_ACCESS_KEY')
-        REGION_NAME = 'us-east-1'
-        self.s3_client = boto3.client('s3',
-                                      aws_access_key_id=S3_ACCESS_KEY_ID,
-                                      aws_secret_access_key=S3_SECRET_ACCESS_KEY,
-                                      region_name=REGION_NAME
-                                      )
+        self.s3_client = None
         self.bucket = 'prod-name-generator-namegeneratori-inputss3bucket-c26jqo3twfxy'
+
+    def get_client(self):
+        if self.s3_client is None:
+            load_dotenv()
+
+            S3_ACCESS_KEY_ID = os.getenv('S3_ACCESS_KEY_ID')
+            S3_SECRET_ACCESS_KEY = os.getenv('S3_SECRET_ACCESS_KEY')
+            REGION_NAME = 'us-east-1'
+            self.s3_client = boto3.client('s3',
+                                          aws_access_key_id=S3_ACCESS_KEY_ID,
+                                          aws_secret_access_key=S3_SECRET_ACCESS_KEY,
+                                          region_name=REGION_NAME
+                                          )
+
+        return self.s3_client
 
     def download_file(self, url, path, override=True):
         print('Downloading?', url, path, file=sys.stderr)
         if not Path(path).exists() or override:
             print('Downloading', url, path, file=sys.stderr)
-            self.s3_client.download_file(self.bucket, url, path)
+            self.get_client().download_file(self.bucket, url, path)
 
 
 def download_wordnet(config):
