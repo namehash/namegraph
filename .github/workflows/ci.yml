@@ -16,6 +16,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.5
+      - name: Hello world action
+        env: 
+          super_secret: ${{ secrets.TEST }}
+        run: echo $TEST
       - name: Install dependencies
         run: pip install -e .
       - name: Show installed dependencies
@@ -35,6 +39,9 @@ jobs:
           path: ./cache
           key: cache-v1.1
       - name: Download data
+        env:
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
         run: |
             ln -s ../tests/data/wikipedia2vec.pkl data/wikipedia2vec.pkl
             touch data/wikipedia2vec.pkl.vectors.npy
