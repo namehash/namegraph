@@ -17,11 +17,11 @@ app:
   secondary_market_names: data/secondary.csv
   advertised_names: data/advertised.csv
   internet_domains: data/top_internet_names.csv
-  primary_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/primary.csv
-  secondary_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/secondary.csv
-  advertised_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/advertised.csv
-  subnames_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/subnames.txt
-  clubs_url: https://namegen-orwjfodkfwefeewoi.s3.amazonaws.com/clubs.csv
+  primary_url: primary.csv
+  secondary_url: secondary.csv
+  advertised_url: advertised.csv
+  subnames_url: subnames.txt
+  clubs_url: clubs.csv
   clubs: data/clubs.csv
 filtering:
   # List of already registered domains
@@ -31,12 +31,12 @@ filtering:
 tokenization:
   dictionary: /usr/share/dict/words
 generation:
-  word2vec_url: https://namegen-resources-dgpstnjyliwzhlhp.s3.amazonaws.com/embeddings.pkl
+  word2vec_url: embeddings.pkl
   word2vec_path: data/embeddings.pkl
   suffixes_path: data/suffixes.txt
   prefixes_path: data/prefixes.txt
   limit: 10000
-  wikipedia2vec_url: https://namegen-resources-dgpstnjyliwzhlhp.s3.amazonaws.com/enwiki_20180420_100d.processed.pkl
+  wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: data/wikipedia2vec.pkl
 random_pipeline:
   normalizers:
