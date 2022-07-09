@@ -1,6 +1,9 @@
 version: "3.9"
 services:
   generator:
+    environment:
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
     image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
     ports:
       - 80:8000

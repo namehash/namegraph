@@ -13,7 +13,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN mkdir generator
 COPY generator/download*.py generator/
 COPY conf/ conf
-# RUN python3 generator/download.py #needs credentials
+RUN python3 generator/download.py
 
 COPY . .
 
