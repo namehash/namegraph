@@ -6,12 +6,14 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 
+RUN apt-get update && apt-get install -y gcc #for building cytoolz wheel
+
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 RUN mkdir generator
 COPY generator/download*.py generator/
-COPY conf/ .
-RUN python3 generator/download.py
+COPY conf/ conf
+# RUN python3 generator/download.py #needs credentials
 
 COPY . .
 
