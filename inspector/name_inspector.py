@@ -39,6 +39,14 @@ def uniq_gaps(tokenized):
     return result
 
 
+def count_words(tokenizeds):
+    count = [len(tokenized) for tokenized in tokenizeds if '' not in tokenized]
+    if not count:
+        return 0
+    else:
+        return min(count)
+
+
 class Inspector:
     def __init__(self, config: DictConfig):
         self.config = config
@@ -61,7 +69,7 @@ class Inspector:
                 'all_classes': (self.f.classes, True),
                 'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
-                'all_number': (self.f.is_number, True),
+                'all_number': (self.f.simple_number, True),
                 'all_emoji': (self.f.is_emoji, True),
                 'all_simple': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
@@ -76,10 +84,11 @@ class Inspector:
                 'name': (self.f.unicodedata_name, True),
                 'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
-                'classes': (self.f.classes, True),
+                'classes': (self.f.classes, False),
+                'char_class': (self.f.char_class, True),
 
                 'is_letter': (self.f.is_letter, True),
-                'is_number': (self.f.is_number, True),
+                'is_number': (self.f.simple_number, True),
                 'is_hyphen': (self.f.is_hyphen, True),
                 'is_emoji': (self.f.is_emoji, True),
                 'is_simple': (self.f.latin_alpha_numeric, True),
@@ -117,7 +126,7 @@ class Inspector:
                 'all_classes': (self.f.classes, True),
                 'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
-                'all_number': (self.f.is_number, True),
+                'all_number': (self.f.simple_number, True),
                 'all_emoji': (self.f.is_emoji, True),
                 'all_simple': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
@@ -133,7 +142,8 @@ class Inspector:
                 'name': (self.f.unicodedata_name, True),
                 'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
-                'classes': (self.f.classes, True),
+                'classes': (self.f.classes, False),
+                'char_class': (self.f.char_class, True),
             },
 
         }
@@ -242,8 +252,11 @@ class Inspector:
         # tokenizeds = [wordninja.split(name)]
         tokenizeds = self.tokenizer.tokenize(name)
         tokenizeds = [tuple(uniq_gaps(tokenized)) for tokenized in tokenizeds]
-        #remove duplicates after empty duplicates removal
-        tokenizeds=uniq(tokenizeds)
+        # remove duplicates after empty duplicates removal
+        tokenizeds = uniq(tokenizeds)
+
+        # count min number of words for tokenization without gaps
+        name_analysis['word_length'] = count_words(tokenizeds)
 
         # name_analysis['tokens'] = len(tokenized)
         name_analysis['tokenizations'] = []
@@ -257,7 +270,7 @@ class Inspector:
             # TODO spacy on tokenized form
             self.spacy(tokens_analysis)
 
-            name_analysis['tokenizations'].append({'tokens':tokens_analysis})
+            name_analysis['tokenizations'].append({'tokens': tokens_analysis})
 
         aggregated = self.aggregate(chars_analysis)
         name_analysis.update(aggregated)
@@ -277,7 +290,7 @@ class Inspector:
 
         doc = Doc(self.nlp.vocab, tokens)
         for i, token in enumerate(self.nlp(doc)):
-            token_analysis=tokens_analysis[mapping[i]]
+            token_analysis = tokens_analysis[mapping[i]]
             token_analysis['pos'] = token.pos_
             token_analysis['lemma'] = token.lemma_
             token_analysis['dep'] = token.dep_

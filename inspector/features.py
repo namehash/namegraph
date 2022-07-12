@@ -29,23 +29,33 @@ class Features:
             'is_emoji': '^(' + emoji_pattern + ')+$',
             'simple-emoji': '^(' + emoji_pattern + '|[a-z0-9-])+$',
             'simple_letter-emoji': '^(' + emoji_pattern + '|[a-z])+$',
-            'is_letter': r'^(\p{Lu}|\p{Ll}|\p{Lt})+$', #\p{LC} not work properly in regex
+            'is_letter': r'^(\p{Lu}|\p{Ll}|\p{Lt}|\p{Lo})+$',  # \p{LC} not work properly in regex
             # TODO: is it correct? or Ll or L? include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
             'is_number': r'^\p{N}+$',  # TODO: Nd | Nl | No?
         }
 
         self.classes_config: Dict[str, Callable] = {
             'any_letter': self.is_letter,
-            'any_number': self.is_number,
+            'any_number': self.simple_number,
             'hyphen': self.is_hyphen,
             'emoji': self.is_emoji,
             'simple': self.simple,
             'invisible': self.invisible,
             'simple_letter': self.simple_letter,
-            'simple_number': self.is_number,
+            'simple_number': self.simple_number,
             'simple_letter_emoji': self.simple_letter_emoji,
             # 'other_letter': self.other_letter,
             # 'other_number': self.other_number,
+        }
+
+        self.char_classes_config: Dict[str, Callable] = {
+            'simple_letter': self.simple_letter,
+            'simple_number': self.simple_number,
+            'any_letter': self.is_letter,
+            'any_number': self.is_number,
+            'hyphen': self.is_hyphen,
+            'emoji': self.is_emoji,
+            'invisible': self.invisible,
         }
 
         self.compiled_regexp_patterns = {k: regex.compile(v) for k, v in self.regexp_patterns.items()}  # TODO: flags?
@@ -108,9 +118,12 @@ class Features:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_letter'].match(name))
 
-    def is_number(self, name) -> bool:
+    def simple_number(self, name) -> bool:
         """Checks if string matches regular expression of lowercase letters."""
         return bool(self.compiled_regexp_patterns['is_number'].match(name))
+
+    def is_number(self, name) -> bool:
+        return False  # TODO
 
     def script_name(self, name) -> Union[str, None]:  # TODO does it need to depend on script names?
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""
@@ -256,6 +269,13 @@ class Features:
             if func(name):
                 result.append(c)
         return result
+
+    def char_class(self, name) -> str:
+        """Return classes of char: simple_letter,simple_number,any_letter,any_number,hyphen,emoji,invisible,special"""
+        for c, func in self.char_classes_config.items():
+            if func(name):
+                return c
+        return 'special'
 
     def ens_is_valid_name(self, name) -> bool:
         return ens.main.ENS.is_valid_name(name)

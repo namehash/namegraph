@@ -73,17 +73,17 @@ class InspectorConfusableCharResult(BaseModel):
                                    description="can be null if script is not assigned for a character")
     codepoint: str = Field(title="codepoint of the character as hex with 0x prefix")
     link: str = Field(title="link to external page with information about the character")
-    classes: List[str] = \
-        Field(title="list of classes in which the character is",
-              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
-                          '* hyphen - a hyphen'
-                          '* emoji - an emoji'
-                          '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner'
-                          '* simple_letter - [a-z]'
-                          '* simple_number - [0-9]'
-                          '* simple_letter_emoji - an emoji or [a-z]'
+    char_class: str = \
+        Field(title="class of the character",
+              description=
+              '* simple_letter - [a-z]'
+              '* simple_number - [0-9]'
+              '* any_letter - a letter in any script that is not simple; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+              '* any_number - a digit in any script that is not simple; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              '* hyphen - a hyphen'
+              '* emoji - an emoji'
+              '* invisible - zero width joiner or non-joiner'
+              '* special - for any character that doesn\'t match one of the other classifications'
               )
 
 
@@ -126,17 +126,17 @@ class InspectorCharResult(BaseModel):
                                    description="can be null if script is not assigned for a character")
     codepoint: str = Field(title="codepoint of the character as hex with 0x prefix")
     link: str = Field(title="link to external page with information about the character")
-    classes: List[str] = \
-        Field(title="list of classes in which the character is",
-              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
-                          '* hyphen - a hyphen'
-                          '* emoji - an emoji'
-                          '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner'
-                          '* simple_letter - [a-z]'
-                          '* simple_number - [0-9]'
-                          '* simple_letter_emoji - an emoji or [a-z]'
+    char_class: str = \
+        Field(title="class of the character",
+              description=
+              '* simple_letter - [a-z]'
+              '* simple_number - [0-9]'
+              '* any_letter - a letter in any script that is not simple; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+              '* any_number - a digit in any script that is not simple; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              '* hyphen - a hyphen'
+              '* emoji - an emoji'
+              '* invisible - zero width joiner or non-joiner'
+              '* special - for any character that doesn\'t match one of the other classifications'
               )
     unicodedata_category: str = Field(
         title="general category assigned to the character: http://www.unicode.org/reports/tr44/#GC_Values_Table",
@@ -174,6 +174,8 @@ class InspectorCharResult(BaseModel):
 class InspectorResult(BaseModel):
     name: str = Field(title="input string")
     length: int = Field(title="number of Unicode characters")
+    word_length: int = Field(title=" minimum number of words in tokenization without gaps",
+                             description='if gaps are in all tokenizations then result is 0')
     all_classes: List[str] = \
         Field(title="list of classes in which all characters are",
               description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
