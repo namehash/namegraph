@@ -3,7 +3,7 @@ import sys
 import hydra
 from omegaconf import DictConfig
 
-from download import S3Downloader
+from download_from_s3 import S3Downloader
 
 
 def download_names(config):
