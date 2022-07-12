@@ -71,3 +71,16 @@ def test_confusable_simple():
         for k, v in confusables.confusable_chars.items():
             if regex.match(r'[a-z0-9-]', k, regex.ASCII):
                 print([k, v], len(k), len(v))
+
+def test_inspector_word_length():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('laptop')
+        assert result['word_length']==1
+
+        result = inspector.analyse_name('lapŁtop')
+        assert result['word_length'] == 0
+
+        result = inspector.analyse_name('toplap')
+        assert result['word_length'] == 2
