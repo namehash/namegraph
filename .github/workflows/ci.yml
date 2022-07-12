@@ -42,6 +42,7 @@ jobs:
             ln -s ../tests/data/wikipedia2vec.pkl data/wikipedia2vec.pkl
             touch data/wikipedia2vec.pkl.vectors.npy
             python3 generator/download.py
+            python3 generator/download_from_s3.py
             python3 generator/download_names.py
       - name: Run tests
         run: pytest -vv

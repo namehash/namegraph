@@ -18,7 +18,8 @@ COPY data/ data
 RUN mkdir generator
 COPY generator/download*.py generator/
 COPY conf/ conf
-RUN python3 generator/download.py 
+RUN python3 generator/download_from_s3.py 
+RUN python3 generator/download.py
 
 FROM python:3.10.5-slim-buster as app
 
