@@ -3,7 +3,7 @@ on:
     branches: [prod]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     env:
@@ -11,6 +11,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
       ECR_REPOSITORY: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator
       PROD_IMAGE_TAG: prod-name-generator
+      CLUSTER_NAME: prod-name-generator
+      SERVER_NAME: prod-name-generator-server
 
     steps:
       - uses: actions/checkout@v2
@@ -29,3 +31,10 @@ jobs:
           .
       - name: push image
         run: docker push --all-tags ${ECR_REPOSITORY}
+
+      - name: deploy
+        run: |
+          aws ecs update-service \
+          --cluster ${CLUSTER_NAME} 
+          --service ${SERVICE_NAME}
+          --force-new-deployment
