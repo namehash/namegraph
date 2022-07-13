@@ -197,12 +197,16 @@ class InspectorResult(BaseModel):
     chars: List[InspectorCharResult]
     tokenizations: List[InspectorTokenizedResult]
     # aggregated: Dict
-    any_emoji: bool = Field(title='true if the string contains any emoji')
-    any_invisible: bool = Field(title='true if the string contains any invisible character')
+    # any_emoji: bool = Field(title='true if the string contains any emoji')
+    any_classes: List[str] = Field(title='list of "any classes"',
+                                   description='* emoji - true if the string contains any emoji'
+                                               '* invisible - true if the string contains any invisible character'
+                                               '* confusable - true if the string contains any confusable character')
+    # any_invisible: bool = Field(title='true if the string contains any invisible character')
     all_unicodeblock: Union[str, None] = Field(
         title="Unicode block of all characters",
         description="can be null if characters are in different blocks or block is not assigned for a character")
-    any_confusable: bool = Field(title='true if the string contains any confusable character')
+    # any_confusable: bool = Field(title='true if the string contains any confusable character')
     ens_is_valid_name: bool = Field(title='true if idna.uts46_remap(name, std3_rules=True) not raise errors',
                                     description='ens.main.ENS.is_valid_name(name)')
     ens_nameprep: Union[str, None] = Field(title='should be the same as idna.uts46_remap(name, std3_rules=True)',
