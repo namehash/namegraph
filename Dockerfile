@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.10.5-slim-buster
+FROM python:3.10.5-slim-buster as prepare
+
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_ACCESS_KEY_ID
 
 WORKDIR /app
 
@@ -12,14 +15,16 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY data/ data
 
-#dont work because no credentials at build time
-#RUN mkdir generator
-#COPY generator/download*.py generator/
-#COPY conf/ conf
-#RUN python3 generator/download.py 
+RUN mkdir generator
+COPY generator/download*.py generator/
+COPY conf/ conf
+RUN python3 generator/download.py 
 
+FROM python:3.10.5-slim-buster as app
+
+COPY --from=prepare /app /app
+WORKDIR /app
 COPY . .
 
 RUN pip3 install --no-cache-dir -e .
-
 CMD python3 generator/download_names.py && python3 -m uvicorn web_api:app --host 0.0.0.0
