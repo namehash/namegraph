@@ -35,6 +35,7 @@ jobs:
       - name: deploy
         run: |
           aws ecs update-service \
+          --region us-east-1 \
           --cluster ${CLUSTER_NAME} \
           --service ${SERVICE_NAME} \
           --force-new-deployment
