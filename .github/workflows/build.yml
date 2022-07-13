@@ -12,7 +12,7 @@ jobs:
       ECR_REPOSITORY: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator
       PROD_IMAGE_TAG: prod-name-generator
       CLUSTER_NAME: prod-name-generator
-      SERVER_NAME: prod-name-generator-server
+      SERVICE_NAME: prod-name-generator-server
 
     steps:
       - uses: actions/checkout@v2
