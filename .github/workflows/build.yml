@@ -23,8 +23,8 @@ jobs:
           docker build \
           --build-arg AWS_SECRET_ACCESS_KEY \
           --build-arg AWS_ACCESS_KEY_ID \
-          -t commit_$(git rev-parse --short "$GITHUB_SHA") \
-          -t ci-build-test \
+          -t ${ECR_REPOSITORY}:commit_$(git rev-parse --short "$GITHUB_SHA") \
+          -t ${ECR_REPOSITORY}:ci-build-test \
           .
       - name: push image
         run: docker push --all-tags ${ECR_REPOSITORY}
