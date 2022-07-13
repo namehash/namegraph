@@ -1,8 +1,9 @@
 import collections
 import unicodedata
-from typing import Dict, Callable, List, Tuple
+from typing import Dict, Callable, List, Tuple, Any
 
 import hydra
+import regex
 import spacy
 from spacy.tokens import Doc
 
@@ -56,6 +57,10 @@ class Inspector:
             'any_invisible': ('is_invisible', 'any'),
             'all_unicodeblock': ('unicodeblock', 'all'),
             'any_confusable': ('confusable', 'any'),
+        }
+
+        self.combine_config = {
+            'any_classes': ['any_emoji', 'any_invisible', 'any_confusable']
         }
         # TODO: MODE: filtering, ML
 
@@ -158,7 +163,7 @@ class Inspector:
 
         self.nlp = spacy.load("en_core_web_sm")
 
-    def analyze_string(self, name):
+    def analyze_string(self, name) -> Dict[str, Any]:
         result = {}
 
         for feature, (func, in_filtering) in self.features_config['string'].items():
@@ -166,7 +171,7 @@ class Inspector:
 
         return result
 
-    def analyze_token(self, name):
+    def analyze_token(self, name: str) -> Dict[str, Any]:
         result = {}
 
         for feature, (func, in_filtering) in self.features_config['token'].items():
@@ -174,14 +179,14 @@ class Inspector:
 
         return result
 
-    def analyze_character(self, name):
+    def analyze_character(self, name: str) -> Dict[str, Any]:
         result = {}
         for feature, (func, in_filtering) in self.features_config['char'].items():
             if in_filtering: result[feature] = func(name)
 
         return result
 
-    def analyze_confusable(self, name):
+    def analyze_confusable(self, name: str) -> Dict[str, Any]:
         result = {}
         for feature, (func, in_filtering) in self.features_config['confusable'].items():
             if in_filtering: result[feature] = func(name)
@@ -203,6 +208,15 @@ class Inspector:
             except TypeError:
                 pass
         return None
+
+    def combine_fields(self, analysis: Dict[str, Any], prefix_to_remove=''):
+        for result_name, names in self.combine_config.items():
+            result = []
+            for name in names:
+                if analysis[name]:
+                    name = regex.sub(f'^{prefix_to_remove}', '', name)
+                    result.append(name)
+            analysis[result_name] = result
 
     def aggregate(self, characters_analysis):
 
@@ -229,11 +243,7 @@ class Inspector:
         #             pass
         return aggregated
 
-    # assume we got normalized and valid name
-    def analyse_name(self, name: str):
-        # result = {}
-        name_analysis = self.analyze_string(name)
-
+    def chars_analysis(self, name: str) -> List[Dict[str, Any]]:
         chars_analysis = []
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
@@ -247,7 +257,27 @@ class Inspector:
                 confusable_strings_analysis.append(confusable_string_analysis)
             char_analysis['confusables'] = confusable_strings_analysis
             chars_analysis.append(char_analysis)
-        name_analysis['chars'] = chars_analysis
+        return chars_analysis
+
+    def tokenizations_analysis(self, tokenizeds: List[List[str]]) -> List[Dict[str, Any]]:
+        tokenizations_analysis = []
+        for tokenized in tokenizeds:
+            tokens_analysis = []
+            for i, token in enumerate(tokenized):
+                token_analysis = self.analyze_token(token)
+                tokens_analysis.append(token_analysis)
+
+            # spacy on tokenized form
+            self.spacy(tokens_analysis)
+
+            tokenizations_analysis.append({'tokens': tokens_analysis})
+        return tokenizations_analysis
+
+    # assume we got normalized and valid name
+    def analyse_name(self, name: str):
+        name_analysis = self.analyze_string(name)
+
+        name_analysis['chars'] = self.chars_analysis(name)
 
         # tokenizeds = [wordninja.split(name)]
         tokenizeds = self.tokenizer.tokenize(name)
@@ -258,35 +288,23 @@ class Inspector:
         # count min number of words for tokenization without gaps
         name_analysis['word_length'] = count_words(tokenizeds)
 
-        # name_analysis['tokens'] = len(tokenized)
-        name_analysis['tokenizations'] = []
-        for tokenized in tokenizeds:
-            tokens_analysis = []
-            for i, token in enumerate(tokenized):
-                token_analysis = self.analyze_token(token)
-                # token_analysis['index'] = i
-                tokens_analysis.append(token_analysis)
+        name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds)
 
-            # TODO spacy on tokenized form
-            self.spacy(tokens_analysis)
-
-            name_analysis['tokenizations'].append({'tokens': tokens_analysis})
-
-        aggregated = self.aggregate(chars_analysis)
+        aggregated = self.aggregate(name_analysis['chars'])
         name_analysis.update(aggregated)
-        # name_analysis['aggregated'] = aggregated
+
+        self.combine_fields(name_analysis, prefix_to_remove='any_')
+
         return name_analysis
 
     def spacy(self, tokens_analysis):
+        """Adds POS and lemmas to tokens."""
         mapping = {}
         tokens = []
         for i, token_analysis in enumerate(tokens_analysis):
             if token_analysis['token'] != '':
                 mapping[len(tokens)] = i
                 tokens.append(token_analysis['token'])
-
-        # tokens = [token_analysis['token'] for token_analysis in tokens_analysis]
-        # print(tokens)
 
         doc = Doc(self.nlp.vocab, tokens)
         for i, token in enumerate(self.nlp(doc)):
@@ -295,18 +313,6 @@ class Inspector:
             token_analysis['lemma'] = token.lemma_
             token_analysis['dep'] = token.dep_
 
-        # for token, token_analysis in zip(self.nlp(doc), tokens_analysis):
-        #     # print(token.text, token.pos_, token.dep_, token.lemma_)
-        #     token_analysis['pos'] = token.pos_
-        #     token_analysis['lemma'] = token.lemma_
-        #     token_analysis['dep'] = token.dep_
-
-
-# for name in names:
-#     print(name)
-#     normalized = ens.main.ENS.nameprep(name)
-#     print(normalized, normalized == name)
-#     print(ens.main.ENS.is_valid_name(name))
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
 def main(config: DictConfig):

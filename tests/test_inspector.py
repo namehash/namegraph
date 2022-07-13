@@ -16,6 +16,7 @@ def test_inspector():
         result = inspector.analyse_name('asd')
         print(result)
 
+
 def test_inspector_character_name():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
@@ -49,6 +50,7 @@ def test_confusable():
             'ῴ': (True, 'ω'),
             'ω': (True, 'ω'),
             '𝕤': (True, 's'),
+            'ą': (True, 'ą'),
             's': (False, None),
             '1': (False, None),
             'l': (False, None),
@@ -72,15 +74,24 @@ def test_confusable_simple():
             if regex.match(r'[a-z0-9-]', k, regex.ASCII):
                 print([k, v], len(k), len(v))
 
+
 def test_inspector_word_length():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         inspector = Inspector(config)
         result = inspector.analyse_name('laptop')
-        assert result['word_length']==1
+        assert result['word_length'] == 1
 
         result = inspector.analyse_name('lapŁtop')
         assert result['word_length'] == 0
 
         result = inspector.analyse_name('toplap')
         assert result['word_length'] == 2
+
+
+def test_inspector_combine():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('laptop😀')
+        assert 'emoji' in result['any_classes']
