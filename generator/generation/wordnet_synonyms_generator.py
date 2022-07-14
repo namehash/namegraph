@@ -20,8 +20,8 @@ class WordnetSynonymsGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__()
-        nltk.download("wordnet")
-        nltk.download("omw-1.4")
+        # nltk.download("wordnet")
+        # nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 

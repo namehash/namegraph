@@ -1,5 +1,5 @@
 import json
-from typing import Iterable, Any
+from typing import Iterable, Any, Union
 
 import regex
 from omegaconf import DictConfig
@@ -23,7 +23,7 @@ class Confusables:
         else:
             return ()
 
-    def get_canonical(self, character) -> Any | None:
+    def get_canonical(self, character) -> Union[Any, None]:
         if self.is_confusable(character):
             return self.confusable_chars[character][0]
         else:

@@ -2,6 +2,8 @@ import collections
 from typing import List, Tuple
 import ahocorasick
 
+from generator.generation.combination_limiter import prod
+
 
 class DFS:
     def __init__(self, automaton, name, skip_non_words=False, with_gaps=False):
@@ -20,7 +22,12 @@ class DFS:
             self.g_in[end_index].append(start_index)
         self.g_out[len(name)] = []
         self.result = []
-
+        # print(self.g_out) #TODO estimate number of tokenizations?
+        estimation = prod([len(v) for k, v in self.g_out.items() if v])
+        # print([len(v) for k, v in self.g_out.items() if v])
+        # print('Estimated number of tokenizations:', estimation)
+        #TODO limit to 100 mln or optimize algorithm: not generate gaps over some tokens?
+        
     def all_paths(self):
         self.dfs(0, [])
         for r in self.result:
@@ -75,4 +82,5 @@ class AllTokenizer():
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
         dfs = DFS(self.automaton, name, self.skip_non_words, self.with_gaps)
         tokenizations = list(dfs.all_paths())
+        # print('Real number of tokenizations:', len(tokenizations))
         return tokenizations
