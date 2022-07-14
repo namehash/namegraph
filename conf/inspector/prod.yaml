@@ -1,2 +1,3 @@
 script_names: data/inspector/script_names.txt
 confusables: data/inspector/confusables.json
+unigrams: data/inspector/unigram_freq.csv

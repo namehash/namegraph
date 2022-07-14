@@ -12,8 +12,8 @@ from omegaconf import DictConfig
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
 # cat Scripts.txt | grep -v -P "^#" | cut -d ";" -f 2 | cut -d ' ' -f 2 | sort -u > script_names.txt
 from generator.tokenization import AllTokenizer
-from generator.xgenerator import uniq
 from inspector.features import Features
+from inspector.ngrams import Ngrams
 
 
 def remove_accents(input_str):
@@ -40,8 +40,8 @@ def uniq_gaps(tokenized):
     return result
 
 
-def count_words(tokenizeds):
-    count = [len(tokenized) for tokenized in tokenizeds if '' not in tokenized]
+def count_words(tokenizeds: List[Dict]):
+    count = [len(tokenized['tokens']) for tokenized in tokenizeds if '' not in tokenized['tokens']]
     if not count:
         return 0
     else:
@@ -52,6 +52,7 @@ class Inspector:
     def __init__(self, config: DictConfig):
         self.config = config
         self.f = Features(config)
+        self.ngrams = Ngrams(config)
         self.aggregate_config = {
             'any_emoji': ('is_emoji', 'any'),
             'any_invisible': ('is_invisible', 'any'),
@@ -259,19 +260,36 @@ class Inspector:
             chars_analysis.append(char_analysis)
         return chars_analysis
 
-    def tokenizations_analysis(self, tokenizeds: List[List[str]]) -> List[Dict[str, Any]]:
-        tokenizations_analysis = []
+    def tokenize(self, name: str) -> List[Dict]:
+        tokenizeds = self.tokenizer.tokenize(name)
+        tokenizeds = [{'tokens': tokenized, 'probability': self.ngrams.sequence_probability(tokenized)} for tokenized in
+                      tokenizeds]
+        for tokenized in tokenizeds:
+            tokenized['tokens'] = tuple(uniq_gaps(tokenized['tokens']))
+        # tokenizeds = [tuple(uniq_gaps(tokenized)) for tokenized in tokenizeds]
+
+        # sort so highest probability with the same tokenization is first
+        tokenizeds = sorted(tokenizeds, key=lambda tokenized: tokenized['probability'], reverse=True)
+        # remove duplicates after empty duplicates removal
+        used = set()
+        tokenizeds = [x for x in tokenizeds if x['tokens'] not in used and (used.add(x['tokens']) or True)]
+
+        return tokenizeds
+
+    def tokenizations_analysis(self, tokenizeds: List[Dict]) -> List[Dict[str, Any]]:
         for tokenized in tokenizeds:
             tokens_analysis = []
-            for i, token in enumerate(tokenized):
+            for i, token in enumerate(tokenized['tokens']):
                 token_analysis = self.analyze_token(token)
+                token_analysis['probability']=self.ngrams.word_probability(token)
                 tokens_analysis.append(token_analysis)
+                # tokenized.update(token_analysis)
 
             # spacy on tokenized form
             self.spacy(tokens_analysis)
-
-            tokenizations_analysis.append({'tokens': tokens_analysis})
-        return tokenizations_analysis
+            tokenized['tokens'] = tokens_analysis
+            # tokenizations_analysis.append({'tokens': tokens_analysis})
+        return tokenizeds
 
     # assume we got normalized and valid name
     def analyse_name(self, name: str):
@@ -280,10 +298,7 @@ class Inspector:
         name_analysis['chars'] = self.chars_analysis(name)
 
         # tokenizeds = [wordninja.split(name)]
-        tokenizeds = self.tokenizer.tokenize(name)
-        tokenizeds = [tuple(uniq_gaps(tokenized)) for tokenized in tokenizeds]
-        # remove duplicates after empty duplicates removal
-        tokenizeds = uniq(tokenizeds)
+        tokenizeds = self.tokenize(name)
 
         # count min number of words for tokenization without gaps
         name_analysis['word_length'] = count_words(tokenizeds)
