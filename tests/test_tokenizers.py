@@ -1,5 +1,6 @@
 from typing import List
 
+import pytest
 from pytest import mark
 from hydra import initialize, compose
 
@@ -177,3 +178,12 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(over
 
         assert ('lap', '', 'top',) in tokenized_names
         assert ('', 'top',) in tokenized_names
+
+@pytest.mark.xfail
+@pytest.mark.timeout(10)
+def test_all_tokenizer_time():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        tokenizer = AllTokenizer(config)
+        print('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+        tokenized_names = tokenizer.tokenize('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
