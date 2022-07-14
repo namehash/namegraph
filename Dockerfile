@@ -9,17 +9,15 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 
-RUN apt-get update && apt-get install -y gcc #for building cytoolz wheel
-
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY data/ data
 
 RUN mkdir generator
-COPY generator/download*.py generator/
+COPY generator/download_from_s3.py generator/
 COPY conf/ conf
 RUN python3 generator/download_from_s3.py 
-RUN python3 generator/download.py
+
 
 FROM python:3.10.5-slim-buster as app
 
@@ -28,4 +26,6 @@ WORKDIR /app
 COPY . .
 
 RUN pip3 install --no-cache-dir -e .
+RUN python3 generator/download.py
+
 CMD python3 generator/download_names.py && python3 -m uvicorn web_api:app --host 0.0.0.0
