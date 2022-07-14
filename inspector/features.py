@@ -27,9 +27,9 @@ class Features:
             'latin-alpha-numeric': '^[a-z0-9]+$',
             'simple': '^[a-z0-9-]+$',
             'is_emoji': '^(' + emoji_pattern + ')+$',
-            'simple-emoji': '^(' + emoji_pattern + '|[a-z0-9-])+$',
-            'simple_letter-emoji': '^(' + emoji_pattern + '|[a-z])+$',
-            'is_letter': r'^(\p{Lu}|\p{Ll}|\p{Lt}|\p{Lo})+$',  # \p{LC} not work properly in regex
+            'simple-emoji': '^([a-z0-9-]|' + emoji_pattern + ')+$',
+            'simple_letter-emoji': '^([a-z]|' + emoji_pattern + ')+$',
+            'is_letter': r'^(\p{Ll}|\p{Lu}|\p{Lt}|\p{Lo})+$',  # \p{LC} not work properly in regex
             # TODO: is it correct? or Ll or L? include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
             'is_number': r'^\p{N}+$',  # TODO: Nd | Nl | No?
         }
@@ -47,6 +47,18 @@ class Features:
             # 'other_letter': self.other_letter,
             # 'other_number': self.other_number,
         }
+        self.token_classes_config: Dict[str, Callable] = {
+            'any_letter': self.is_letter,
+            'any_number': self.simple_number,
+            'hyphen': self.is_hyphen,
+            'emoji': self.is_emoji,
+            'simple': self.simple,
+            'invisible': self.invisible,
+            'simple_letter': self.simple_letter,
+            'simple_number': self.simple_number,
+            # 'other_letter': self.other_letter,
+            # 'other_number': self.other_number,
+        }
 
         self.char_classes_config: Dict[str, Callable] = {
             'simple_letter': self.simple_letter,
@@ -61,6 +73,10 @@ class Features:
         self.compiled_regexp_patterns = {k: regex.compile(v) for k, v in self.regexp_patterns.items()}  # TODO: flags?
 
         self.script_names = [line.strip() for line in open(config.inspector.script_names)]
+        self.compiled_script_names = {script_name: regex.compile(r'^\p{' + script_name + r'}+$') for script_name in
+                                      self.script_names}
+        # if regex.match(r'^\p{' + script_name + r'}+$', name):
+
         self.confusables = Confusables(config)
 
         self.nlp = spacy.load('en_core_web_sm')
@@ -89,7 +105,7 @@ class Features:
         """Checks if whole string matches regular expression of lowercase Latin letters."""
         return bool(self.compiled_regexp_patterns['simple_letter'].match(name))
 
-    def simple_letter_emoji(self, name) -> bool:
+    def simple_letter_emoji(self, name) -> bool:  # TODO: slow
         """Checks if whole string matches regular expression of lowercase Latin letters."""
         return bool(self.compiled_regexp_patterns['simple_letter-emoji'].match(name))
 
@@ -125,11 +141,11 @@ class Features:
     def is_number(self, name) -> bool:
         return False  # TODO
 
-    def script_name(self, name) -> Union[str, None]:  # TODO does it need to depend on script names?
+    def script_name(self, name) -> Union[str, None]:  # TODO does it need to depend on script names? 
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""
         result = None
-        for script_name in self.script_names:
-            if regex.match(r'^\p{' + script_name + r'}+$', name):
+        for script_name, regexp in self.compiled_script_names.items():  # TODO: slow
+            if regexp.match(name):
                 result = script_name
                 break
         return result
@@ -266,6 +282,14 @@ class Features:
         """Return classes of string: letter,number,hyphen,emoji,simple,invisible"""
         result = []
         for c, func in self.classes_config.items():
+            if func(name):
+                result.append(c)
+        return result
+
+    def token_classes(self, name) -> List[str]:
+        """Return classes of string: letter,number,hyphen,emoji,simple,invisible"""
+        result = []
+        for c, func in self.token_classes_config.items():
             if func(name):
                 result.append(c)
         return result

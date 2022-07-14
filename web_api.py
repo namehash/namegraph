@@ -104,18 +104,19 @@ class InspectorTokenResult(BaseModel):
                           '* invisible - zero width joiner or non-joiner'
                           '* simple_letter - [a-z]'
                           '* simple_number - [0-9]'
-                          '* simple_letter_emoji - an emoji or [a-z]'
               )
     all_script: Union[str, None] = \
         Field(title="script name of all characters",
               description="can be null if characters are in different scripts or script is not assigned for a character")
-    in_dictionary: bool = Field(title="if the token is in dictionary")
+    probability: float = Field(title="probability of the token")
+    # in_dictionary: bool = Field(title="if the token is in dictionary")
     pos: str = Field(title="part of speech of the token")
     lemma: str = Field(title="lemma of the word")
 
 
 class InspectorTokenizedResult(BaseModel):
     tokens: List[Union[InspectorTokenResult, InspectorEmptyTokenResult]]
+    probability: float = Field(title="probability of the tokenization")
 
 
 class InspectorCharResult(BaseModel):
@@ -196,6 +197,7 @@ class InspectorResult(BaseModel):
     # all_simple: bool
     chars: List[InspectorCharResult]
     tokenizations: List[InspectorTokenizedResult]
+    probability: float = Field(title="sum of tokenizations probabilities")
     # aggregated: Dict
     # any_emoji: bool = Field(title='true if the string contains any emoji')
     any_classes: List[str] = Field(title='list of "any classes"',
@@ -209,14 +211,16 @@ class InspectorResult(BaseModel):
     # any_confusable: bool = Field(title='true if the string contains any confusable character')
     ens_is_valid_name: bool = Field(title='true if idna.uts46_remap(name, std3_rules=True) not raise errors',
                                     description='ens.main.ENS.is_valid_name(name)')
-    ens_nameprep: Union[str, None] = Field(title='should be the same as idna.uts46_remap(name, std3_rules=True)',
-                                           description='ens.main.ENS.nameprep(name)')
-    uts46_remap: Union[str, None] = \
+    ens_nameprep: Union[str, None] = \
         Field(titile='Re-map the characters in the string according to UTS46 processing.',
               description='https://docs.ens.domains/contract-api-reference/name-processing#normalising-names'
                           'idna.uts46_remap(name, std3_rules=True)')
+    # uts46_remap: Union[str, None] = \
+    #     Field(titile='Re-map the characters in the string according to UTS46 processing.',
+    #           description='https://docs.ens.domains/contract-api-reference/name-processing#normalising-names'
+    #                       'idna.uts46_remap(name, std3_rules=True)')
     idna_encode: Union[str, None] = Field(
-        title='it does the same as uts46_remap(name, std3_rules=True), but do additional cheks regarding doots (subdomains), length, punycode, NFC, hyphens, combining characters',
+        title='it does the same as uts46_remap(name, std3_rules=True), but do additional checks regarding dots (subdomains), length, punycode, NFC, hyphens, combining characters',
         description='idna.encode(name, uts46=True, std3_rules=True, transitional=False)')
     version: str = Field(default='0.0.1', title="version of the name inspector",
                          description="version can be used for updating cache")

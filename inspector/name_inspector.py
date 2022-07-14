@@ -129,7 +129,7 @@ class Inspector:
             'token': {
                 'token': (self.f.name, True),
                 'length': (self.f.length, True),
-                'all_classes': (self.f.classes, True),
+                'all_classes': (self.f.token_classes, True),
                 'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
                 'all_number': (self.f.simple_number, True),
@@ -162,7 +162,7 @@ class Inspector:
 
         self.tokenizer = AllTokenizer(config)
 
-        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load("en_core_web_sm", exclude=["tok2vec", "parser", "ner"])  # ner is slow
 
     def analyze_string(self, name) -> Dict[str, Any]:
         result = {}
@@ -281,13 +281,16 @@ class Inspector:
             tokens_analysis = []
             for i, token in enumerate(tokenized['tokens']):
                 token_analysis = self.analyze_token(token)
-                token_analysis['probability']=self.ngrams.word_probability(token)
+                token_analysis['probability'] = self.ngrams.word_probability(token)
                 tokens_analysis.append(token_analysis)
                 # tokenized.update(token_analysis)
 
             # spacy on tokenized form
-            self.spacy(tokens_analysis)
+
             tokenized['tokens'] = tokens_analysis
+
+        for tokenized in tokenizeds:  # TODO: limit spacy
+            self.spacy(tokenized['tokens'])
             # tokenizations_analysis.append({'tokens': tokens_analysis})
         return tokenizeds
 
@@ -305,6 +308,10 @@ class Inspector:
 
         name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds)
 
+        # sum probabilities
+        name_analysis['probability'] = sum(
+            [tokenization['probability'] for tokenization in name_analysis['tokenizations']])
+
         aggregated = self.aggregate(name_analysis['chars'])
         name_analysis.update(aggregated)
 
@@ -314,6 +321,8 @@ class Inspector:
 
     def spacy(self, tokens_analysis):
         """Adds POS and lemmas to tokens."""
+        # TODO: slow
+        # use batching with nlp.pipe()
         mapping = {}
         tokens = []
         for i, token_analysis in enumerate(tokens_analysis):
@@ -321,12 +330,12 @@ class Inspector:
                 mapping[len(tokens)] = i
                 tokens.append(token_analysis['token'])
 
-        doc = Doc(self.nlp.vocab, tokens)
+        doc = Doc(self.nlp.vocab, tokens)  # TODO: cache because after removing gaps there are duplicates
         for i, token in enumerate(self.nlp(doc)):
             token_analysis = tokens_analysis[mapping[i]]
             token_analysis['pos'] = token.pos_
             token_analysis['lemma'] = token.lemma_
-            token_analysis['dep'] = token.dep_
+            # token_analysis['dep'] = token.dep_
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
