@@ -1,3 +1,5 @@
+Common
+Latin
 Adlam
 Ahom
 Anatolian_Hieroglyphs
@@ -22,7 +24,6 @@ Chakma
 Cham
 Cherokee
 Chorasmian
-Common
 Coptic
 Cuneiform
 Cypriot
@@ -67,7 +68,6 @@ Khmer
 Khojki
 Khudawadi
 Lao
-Latin
 Lepcha
 Limbu
 Linear_A
