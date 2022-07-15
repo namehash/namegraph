@@ -1,5 +1,6 @@
 import collections
 import unicodedata
+from itertools import islice
 from typing import Dict, Callable, List, Tuple, Any
 
 import hydra
@@ -261,7 +262,7 @@ class Inspector:
         return chars_analysis
 
     def tokenize(self, name: str) -> List[Dict]:
-        tokenizeds = self.tokenizer.tokenize(name)
+        tokenizeds = list(islice(self.tokenizer.tokenize(name), self.config.inspector.alltokenizer_limit))
         tokenizeds = [{'tokens': tokenized, 'probability': self.ngrams.sequence_probability(tokenized)} for tokenized in
                       tokenizeds]
         for tokenized in tokenizeds:

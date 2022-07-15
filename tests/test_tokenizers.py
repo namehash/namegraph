@@ -1,3 +1,4 @@
+from itertools import islice
 from typing import List
 
 import pytest
@@ -76,7 +77,6 @@ def test_all_tokenizer(overrides: List[str]):
         config = compose(config_name="test_config", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 455 tokenizations
-        print(len(tokenized_names))
         assert ('york', 'new', 'Ł', 'york', '123',) in tokenized_names
         assert ('y', 'o', 'r', 'k', 'new', 'Ł', 'york', '123',) in tokenized_names
         assert ('yorknewŁyork123',) not in tokenized_names
@@ -111,7 +111,7 @@ def test_all_tokenizer_skip_non_words(overrides: List[str]):
         config = compose(config_name="test_config", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 0 tokenizations
-        assert tokenized_names == []
+        assert list(tokenized_names) == []
 
         tokenized_names = tokenizer.tokenize('laptop')  # 13 tokenizations
         assert ('laptop',) in tokenized_names
@@ -181,9 +181,23 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(over
 
 @pytest.mark.xfail
 @pytest.mark.timeout(10)
-def test_all_tokenizer_time():
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=true", "tokenization.skip_non_words=false",
+          "tokenization.add_letters_ias=false",
+          "tokenization.with_gaps=true"]),
+    ],
+)
+def test_all_tokenizer_time(overrides):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
         tokenizer = AllTokenizer(config)
-        print('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+        # print('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
         tokenized_names = tokenizer.tokenize('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+        tokenized_names=list(islice(tokenized_names, 1000))
+        # print(tokenized_names)
+        # for i,t in enumerate(tokenized_names):
+        #     if i>10: break
+        #     print(t)
+        # # tokenized_names = tokenizer.tokenize('laptop')
