@@ -94,3 +94,12 @@ def test_inspector_combine():
         inspector = Inspector(config)
         result = inspector.analyse_name('laptop😀')
         assert 'emoji' in result['any_classes']
+
+@pytest.mark.timeout(10)
+def test_inspector_long():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+        # result = inspector.analyse_name('laptop')
+        print(result)

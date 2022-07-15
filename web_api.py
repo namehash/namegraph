@@ -196,7 +196,8 @@ class InspectorResult(BaseModel):
     # all_emoji: bool
     # all_simple: bool
     chars: List[InspectorCharResult]
-    tokenizations: List[InspectorTokenizedResult]
+    tokenizations: List[InspectorTokenizedResult] = Field(title='List of tokenizations sorted by probability',
+                                                          description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)')
     probability: float = Field(title="sum of tokenizations probabilities")
     # aggregated: Dict
     # any_emoji: bool = Field(title='true if the string contains any emoji')

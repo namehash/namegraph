@@ -1,5 +1,5 @@
 import collections
-from typing import List, Tuple
+from typing import Tuple,  Iterable
 import ahocorasick
 
 from generator.generation.combination_limiter import prod
@@ -23,14 +23,16 @@ class DFS:
         self.g_out[len(name)] = []
         self.result = []
         # print(self.g_out) #TODO estimate number of tokenizations?
-        estimation = prod([len(v) for k, v in self.g_out.items() if v])
+        # estimation = prod([len(v) for k, v in self.g_out.items() if v])
         # print([len(v) for k, v in self.g_out.items() if v])
         # print('Estimated number of tokenizations:', estimation)
-        #TODO limit to 100 mln or optimize algorithm: not generate gaps over some tokens?
-        
+        # TODO limit to 100 mln or optimize algorithm: not generate gaps over some tokens?
+
     def all_paths(self):
-        self.dfs(0, [])
-        for r in self.result:
+        # self.dfs(0, [])
+
+        # for r in self.result:
+        for r in self.dfs(0, []):
             t = []
             for start, end, in_dictionary in r:
                 if not in_dictionary and self.with_gaps:
@@ -39,25 +41,31 @@ class DFS:
                     t.append(self.name[start:end])
             yield tuple(t)
 
-    def dfs(self, index, result):
+    def dfs(self, index, result, gap_before=False):
         if index == len(self.name):
-            self.result.append(result)
+            yield result
             return
 
         if index in self.g_out:
-            for end in self.g_out[index]:
-                self.dfs(end, result + [(index, end, True)])
+            for end in sorted(self.g_out[index], reverse=True):
+                yield from self.dfs(end, result + [(index, end, True)])
 
-        if not self.skip_non_words:
+        if not self.skip_non_words and not gap_before:
+            # min_end = 100000
+            # print(self.g_out.keys())
             for potential_index in self.g_out.keys():
+                # print(potential_index, min_end)
+                # if potential_index>=min_end:
+                #     break
                 if potential_index <= index: continue
                 if index == 0 and potential_index == len(self.name): continue
                 if potential_index not in self.g_in:
-                    self.dfs(potential_index, result + [(index, potential_index, False)])
+                    yield from self.dfs(potential_index, result + [(index, potential_index, False)], gap_before=True)
+                    # min_end = min(min_end, min(self.g_out[potential_index]))
 
 
 class AllTokenizer():
-    """Return all tokenizations."""
+    """Return all tokenizations. It is a generator."""
 
     def __init__(self, config):
         path = config.tokenization.dictionary
@@ -79,8 +87,9 @@ class AllTokenizer():
 
         self.automaton.make_automaton()
 
-    def tokenize(self, name: str) -> List[Tuple[str, ...]]:
+    def tokenize(self, name: str) -> Iterable[Tuple[str, ...]]:
         dfs = DFS(self.automaton, name, self.skip_non_words, self.with_gaps)
-        tokenizations = list(dfs.all_paths())
+        # tokenizations = list(dfs.all_paths())
+        tokenizations = dfs.all_paths()
         # print('Real number of tokenizations:', len(tokenizations))
         return tokenizations
