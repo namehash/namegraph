@@ -50,6 +50,9 @@ class Name(BaseModel):
 
 
 class Result(BaseModel):
+    """
+    Input name might be truncated if is too long.
+    """
     advertised: List[str] = []
     secondary: List[str] = []
     primary: List[str] = []
@@ -62,6 +65,7 @@ async def root(name: str):
 
 @app.post("/", response_model=Result)
 async def root(name: Name):
+    logger.debug(f'Request received: {name.name}')
     return generator.generate_names(name.name)
 
 
@@ -176,7 +180,8 @@ class InspectorResult(BaseModel):
     name: str = Field(title="input string")
     length: int = Field(title="number of Unicode characters")
     word_length: int = Field(title=" minimum number of words in tokenization without gaps",
-                             description='if gaps are in all tokenizations then result is 0')
+                             description='if gaps are in all tokenizations then result is 0'
+                                         'if tokenization is empty then result is 0')
     all_classes: List[str] = \
         Field(title="list of classes in which all characters are",
               description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
@@ -197,7 +202,8 @@ class InspectorResult(BaseModel):
     # all_simple: bool
     chars: List[InspectorCharResult]
     tokenizations: List[InspectorTokenizedResult] = Field(title='List of tokenizations sorted by probability',
-                                                          description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)')
+                                                          description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)'
+                                                                      'the list might be empty if input name is too long')
     probability: float = Field(title="sum of tokenizations probabilities")
     # aggregated: Dict
     # any_emoji: bool = Field(title='true if the string contains any emoji')
@@ -230,3 +236,8 @@ class InspectorResult(BaseModel):
 @app.get("/inspector/", response_model=InspectorResult)
 async def root(name: str):
     return inspector.analyse_name(name)
+
+
+@app.post("/inspector/", response_model=InspectorResult)
+async def root(name: Name):
+    return inspector.analyse_name(name.name)

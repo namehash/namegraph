@@ -4,6 +4,7 @@
     - UnicodeNormalizer
     - NamehashNormalizer
     - ReplaceInvalidNormalizer
+    - LongNameNormalizer
   tokenizers:
     - BigramWordnetTokenizer
   generators:

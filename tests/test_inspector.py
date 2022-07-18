@@ -1,7 +1,6 @@
-import re
-
 import pytest
 import regex
+
 from hydra import compose, initialize
 
 from inspector.confusables import Confusables
@@ -100,3 +99,11 @@ def test_inspector_long():
         config = compose(config_name="prod_config")
         inspector = Inspector(config)
         result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+
+
+@pytest.mark.timeout(10)
+def test_inspector_long2():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('a' * 40000)

@@ -22,14 +22,17 @@ class DFS:
         self.result = []
 
     def all_paths(self):
-        for r in self.dfs(0, []):
-            t = []
-            for start, end, in_dictionary in r:
-                if not in_dictionary and self.with_gaps:
-                    t.append('')
-                else:
-                    t.append(self.name[start:end])
-            yield tuple(t)
+        try:
+            for r in self.dfs(0, []):
+                t = []
+                for start, end, in_dictionary in r:
+                    if not in_dictionary and self.with_gaps:
+                        t.append('')
+                    else:
+                        t.append(self.name[start:end])
+                yield tuple(t)
+        except RecursionError:
+            return
 
     def dfs(self, index, result, gap_before=False):
         if index == len(self.name):
