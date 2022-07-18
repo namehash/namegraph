@@ -18,8 +18,6 @@ class Features:
         self.config = config
         emojis = sorted(unicode_codes.EMOJI_DATA, key=len, reverse=True)
         emoji_pattern = u'(' + u'|'.join(regex.escape(u) for u in emojis) + u')'
-        # _EMOJI_REGEXP = regex.compile(emoji_pattern)
-        # EMOJI_REGEXP_AZ09 = regex.compile('^(' + emoji_pattern + '|[a-z0-9-])+$')
 
         self.regexp_patterns = {
             'simple_letter': '^[a-z]+$',
@@ -31,7 +29,7 @@ class Features:
             'simple_letter-emoji': '^([a-z]|' + emoji_pattern + ')+$',
             'is_letter': r'^(\p{Ll}|\p{Lu}|\p{Lt}|\p{Lo})+$',  # \p{LC} not work properly in regex
             # TODO: is it correct? or Ll or L? include small caps http://www.unicode.org/reports/tr44/#GC_Values_Table
-            'is_number': r'^\p{N}+$',  # TODO: Nd | Nl | No?
+            'is_number': r'^\p{N}+$',  # TODO: replace with numeric data from Unicode.org
         }
 
         self.classes_config: Dict[str, Callable] = {
@@ -75,7 +73,6 @@ class Features:
         self.script_names = [line.strip() for line in open(config.inspector.script_names)]
         self.compiled_script_names = {script_name: regex.compile(r'^\p{' + script_name + r'}+$') for script_name in
                                       self.script_names}
-        # if regex.match(r'^\p{' + script_name + r'}+$', name):
 
         self.confusables = Confusables(config)
 
@@ -87,7 +84,6 @@ class Features:
             for line in f:
                 word = line.strip().lower()
                 if skip_one_letter_words and len(word) == 1: continue
-                # if re.match(r'^\w+$', word):
                 self.dictionary.add(word)
         if config.tokenization.add_letters_ias:
             for char in 'ias':
@@ -236,18 +232,6 @@ class Features:
     def name(self, name) -> str:
         return name
 
-    # def lemma(self, name):
-    #     """Returns lemma of word."""
-    #     sentence = self.nlp(name)
-    #     for word in sentence:
-    #         print([word.text, word.lemma_, word.pos_])
-    # 
-    #     return name
-    # 
-    # def pos(self, name):
-    #     """Returns part of speech of word."""
-    #     return name
-
     def in_dictionary(self, name) -> bool:
         """Checks if string is in dictionary."""
         return name in self.dictionary
@@ -324,6 +308,5 @@ class Features:
         except idna.core.InvalidCodepoint:
             encode = None
         except idna.core.IDNAError as e:
-            # print(e)
             encode = None
         return encode

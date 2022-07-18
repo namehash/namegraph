@@ -1,5 +1,3 @@
-from math import e
-
 from hydra import initialize, compose
 
 from inspector.ngrams import Ngrams
@@ -19,4 +17,3 @@ def test_ngrams():
         assert ngrams.sequence_probability(['cat']) > ngrams.sequence_probability(['c', 'a', 't'])
 
         assert ngrams.sequence_probability(['repeatable']) > ngrams.sequence_probability(['repeat', 'able'])
-        

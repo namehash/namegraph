@@ -196,8 +196,3 @@ def test_all_tokenizer_time(overrides):
         # print('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
         tokenized_names = tokenizer.tokenize('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
         tokenized_names=list(islice(tokenized_names, 1000))
-        # print(tokenized_names)
-        # for i,t in enumerate(tokenized_names):
-        #     if i>10: break
-        #     print(t)
-        # # tokenized_names = tokenizer.tokenize('laptop')

@@ -13,8 +13,8 @@ logging.config.dictConfig(
                 "stream": "ext://sys.stdout",
             }
         },
-        "loggers": {"generator": {"handlers": ["console"], "level": "INFO", "propagate": False}},
+        "loggers": {"inspector": {"handlers": ["console"], "level": "INFO", "propagate": False}},
     }
 )
 
-logger = logging.getLogger("generator")
+logger = logging.getLogger("inspector")
