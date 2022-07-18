@@ -261,6 +261,9 @@ class Inspector:
         return chars_analysis
 
     def tokenize(self, name: str) -> List[Dict]:
+        if len(name) > self.config.inspector.tokenization_length_threshold:
+            return []
+
         tokenizeds = list(islice(self.tokenizer.tokenize(name), self.config.inspector.alltokenizer_limit))
         tokenizeds = [{'tokens': tokenized, 'probability': self.ngrams.sequence_probability(tokenized)} for tokenized in
                       tokenizeds]

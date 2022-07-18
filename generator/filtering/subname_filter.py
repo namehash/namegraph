@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Iterable, Set
+from typing import Iterable, Set, List
 
 
 class SubnameFilter:
@@ -11,5 +11,5 @@ class SubnameFilter:
                 subnames.add(line.strip())
         self.pattern = re.compile('|'.join([re.escape(token) for token in subnames]))
 
-    def apply(self, names: Iterable[str]):
+    def apply(self, names: Iterable[str]) -> List[str]:
         return [n for n in names if not self.pattern.search(n)]

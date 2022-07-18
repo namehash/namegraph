@@ -1,13 +1,13 @@
 import csv
-import json
-import random
+import logging
 from pathlib import Path
 from typing import Set, Dict, List, Tuple
 
-# from generator.filtering import SubnameFilter, ValidNameFilter
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.normalization.strip_eth_normalizer import strip_eth
+
+logger = logging.getLogger('generator')
 
 
 class Singleton(type):
@@ -25,6 +25,7 @@ class Singleton(type):
 
 class Domains(metaclass=Singleton):
     def __init__(self, config):
+        logger.debug('Initing Domains')
         self.config = config
         self.subname_filter = SubnameFilter(config)
         self.validname_filter = ValidNameFilter(config)
@@ -44,6 +45,7 @@ class Domains(metaclass=Singleton):
         self.internet -= self.advertised.keys()
 
         self.internet = set(self.validname_filter.apply(self.subname_filter.apply(self.internet)))
+        logger.debug('Inited Domains')
 
     def read_csv(self, path: str) -> Set[str]:
         domains: Set[str] = set()

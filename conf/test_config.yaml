@@ -24,6 +24,8 @@ app:
   subnames_url: subnames.txt
   clubs_url: clubs.csv
   clubs: tests/data/clubs.csv
+  #for longer names only first 30 characters are taken into consideration
+  name_length_limit: 30
 filtering:
   # List of already registered domains
   domains: tests/data/primary.csv

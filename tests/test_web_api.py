@@ -43,6 +43,7 @@ def test_get():
     primary = json['primary']
     assert "discharge" in primary
 
+
 @pytest.fixture(scope="module")
 def prod_test_client():
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
@@ -52,7 +53,8 @@ def prod_test_client():
     importlib.reload(web_api)
     client = TestClient(web_api.app)
     return client
-    
+
+
 @pytest.mark.slow
 def test_get_namehash(prod_test_client):
     client = prod_test_client
@@ -66,7 +68,6 @@ def test_get_namehash(prod_test_client):
     primary = json['primary']
 
 
-    
 @pytest.mark.slow
 def test_prod(prod_test_client):
     client = prod_test_client
@@ -79,3 +80,27 @@ def test_prod(prod_test_client):
 
     primary = json['primary']
     assert "myfire" in primary
+
+
+@pytest.mark.timeout(10)
+@pytest.mark.slow
+def test_prod_long(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={"name": "a" * 40000})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
+
+
+@pytest.mark.timeout(10)
+@pytest.mark.slow
+def test_prod_long_get(prod_test_client):
+    client = prod_test_client
+    response = client.get("/?name=" + 'a' * 40000)
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])

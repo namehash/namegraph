@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, List
 
 from generator.domains import Domains
 
@@ -9,5 +9,5 @@ class DomainFilter:
     def __init__(self, config):
         self.domains = Domains(config)
 
-    def apply(self, names: Iterable[str]):
+    def apply(self, names: Iterable[str]) -> List[str]:
         return [n for n in names if n not in self.domains.registered]
