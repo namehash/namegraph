@@ -1,7 +1,7 @@
 import collections
 import unicodedata
 from itertools import islice
-from typing import Dict, Callable, List, Tuple, Any
+from typing import Dict, Callable, List, Tuple, Any, Iterable
 
 import hydra
 import regex
@@ -17,17 +17,17 @@ from inspector.features import Features
 from inspector.ngrams import Ngrams
 
 
-def remove_accents(input_str):
+def remove_accents(input_str: str) -> str:
     nfkd_form = unicodedata.normalize('NFKD', input_str)
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def strip_accents(s):
+def strip_accents(s: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFD', s)
                    if unicodedata.category(c) != 'Mn')
 
 
-def uniq_gaps(tokenized):
+def uniq_gaps(tokenized: Iterable[str]) -> List[str]:
     result = []
     before_empty = False
     for token in tokenized:
@@ -41,7 +41,7 @@ def uniq_gaps(tokenized):
     return result
 
 
-def count_words(tokenizeds: List[Dict]):
+def count_words(tokenizeds: List[Dict]) -> int:
     count = [len(tokenized['tokens']) for tokenized in tokenizeds if '' not in tokenized['tokens']]
     if not count:
         return 0
@@ -249,7 +249,6 @@ class Inspector:
         chars_analysis = []
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
-            # char_analysis['index'] = i
             confusable_strings_analysis = []
             for confusable_string in char_analysis['confusables']:
                 confusable_string_analysis = []
@@ -267,7 +266,6 @@ class Inspector:
                       tokenizeds]
         for tokenized in tokenizeds:
             tokenized['tokens'] = tuple(uniq_gaps(tokenized['tokens']))
-        # tokenizeds = [tuple(uniq_gaps(tokenized)) for tokenized in tokenizeds]
 
         # sort so highest probability with the same tokenization is first
         tokenizeds = sorted(tokenizeds, key=lambda tokenized: tokenized['probability'], reverse=True)
@@ -284,7 +282,6 @@ class Inspector:
                 token_analysis = self.analyze_token(token)
                 token_analysis['probability'] = self.ngrams.word_probability(token)
                 tokens_analysis.append(token_analysis)
-                # tokenized.update(token_analysis)
 
             # spacy on tokenized form
 
@@ -292,7 +289,6 @@ class Inspector:
 
         for tokenized in tokenizeds:  # TODO: limit spacy
             self.spacy(tokenized['tokens'])
-            # tokenizations_analysis.append({'tokens': tokens_analysis})
         return tokenizeds
 
     # assume we got normalized and valid name

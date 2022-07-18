@@ -29,7 +29,7 @@ def test_inspector_character_name():
 
 def test_remove_accents():
     chars = {'ą': 'a', 'ś': 's', 'ó': 'o', 'ź': 'z', 'ώ': 'ω', 'ῴ': 'ω'}
-    # chars.update({'ł':'l','ό':'o'}) #dont work
+    # {'ł':'l','ό':'o'} dont work
     for char, canonical in chars.items():
         assert remove_accents(char) == canonical
         assert strip_accents(char) == canonical
@@ -39,29 +39,27 @@ def test_confusable():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
         test_confusables = Confusables(config)
-        chars = {
-            'ą': (True, 'a'),
-            'ś': (True, 's'),
-            'ó': (True, 'o'),
-            'ź': (True, 'z'),
-            'ł': (True, 'l'),
-            'ώ': (True, 'ω'),
-            'ῴ': (True, 'ω'),
-            # 'ω': (True, 'ω'),
-            '𝕤': (True, 's'),
-            # 'ą': (True, 'a'),
-            's': (False, None),
-            '1': (False, None),
-            'l': (False, None),
-            '⒀': (True, '(13)'),
-        }
-        # chars.update({'ł':'l','ό':'o'}) #dont work
-        for char, expected in chars.items():
+        chars = [
+            ('ą', True, 'a'),
+            ('ś', True, 's'),
+            ('ó', True, 'o'),
+            ('ź', True, 'z'),
+            ('ł', True, 'l'),
+            ('ώ', True, 'ω'),
+            ('ῴ', True, 'ω'),
+            ('𝕤', True, 's'),
+            ('ą', True, 'ą'),
+            ('s', False, None),
+            ('1', False, None),
+            ('l', False, None),
+            ('⒀', True, '(13)'),
+        ]
+        for char, expected_is_confusable, expected_confusables in chars:
             is_confusable, confusables = test_confusables.analyze(char)
-            print(char, expected, is_confusable, confusables)
-            assert is_confusable == expected[0]
+            print(char, expected_is_confusable, expected_confusables, is_confusable, confusables)
+            assert is_confusable == expected_is_confusable
             if is_confusable:
-                assert expected[1] in confusables
+                assert expected_confusables in confusables
 
 
 def test_confusable_simple():
@@ -95,11 +93,10 @@ def test_inspector_combine():
         result = inspector.analyse_name('laptop😀')
         assert 'emoji' in result['any_classes']
 
+
 @pytest.mark.timeout(10)
 def test_inspector_long():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
         inspector = Inspector(config)
         result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
-        # result = inspector.analyse_name('laptop')
-        print(result)
