@@ -124,3 +124,11 @@ def test_inspector_long2():
         config = compose(config_name="prod_config")
         inspector = Inspector(config)
         result = inspector.analyse_name('a' * 40000)
+
+@pytest.mark.timeout(10)
+def test_inspector_ner():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('billycorgan', entities=True)
+        assert any([t['entities'] for t in result['tokenizations']])

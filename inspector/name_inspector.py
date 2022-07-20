@@ -73,14 +73,14 @@ class Inspector:
 
         self.combine_config = {
             # 'any_classes': [
-                # 'any_simple_letter',
-                # 'any_simple_number',
-                # 'any_any_letter',
-                # 'any_any_number',
-                # 'any_hyphen',
-                # 'any_emoji',
-                # 'any_invisible',
-                # 'any_special'
+            # 'any_simple_letter',
+            # 'any_simple_number',
+            # 'any_any_letter',
+            # 'any_any_number',
+            # 'any_hyphen',
+            # 'any_emoji',
+            # 'any_invisible',
+            # 'any_special'
             # ]
         }
         # TODO: MODE: filtering, ML
@@ -182,7 +182,7 @@ class Inspector:
 
         self.tokenizer = AllTokenizer(config)
 
-        self.nlp = spacy.load("en_core_web_sm", exclude=["tok2vec", "parser", "ner"])  # ner is slow
+        self.nlp = spacy.load("en_core_web_sm", exclude=["tok2vec", "parser"])  # ner is slow
 
     def analyze_string(self, name) -> Dict[str, Any]:
         result = {}
@@ -300,7 +300,7 @@ class Inspector:
 
         return tokenizeds
 
-    def tokenizations_analysis(self, tokenizeds: List[Dict]) -> List[Dict[str, Any]]:
+    def tokenizations_analysis(self, tokenizeds: List[Dict], entities=False) -> List[Dict[str, Any]]:
         for tokenized in tokenizeds:
             tokens_analysis = []
             for i, token in enumerate(tokenized['tokens']):
@@ -313,11 +313,11 @@ class Inspector:
             tokenized['tokens'] = tokens_analysis
 
         for tokenized in tokenizeds:  # TODO: limit spacy
-            self.spacy(tokenized['tokens'])
+            self.spacy(tokenized, entities)
         return tokenizeds
 
     # assume we got normalized and valid name
-    def analyse_name(self, name: str):
+    def analyse_name(self, name: str, entities: bool = False):
         name_analysis = self.analyze_string(name)
 
         name_analysis['chars'] = self.chars_analysis(name)
@@ -328,7 +328,7 @@ class Inspector:
         # count min number of words for tokenization without gaps
         name_analysis['word_length'] = count_words(tokenizeds)
 
-        name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds)
+        name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
 
         # sum probabilities
         name_analysis['probability'] = sum(
@@ -341,10 +341,11 @@ class Inspector:
 
         return name_analysis
 
-    def spacy(self, tokens_analysis):
+    def spacy(self, tokenized: Dict[str, Any], entities: bool = False):
         """Adds POS and lemmas to tokens."""
         # TODO: slow
         # use batching with nlp.pipe()
+        tokens_analysis = tokenized['tokens']
         mapping = {}
         tokens = []
         for i, token_analysis in enumerate(tokens_analysis):
@@ -353,7 +354,10 @@ class Inspector:
                 tokens.append(token_analysis['token'])
 
         doc = Doc(self.nlp.vocab, tokens)  # TODO: cache because after removing gaps there are duplicates
-        for i, token in enumerate(self.nlp(doc)):
+        next(self.nlp.pipe([doc], disable=[] if entities else ["ner"]))
+        if entities:
+            tokenized['entities'] = [(ent.text, ent.label_) for ent in doc.ents]
+        for i, token in enumerate(doc):
             token_analysis = tokens_analysis[mapping[i]]
             token_analysis['pos'] = token.pos_
             token_analysis['lemma'] = token.lemma_

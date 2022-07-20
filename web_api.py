@@ -46,7 +46,12 @@ inspector = init_inspector()
 
 
 class Name(BaseModel):
-    name: str
+    name: str = Field(title='input name')
+
+
+class InspectorName(BaseModel):
+    name: str = Field(title='input name')
+    entities: bool = Field(default=False, title='additionally extract entities')
 
 
 class Result(BaseModel):
@@ -244,5 +249,5 @@ async def root(name: str):
 
 
 @app.post("/inspector/", response_model=InspectorResult)
-async def root(name: Name):
-    return inspector.analyse_name(name.name)
+async def root(name: InspectorName):
+    return inspector.analyse_name(name.name, name.entities)
