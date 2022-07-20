@@ -6,6 +6,8 @@ from fastapi.testclient import TestClient
 
 from generator.domains import Domains
 
+from helpers import check_inspector_response
+
 
 @pytest.fixture(scope="module")
 def prod_test_client():
@@ -100,3 +102,73 @@ def test_prod_inspector_long2_post(prod_test_client):
     json = response.json()
     assert 'name' in json
     assert len(json['tokenizations']) == 0
+
+
+@pytest.mark.slow
+def test_inspector_basic(prod_test_client):
+    name = 'cat'
+    response = prod_test_client.post('/inspector/', json={'name': name})
+    assert response.status_code == 200
+    json = response.json()
+
+    check_inspector_response(name, json)
+
+    assert json['word_length'] == 1
+    assert json['all_class'] == 'simple_letter'
+    assert json['all_script'] == 'Latin'
+    assert 0 < json['probability']
+    assert json['any_classes'] == ['simple_letter']
+    assert json['all_unicodeblock'] == 'BASIC_LATIN'
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == name
+
+    for char, name_char in zip((sorted(json['chars'], key=lambda c: c['char'])), sorted(name)):
+        assert char['script'] == 'Latin'
+        assert char['name'] == f'LATIN SMALL LETTER {name_char.upper()}'
+        assert char['char_class'] == 'simple_letter'
+        assert char['unicodedata_category'] == 'Ll'
+        assert char['unicodeblock'] == 'BASIC_LATIN'
+        assert char['confusables'] == []
+
+    tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
+    tok = tokenization['tokens'][0]
+    assert tok['token'] == name
+    assert tok['length'] == len(name)
+    assert tok['pos'] == 'NOUN'
+    assert tok['lemma'] == name
+
+
+@pytest.mark.slow
+def test_inspector_special(prod_test_client):
+    name = 'żółć'
+    response = prod_test_client.post('/inspector/', json={'name': name})
+    assert response.status_code == 200
+    json = response.json()
+
+    check_inspector_response(name, json)
+
+    assert json['word_length'] == 0
+    assert json['all_class'] == 'any_letter'
+    assert json['all_script'] == 'Latin'
+    assert json['probability'] == 0
+    assert json['any_classes'] == ['any_letter']
+    assert json['all_unicodeblock'] is None
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == 'xn--kda4b0koi'
+
+    for char, (name_char, canonical_char) in zip(sorted(json['chars'], key=lambda c: c['char']), sorted(zip(name, 'zolc'))):
+        assert char['script'] == 'Latin'
+        assert char['name'].startswith(f'LATIN SMALL LETTER {canonical_char.upper()}')
+        assert char['char_class'] == 'any_letter'
+        assert char['unicodedata_category'] == 'Ll'
+        assert char['unicodeblock'] == 'LATIN_EXTENDED_A' or char['unicodeblock'] == 'LATIN_EXTENDED_LETTER'
+
+        found_canonical_in_confusables = False
+        for conf_list in char['confusables']:
+            for conf in conf_list:
+                found_canonical_in_confusables |= conf['char'] == canonical_char
+        assert found_canonical_in_confusables
+
+    assert json['tokenizations'] == []
