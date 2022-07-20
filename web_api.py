@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
 
 from fastapi import FastAPI
 from hydra import initialize, compose
@@ -128,8 +128,8 @@ class InspectorTokenResult(BaseModel):
 class InspectorTokenizedResult(BaseModel):
     tokens: List[Union[InspectorTokenResult, InspectorEmptyTokenResult]]
     probability: float = Field(title="probability of the tokenization")
-    entities: Union[List[str], None] = Field(default=None, title="list of entities",
-                                             description='null if entity recognition disabled ot the input name is too long')
+    entities: Union[List[Tuple[str, str]], None] = Field(default=None, title="list of entities",
+                                                         description='null if entity recognition disabled ot the input name is too long')
 
 
 class InspectorCharResult(BaseModel):
