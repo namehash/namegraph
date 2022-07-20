@@ -39,15 +39,19 @@ class DFS:
             yield result
             return
 
+        found_next_token = False
         if index in self.g_out:
             for end in sorted(self.g_out[index], reverse=True):
+                found_next_token = True
                 yield from self.dfs(end, result + [(index, end, True)])
 
         if not self.skip_non_words and not gap_before:
             for potential_index in self.g_out.keys():
                 if potential_index <= index: continue
                 if index == 0 and potential_index == len(self.name): continue
+                if found_next_token and potential_index == len(self.name): continue
                 if potential_index not in self.g_in:
+                    found_next_token = True
                     yield from self.dfs(potential_index, result + [(index, potential_index, False)], gap_before=True)
 
 

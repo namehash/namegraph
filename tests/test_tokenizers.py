@@ -179,6 +179,7 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(over
         assert ('lap', '', 'top',) in tokenized_names
         assert ('', 'top',) in tokenized_names
 
+
 @pytest.mark.xfail
 @pytest.mark.timeout(10)
 @mark.parametrize(
@@ -195,4 +196,23 @@ def test_all_tokenizer_time(overrides):
         tokenizer = AllTokenizer(config)
         # print('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
         tokenized_names = tokenizer.tokenize('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
-        tokenized_names=list(islice(tokenized_names, 1000))
+        tokenized_names = list(islice(tokenized_names, 1000))
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["tokenization.skip_one_letter_words=true", "tokenization.skip_non_words=false",
+          "tokenization.add_letters_ias=false",
+          "tokenization.with_gaps=true"]),
+    ],
+)
+def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps23(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        tokenizer = AllTokenizer(config)
+        tokenized_names = list(tokenizer.tokenize('laptop😀ą'))
+        print(tokenized_names)
+        assert ('laptop', '') in tokenized_names
+        assert ('lap', 'top', '') in tokenized_names
+        assert ('lap', '',) not in tokenized_names

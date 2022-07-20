@@ -104,3 +104,31 @@ def test_prod_long_get(prod_test_client):
 
     json = response.json()
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
+
+
+@pytest.mark.timeout(10)
+@pytest.mark.slow
+def test_prod_inspector_long_post(prod_test_client):
+    client = prod_test_client
+    response = client.post("/inspector/",
+                           json={"name": "miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan"})
+
+    assert response.status_code == 200
+
+    json = response.json()
+
+    assert 'name' in json
+    assert len(json['tokenizations']) == 0
+
+
+@pytest.mark.timeout(10)
+@pytest.mark.slow
+def test_prod_inspector_long2_post(prod_test_client):
+    client = prod_test_client
+    response = client.post("/inspector/", json={"name": "a" * 40000})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert 'name' in json
+    assert len(json['tokenizations']) == 0

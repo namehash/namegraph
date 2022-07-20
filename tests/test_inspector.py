@@ -89,8 +89,25 @@ def test_inspector_combine():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         inspector = Inspector(config)
-        result = inspector.analyse_name('laptop😀')
+        result = inspector.analyse_name('laptop😀ą')
+        print(result)
         assert 'emoji' in result['any_classes']
+        tokenizations = result['tokenizations']
+        assert ['laptop', ''] == [token['token'] for token in tokenizations[0]['tokens']]
+        assert ['lap', 'top', ''] == [token['token'] for token in tokenizations[1]['tokens']]
+
+
+@pytest.mark.xfail
+def test_inspector_prob():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('😀lap😀')
+        # print(result)
+        tokenizations = result['tokenizations']
+        print(tokenizations)
+        assert ['', 'lap', ''] == [token['token'] for token in tokenizations[0]['tokens']]
+        assert ['', 'a', ''] == [token['token'] for token in tokenizations[1]['tokens']]
 
 
 @pytest.mark.timeout(10)
