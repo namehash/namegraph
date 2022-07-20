@@ -55,14 +55,33 @@ class Inspector:
         self.f = Features(config)
         self.ngrams = Ngrams(config)
         self.aggregate_config = {
-            'any_emoji': ('is_emoji', 'any'),
-            'any_invisible': ('is_invisible', 'any'),
             'all_unicodeblock': ('unicodeblock', 'all'),
+            'all_class': ('char_class', 'all'),
+            'any_classes': ('char_class', 'any'),
+            'all_script': ('script', 'all'),
             'any_confusable': ('confusable', 'any'),
+
+            # 'any_simple_letter': ('simple_letter', 'any'),
+            # 'any_simple_number': ('simple_number', 'any'),
+            # 'any_any_letter': ('any_letter', 'any'),
+            # 'any_any_number': ('any_number', 'any'),
+            # 'any_hyphen': ('hyphen', 'any'),
+            # 'any_emoji': ('emoji', 'any'),
+            # 'any_invisible': ('invisible', 'any'),
+            # 'any_special': ('special', 'any'),
         }
 
         self.combine_config = {
-            'any_classes': ['any_emoji', 'any_invisible', 'any_confusable']
+            # 'any_classes': [
+                # 'any_simple_letter',
+                # 'any_simple_number',
+                # 'any_any_letter',
+                # 'any_any_number',
+                # 'any_hyphen',
+                # 'any_emoji',
+                # 'any_invisible',
+                # 'any_special'
+            # ]
         }
         # TODO: MODE: filtering, ML
 
@@ -71,18 +90,18 @@ class Inspector:
             'string': {
                 'name': (self.f.name, True),
                 'length': (self.f.length, True),
-                'emoji_count': (self.f.emoji_count, False),
-                'bytes': (self.f.bytes, False),
-                'all_classes': (self.f.classes, True),
-                'all_script': (self.f.script_name, True),
+                # 'emoji_count': (self.f.emoji_count, False),
+                # 'bytes': (self.f.bytes, False),
+                # 'all_classes': (self.f.classes, True),
+                # 'all_script': (self.f.script_name, True),
                 'all_letter': (self.f.is_letter, True),
-                'all_number': (self.f.simple_number, True),
-                'all_emoji': (self.f.is_emoji, True),
+                # 'all_number': (self.f.simple_number, True),
+                # 'all_emoji': (self.f.is_emoji, True),
                 'all_simple': (self.f.latin_alpha_numeric, True),
                 'in_dictionary': (self.f.in_dictionary, True),
                 'ens_is_valid_name': (self.f.ens_is_valid_name, True),
                 'ens_nameprep': (self.f.ens_nameprep, True),
-                'uts46_remap': (self.f.uts46_remap, True),
+                # 'uts46_remap': (self.f.uts46_remap, True),
                 'idna_encode': (self.f.idna_encode, True),
             },
             'char': {
@@ -91,52 +110,52 @@ class Inspector:
                 'name': (self.f.unicodedata_name, True),
                 'codepoint': (self.f.codepoint_hex, True),
                 'link': (self.f.link, True),
-                'classes': (self.f.classes, False),
+                # 'classes': (self.f.classes, False),
                 'char_class': (self.f.char_class, True),
 
-                'is_letter': (self.f.is_letter, True),
-                'is_number': (self.f.simple_number, True),
-                'is_hyphen': (self.f.is_hyphen, True),
-                'is_emoji': (self.f.is_emoji, True),
-                'is_simple': (self.f.latin_alpha_numeric, True),
-                'is_invisible': (self.f.invisible, True),
+                # 'is_letter': (self.f.is_letter, True),
+                # 'is_number': (self.f.simple_number, True),
+                # 'is_hyphen': (self.f.is_hyphen, True),
+                # 'is_emoji': (self.f.is_emoji, True),
+                # 'is_simple': (self.f.latin_alpha_numeric, True),
+                # 'is_invisible': (self.f.invisible, True),
 
-                'simple_letter': (self.f.simple_letter, True),
-                'simple_letter_emoji': (self.f.simple_letter_emoji, True),
-                'numeric': (self.f.numeric, True),
-                'latin-alpha-numeric': (self.f.latin_alpha_numeric, True),
-                'simple-emoji': (self.f.simple_emoji, True),
-                'zwj': (self.f.zwj, True),
-                'zwnj': (self.f.zwnj, True),
+                # 'simple_letter': (self.f.simple_letter, True),
+                # 'simple_letter_emoji': (self.f.simple_letter_emoji, True),
+                # 'numeric': (self.f.numeric, True),
+                # 'latin-alpha-numeric': (self.f.latin_alpha_numeric, True),
+                # 'simple-emoji': (self.f.simple_emoji, True),
+                # 'zwj': (self.f.zwj, True),
+                # 'zwnj': (self.f.zwnj, True),
                 'unicodedata_category': (self.f.unicodedata_category, True),
-                'unicodedata_bidirectional': (self.f.unicodedata_bidirectional, True),
-                'unicodedata_combining': (self.f.unicodedata_combining, True),
-                'unicodedata_mirrored': (self.f.unicodedata_mirrored, True),
-                'unicodedata_decomposition': (self.f.unicodedata_decomposition, True),
+                # 'unicodedata_bidirectional': (self.f.unicodedata_bidirectional, True),
+                # 'unicodedata_combining': (self.f.unicodedata_combining, True),
+                # 'unicodedata_mirrored': (self.f.unicodedata_mirrored, True),
+                # 'unicodedata_decomposition': (self.f.unicodedata_decomposition, True),
                 'unicodeblock': (self.f.unicodeblock, True),
-                'confusable': (self.f.is_confusable, False),
+                # 'confusable': (self.f.is_confusable, False),
                 'confusables': (self.f.get_confusables, True),
-                'canonical': (self.f.get_canonical, False),
-                'ascii': (self.f.is_ascii, False),
-                'codepoint_int': (self.f.codepoint_int, False),
-                'codepoint_hex': (self.f.codepoint, False),
-                'bytes': (self.f.bytes, False),
-                'unidecode': (self.f.unidecode, True),
-                'NFKD_ascii': (self.f.NFKD_ascii, False),
-                'NFD_ascii': (self.f.NFD_ascii, False),
-                'NFKD': (self.f.NFKD, False),
-                'NFD': (self.f.NFD, False),
+                # 'canonical': (self.f.get_canonical, False),
+                # 'ascii': (self.f.is_ascii, False),
+                # 'codepoint_int': (self.f.codepoint_int, False),
+                # 'codepoint_hex': (self.f.codepoint, False),
+                # 'bytes': (self.f.bytes, False),
+                # 'unidecode': (self.f.unidecode, True),
+                # 'NFKD_ascii': (self.f.NFKD_ascii, False),
+                # 'NFD_ascii': (self.f.NFD_ascii, False),
+                # 'NFKD': (self.f.NFKD, False),
+                # 'NFD': (self.f.NFD, False),
             },
             'token': {
                 'token': (self.f.name, True),
                 'length': (self.f.length, True),
-                'all_classes': (self.f.token_classes, True),
-                'all_script': (self.f.script_name, True),
-                'all_letter': (self.f.is_letter, True),
-                'all_number': (self.f.simple_number, True),
-                'all_emoji': (self.f.is_emoji, True),
-                'all_simple': (self.f.latin_alpha_numeric, True),
-                'in_dictionary': (self.f.in_dictionary, True),
+                # 'all_classes': (self.f.token_classes, True),
+                # 'all_script': (self.f.script_name, True),
+                # 'all_letter': (self.f.is_letter, True),
+                # 'all_number': (self.f.simple_number, True),
+                # 'all_emoji': (self.f.is_emoji, True),
+                # 'all_simple': (self.f.latin_alpha_numeric, True),
+                # 'in_dictionary': (self.f.in_dictionary, True),
                 # 'lemma': (self.f.lemma, True),
                 # 'pos': (self.f.pos, True),
                 # 'tense': (self.f.name, True),
@@ -202,13 +221,16 @@ class Inspector:
             elif mode == 'any':
                 return any(vs)
         else:
-            try:
-                if len(set(vs)) == 1:
-                    return vs[0]
-                else:
-                    return None
-            except TypeError:
-                pass
+            if mode == 'all':
+                try:
+                    if len(set(vs)) == 1:
+                        return vs[0]
+                    else:
+                        return None
+                except TypeError:
+                    pass
+            elif mode == 'any':
+                return list(set(vs))
         return None
 
     def combine_fields(self, analysis: Dict[str, Any], prefix_to_remove=''):

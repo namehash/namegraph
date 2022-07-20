@@ -98,20 +98,22 @@ class InspectorEmptyTokenResult(BaseModel):
 class InspectorTokenResult(BaseModel):
     token: str = Field(title="the token")
     length: int = Field(title="number of Unicode characters")
-    all_classes: List[str] = \
-        Field(title="list of classes in which all characters are",
-              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
-                          '* hyphen - a hyphen'
-                          '* emoji - an emoji'
-                          '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner'
-                          '* simple_letter - [a-z]'
-                          '* simple_number - [0-9]'
-              )
-    all_script: Union[str, None] = \
-        Field(title="script name of all characters",
-              description="can be null if characters are in different scripts or script is not assigned for a character")
+    # all_class: Union[str,None] = \
+    #     Field(title="class in which all characters are",
+    #           description=
+    #           '* simple_letter - [a-z]'
+    #           '* simple_number - [0-9]'
+    #           '* any_letter - a letter in any script that is not simple; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+    #           '* any_number - a digit in any script that is not simple; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+    #           '* hyphen - a hyphen'
+    #           '* emoji - an emoji'
+    #           '* invisible - zero width joiner or non-joiner'
+    #           '* special - for any character that doesn\'t match one of the other classifications'
+    #           '* null'
+    #           )
+    # all_script: Union[str, None] = \
+    #     Field(title="script name of all characters",
+    #           description="can be null if characters are in different scripts or script is not assigned for a character")
     probability: float = Field(title="probability of the token")
     # in_dictionary: bool = Field(title="if the token is in dictionary")
     pos: str = Field(title="part of speech of the token")
@@ -121,6 +123,8 @@ class InspectorTokenResult(BaseModel):
 class InspectorTokenizedResult(BaseModel):
     tokens: List[Union[InspectorTokenResult, InspectorEmptyTokenResult]]
     probability: float = Field(title="probability of the tokenization")
+    entities: Union[List[str], None] = Field(default=None, title="list of entities",
+                                             description='null if entity recognition disabled ot the input name is too long')
 
 
 class InspectorCharResult(BaseModel):
@@ -158,9 +162,9 @@ class InspectorCharResult(BaseModel):
     unicodeblock: Union[str, None] = \
         Field(title="name of Unicode block in which the character is or null",
               description='the unicodeblock library is not maintained, it uses some old Unicode version')
-    unidecode: str = Field(
-        title="https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.",
-        description="e.g. it converts 'ł' to 'l', 'ω' (omega) to 'o'.")
+    # unidecode: str = Field(
+    #     title="https://pypi.org/project/Unidecode/ Tries to represent name in ASCII characters.",
+    #     description="e.g. it converts 'ł' to 'l', 'ω' (omega) to 'o'.")
     # NFKD_ascii: str = Field(title="string after decomposition in compatible mode with removed non-ascii chars")
     # NFD_ascii: str = Field(title="string after decomposition with removed non-ascii chars")
     # NFKD: str = Field(title="string after decomposition in compatible mode")
@@ -182,17 +186,18 @@ class InspectorResult(BaseModel):
     word_length: int = Field(title=" minimum number of words in tokenization without gaps",
                              description='if gaps are in all tokenizations then result is 0'
                                          'if tokenization is empty then result is 0')
-    all_classes: List[str] = \
-        Field(title="list of classes in which all characters are",
-              description='* any_letter - a letter in any script; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
-                          '* any_number - a digit in any script; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
-                          '* hyphen - a hyphen'
-                          '* emoji - an emoji'
-                          '* simple - [a-z0-9-]'
-                          '* invisible - zero width joiner or non-joiner'
-                          '* simple_letter - [a-z]'
-                          '* simple_number - [0-9]'
-                          '* simple_letter_emoji - an emoji or [a-z]'
+    all_class: Union[str, None] = \
+        Field(title="class in which all characters are",
+              description=
+              '* simple_letter - [a-z]'
+              '* simple_number - [0-9]'
+              '* any_letter - a letter in any script that is not simple; LC class http://www.unicode.org/reports/tr44/#GC_Values_Table'
+              '* any_number - a digit in any script that is not simple; N class http://www.unicode.org/reports/tr44/#GC_Values_Table'  # TODO: check
+              '* hyphen - a hyphen'
+              '* emoji - an emoji'
+              '* invisible - zero width joiner or non-joiner'
+              '* special - for any character that doesn\'t match one of the other classifications'
+              '* null'
               )
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")

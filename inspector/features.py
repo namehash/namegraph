@@ -132,10 +132,10 @@ class Features:
 
     def simple_number(self, name) -> bool:
         """Checks if string matches regular expression of lowercase letters."""
-        return bool(self.compiled_regexp_patterns['is_number'].match(name))
+        return bool(self.compiled_regexp_patterns['numeric'].match(name))
 
     def is_number(self, name) -> bool:
-        return False  # TODO
+        return bool(self.compiled_regexp_patterns['is_number'].match(name))
 
     def script_name(self, name) -> Union[str, None]:  # TODO does it need to depend on script names? 
         """Returns name of script (writing system) of the string, None if different scripts are used in the string."""

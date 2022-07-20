@@ -21,7 +21,7 @@ class Wikipedia2VGenerator(NameGenerator):
             self.model = gensim.models.keyedvectors.KeyedVectors.load(config.generation.wikipedia2vec_path)
         except FileNotFoundError as e:
             print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
-            raise FileNotFoundError('No embeddings in binary format. Run generator/download.py.')
+            raise FileNotFoundError('No embeddings in binary format. Run generator/download_from_s3.py.')
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         name = '_'.join(tokens)
