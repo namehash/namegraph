@@ -125,6 +125,7 @@ def test_inspector_long2():
         inspector = Inspector(config)
         result = inspector.analyse_name('a' * 40000)
 
+
 @pytest.mark.timeout(10)
 def test_inspector_ner():
     with initialize(version_base=None, config_path="../conf/"):
@@ -132,3 +133,21 @@ def test_inspector_ner():
         inspector = Inspector(config)
         result = inspector.analyse_name('billycorgan', entities=True)
         assert any([t['entities'] for t in result['tokenizations']])
+
+
+@pytest.mark.timeout(10)
+def test_inspector_unknown_name():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]')
+        # TODO
+
+
+@pytest.mark.timeout(10)
+def test_inspector_score():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('laptop', score=True)
+        assert 'score' in result

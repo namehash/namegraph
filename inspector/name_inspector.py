@@ -59,6 +59,7 @@ class Inspector:
             'all_class': ('char_class', 'all'),
             'any_classes': ('char_class', 'any'),
             'all_script': ('script', 'all'),
+            'any_scripts': ('script', 'any'),
             'any_confusable': ('confusable', 'any'),
 
             # 'any_simple_letter': ('simple_letter', 'any'),
@@ -183,6 +184,8 @@ class Inspector:
         self.tokenizer = AllTokenizer(config)
 
         self.nlp = spacy.load("en_core_web_sm", exclude=["tok2vec", "parser"])  # ner is slow
+
+        self.scorer = Scorer(config)
 
     def analyze_string(self, name) -> Dict[str, Any]:
         result = {}
@@ -317,27 +320,31 @@ class Inspector:
         return tokenizeds
 
     # assume we got normalized and valid name
-    def analyse_name(self, name: str, entities: bool = False):
+    def analyse_name(self, name: str, score: bool = True, entities: bool = False):
         name_analysis = self.analyze_string(name)
 
         name_analysis['chars'] = self.chars_analysis(name)
 
         # tokenizeds = [wordninja.split(name)]
-        tokenizeds = self.tokenize(name)
+        if score:
+            tokenizeds = self.tokenize(name)
 
-        # count min number of words for tokenization without gaps
-        name_analysis['word_length'] = count_words(tokenizeds)
+            # count min number of words for tokenization without gaps
+            name_analysis['word_length'] = count_words(tokenizeds)
+    
+            name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
 
-        name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
-
-        # sum probabilities
-        name_analysis['probability'] = sum(
-            [tokenization['probability'] for tokenization in name_analysis['tokenizations']])
+            # sum probabilities
+            name_analysis['probability'] = sum(
+                [tokenization['probability'] for tokenization in name_analysis['tokenizations']])
 
         aggregated = self.aggregate(name_analysis['chars'])
         name_analysis.update(aggregated)
 
         self.combine_fields(name_analysis, prefix_to_remove='any_')
+
+        if score:
+            name_analysis['score'] = self.score_name(name_analysis)
 
         return name_analysis
 
@@ -362,6 +369,86 @@ class Inspector:
             token_analysis['pos'] = token.pos_
             token_analysis['lemma'] = token.lemma_
             # token_analysis['dep'] = token.dep_
+
+    def score_name(self, name_analysis):
+        return self.scorer.score(name_analysis)
+
+
+class Scorer:
+    def __init__(self, config):
+        # self.config = config
+        self.name_length_limit = config.app.name_length_limit
+
+    def score(self, name_analysis) -> float:
+        # TODO return 0 if namehash
+
+        if self.name_contains_invisible(name_analysis):
+            result = 1
+        elif self.name_too_long(name_analysis):
+            result = 2
+        elif self.name_contains_confusable(name_analysis):
+            result = 3
+        elif self.name_contains_special(name_analysis):
+            result = 4
+        elif self.name_contains_number(name_analysis):
+            result = 5
+        elif self.name_contains_letters(name_analysis):
+            result = 6
+        elif self.name_contains_emoji(name_analysis):
+            result = 7
+        elif self.name_contains_hyphen(name_analysis):
+            result = 8
+        elif self.name_contains_simple_number(name_analysis):
+            result = 9
+        elif self.word_count(name_analysis) is None:
+            result = 10
+        elif self.word_count(name_analysis) == 0:
+            result = 11
+        elif self.word_count(name_analysis) >= 4:
+            result = 12
+        elif self.word_count(name_analysis) == 3:
+            result = 13
+        elif self.word_count(name_analysis) == 2:
+            result = 14
+        elif self.word_count(name_analysis) == 1:
+            result = 15
+        else:
+            raise ValueError('error in name scoring algorithm')
+
+        return result + self.short_name_bonus(name_analysis)
+
+    def name_contains_invisible(self, name_analysis):
+        return 'invisible' in name_analysis['any_classes']
+
+    def name_too_long(self, name_analysis):
+        return name_analysis['length'] > self.name_length_limit
+
+    def name_contains_confusable(self, name_analysis):
+        return any([char['confusables'] for char in name_analysis['chars']])
+
+    def name_contains_special(self, name_analysis):
+        return 'special' in name_analysis['any_classes']
+
+    def name_contains_number(self, name_analysis):
+        return 'any_number' in name_analysis['any_classes']
+
+    def name_contains_letters(self, name_analysis):
+        return 'any_letter' in name_analysis['any_classes']
+
+    def name_contains_emoji(self, name_analysis):
+        return 'emoji' in name_analysis['any_classes']
+
+    def name_contains_hyphen(self, name_analysis):
+        return 'hyphen' in name_analysis['any_classes']
+
+    def name_contains_simple_number(self, name_analysis):
+        return 'simple_number' in name_analysis['any_classes']
+
+    def word_count(self, name_analysis):
+        return name_analysis['word_length']
+
+    def short_name_bonus(self, name_analysis):
+        return 1 - name_analysis['length'] / (self.name_length_limit + 1)
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
