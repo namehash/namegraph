@@ -182,10 +182,10 @@ def test_inspector_special(prod_test_client):
 
 
 @pytest.mark.slow
-def test_inspector_stress(prod_test_client):
+def test_inspector_special_cases(prod_test_client):
     client = prod_test_client
 
-    special_cases = [
+    names = [
         'dbque.eth\n',
         '🇪🇹is🦇🔊💲.eth',
         'iwant\U0001faf5.eth',
@@ -194,29 +194,37 @@ def test_inspector_stress(prod_test_client):
         'iwant🫵.eth',
     ]
 
-    input_filename = 'data/primary.csv'
-
-    # use only names with unusual characters
-    special_filter = regex.compile(r'[^a-zA-Z0-9.]')
-    # will check 1/data_fraction of data (after character filtering)
-    data_fraction = 2000
-
-    def process_name(name):
+    for name in names:
         response = client.post('/inspector/', json={'name': name})
         assert response.status_code == 200
         check_inspector_response(name, response.json())
 
-    for name in special_cases:
-        process_name(name)
+
+@pytest.mark.slow
+def test_inspector_stress(prod_test_client):
+    client = prod_test_client
+
+    input_filename = 'data/primary.csv'
+
+    # use only names with unusual characters
+    special_filter = regex.compile(r'[^a-zA-Z0-9.]')
+
+    # will check 1/data_fraction of data (after character filtering)
+    data_fraction = 2000
 
     with open(input_filename, 'r') as f:
         i = 0
         for line in f:
             # strip only one last newline
             name = line[:-1]
+
             # skip simple names
             if special_filter.search(name) is None:
                 continue
+
             if i % data_fraction == 0:
-                process_name(name)
+                response = client.post('/inspector/', json={'name': name})
+                assert response.status_code == 200
+                check_inspector_response(name, response.json())
+
             i += 1
