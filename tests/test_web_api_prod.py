@@ -1,5 +1,6 @@
 import os
 import sys
+from time import time as get_time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -202,16 +203,24 @@ def test_inspector_special_cases(prod_test_client):
 @pytest.mark.slow
 def test_inspector_stress(prod_test_client):
     client = prod_test_client
+    max_duration = 1
     for name in generate_example_names(400):
+        start = get_time()
         response = client.post('/inspector/', json={'name': name})
-        assert response.status_code == 200
+        duration = get_time() - start
+        assert response.status_code == 200, f'{name} failed with {response.status_code}'
+        assert duration < max_duration, f'Time exceeded on {name}'
         check_inspector_response(name, response.json())
 
 
 @pytest.mark.slow
 def test_generator_stress(prod_test_client):
     client = prod_test_client
+    max_duration = 1
     for name in generate_example_names(400):
+        start = get_time()
         response = client.post('/', json={'name': name})
-        assert response.status_code == 200
+        duration = get_time() - start
+        assert response.status_code == 200, f'{name} failed with {response.status_code}'
+        assert duration < max_duration, f'Time exceeded on {name}'
         check_generator_response(response.json())
