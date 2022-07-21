@@ -448,7 +448,7 @@ class Scorer:
         return name_analysis['word_length']
 
     def short_name_bonus(self, name_analysis):
-        return 1 - name_analysis['length'] / (self.name_length_limit + 1)
+        return 1 - min(name_analysis['length'], self.name_length_limit) / (self.name_length_limit + 1)
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
