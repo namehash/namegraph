@@ -116,12 +116,14 @@ def test_inspector_basic(prod_test_client):
     assert json['word_length'] == 1
     assert json['all_class'] == 'simple_letter'
     assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
     assert 0 < json['probability']
     assert json['any_classes'] == ['simple_letter']
     assert json['all_unicodeblock'] == 'BASIC_LATIN'
     assert json['ens_is_valid_name']
     assert json['ens_nameprep'] == name
     assert json['idna_encode'] == name
+    assert 0 < json['score']
 
     # order of the returned characters must match input name
     for char, name_char in zip(json['chars'], name):
@@ -152,12 +154,14 @@ def test_inspector_special(prod_test_client):
     assert json['word_length'] == 0
     assert json['all_class'] == 'any_letter'
     assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
     assert json['probability'] == 0
     assert json['any_classes'] == ['any_letter']
     assert json['all_unicodeblock'] is None
     assert json['ens_is_valid_name']
     assert json['ens_nameprep'] == name
     assert json['idna_encode'] == 'xn--kda4b0koi'
+    assert 0 < json['score']
 
     # order of the returned characters must match input name
     for char, canonical_char in zip(json['chars'], 'zolc'):
