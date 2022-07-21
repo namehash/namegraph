@@ -52,6 +52,7 @@ class Name(BaseModel):
 class InspectorName(BaseModel):
     name: str = Field(title='input name')
     entities: bool = Field(default=False, title='additionally extract entities')
+    score: bool = Field(default=True, title='score name', description='if false then tokenization is not performed')
 
 
 class Result(BaseModel):
@@ -188,9 +189,10 @@ class InspectorCharResult(BaseModel):
 class InspectorResult(BaseModel):
     name: str = Field(title="input string")
     length: int = Field(title="number of Unicode characters")
-    word_length: int = Field(title=" minimum number of words in tokenization without gaps",
-                             description='if gaps are in all tokenizations then result is 0'
-                                         'if tokenization is empty then result is 0')
+    word_length: Union[int, None] = Field(default=None, title=" minimum number of words in tokenization without gaps",
+                                          description='if gaps are in all tokenizations then result is 0'
+                                                      'if tokenization is empty then result is 0'
+                                                      'if tokenization was not performed then result is null')
     all_class: Union[str, None] = \
         Field(title="class in which all characters are",
               description=
@@ -206,15 +208,19 @@ class InspectorResult(BaseModel):
               )
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")
+    any_scripts: List[str] = Field(title="list of script names of all characters")
     # all_letter: bool
     # all_number: bool
     # all_emoji: bool
     # all_simple: bool
     chars: List[InspectorCharResult]
-    tokenizations: List[InspectorTokenizedResult] = Field(title='List of tokenizations sorted by probability',
-                                                          description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)'
-                                                                      'the list might be empty if input name is too long')
-    probability: float = Field(title="sum of tokenizations probabilities")
+    tokenizations: Union[List[InspectorTokenizedResult], None] = Field(
+        title='List of tokenizations sorted by probability',
+        description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)'
+                    'the list might be empty if input name is too long'
+                    'if tokenization was not performed then result is null')
+    probability: Union[float, None] = Field(title="sum of tokenizations probabilities",
+                                            description='if tokenization was not performed then result is null')
     # aggregated: Dict
     # any_emoji: bool = Field(title='true if the string contains any emoji')
     any_classes: List[str] = Field(title='list of "any classes"',
@@ -241,6 +247,8 @@ class InspectorResult(BaseModel):
         description='idna.encode(name, uts46=True, std3_rules=True, transitional=False)')
     version: str = Field(default='0.0.1', title="version of the name inspector",
                          description="version can be used for updating cache")
+    score: Union[float, None] = Field(title='score of the name',
+                                      description='if tokenization was not performed then result is null')
 
 
 @app.get("/inspector/", response_model=InspectorResult)
@@ -250,4 +258,4 @@ async def root(name: str):
 
 @app.post("/inspector/", response_model=InspectorResult)
 async def root(name: InspectorName):
-    return inspector.analyse_name(name.name, name.entities)
+    return inspector.analyse_name(name.name, name.score, name.entities)
