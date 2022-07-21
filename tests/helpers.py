@@ -42,7 +42,8 @@ def check_inspector_response(name, resp):
     assert VERSION_REGEX.match(resp['version'])
 
     # check returned characters
-    for char, name_char in zip((sorted(resp['chars'], key=lambda c: c['char'])), sorted(name)):
+    # the order of the characters must match the input name
+    for char, name_char in zip(resp['chars'], name):
         assert sorted(char.keys()) == sorted([
             'char',
             'script',
