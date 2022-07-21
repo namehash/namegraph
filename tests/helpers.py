@@ -1,3 +1,9 @@
+import regex
+
+
+VERSION_REGEX = regex.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
+
+
 def check_inspector_response(name, resp):
     """
     Checks that the response from the inspector is valid.
@@ -33,7 +39,7 @@ def check_inspector_response(name, resp):
     assert type(resp['ens_is_valid_name']) == bool
     assert type(resp['ens_nameprep']) == str
     assert type(resp['idna_encode']) == str
-    assert resp['version'] == '0.0.1'
+    assert VERSION_REGEX.match(resp['version'])
 
     # check returned characters
     for char, name_char in zip((sorted(resp['chars'], key=lambda c: c['char'])), sorted(name)):
