@@ -8,6 +8,15 @@ def check_inspector_response(name, resp):
     """
     Checks that the response from the inspector is valid.
     Verifies only field names and types without exact values.
+    Nullable fields:
+    - all_class
+    - all_script
+    - all_unicodeblock
+    - ens_nameprep
+    - idna_encode
+    - score
+    - chars.name
+    - chars.unicodeblock
     """
     assert sorted(resp.keys()) == sorted([
         'name',
@@ -31,8 +40,8 @@ def check_inspector_response(name, resp):
     assert resp['name'] == name
     assert resp['length'] == len(name)
     assert 0 <= resp['word_length']
-    assert type(resp['all_class']) == str
-    assert type(resp['all_script']) == str
+    assert resp['all_class'] is None or type(resp['all_class']) == str
+    assert resp['all_script'] is None or type(resp['all_script']) == str
     assert type(resp['any_scripts']) == list
     assert type(resp['chars']) == list
     assert type(resp['tokenizations']) == list
@@ -40,10 +49,10 @@ def check_inspector_response(name, resp):
     # all_unicodeblock can be null
     assert resp['all_unicodeblock'] is None or type(resp['all_unicodeblock']) == str
     assert type(resp['ens_is_valid_name']) == bool
-    assert type(resp['ens_nameprep']) == str
-    assert type(resp['idna_encode']) == str
+    assert resp['ens_nameprep'] is None or type(resp['ens_nameprep']) == str
+    assert resp['idna_encode'] is None or type(resp['idna_encode']) == str
     assert VERSION_REGEX.match(resp['version'])
-    assert 0 <= resp['score']
+    assert resp['score'] is None or 0 <= resp['score']
 
     # check returned characters
     # the order of the characters must match the input name
@@ -62,13 +71,13 @@ def check_inspector_response(name, resp):
 
         assert char['char'] == name_char
         assert type(char['script']) == str
-        assert type(char['name']) == str
+        assert char['name'] is None or type(char['name']) == str
         # extract codepoint to create link
         assert char['codepoint'].startswith('0x')
         assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
         assert type(char['char_class']) == str
         assert type(char['unicodedata_category']) == str
-        assert type(char['unicodeblock']) == str
+        assert char['unicodeblock'] is None or type(char['unicodeblock']) == str
         for conf_list in char['confusables']:
             for conf in conf_list:
                 assert sorted(conf.keys()) == sorted([
