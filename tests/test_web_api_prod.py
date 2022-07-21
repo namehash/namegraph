@@ -123,7 +123,8 @@ def test_inspector_basic(prod_test_client):
     assert json['ens_nameprep'] == name
     assert json['idna_encode'] == name
 
-    for char, name_char in zip((sorted(json['chars'], key=lambda c: c['char'])), sorted(name)):
+    # order of the returned characters must match input name
+    for char, name_char in zip(json['chars'], name):
         assert char['script'] == 'Latin'
         assert char['name'] == f'LATIN SMALL LETTER {name_char.upper()}'
         assert char['char_class'] == 'simple_letter'
@@ -158,7 +159,8 @@ def test_inspector_special(prod_test_client):
     assert json['ens_nameprep'] == name
     assert json['idna_encode'] == 'xn--kda4b0koi'
 
-    for char, (name_char, canonical_char) in zip(sorted(json['chars'], key=lambda c: c['char']), sorted(zip(name, 'zolc'))):
+    # order of the returned characters must match input name
+    for char, canonical_char in zip(json['chars'], 'zolc'):
         assert char['script'] == 'Latin'
         assert char['name'].startswith(f'LATIN SMALL LETTER {canonical_char.upper()}')
         assert char['char_class'] == 'any_letter'
