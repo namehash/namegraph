@@ -15,6 +15,7 @@ def check_inspector_response(name, resp):
         'word_length',
         'all_class',
         'all_script',
+        'any_scripts',
         'chars',
         'tokenizations',
         'probability',
@@ -24,6 +25,7 @@ def check_inspector_response(name, resp):
         'ens_nameprep',
         'idna_encode',
         'version',
+        'score',
     ])
 
     assert resp['name'] == name
@@ -31,6 +33,7 @@ def check_inspector_response(name, resp):
     assert 0 <= resp['word_length']
     assert type(resp['all_class']) == str
     assert type(resp['all_script']) == str
+    assert type(resp['any_scripts']) == list
     assert type(resp['chars']) == list
     assert type(resp['tokenizations']) == list
     assert 0 <= resp['probability'] <= 1
@@ -40,6 +43,7 @@ def check_inspector_response(name, resp):
     assert type(resp['ens_nameprep']) == str
     assert type(resp['idna_encode']) == str
     assert VERSION_REGEX.match(resp['version'])
+    assert 0 <= resp['score']
 
     # check returned characters
     # the order of the characters must match the input name
