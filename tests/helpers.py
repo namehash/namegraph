@@ -2,7 +2,7 @@ import regex
 
 
 VERSION_REGEX = regex.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
-SPECIAL_CHAR_REGEX = regex.compile(r'[^a-zA-Z0-9.]')
+SPECIAL_CHAR_REGEX = regex.compile(r'[^a-zA-Z0-9.-]')
 
 
 def check_inspector_response(name, resp):
