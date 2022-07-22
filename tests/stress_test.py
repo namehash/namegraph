@@ -46,7 +46,7 @@ def stress_test(fn, filename):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-simple', action='store_true', help='Skip simple names')
-    parser.add_argument('-t', type=float, default=1, help='Timeout [s] for each request (0 for no timeout)')
+    parser.add_argument('-t', type=float, default=0, help='Timeout [s] for each request')
     parser.add_argument('module', choices=['inspector', 'generator'], help='Module to test')
     parser.add_argument('data_file', help='File with names to use')
     args = parser.parse_args()
