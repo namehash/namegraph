@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from generator.domains import Domains
 
-from helpers import check_inspector_response, check_generator_response, generate_example_names
+from .helpers import check_inspector_response, check_generator_response, generate_example_names
 
 
 @pytest.fixture(scope="module")
