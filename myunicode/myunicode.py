@@ -1,7 +1,7 @@
 from .data import UNICODE_DATA
 from .blocks import BLOCK_STARTS, BLOCK_NAMES
 from .scripts import script_of_char, NEUTRAL_SCRIPTS
-from .emojis import char_is_emoji
+from .emojis import EMOJI_STARTS, IS_EMOJI
 
 from bisect import bisect_right
 from typing import Optional
@@ -61,5 +61,7 @@ def script_of(text: str) -> Optional[str]:
     return script
 
 
-def is_emoji(text: str) -> bool:
-    return len(text) > 0 and all(map(char_is_emoji, text))
+def is_emoji(chr: str) -> bool:
+    if len(chr) != 1:
+        raise TypeError('is_emoji() argument must be a unicode character, not str')
+    return IS_EMOJI[bisect_right(EMOJI_STARTS, ord(chr)) - 1]
