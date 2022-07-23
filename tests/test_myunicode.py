@@ -130,11 +130,24 @@ def test_script_of(chr, expected):
         ('🤔', True),
         ('a', False),
         ('ア', False),
-        ('abc', False),
-        ('🫶😫🤔', True),
-        ('🫶😫🤔a', False),
-        ('', False),
+        ('\U0000200D', True),  # TODO ZWJ is emoji?
     ]
 )
 def test_is_emoji(chr, expected):
     assert myunicode.is_emoji(chr) == expected
+
+
+@pytest.mark.parametrize(
+    'chr',
+    [
+        'abc',
+        '🫶😫🤔',
+        '🫶😫🤔a',
+        '',
+        '\U0000200D\U0000200D',
+        '🏳️‍🌈',  # ZWJ sequence
+    ]
+)
+def test_is_emoji_throws_on_str(chr):
+    with pytest.raises(TypeError):
+        myunicode.is_emoji(chr)
