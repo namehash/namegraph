@@ -1,6 +1,6 @@
 from .data import UNICODE_DATA
 from .blocks import BLOCK_STARTS, BLOCK_NAMES
-from .scripts import script_of_char
+from .scripts import script_of_char, NEUTRAL_SCRIPTS
 
 from bisect import bisect_right
 from typing import Optional
@@ -42,8 +42,19 @@ def block_of(chr: str) -> str:
 
 
 def script_of(text: str) -> Optional[str]:
-    if len(text) == 0:
-        raise TypeError('script_of() argument must be a non-empty string')
-    script = script_of_char(text[0])
-    scripts = set((script, 'Common', 'Inherited', 'Unknown'))
-    return script if all(script_of_char(text[i]) in scripts for i in range(1, len(text))) else None
+    script = None
+
+    for c in text:
+        s = script_of_char(c)
+
+        if s in NEUTRAL_SCRIPTS:
+            continue
+
+        if script is None:
+            # found first non-neutral character
+            script = s
+        elif script != s:
+            # conflict
+            return None
+
+    return script
