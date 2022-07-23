@@ -83,9 +83,9 @@ def test_combining_throws_on_str(chr):
 @pytest.mark.parametrize(
     'chr,expected',
     [
-        ('a', 'BASIC_LATIN'),
-        ('ア', 'KATAKANA'),
-        ('🩶', None)
+        ('a', 'Basic Latin'),
+        ('ア', 'Katakana'),
+        ('🩶', 'Symbols and Pictographs Extended-A'),
     ]
 )
 def test_block_of(chr, expected):

@@ -1,4 +1,6 @@
 from .data import UNICODE_DATA
+from .blocks import BLOCK_STARTS, BLOCK_NAMES
+from bisect import bisect_right
 
 
 def name(chr: str, default=None) -> str:
@@ -33,7 +35,7 @@ def combining(chr: str) -> int:
 def block_of(chr: str) -> str:
     if len(chr) != 1:
         raise TypeError('block_of() argument must be a unicode character, not str')
-    pass
+    return BLOCK_NAMES[bisect_right(BLOCK_STARTS, ord(chr)) - 1]
 
 
 def script_of(chr: str) -> str:
