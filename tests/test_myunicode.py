@@ -113,15 +113,13 @@ def test_block_of_throws_on_str(chr):
         ('そのめ,だれのめ...?', 'Hiragana'),
         ('لوحة المفاتيح العربية', 'Arabic'),
         ('Those eyes, だれのめ?', None),
+        (' ,. co jak na początku jest common?', 'Latin'),
+        (' ,.?', None),  # TODO should be Common?
+        ('', None),
     ]
 )
 def test_script_of(chr, expected):
     assert myunicode.script_of(chr) == expected
-
-
-def test_script_throws_on_empty():
-    with pytest.raises(TypeError):
-        myunicode.script_of('')
 
 
 @pytest.mark.parametrize('emoji', ['🫶'])
