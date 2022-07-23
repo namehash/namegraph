@@ -1,6 +1,7 @@
 from .data import UNICODE_DATA
 from .blocks import BLOCK_STARTS, BLOCK_NAMES
 from .scripts import script_of_char, NEUTRAL_SCRIPTS
+from .emojis import char_is_emoji
 
 from bisect import bisect_right
 from typing import Optional
@@ -58,3 +59,7 @@ def script_of(text: str) -> Optional[str]:
             return None
 
     return script
+
+
+def is_emoji(text: str) -> bool:
+    return len(text) > 0 and all(map(char_is_emoji, text))
