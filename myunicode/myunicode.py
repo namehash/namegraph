@@ -1,6 +1,9 @@
 from .data import UNICODE_DATA
 from .blocks import BLOCK_STARTS, BLOCK_NAMES
+from .scripts import script_of_char
+
 from bisect import bisect_right
+from typing import Optional
 
 
 def name(chr: str, default=None) -> str:
@@ -38,5 +41,8 @@ def block_of(chr: str) -> str:
     return BLOCK_NAMES[bisect_right(BLOCK_STARTS, ord(chr)) - 1]
 
 
-def script_of(chr: str) -> str:
-    pass
+def script_of(text: str) -> Optional[str]:
+    if len(text) == 0:
+        raise TypeError('script_of() argument must be a non-empty string')
+    script = script_of_char(text[0])
+    return script if all(script_of_char(text[i]) == script for i in range(1, len(text))) else None
