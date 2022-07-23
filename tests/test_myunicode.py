@@ -107,10 +107,21 @@ def test_block_of_throws_on_str(chr):
         ('ア', 'Katakana'),
         ('アア', 'Katakana'),
         ('aア', None),
+        ('Mały kotek', 'Latin'),
+        ('その目、誰の目？', None),
+        ('そのめ、だれのめ？', 'Hiragana'),
+        ('そのめ,だれのめ...?', 'Hiragana'),
+        ('لوحة المفاتيح العربية', 'Arabic'),
+        ('Those eyes, だれのめ?', None),
     ]
 )
 def test_script_of(chr, expected):
     assert myunicode.script_of(chr) == expected
+
+
+def test_script_throws_on_empty():
+    with pytest.raises(TypeError):
+        myunicode.script_of('')
 
 
 @pytest.mark.parametrize('emoji', ['🫶'])

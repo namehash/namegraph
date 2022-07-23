@@ -45,4 +45,5 @@ def script_of(text: str) -> Optional[str]:
     if len(text) == 0:
         raise TypeError('script_of() argument must be a non-empty string')
     script = script_of_char(text[0])
-    return script if all(script_of_char(text[i]) == script for i in range(1, len(text))) else None
+    scripts = set((script, 'Common', 'Inherited', 'Unknown'))
+    return script if all(script_of_char(text[i]) in scripts for i in range(1, len(text))) else None
