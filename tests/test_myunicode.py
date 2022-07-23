@@ -122,6 +122,19 @@ def test_script_of(chr, expected):
     assert myunicode.script_of(chr) == expected
 
 
-@pytest.mark.parametrize('emoji', ['🫶'])
-def test_emojis(emoji):
-    assert emoji in myunicode.EMOJIS
+@pytest.mark.parametrize(
+    'chr,expected',
+    [
+        ('🫶', True),
+        ('😫', True),
+        ('🤔', True),
+        ('a', False),
+        ('ア', False),
+        ('abc', False),
+        ('🫶😫🤔', True),
+        ('🫶😫🤔a', False),
+        ('', False),
+    ]
+)
+def test_is_emoji(chr, expected):
+    assert myunicode.is_emoji(chr) == expected
