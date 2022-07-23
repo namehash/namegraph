@@ -2,6 +2,8 @@ from .data import UNICODE_DATA
 
 
 def name(chr: str, default=None) -> str:
+    if len(chr) != 1:
+        raise TypeError('name() argument 1 must be a unicode character, not str')
     if default is None:
         try:
             return UNICODE_DATA.name[ord(chr)]
@@ -12,14 +14,20 @@ def name(chr: str, default=None) -> str:
 
 
 def category(chr: str) -> str:
-    return UNICODE_DATA.category[ord(chr)]
+    if len(chr) != 1:
+        raise TypeError('category() argument must be a unicode character, not str')
+    return UNICODE_DATA.category.get(ord(chr), 'Cn')
 
 
 def combining(chr: str) -> int:
-    return UNICODE_DATA.combining[ord(chr)]
+    if len(chr) != 1:
+        raise TypeError('combining() argument must be a unicode character, not str')
+    return UNICODE_DATA.combining.get(ord(chr), 0)
 
 
 def block_of(chr: str) -> str:
+    if len(chr) != 1:
+        raise TypeError('block_of() argument must be a unicode character, not str')
     pass
 
 
