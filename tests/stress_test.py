@@ -2,6 +2,7 @@ import sys
 import os
 import math
 from time import time as get_time
+from tqdm import tqdm
 import argparse
 
 from generator.domains import Domains
@@ -29,32 +30,13 @@ def stress_test(fn, filename):
     with open(filename, 'r') as f:
         num_lines = sum(1 for _ in f)
         f.seek(0)
-        print(f'0/{num_lines}', end='')
 
-        start_time = get_time()
-
-        for i, line in enumerate(f):
-            if (i + 1) % 10 == 0:
-                now = get_time()
-                avg_sample_time = (now - start_time) / i
-
-                remaining_samples = num_lines - i
-                remaining_time_m = avg_sample_time * remaining_samples / 60
-                remaining_time_h = remaining_time_m / 60
-
-                if remaining_time_h > 1:
-                    remaining_time_m -= int(remaining_time_h) * 60
-                    print(f'\r{i+1}/{num_lines} [{remaining_time_h:.0f}h {remaining_time_m:.0f}m]            ', end='')
-                else:
-                    print(f'\r{i+1}/{num_lines} [{remaining_time_m:.0f}m]                      ', end='')
-
+        for i, line in tqdm(enumerate(f), total=num_lines):
             try:
                 name = line[:-1]
                 fn(name)
             except Exception as e:
                 print(f'\n[{i+1}] {name} failed: {e}')
-
-    print(f'\r{num_lines}/{num_lines}')
 
 
 if __name__ == "__main__":
