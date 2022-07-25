@@ -8,6 +8,11 @@ from typing import Optional
 
 
 def name(chr: str, default=None) -> str:
+    """
+    Returns the name of the unicode character.
+    If the character does not have a name,
+    returns default if given or throws an exception.
+    """
     if len(chr) != 1:
         raise TypeError('name() argument 1 must be a unicode character, not str')
     try:
@@ -19,6 +24,10 @@ def name(chr: str, default=None) -> str:
 
 
 def category(chr: str) -> str:
+    """
+    Returns the category of the unicode character.
+    If the character does not have a category, returns 'Cn'.
+    """
     if len(chr) != 1:
         raise TypeError('category() argument must be a unicode character, not str')
     try:
@@ -28,6 +37,10 @@ def category(chr: str) -> str:
 
 
 def combining(chr: str) -> int:
+    """
+    Returns the combining class of the unicode character.
+    If the character does not have a combining class, returns 0.
+    """
     if len(chr) != 1:
         raise TypeError('combining() argument must be a unicode character, not str')
     try:
@@ -37,12 +50,21 @@ def combining(chr: str) -> int:
 
 
 def block_of(chr: str) -> str:
+    """
+    Returns the block of the character.
+    If the character does not have a block, throws exception.
+    """
     if len(chr) != 1:
         raise TypeError('block_of() argument must be a unicode character, not str')
     return BLOCK_NAMES[bisect_right(BLOCK_STARTS, ord(chr)) - 1]
 
 
 def script_of(text: str) -> Optional[str]:
+    """
+    Returns the script of text, or None if text has many scripts.
+    Common, Inherited and Unknown scripts are considered neutral.
+    Returns None if text has only neutral scripts.
+    """
     script = None
 
     for c in text:
@@ -62,6 +84,9 @@ def script_of(text: str) -> Optional[str]:
 
 
 def is_emoji(chr: str) -> bool:
+    """
+    Returns True if the character is an emoji.
+    """
     if len(chr) != 1:
         raise TypeError('is_emoji() argument must be a unicode character, not str')
     return IS_EMOJI[bisect_right(EMOJI_STARTS, ord(chr)) - 1]
