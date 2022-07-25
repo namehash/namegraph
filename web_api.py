@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Union, Tuple
+from typing import List, Dict, Union, Tuple, Optional
 
 from fastapi import FastAPI
 from hydra import initialize, compose
@@ -208,7 +208,7 @@ class InspectorResult(BaseModel):
               )
     all_script: Union[str, None] = Field(title="script name of all characters",
                                          description="can be null if characters are in different scripts or script is not assigned for a character")
-    any_scripts: List[str] = Field(title="list of script names of all characters")
+    any_scripts: List[Optional[str]] = Field(title="list of script names of all characters")
     # all_letter: bool
     # all_number: bool
     # all_emoji: bool
@@ -218,7 +218,7 @@ class InspectorResult(BaseModel):
         title='List of tokenizations sorted by probability',
         description='number of tokenizations is limited to `inspector.alltokenizer_limit` (1000)'
                     'the list might be empty if input name is too long'
-                    'if tokenization was not performed then result is null')
+                    'if tokenization was not performed (because no score flag) then result is null')
     probability: Union[float, None] = Field(title="sum of tokenizations probabilities",
                                             description='if tokenization was not performed then result is null')
     # aggregated: Dict

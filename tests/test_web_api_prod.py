@@ -89,7 +89,7 @@ def test_prod_inspector_long_post(prod_test_client):
     json = response.json()
 
     assert 'name' in json
-    assert len(json['tokenizations']) == 0
+    assert json['tokenizations'] is None
 
 
 @pytest.mark.execution_timeout(10)
@@ -102,7 +102,7 @@ def test_prod_inspector_long2_post(prod_test_client):
 
     json = response.json()
     assert 'name' in json
-    assert len(json['tokenizations']) == 0
+    assert json['tokenizations'] is None
 
 
 @pytest.mark.slow
@@ -206,7 +206,6 @@ def test_inspector_special_cases(prod_test_client, name):
     check_inspector_response(name, response.json())
 
 
-@pytest.mark.xfail
 @pytest.mark.slow
 @pytest.mark.parametrize(
     'name',

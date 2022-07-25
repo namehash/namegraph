@@ -286,8 +286,6 @@ class Inspector:
         return chars_analysis
 
     def tokenize(self, name: str) -> List[Dict]:
-        if len(name) > self.config.inspector.tokenization_length_threshold:
-            return []
 
         tokenizeds = list(islice(self.tokenizer.tokenize(name), self.config.inspector.alltokenizer_limit))
         tokenizeds = [{'tokens': tokenized, 'probability': self.ngrams.sequence_probability(tokenized)} for tokenized in
@@ -326,12 +324,12 @@ class Inspector:
         name_analysis['chars'] = self.chars_analysis(name)
 
         # tokenizeds = [wordninja.split(name)]
-        if score:
+        if score and len(name) <= self.config.inspector.tokenization_length_threshold:
             tokenizeds = self.tokenize(name)
 
             # count min number of words for tokenization without gaps
             name_analysis['word_length'] = count_words(tokenizeds)
-    
+
             name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
 
             # sum probabilities
@@ -415,7 +413,8 @@ class Scorer:
         else:
             raise ValueError('error in name scoring algorithm')
 
-        return result + self.short_name_bonus(name_analysis)
+        result += self.short_name_bonus(name_analysis)
+        return result / 16
 
     def name_contains_invisible(self, name_analysis):
         return 'invisible' in name_analysis['any_classes']
