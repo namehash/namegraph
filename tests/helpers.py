@@ -70,7 +70,7 @@ def check_inspector_response(name, resp):
         ])
 
         assert char['char'] == name_char
-        assert type(char['script']) == str
+        assert char['script'] is None or type(char['script']) == str
         assert char['name'] is None or type(char['name']) == str
         # extract codepoint to create link
         assert char['codepoint'].startswith('0x')
