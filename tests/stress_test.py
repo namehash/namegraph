@@ -41,22 +41,24 @@ def stress_test(fn, filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--no-simple', action='store_true', help='Skip simple names')
-    parser.add_argument('-t', type=float, default=0, help='Timeout [s] for each request')
+    parser.add_argument('--no-simple', action='store_true', help=f'Skip simple names {SPECIAL_CHAR_REGEX.pattern}')
+    parser.add_argument('-t', '--timeout', type=float, default=0, help='Timeout [s] for each request')
+    parser.add_argument('-l', '--long-length', type=int, default=500, help='Names above this length will not be skipped')
     parser.add_argument('module', choices=['inspector', 'generator'], help='Module to test')
     parser.add_argument('data_file', help='File with names to use')
     args = parser.parse_args()
 
     module = args.module
     filename = args.data_file
-    timeout = math.inf if args.t == 0 else args.t
+    timeout = math.inf if args.timeout == 0 else args.timeout
     enable_filter = args.no_simple
+    long_length = args.long_length
 
     print('Creating client...')
     client = prod_test_client()
 
     def run_inspector(name):
-        if enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
+        if len(name) < long_length and enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
             return
         start = get_time()
         resp = client.post('/inspector/', json={'name': name})
@@ -66,7 +68,7 @@ if __name__ == "__main__":
         check_inspector_response(name, resp.json())
 
     def run_generator(name):
-        if enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
+        if len(name) < long_length and enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
             return
         start = get_time()
         resp = client.post('/', json={'name': name})
