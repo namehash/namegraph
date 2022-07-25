@@ -3,6 +3,14 @@ import os
 import regex
 
 
+# TODO import from utils.py
+# does not work:
+# from myunicode.utils import get_data_lines
+def get_data_lines(lines):
+    lines = map(str.strip, lines)
+    return (l for l in lines if len(l) > 0 and not l.startswith('#'))
+
+
 _PATH = 'data/myunicode'
 
 # e.g. 11AB0..11ABF; Unified Canadian Aboriginal Syllabics Extended-A
@@ -20,12 +28,7 @@ _EMOJI_REGEX = regex.compile(r'^(?<start>[0-9a-fA-F]+)(?:..(?<stop>[0-9a-fA-F]+)
 def download_data():
     r = requests.get('https://www.unicode.org/Public/UNIDATA/UnicodeData.txt')
     with open(f'{_PATH}/UnicodeData.txt', 'w') as f:
-        for line in r.text.splitlines():
-            line = line.strip()
-
-            if len(line) == 0:
-                continue
-
+        for line in get_data_lines(r.text.splitlines()):
             fields = line.split(';')
             code = fields[0]
             name = fields[1]
@@ -37,32 +40,27 @@ def download_data():
 
 def download_blocks():
     r = requests.get('https://www.unicode.org/Public/UNIDATA/Blocks.txt')
+    blocks = []
+    for line in get_data_lines(r.text.splitlines()):
+        m = _BLOCK_REGEX.search(line)
+        start = m.group('start')
+        stop = m.group('stop')
+        name = m.group('name').strip()
+
+        blocks.append((start, stop, name))
+
+    # ensure proper order for bisect
+    blocks.sort(key=lambda x: int(x[0], base=16))
+
     with open(f'{_PATH}/Blocks.txt', 'w') as f:
-        for line in r.text.splitlines():
-            line = line.strip()
-            
-            # Skip comments and empty lines
-            if len(line) == 0 or line[0] == '#':
-                continue
-
-            m = _BLOCK_REGEX.search(line)
-            start = m.group('start')
-            stop = m.group('stop')
-            name = m.group('name').strip()
-
+        for start, stop, name in blocks:
             f.write(f'{start};{stop};{name}\n')
 
 
 def download_scripts():
     r = requests.get('https://www.unicode.org/Public/UNIDATA/Scripts.txt')
     scripts = []
-    for line in r.text.splitlines():
-        line = line.strip()
-
-        # Skip comments and empty lines
-        if len(line) == 0 or line[0] == '#':
-            continue
-
+    for line in get_data_lines(r.text.splitlines()):
         m = _SCRIPT_REGEX.search(line)
         start = int(m.group('start'), base=16)
         stop = int(m.group('stop'), base=16) if m.group('stop') is not None else start
@@ -70,6 +68,7 @@ def download_scripts():
 
         scripts.append((start, stop, script))
 
+    # ensure proper order for bisect
     scripts.sort(key=lambda x: x[0])
 
     # compress continuous script ranges
@@ -84,20 +83,14 @@ def download_scripts():
             compressed.append(s)
 
     with open(f'{_PATH}/Scripts.txt', 'w') as f:
-        for s in compressed:
-            f.write(f'{s[0]:04X};{s[1]:04X};{s[2]}\n')
+        for start, stop, script in compressed:
+            f.write(f'{start:04X};{stop:04X};{script}\n')
 
 
 def download_emoji():
     r = requests.get('https://www.unicode.org/Public/UNIDATA/emoji/emoji-data.txt')
     emojis = set()
-    for line in r.text.splitlines():
-        line = line.strip()
-
-        # Skip comments and empty lines
-        if len(line) == 0 or line[0] == '#':
-            continue
-
+    for line in get_data_lines(r.text.splitlines()):
         m = _EMOJI_REGEX.search(line)
         start = int(m.group('start'), base=16)
         stop = int(m.group('stop'), base=16) if m.group('stop') is not None else start
@@ -105,6 +98,7 @@ def download_emoji():
         for e in range(start, stop + 1):
             emojis.add(e)
 
+    # extract emoji character code ranges
     ranges = []
     for e in sorted(emojis):
         # if there was a gap
@@ -117,6 +111,7 @@ def download_emoji():
 
     with open(f'{_PATH}/emoji-ranges.txt', 'w') as f:
         for start, stop in ranges:
+            # the range name is '' - non-emoji ranges are None
             f.write(f'{start:04X};{stop:04X};\n')
 
 
