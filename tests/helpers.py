@@ -9,12 +9,16 @@ def check_inspector_response(name, resp):
     Checks that the response from the inspector is valid.
     Verifies only field names and types without exact values.
     Nullable fields:
+    - word_length
     - all_class
     - all_script
+    - tokenizations
+    - probability
     - all_unicodeblock
     - ens_nameprep
     - idna_encode
     - score
+    - chars.script
     - chars.name
     - chars.unicodeblock
     """
