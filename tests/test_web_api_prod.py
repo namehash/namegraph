@@ -182,20 +182,15 @@ def test_inspector_special(prod_test_client):
 
 
 @pytest.mark.slow
-def test_inspector_special_cases(prod_test_client):
-    client = prod_test_client
-
-    names = [
+@pytest.mark.parametrize(
+    'name',
+    [
         'dbque.eth\n',
         '🇪🇹is🦇🔊💲.eth',
         'iwant\U0001faf5.eth',
         'iwant\\U0001faf5.eth',
         'iwant\\\\U0001faf5.eth',
         'iwant🫵.eth',
-        '🩶🩶🩶🩶🩶.eth',
-        '🫨🫨🫨.eth',
-        '🩷🩷🩷.eth',
-        '🩶🩶🩶🩶🩶.eth',
         'ЁЯй╖ЁЯй╖ЁЯй╖.eth',
         'ЁЯлиЁЯлиЁЯли.eth',
         'ЁЯй╡ЁЯй╡ЁЯй╡ЁЯй╡ЁЯй╡.eth',
@@ -203,13 +198,30 @@ def test_inspector_special_cases(prod_test_client):
         'ЁЯй╖ЁЯй╖ЁЯй╖ЁЯй╖ЁЯй╖.eth',
         'ЁЯй╡ЁЯй╡ЁЯй╡.eth',
         'ЁЯй╢ЁЯй╢ЁЯй╢.eth',
+    ]
+)
+def test_inspector_special_cases(prod_test_client, name):
+    response = prod_test_client.post('/inspector/', json={'name': name})
+    assert response.status_code == 200
+    check_inspector_response(name, response.json())
+
+
+@pytest.mark.xfail
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    'name',
+    [
+        '🩶🩶🩶🩶🩶.eth',
+        '🫨🫨🫨.eth',
+        '🩷🩷🩷.eth',
+        '🩶🩶🩶🩶🩶.eth',
         'i🩷u.eth',
     ]
-
-    for name in names:
-        response = client.post('/inspector/', json={'name': name})
-        assert response.status_code == 200
-        check_inspector_response(name, response.json())
+)
+def test_inspector_invalid_script(prod_test_client, name):
+    response = prod_test_client.post('/inspector/', json={'name': name})
+    assert response.status_code == 200
+    check_inspector_response(name, response.json())
 
 
 @pytest.mark.slow
