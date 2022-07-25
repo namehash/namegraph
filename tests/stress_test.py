@@ -6,7 +6,7 @@ import argparse
 
 from generator.domains import Domains
 from fastapi.testclient import TestClient
-from .helpers import check_inspector_response, check_generator_response, SPECIAL_CHAR_REGEX
+from tests.helpers import check_inspector_response, check_generator_response, SPECIAL_CHAR_REGEX
 
 
 def prod_test_client():
@@ -29,11 +29,25 @@ def stress_test(fn, filename):
     with open(filename, 'r') as f:
         num_lines = sum(1 for _ in f)
         f.seek(0)
-        print(f'0/{num_lines}')
+        print(f'0/{num_lines}', end='')
+
+        start_time = get_time()
 
         for i, line in enumerate(f):
-            if (i + 1) % 100 == 0:
-                print(f'\r{i+1}/{num_lines}', end='')
+            if (i + 1) % 10 == 0:
+                now = get_time()
+                avg_sample_time = (now - start_time) / i
+
+                remaining_samples = num_lines - i
+                remaining_time_m = avg_sample_time * remaining_samples / 60
+                remaining_time_h = remaining_time_m / 60
+
+                if remaining_time_h > 1:
+                    remaining_time_m -= int(remaining_time_h) * 60
+                    print(f'\r{i+1}/{num_lines} [{remaining_time_h:.0f}h {remaining_time_m:.0f}m]            ', end='')
+                else:
+                    print(f'\r{i+1}/{num_lines} [{remaining_time_m:.0f}m]                      ', end='')
+
             try:
                 name = line[:-1]
                 fn(name)
