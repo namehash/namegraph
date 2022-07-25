@@ -26,6 +26,22 @@ def prod_test_client():
     return client
 
 
+def request_inspector(name):
+    return client.post('/inspector/', json={'name': name})
+
+
+def verify_inspector(name, json):
+    check_inspector_response(name, json)
+
+
+def request_generator(name):
+    return client.post('/', json={'name': name})
+
+
+def verify_generator(name, json):
+    check_generator_response(json)
+
+
 def stress_test(fn, filename):
     with open(filename, 'r') as f:
         num_lines = sum(1 for _ in f)
@@ -57,27 +73,20 @@ if __name__ == "__main__":
     print('Creating client...')
     client = prod_test_client()
 
-    def run_inspector(name):
+    request_fn = request_inspector if module == 'inspector' else request_generator
+    verify_fn = verify_inspector if module == 'inspector' else verify_generator
+
+    def test_name(name):
         if len(name) < long_length and enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
             return
+
         start = get_time()
-        resp = client.post('/inspector/', json={'name': name})
+        resp = request_fn(name)
         duration = get_time() - start
+        
         assert resp.status_code == 200
         assert duration < timeout, f'Time limit exceeded'
-        check_inspector_response(name, resp.json())
+        
+        verify_fn(name, resp.json())
 
-    def run_generator(name):
-        if len(name) < long_length and enable_filter and SPECIAL_CHAR_REGEX.search(name) is None:
-            return
-        start = get_time()
-        resp = client.post('/', json={'name': name})
-        duration = get_time() - start
-        assert resp.status_code == 200
-        assert duration < timeout, f'Time limit exceeded'
-        check_generator_response(resp.json())
-
-    if module == 'inspector':
-        stress_test(run_inspector, filename)
-    elif module == 'generator':
-        stress_test(run_generator, filename)
+    stress_test(test_name, filename)
