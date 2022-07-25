@@ -1,6 +1,5 @@
 import regex
 
-
 VERSION_REGEX = regex.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
 SPECIAL_CHAR_REGEX = regex.compile(r'[^a-zA-Z0-9.-]')
 
@@ -40,20 +39,20 @@ def check_inspector_response(name, resp):
 
     assert resp['name'] == name
     assert resp['length'] == len(name)
-    assert 0 <= resp['word_length']
+    assert resp['word_length'] is None or 0 <= resp['word_length']
     assert resp['all_class'] is None or type(resp['all_class']) == str
     assert resp['all_script'] is None or type(resp['all_script']) == str
     assert type(resp['any_scripts']) == list
     assert type(resp['chars']) == list
-    assert type(resp['tokenizations']) == list
-    assert 0 <= resp['probability'] <= 1
+    assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
+    assert resp['probability'] is None or 0 <= resp['probability'] <= 1
     # all_unicodeblock can be null
     assert resp['all_unicodeblock'] is None or type(resp['all_unicodeblock']) == str
     assert type(resp['ens_is_valid_name']) == bool
     assert resp['ens_nameprep'] is None or type(resp['ens_nameprep']) == str
     assert resp['idna_encode'] is None or type(resp['idna_encode']) == str
     assert VERSION_REGEX.match(resp['version'])
-    assert resp['score'] is None or 0 <= resp['score']
+    assert resp['score'] is None or 0 <= resp['score'] <= 1
 
     # check returned characters
     # the order of the characters must match the input name
@@ -94,31 +93,32 @@ def check_inspector_response(name, resp):
                 assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
 
     # check returned tokenizations
-    for tokenization in resp['tokenizations']:
-        assert sorted(tokenization.keys()) == sorted([
-            'tokens',
-            'probability',
-            'entities',
-        ])
-        assert 0 <= tokenization['probability'] <= 1
-        # TODO check entities
-        for token in tokenization['tokens']:
-            # token can be empty
-            if list(token.keys()) == ['token']:
-                assert token['token'] == ''
-            else:
-                assert sorted(token.keys()) == sorted([
-                    'token',
-                    'length',
-                    'probability',
-                    'pos',
-                    'lemma',
-                ])
-                assert type(token['token']) == str
-                assert 0 <= token['length']
-                assert 0 <= token['probability'] <= 1
-                assert type(token['pos']) == str
-                assert type(token['lemma']) == str
+    if resp['tokenizations'] is not None:
+        for tokenization in resp['tokenizations']:
+            assert sorted(tokenization.keys()) == sorted([
+                'tokens',
+                'probability',
+                'entities',
+            ])
+            assert 0 <= tokenization['probability'] <= 1
+            # TODO check entities
+            for token in tokenization['tokens']:
+                # token can be empty
+                if list(token.keys()) == ['token']:
+                    assert token['token'] == ''
+                else:
+                    assert sorted(token.keys()) == sorted([
+                        'token',
+                        'length',
+                        'probability',
+                        'pos',
+                        'lemma',
+                    ])
+                    assert type(token['token']) == str
+                    assert 0 <= token['length']
+                    assert 0 <= token['probability'] <= 1
+                    assert type(token['pos']) == str
+                    assert type(token['lemma']) == str
 
 
 def check_generator_response(json):

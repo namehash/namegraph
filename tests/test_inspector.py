@@ -151,3 +151,11 @@ def test_inspector_score():
         inspector = Inspector(config)
         result = inspector.analyse_name('laptop', score=True)
         assert 'score' in result
+
+@pytest.mark.execution_timeout(10)
+def test_inspector_score_long():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        inspector = Inspector(config)
+        result = inspector.analyse_name('laptoplaptoplaptoplaptoplaptop', score=True)
+        assert 'score' in result
