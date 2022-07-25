@@ -110,7 +110,7 @@ def test_inspector_prob():
         assert ['', 'a', ''] == [token['token'] for token in tokenizations[1]['tokens']]
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 def test_inspector_long():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
@@ -118,7 +118,7 @@ def test_inspector_long():
         result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 def test_inspector_long2():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
@@ -126,7 +126,7 @@ def test_inspector_long2():
         result = inspector.analyse_name('a' * 40000)
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 def test_inspector_ner():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
@@ -135,7 +135,7 @@ def test_inspector_ner():
         assert any([t['entities'] for t in result['tokenizations']])
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 def test_inspector_unknown_name():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
@@ -144,7 +144,7 @@ def test_inspector_unknown_name():
         # TODO
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 def test_inspector_score():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")

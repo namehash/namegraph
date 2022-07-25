@@ -181,7 +181,7 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(over
 
 
 @pytest.mark.xfail
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 @mark.parametrize(
     "overrides",
     [

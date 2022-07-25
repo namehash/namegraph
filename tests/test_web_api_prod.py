@@ -53,7 +53,7 @@ def test_prod(prod_test_client):
     assert "myfire" in primary
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
@@ -65,7 +65,7 @@ def test_prod_long(prod_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 @pytest.mark.slow
 def test_prod_long_get(prod_test_client):
     client = prod_test_client
@@ -77,7 +77,7 @@ def test_prod_long_get(prod_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 @pytest.mark.slow
 def test_prod_inspector_long_post(prod_test_client):
     client = prod_test_client
@@ -92,7 +92,7 @@ def test_prod_inspector_long_post(prod_test_client):
     assert len(json['tokenizations']) == 0
 
 
-@pytest.mark.timeout(10)
+@pytest.mark.execution_timeout(10)
 @pytest.mark.slow
 def test_prod_inspector_long2_post(prod_test_client):
     client = prod_test_client
