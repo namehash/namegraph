@@ -13,7 +13,7 @@ emoji==1.7.0
 pyahocorasick==1.4.4
 spacy
 pytest-benchmark
-pytest-timeout
+pytest-timeouts
 web3
 boto3
 python-dotenv
