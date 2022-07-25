@@ -138,10 +138,13 @@ def check_generator_response(json):
 
 def generate_example_names(count, input_filename='data/primary.csv'):
     with open(input_filename, 'r') as f:
+        num_lines = sum(1 for _ in f)
+        f.seek(0)
+
         # ensure uniform sampling of lines
         # from the input file
-        stride = max(1, len(f.readlines()) // count)
-        f.seek(0)
+        stride = max(1, num_lines // count)
+        
         i = 0
         for line in f:
             # strip \n
