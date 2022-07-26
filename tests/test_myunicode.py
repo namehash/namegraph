@@ -114,7 +114,7 @@ def test_block_of_throws_on_str(chr):
         ('لوحة المفاتيح العربية', 'Arabic'),
         ('Those eyes, だれのめ?', None),
         (' ,. co jak na początku jest common?', 'Latin'),
-        (' ,.?', None),  # TODO should be Common?
+        (' ,.?', 'Common'),
         ('', None),
     ]
 )
