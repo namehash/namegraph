@@ -256,7 +256,7 @@ def test_inspector_no_score(prod_test_client):
     assert response.status_code == 200
     json = response.json()
     print(json)
-    check_inspector_response(name, json)
+    check_inspector_response(name, json, tokenization=False)
 
     assert json['word_length'] is None
     assert json['all_class'] == 'simple_letter'
@@ -289,7 +289,7 @@ def test_inspector_limit_confusables(prod_test_client):
     assert response.status_code == 200
     json = response.json()
     print(json)
-    check_inspector_response(name, json)
+    check_inspector_response(name, json, limit_confusables=True)
 
     assert json['word_length'] == 0
     assert json['all_class'] is None
@@ -317,7 +317,7 @@ def test_inspector_disable_chars_output(prod_test_client):
     assert response.status_code == 200
     json = response.json()
     print(json)
-    check_inspector_response(name, json)
+    check_inspector_response(name, json, disable_chars_output=True)
 
     assert json['word_length'] == 1
     assert json['all_class'] == 'simple_letter'
@@ -348,7 +348,7 @@ def test_inspector_disable_char_analysis(prod_test_client):
     assert response.status_code == 200
     json = response.json()
     print(json)
-    check_inspector_response(name, json)
+    check_inspector_response(name, json, disable_char_analysis=True)
 
     assert json['word_length'] == 1
     assert json['all_class'] is None

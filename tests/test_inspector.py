@@ -147,14 +147,14 @@ def test_inspector_unknown_name(prod_inspector):
 @pytest.mark.execution_timeout(10)
 def test_inspector_score(prod_inspector):
     inspector = prod_inspector
-    result = inspector.analyse_name('laptop', score=True)
+    result = inspector.analyse_name('laptop', tokenization=True)
     assert 'score' in result
 
 
 @pytest.mark.execution_timeout(10)
 def test_inspector_score_long(prod_inspector):
     inspector = prod_inspector
-    result = inspector.analyse_name('laptoplaptoplaptoplaptoplaptop', score=True)
+    result = inspector.analyse_name('laptoplaptoplaptoplaptoplaptop', tokenization=True)
     assert 'score' in result
 
 
