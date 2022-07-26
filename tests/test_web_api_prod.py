@@ -226,7 +226,7 @@ def test_inspector_invalid_script(prod_test_client, name):
 @pytest.mark.slow
 def test_inspector_stress(prod_test_client):
     client = prod_test_client
-    max_duration = 1
+    max_duration = 2
     for name in generate_example_names(400):
         start = get_time()
         response = client.post('/inspector/', json={'name': name})
@@ -239,7 +239,7 @@ def test_inspector_stress(prod_test_client):
 @pytest.mark.slow
 def test_generator_stress(prod_test_client):
     client = prod_test_client
-    max_duration = 1
+    max_duration = 2
     for name in generate_example_names(400):
         start = get_time()
         response = client.post('/', json={'name': name})
