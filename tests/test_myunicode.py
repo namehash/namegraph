@@ -151,3 +151,21 @@ def test_is_emoji(chr, expected):
 def test_is_emoji_throws_on_str(chr):
     with pytest.raises(TypeError):
         myunicode.is_emoji(chr)
+
+
+@pytest.mark.parametrize(
+    'chr,expected',
+    [
+        ('a', False),
+        ('1', True),
+        ('🫶', False),
+        ('十', False),
+        ('１', True)
+    ])
+def test_is_numeric(chr, expected):
+    assert myunicode.is_numeric(chr) == expected
+
+
+def test_is_numeric_throws_on_str():
+    with pytest.raises(TypeError):
+        myunicode.is_numeric('１０')

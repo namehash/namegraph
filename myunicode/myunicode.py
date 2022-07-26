@@ -90,3 +90,12 @@ def is_emoji(chr: str) -> bool:
     if len(chr) != 1:
         raise TypeError('is_emoji() argument must be a unicode character, not str')
     return IS_EMOJI[bisect_right(EMOJI_STARTS, ord(chr)) - 1]
+
+
+def is_numeric(chr: str) -> bool:
+    """
+    Returns True if the character is numeric (category N).
+    """
+    if len(chr) != 1:
+        raise TypeError('is_numeric() argument must be a unicode character, not str')
+    return category(chr).startswith('N')
