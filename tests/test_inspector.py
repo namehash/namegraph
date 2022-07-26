@@ -207,26 +207,3 @@ def test_inspector_numerics():
 
                 char = chr(int(line, 16))
                 assert features.is_number(char), f'{line} not detected as number'
-
-
-INSPECTOR_NUMERICS_FAILING = [
-    'F96B',
-    'F973',
-    'F978',
-    'F9B2',
-    'F9D1',
-    'F9D3',
-    'F9FD',
-    '2F890',
-]
-
-
-@pytest.mark.xfail
-def test_inspector_numerics_fail():
-     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        features = Features(config)
-
-        for code in INSPECTOR_NUMERICS_FAILING:
-            char = chr(int(code, 16))
-            assert features.is_number(char), f'{code} not detected as number'

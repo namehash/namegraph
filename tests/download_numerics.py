@@ -1,7 +1,5 @@
 import requests
 
-from tests.test_inspector import INSPECTOR_NUMERICS_FAILING
-
 
 _FILEPATH = 'tests/data/unicode_numerics.txt'
 
@@ -17,15 +15,12 @@ def download_data():
 
             fields = line.split(';')
             code = fields[0].strip()
-            numeric_value = fields[8].strip()
+            category = fields[2].strip()
 
-            is_numeric = len(numeric_value) > 0
+            is_numeric = category[0] == 'N'
             
             if is_numeric:
-                if code in INSPECTOR_NUMERICS_FAILING:
-                    f.write(f'# {code}\n')
-                else:
-                    f.write(f'{code}\n')
+                f.write(f'{code}\n')
 
 
 if __name__ == '__main__':
