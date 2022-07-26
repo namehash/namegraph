@@ -192,3 +192,41 @@ def test_inspector_disable_char_analysis(prod_inspector):
 
     result = inspector.analyse_name('ąlaptop', disable_char_analysis=False)
     assert len(result['chars']) == 7
+
+
+def test_inspector_numerics():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        features = Features(config)
+        
+        with open('tests/data/unicode_numerics.txt', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if len(line) == 0 or line.startswith('#'):
+                    continue
+
+                char = chr(int(line, 16))
+                assert features.is_number(char), f'{line} not detected as number'
+
+
+INSPECTOR_NUMERICS_FAILING = [
+    'F96B',
+    'F973',
+    'F978',
+    'F9B2',
+    'F9D1',
+    'F9D3',
+    'F9FD',
+    '2F890',
+]
+
+
+@pytest.mark.xfail
+def test_inspector_numerics_fail():
+     with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        features = Features(config)
+
+        for code in INSPECTOR_NUMERICS_FAILING:
+            char = chr(int(code, 16))
+            assert features.is_number(char), f'{code} not detected as number'
