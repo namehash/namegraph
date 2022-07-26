@@ -63,7 +63,6 @@ def script_of(text: str) -> Optional[str]:
     """
     Returns the script of text, or None if text has many scripts.
     Common, Inherited and Unknown scripts are considered neutral.
-    Returns None if text has only neutral scripts.
     """
     script = None
 
@@ -79,6 +78,12 @@ def script_of(text: str) -> Optional[str]:
         elif script != s:
             # conflict
             return None
+
+    if script is None:
+        # text is either empty or neutral
+        # empty text has no script
+        # neutral text has Common script
+        return None if len(text) == 0 else 'Common'
 
     return script
 
