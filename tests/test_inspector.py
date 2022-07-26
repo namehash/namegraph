@@ -8,12 +8,26 @@ from inspector.features import Features
 from inspector.name_inspector import Inspector, remove_accents, strip_accents
 
 
-def test_inspector():
+@pytest.fixture(scope="module")
+def prod_inspector():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
         inspector = Inspector(config)
-        result = inspector.analyse_name('asd')
-        print(result)
+        return inspector
+
+
+@pytest.fixture(scope="module")
+def inspector_test_config():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        inspector = Inspector(config)
+        return inspector
+
+
+def test_inspector(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('asd')
+    print(result)
 
 
 def test_inspector_character_name():
@@ -55,7 +69,7 @@ def test_confusable():
         ]
         for char, expected_is_confusable, expected_confusables in chars:
             is_confusable, confusables = test_confusables.analyze(char)
-            print(char, expected_is_confusable, expected_confusables, is_confusable, confusables)
+            # print(char, expected_is_confusable, expected_confusables, is_confusable, confusables)
             assert is_confusable == expected_is_confusable
             if is_confusable:
                 assert expected_confusables in confusables
@@ -71,91 +85,110 @@ def test_confusable_simple():
                 print([k, v], len(k), len(v))
 
 
-def test_inspector_word_length():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('laptop')
-        assert result['word_length'] == 1
+def test_inspector_word_length(inspector_test_config):
+    inspector = inspector_test_config
+    result = inspector.analyse_name('laptop')
+    assert result['word_length'] == 1
 
-        result = inspector.analyse_name('lapŁtop')
-        assert result['word_length'] == 0
+    result = inspector.analyse_name('lapŁtop')
+    assert result['word_length'] == 0
 
-        result = inspector.analyse_name('toplap')
-        assert result['word_length'] == 2
+    result = inspector.analyse_name('toplap')
+    assert result['word_length'] == 2
 
 
-def test_inspector_combine():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('laptop😀ą')
-        print(result)
-        assert 'emoji' in result['any_classes']
-        tokenizations = result['tokenizations']
-        assert ['laptop', ''] == [token['token'] for token in tokenizations[0]['tokens']]
-        assert ['lap', 'top', ''] == [token['token'] for token in tokenizations[1]['tokens']]
+def test_inspector_combine(inspector_test_config):
+    inspector = inspector_test_config
+    result = inspector.analyse_name('laptop😀ą')
+    print(result)
+    assert 'emoji' in result['any_classes']
+    tokenizations = result['tokenizations']
+    assert ['laptop', ''] == [token['token'] for token in tokenizations[0]['tokens']]
+    assert ['lap', 'top', ''] == [token['token'] for token in tokenizations[1]['tokens']]
 
 
 @pytest.mark.xfail
-def test_inspector_prob():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('😀lap😀')
-        # print(result)
-        tokenizations = result['tokenizations']
-        print(tokenizations)
-        assert ['', 'lap', ''] == [token['token'] for token in tokenizations[0]['tokens']]
-        assert ['', 'a', ''] == [token['token'] for token in tokenizations[1]['tokens']]
+def test_inspector_prob(inspector_test_config):
+    inspector = inspector_test_config
+    result = inspector.analyse_name('😀lap😀')
+    # print(result)
+    tokenizations = result['tokenizations']
+    print(tokenizations)
+    assert ['', 'lap', ''] == [token['token'] for token in tokenizations[0]['tokens']]
+    assert ['', 'a', ''] == [token['token'] for token in tokenizations[1]['tokens']]
 
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_long():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
+def test_inspector_long(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
 
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_long2():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('a' * 40000)
+def test_inspector_long2(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('a' * 40000)
 
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_ner():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('billycorgan', entities=True)
-        assert any([t['entities'] for t in result['tokenizations']])
+def test_inspector_ner(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('billycorgan', entities=True)
+    assert any([t['entities'] for t in result['tokenizations']])
 
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_unknown_name():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]')
-        # TODO
+def test_inspector_unknown_name(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]')
+    # TODO
 
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_score():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('laptop', score=True)
-        assert 'score' in result
+def test_inspector_score(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('laptop', score=True)
+    assert 'score' in result
+
 
 @pytest.mark.execution_timeout(10)
-def test_inspector_score_long():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
-        inspector = Inspector(config)
-        result = inspector.analyse_name('laptoplaptoplaptoplaptoplaptop', score=True)
-        assert 'score' in result
+def test_inspector_score_long(prod_inspector):
+    inspector = prod_inspector
+    result = inspector.analyse_name('laptoplaptoplaptoplaptoplaptop', score=True)
+    assert 'score' in result
+
+
+@pytest.mark.execution_timeout(10)
+def test_inspector_limit_confusables(prod_inspector):
+    inspector = prod_inspector
+
+    result = inspector.analyse_name('ąlaptop', limit_confusables=True)
+    assert len(result['chars'][0]['confusables']) == 1
+
+    result = inspector.analyse_name('ąlaptop', limit_confusables=False)
+    assert len(result['chars'][0]['confusables']) > 1
+
+
+@pytest.mark.execution_timeout(10)
+def test_inspector_disable_chars_output(prod_inspector):
+    inspector = prod_inspector
+
+    result = inspector.analyse_name('ąlaptop', disable_chars_output=True)
+    assert result['chars'] is None
+    assert len(result['any_classes']) >= 1
+
+    result = inspector.analyse_name('ąlaptop', disable_chars_output=False)
+    assert len(result['chars']) == 7
+
+
+@pytest.mark.execution_timeout(10)
+def test_inspector_disable_char_analysis(prod_inspector):
+    inspector = prod_inspector
+
+    result = inspector.analyse_name('ąlaptop', disable_char_analysis=True)
+    assert result['chars'] is None
+    assert 'any_classes' not in result
+    print(result)
+
+    result = inspector.analyse_name('ąlaptop', disable_char_analysis=False)
+    assert len(result['chars']) == 7

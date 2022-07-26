@@ -46,8 +46,8 @@ def check_inspector_response(name, resp):
     assert resp['word_length'] is None or 0 <= resp['word_length']
     assert resp['all_class'] is None or type(resp['all_class']) == str
     assert resp['all_script'] is None or type(resp['all_script']) == str
-    assert type(resp['any_scripts']) == list
-    assert type(resp['chars']) == list
+    assert resp['any_scripts'] is None or type(resp['any_scripts']) == list
+    assert resp['chars'] is None or type(resp['chars']) == list
     assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
     assert resp['probability'] is None or 0 <= resp['probability'] <= 1
     # all_unicodeblock can be null
@@ -60,41 +60,42 @@ def check_inspector_response(name, resp):
 
     # check returned characters
     # the order of the characters must match the input name
-    for char, name_char in zip(resp['chars'], name):
-        assert sorted(char.keys()) == sorted([
-            'char',
-            'script',
-            'name',
-            'codepoint',
-            'link',
-            'char_class',
-            'unicodedata_category',
-            'unicodeblock',
-            'confusables',
-        ])
-
-        assert char['char'] == name_char
-        assert char['script'] is None or type(char['script']) == str
-        assert char['name'] is None or type(char['name']) == str
-        # extract codepoint to create link
-        assert char['codepoint'].startswith('0x')
-        assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
-        assert type(char['char_class']) == str
-        assert type(char['unicodedata_category']) == str
-        assert char['unicodeblock'] is None or type(char['unicodeblock']) == str
-        for conf_list in char['confusables']:
-            for conf in conf_list:
-                assert sorted(conf.keys()) == sorted([
-                    'char',
-                    'script',
-                    'name',
-                    'codepoint',
-                    'link',
-                    'char_class',
-                ])
-                # extract codepoint to create link
-                assert char['codepoint'].startswith('0x')
-                assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
+    if resp['chars'] is not None:
+        for char, name_char in zip(resp['chars'], name):
+            assert sorted(char.keys()) == sorted([
+                'char',
+                'script',
+                'name',
+                'codepoint',
+                'link',
+                'char_class',
+                'unicodedata_category',
+                'unicodeblock',
+                'confusables',
+            ])
+    
+            assert char['char'] == name_char
+            assert char['script'] is None or type(char['script']) == str
+            assert char['name'] is None or type(char['name']) == str
+            # extract codepoint to create link
+            assert char['codepoint'].startswith('0x')
+            assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
+            assert type(char['char_class']) == str
+            assert type(char['unicodedata_category']) == str
+            assert char['unicodeblock'] is None or type(char['unicodeblock']) == str
+            for conf_list in char['confusables']:
+                for conf in conf_list:
+                    assert sorted(conf.keys()) == sorted([
+                        'char',
+                        'script',
+                        'name',
+                        'codepoint',
+                        'link',
+                        'char_class',
+                    ])
+                    # extract codepoint to create link
+                    assert char['codepoint'].startswith('0x')
+                    assert char['link'] == f'https://unicode.link/codepoint/{char["codepoint"][2:]}'
 
     # check returned tokenizations
     if resp['tokenizations'] is not None:
