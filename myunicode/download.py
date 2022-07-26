@@ -98,6 +98,9 @@ def download_emoji():
         for e in range(start, stop + 1):
             emojis.add(e)
 
+    # remove ZWJ
+    emojis.remove(0x200D)
+
     # extract emoji character code ranges
     ranges = []
     for e in sorted(emojis):
