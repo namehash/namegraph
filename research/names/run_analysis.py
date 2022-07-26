@@ -11,7 +11,7 @@ DATA_DIR = PROJECT_DIR / 'data'
 
 print('Loading data...')
 with open(DATA_DIR / 'primary.csv', 'r') as f:
-    names = [l for l in map(str.strip, f) if len(l) > 0]
+    names = [l.removesuffix('.eth') for l in map(str.strip, f) if len(l) > 0]
 print('Loaded', len(names), 'names')
 
 
