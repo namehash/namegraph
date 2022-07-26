@@ -270,10 +270,14 @@ class Inspector:
         #             pass
         return aggregated
 
-    def chars_analysis(self, name: str) -> List[Dict[str, Any]]:
+    def chars_analysis(self, name: str, limit_confusables: bool = False) -> List[Dict[str, Any]]:
         chars_analysis = []
         for i, char in enumerate(name):
             char_analysis = self.analyze_character(char)
+
+            if limit_confusables:
+                char_analysis['confusables'] = char_analysis['confusables'][:1]
+
             confusable_strings_analysis = []
             for confusable_string in char_analysis['confusables']:
                 confusable_string_analysis = []
@@ -318,10 +322,14 @@ class Inspector:
         return tokenizeds
 
     # assume we got normalized and valid name
-    def analyse_name(self, name: str, score: bool = True, entities: bool = False):
+    def analyse_name(self, name: str, score: bool = True, entities: bool = False, limit_confusables: bool = False,
+                     disable_chars_output: bool = False, disable_char_analysis: bool = False):
         name_analysis = self.analyze_string(name)
 
-        name_analysis['chars'] = self.chars_analysis(name)
+        if disable_char_analysis:
+            name_analysis['chars'] = None
+        else:
+            name_analysis['chars'] = self.chars_analysis(name, limit_confusables=limit_confusables)
 
         # tokenizeds = [wordninja.split(name)]
         if score and len(name) <= self.config.inspector.tokenization_length_threshold:
@@ -336,13 +344,17 @@ class Inspector:
             name_analysis['probability'] = sum(
                 [tokenization['probability'] for tokenization in name_analysis['tokenizations']])
 
-        aggregated = self.aggregate(name_analysis['chars'])
-        name_analysis.update(aggregated)
+        if not disable_char_analysis:
+            aggregated = self.aggregate(name_analysis['chars'])
+            name_analysis.update(aggregated)
 
-        self.combine_fields(name_analysis, prefix_to_remove='any_')
+            self.combine_fields(name_analysis, prefix_to_remove='any_')
 
-        if score:
-            name_analysis['score'] = self.score_name(name_analysis)
+            if score:
+                name_analysis['score'] = self.score_name(name_analysis)
+
+        if disable_chars_output:
+            name_analysis['chars'] = None
 
         return name_analysis
 

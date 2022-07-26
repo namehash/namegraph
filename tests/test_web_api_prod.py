@@ -247,3 +247,126 @@ def test_generator_stress(prod_test_client):
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
         check_generator_response(response.json())
+
+
+@pytest.mark.slow
+def test_inspector_no_score(prod_test_client):
+    name = 'cat'
+    response = prod_test_client.post('/inspector/', json={'name': name, 'score': False})
+    assert response.status_code == 200
+    json = response.json()
+    print(json)
+    check_inspector_response(name, json)
+
+    assert json['word_length'] is None
+    assert json['all_class'] == 'simple_letter'
+    assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
+    assert json['probability'] is None or 0 < json['probability']
+    assert json['any_classes'] == ['simple_letter']
+    assert json['all_unicodeblock'] == 'BASIC_LATIN'
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == name
+    assert json['score'] is None
+
+    # order of the returned characters must match input name
+    for char, name_char in zip(json['chars'], name):
+        assert char['script'] == 'Latin'
+        assert char['name'] == f'LATIN SMALL LETTER {name_char.upper()}'
+        assert char['char_class'] == 'simple_letter'
+        assert char['unicodedata_category'] == 'Ll'
+        assert char['unicodeblock'] == 'BASIC_LATIN'
+        assert char['confusables'] == []
+
+    assert json['tokenizations'] is None
+
+
+@pytest.mark.slow
+def test_inspector_limit_confusables(prod_test_client):
+    name = 'ącat'
+    response = prod_test_client.post('/inspector/', json={'name': name, 'limit_confusables': True})
+    assert response.status_code == 200
+    json = response.json()
+    print(json)
+    check_inspector_response(name, json)
+
+    assert json['word_length'] == 0
+    assert json['all_class'] is None
+    assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
+    assert 0 < json['probability']
+    assert sorted(json['any_classes']) == ['any_letter', 'simple_letter']
+    assert json['all_unicodeblock'] is None
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == 'xn--cat-hpa'
+    assert json['score'] >= 0
+
+    assert len(json['chars'][0]['confusables']) == 1
+
+    tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
+    tok = tokenization['tokens'][0]
+    assert tok['token'] == ''
+
+
+@pytest.mark.slow
+def test_inspector_disable_chars_output(prod_test_client):
+    name = 'cat'
+    response = prod_test_client.post('/inspector/', json={'name': name, 'disable_chars_output': True})
+    assert response.status_code == 200
+    json = response.json()
+    print(json)
+    check_inspector_response(name, json)
+
+    assert json['word_length'] == 1
+    assert json['all_class'] == 'simple_letter'
+    assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
+    assert 0 < json['probability']
+    assert json['any_classes'] == ['simple_letter']
+    assert json['all_unicodeblock'] == 'BASIC_LATIN'
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == name
+    assert json['score'] >= 0
+
+    assert json['chars'] is None
+
+    tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
+    tok = tokenization['tokens'][0]
+    assert tok['token'] == name
+    assert tok['length'] == len(name)
+    assert tok['pos'] == 'NOUN'
+    assert tok['lemma'] == name
+
+
+@pytest.mark.slow
+def test_inspector_disable_char_analysis(prod_test_client):
+    name = 'cat'
+    response = prod_test_client.post('/inspector/', json={'name': name, 'disable_char_analysis': True})
+    assert response.status_code == 200
+    json = response.json()
+    print(json)
+    check_inspector_response(name, json)
+
+    assert json['word_length'] == 1
+    assert json['all_class'] is None
+    assert json['all_script'] is None
+    assert json['any_scripts'] is None
+    assert 0 < json['probability']
+    assert json['any_classes'] is None
+    assert json['all_unicodeblock'] is None
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == name
+    assert json['idna_encode'] == name
+    assert json['score'] is None
+
+    assert json['chars'] is None
+
+    tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
+    tok = tokenization['tokens'][0]
+    assert tok['token'] == name
+    assert tok['length'] == len(name)
+    assert tok['pos'] == 'NOUN'
+    assert tok['lemma'] == name
