@@ -264,7 +264,7 @@ async def root(name: str):
 @app.post("/inspector/", response_model=InspectorResult)
 async def root(name: InspectorName):
     return inspector.analyse_name(name.name,
-                                  score=name.score,
+                                  tokenization=name.score,
                                   entities=name.entities,
                                   limit_confusables=name.limit_confusables,
                                   disable_chars_output=name.disable_chars_output,

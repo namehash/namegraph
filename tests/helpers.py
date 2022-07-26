@@ -4,23 +4,15 @@ VERSION_REGEX = regex.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
 SPECIAL_CHAR_REGEX = regex.compile(r'[^a-zA-Z0-9.-]')
 
 
-def check_inspector_response(name, resp):
+def check_inspector_response(name,
+                             resp,
+                             tokenization=True,
+                             limit_confusables=False,
+                             disable_chars_output=False,
+                             disable_char_analysis=False):
     """
     Checks that the response from the inspector is valid.
     Verifies only field names and types without exact values.
-    Nullable fields:
-    - word_length
-    - all_class
-    - all_script
-    - tokenizations
-    - probability
-    - all_unicodeblock
-    - ens_nameprep
-    - idna_encode
-    - score
-    - chars.script
-    - chars.name
-    - chars.unicodeblock
     """
     assert sorted(resp.keys()) == sorted([
         'name',
@@ -43,24 +35,40 @@ def check_inspector_response(name, resp):
 
     assert resp['name'] == name
     assert resp['length'] == len(name)
-    assert resp['word_length'] is None or 0 <= resp['word_length']
-    assert resp['all_class'] is None or type(resp['all_class']) == str
-    assert resp['all_script'] is None or type(resp['all_script']) == str
-    assert resp['any_scripts'] is None or type(resp['any_scripts']) == list
-    assert resp['chars'] is None or type(resp['chars']) == list
-    assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
-    assert resp['probability'] is None or 0 <= resp['probability'] <= 1
+
+    if disable_char_analysis:
+        assert resp['all_class'] is None
+        assert resp['all_script'] is None
+        assert resp['any_scripts'] is None
+        assert resp['all_unicodeblock'] is None
+    else:
+        assert resp['all_class'] is None or type(resp['all_class']) == str
+        assert resp['all_script'] is None or type(resp['all_script']) == str
+        assert resp['any_scripts'] is None or type(resp['any_scripts']) == list
+        assert resp['all_unicodeblock'] is None or type(resp['all_unicodeblock']) == str
+
+    if tokenization:
+        assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
+        assert resp['probability'] is None or 0 <= resp['probability'] <= 1
+        assert resp['score'] is None or 0 <= resp['score'] <= 1
+        assert resp['word_length'] is None or 0 <= resp['word_length']
+    else:
+        assert resp['tokenizations'] is None
+        assert resp['probability'] is None
+        assert resp['score'] is None
+        assert resp['word_length'] is None
     # all_unicodeblock can be null
-    assert resp['all_unicodeblock'] is None or type(resp['all_unicodeblock']) == str
+
     assert type(resp['ens_is_valid_name']) == bool
     assert resp['ens_nameprep'] is None or type(resp['ens_nameprep']) == str
     assert resp['idna_encode'] is None or type(resp['idna_encode']) == str
     assert VERSION_REGEX.match(resp['version'])
-    assert resp['score'] is None or 0 <= resp['score'] <= 1
 
     # check returned characters
     # the order of the characters must match the input name
-    if resp['chars'] is not None:
+    if disable_chars_output or disable_char_analysis:
+        assert resp['chars'] is None
+    else:
         for char, name_char in zip(resp['chars'], name):
             assert sorted(char.keys()) == sorted([
                 'char',
@@ -73,7 +81,7 @@ def check_inspector_response(name, resp):
                 'unicodeblock',
                 'confusables',
             ])
-    
+
             assert char['char'] == name_char
             assert char['script'] is None or type(char['script']) == str
             assert char['name'] is None or type(char['name']) == str
@@ -83,6 +91,10 @@ def check_inspector_response(name, resp):
             assert type(char['char_class']) == str
             assert type(char['unicodedata_category']) == str
             assert char['unicodeblock'] is None or type(char['unicodeblock']) == str
+
+            if limit_confusables:
+                assert len(char['confusables']) <= 1
+
             for conf_list in char['confusables']:
                 for conf in conf_list:
                     assert sorted(conf.keys()) == sorted([
@@ -149,7 +161,7 @@ def generate_example_names(count, input_filename='data/primary.csv'):
         # ensure uniform sampling of lines
         # from the input file
         stride = max(1, num_lines // count)
-        
+
         i = 0
         for line in f:
             # strip \n

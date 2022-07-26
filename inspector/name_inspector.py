@@ -322,7 +322,7 @@ class Inspector:
         return tokenizeds
 
     # assume we got normalized and valid name
-    def analyse_name(self, name: str, score: bool = True, entities: bool = False, limit_confusables: bool = False,
+    def analyse_name(self, name: str, tokenization: bool = True, entities: bool = False, limit_confusables: bool = False,
                      disable_chars_output: bool = False, disable_char_analysis: bool = False):
         name_analysis = self.analyze_string(name)
 
@@ -332,7 +332,7 @@ class Inspector:
             name_analysis['chars'] = self.chars_analysis(name, limit_confusables=limit_confusables)
 
         # tokenizeds = [wordninja.split(name)]
-        if score and len(name) <= self.config.inspector.tokenization_length_threshold:
+        if tokenization and len(name) <= self.config.inspector.tokenization_length_threshold:
             tokenizeds = self.tokenize(name)
 
             # count min number of words for tokenization without gaps
@@ -350,7 +350,7 @@ class Inspector:
 
             self.combine_fields(name_analysis, prefix_to_remove='any_')
 
-            if score:
+            if tokenization:
                 name_analysis['score'] = self.score_name(name_analysis)
 
         if disable_chars_output:
