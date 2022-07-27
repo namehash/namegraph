@@ -50,7 +50,7 @@ class Name(BaseModel):
 
 
 class InspectorName(BaseModel):
-    name: str = Field(title='input name')
+    label: str = Field(title='input name')
     entities: bool = Field(default=False, title='additionally extract entities')
     tokenization: bool = Field(default=True, title='enable tokenization',
                         description='if false then tokenization is not performed')
@@ -263,7 +263,7 @@ async def root(name: str):
 
 @app.post("/inspector/", response_model=InspectorResult)
 async def root(name: InspectorName):
-    return inspector.analyse_name(name.name,
+    return inspector.analyse_name(name.label,
                                   tokenization=name.tokenization,
                                   entities=name.entities,
                                   limit_confusables=name.limit_confusables,
