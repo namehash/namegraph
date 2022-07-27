@@ -219,13 +219,12 @@ def test_inspector_numerics():
         ('mały kotek poszedł na spacer i tak', 2),  # len >= 30
         ('m𝖺ły kotek', 3),  # confusables
         ('maly☭kotek', 4),  # special
-        # ('20', 5),  # number
-        # ('malykotek', 6),  # letter
+        ('\u1C50malekotki', 5),  # number
+        ('2male豚', 6),  # letter
         ('maly🐈', 7),  # emoji
         ('maly-kotek', 8),  # hyphen
-        ('10', 9),  # simple number
-        # ('gdhdfhgdf', 10),  # word count null
-        # ('abcdefg', 11),  # word count 0
+        ('2malekotki', 9),  # simple number
+        ('sdfbgfdbgjkdfjgdfhjfgdjfgdsjh', 11),  # word count 0
         ('bardzomaleladnekotki', 12),  # word count 4+
         ('verymalecats', 13),  # word count 3
         ('malecats', 14),  # word count 2
@@ -234,3 +233,8 @@ def test_inspector_numerics():
 )
 def test_scorer(prod_inspector, name, low):
     assert low <= prod_inspector.analyse_name(name)['score'] * 16 <= low + 1
+
+
+def test_scorer_tokenization_false(prod_inspector):
+    # word count null
+    assert 10 <= prod_inspector.analyse_name('tokenizationfalse', tokenization=False)['score'] * 16 <= 11
