@@ -173,12 +173,15 @@ def test_inspector_limit_confusables(prod_inspector):
 def test_inspector_disable_chars_output(prod_inspector):
     inspector = prod_inspector
 
-    result = inspector.analyse_name('ąlaptop', disable_chars_output=True)
-    assert result['chars'] is None
+    result = inspector.analyse_name('ąlaptop', truncate_chars_output=0)
+    assert len(result['chars']) == 0
     assert len(result['any_classes']) >= 1
 
-    result = inspector.analyse_name('ąlaptop', disable_chars_output=False)
+    result = inspector.analyse_name('ąlaptop', truncate_chars_output=None)
     assert len(result['chars']) == 7
+
+    result = inspector.analyse_name('ąlaptop', truncate_chars_output=3)
+    assert len(result['chars']) == 3
 
 
 @pytest.mark.execution_timeout(10)
@@ -198,7 +201,7 @@ def test_inspector_numerics():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config")
         features = Features(config)
-        
+
         with open('tests/data/unicode_numerics.txt', 'r') as f:
             for line in f:
                 line = line.strip()

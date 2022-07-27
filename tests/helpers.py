@@ -8,8 +8,9 @@ def check_inspector_response(name,
                              resp,
                              tokenization=True,
                              limit_confusables=False,
-                             disable_chars_output=False,
-                             disable_char_analysis=False):
+                             truncate_chars_output=None,
+                             disable_char_analysis=False,
+                             pos_lemma=True):
     """
     Checks that the response from the inspector is valid.
     Verifies only field names and types without exact values.
@@ -25,6 +26,7 @@ def check_inspector_response(name,
         'tokenizations',
         'probability',
         'any_classes',
+        'any_confusable',
         'all_unicodeblock',
         'ens_is_valid_name',
         'ens_nameprep',
@@ -40,22 +42,24 @@ def check_inspector_response(name,
         assert resp['all_class'] is None
         assert resp['all_script'] is None
         assert resp['any_scripts'] is None
+        assert resp['any_confusable'] is None
         assert resp['all_unicodeblock'] is None
+        assert resp['score'] is None
     else:
         assert resp['all_class'] is None or type(resp['all_class']) == str
         assert resp['all_script'] is None or type(resp['all_script']) == str
         assert resp['any_scripts'] is None or type(resp['any_scripts']) == list
         assert resp['all_unicodeblock'] is None or type(resp['all_unicodeblock']) == str
+        assert type(resp['any_confusable']) == bool
+        assert resp['score'] is None or 0 <= resp['score'] <= 1
 
     if tokenization:
         assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
         assert resp['probability'] is None or 0 <= resp['probability'] <= 1
-        assert resp['score'] is None or 0 <= resp['score'] <= 1
         assert resp['word_count'] is None or 0 <= resp['word_count']
     else:
         assert resp['tokenizations'] is None
         assert resp['probability'] is None
-        assert resp['score'] is None
         assert resp['word_count'] is None
     # all_unicodeblock can be null
 
@@ -66,9 +70,11 @@ def check_inspector_response(name,
 
     # check returned characters
     # the order of the characters must match the input name
-    if disable_chars_output or disable_char_analysis:
+    if disable_char_analysis:
         assert resp['chars'] is None
     else:
+        if truncate_chars_output is not None:
+            assert len(resp['chars']) <= truncate_chars_output
         for char, name_char in zip(resp['chars'], name):
             assert sorted(char.keys()) == sorted([
                 'char',
@@ -134,8 +140,12 @@ def check_inspector_response(name,
                     assert type(token['token']) == str
                     assert 0 <= token['length']
                     assert 0 <= token['probability'] <= 1
-                    assert type(token['pos']) == str
-                    assert type(token['lemma']) == str
+                    if pos_lemma:
+                        assert token['pos'] is None or type(token['pos']) == str
+                        assert token['lemma'] is None or type(token['lemma']) == str
+                    else:
+                        assert token['pos'] is None
+                        assert token['lemma'] is None
 
 
 def check_generator_response(json):

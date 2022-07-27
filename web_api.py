@@ -53,11 +53,16 @@ class InspectorName(BaseModel):
     label: str = Field(title='input name')
     entities: bool = Field(default=False, title='additionally extract entities')
     tokenization: bool = Field(default=True, title='enable tokenization',
-                        description='if false then tokenization is not performed')
+                               description='if false then tokenization is not performed')
     limit_confusables: bool = Field(default=False, title='limit confusables to 1 element')
-    disable_chars_output: bool = Field(default=False,
-                                       title='disable chars (character analysis) in output, but aggregated info is returned')
+    truncate_chars_output: Optional[int] = Field(
+        default=None,
+        title='truncate chars (character analysis) in output, but aggregated info is calculated before truncation',
+        description="set to null if don't want truncation"
+                    "set to 0 to disable character analysis output")
     disable_char_analysis: bool = Field(default=False, title='disable character analysis')
+    pos_lemma: bool = Field(default=True, title='do part-of-speech tagging and lemmatization',
+                            description='required for entitites recognition')
 
 
 class Result(BaseModel):
@@ -127,8 +132,8 @@ class InspectorTokenResult(BaseModel):
     #           description="can be null if characters are in different scripts or script is not assigned for a character")
     probability: float = Field(title="probability of the token")
     # in_dictionary: bool = Field(title="if the token is in dictionary")
-    pos: str = Field(title="part of speech of the token")
-    lemma: str = Field(title="lemma of the word")
+    pos: Optional[str] = Field(title="part of speech of the token")
+    lemma: Optional[str] = Field(title="lemma of the word")
 
 
 class InspectorTokenizedResult(BaseModel):
@@ -196,8 +201,8 @@ class InspectorResult(BaseModel):
     length: int = Field(title="number of Unicode characters")
     word_count: Union[int, None] = Field(default=None, title=" minimum number of words in tokenization without gaps",
                                          description='if gaps are in all tokenizations then result is 0'
-                                                      'if tokenization is empty then result is 0'
-                                                      'if tokenization was not performed then result is null')
+                                                     'if tokenization is empty then result is 0'
+                                                     'if tokenization was not performed then result is null')
     all_class: Union[str, None] = \
         Field(title="class in which all characters are",
               description=
@@ -236,7 +241,7 @@ class InspectorResult(BaseModel):
     all_unicodeblock: Union[str, None] = Field(
         title="Unicode block of all characters",
         description="can be null if characters are in different blocks or block is not assigned for a character")
-    # any_confusable: bool = Field(title='true if the string contains any confusable character')
+    any_confusable: Optional[bool] = Field(title='true if the string contains any confusable character')
     ens_is_valid_name: bool = Field(title='true if idna.uts46_remap(name, std3_rules=True) not raise errors',
                                     description='ens.main.ENS.is_valid_name(name)')
     ens_nameprep: Union[str, None] = \
@@ -267,5 +272,6 @@ async def root(name: InspectorName):
                                   tokenization=name.tokenization,
                                   entities=name.entities,
                                   limit_confusables=name.limit_confusables,
-                                  disable_chars_output=name.disable_chars_output,
-                                  disable_char_analysis=name.disable_char_analysis)
+                                  truncate_chars_output=name.truncate_chars_output,
+                                  disable_char_analysis=name.disable_char_analysis,
+                                  pos_lemma=name.pos_lemma)
