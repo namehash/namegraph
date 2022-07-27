@@ -235,6 +235,13 @@ def test_scorer(prod_inspector, name, low):
     assert low <= prod_inspector.analyse_name(name)['score'] * 16 <= low + 1
 
 
-def test_scorer_tokenization_false(prod_inspector):
-    # word count null
-    assert 10 <= prod_inspector.analyse_name('tokenizationfalse', tokenization=False)['score'] * 16 <= 11
+@pytest.mark.xfail
+def test_scorer_word_count_null(prod_inspector):
+    # this case is unreachable because:
+    # - tokenization_length_threshold = 30
+    # - word count is null only if:
+    #   - tokenization = False:
+    #     - then score is not computed at all
+    #   - or name length > tokenization_length_threshold:
+    #     - then 2 < score < 3 because of long name penalty
+    assert 10 <= prod_inspector.analyse_name('co poradzisz')['score'] * 16 <= 11
