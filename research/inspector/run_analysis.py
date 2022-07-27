@@ -88,28 +88,74 @@ print('Drawing plots...')
 
 plt.clf()
 plt.plot(lengths, [r[0] for r in default_results], label='default')
+plt.title('Duration - default')
+plt.savefig(THIS_DIR / 'duration_default.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in no_score_results], label='no score')
+plt.title('Duration - no score')
+plt.savefig(THIS_DIR / 'duration_no_score.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in limit_confusables_results], label='limit confusables')
+plt.title('Duration - limit confusables')
+plt.savefig(THIS_DIR / 'duration_limit_confusables.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in disable_chars_output_results], label='disable chars output')
+plt.title('Duration - disable chars output')
+plt.savefig(THIS_DIR / 'duration_disable_chars_output.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in disable_char_analysis_results], label='disable char analysis')
+plt.title('Duration - disable char analysis')
+plt.savefig(THIS_DIR / 'duration_disable_char_analysis.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in no_score_limit_confusables_results], label='no score limit confusables')
+plt.title('Duration - no score limit confusables')
+plt.savefig(THIS_DIR / 'duration_no_score_limit_confusables.png')
+
+plt.clf()
 plt.plot(lengths, [r[0] for r in no_score_disable_chars_output_results], label='no score disable chars output')
-plt.legend()
-plt.title('Duration')
-plt.savefig(THIS_DIR / 'duration.png')
+plt.title('Duration - no score disable chars output')
+plt.savefig(THIS_DIR / 'duration_no_score_disable_chars_output.png')
 
 
 plt.clf()
 plt.plot(lengths, [r[1] for r in default_results], label='default')
+plt.title('Size - default')
+plt.savefig(THIS_DIR / 'size_default.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in no_score_results], label='no score')
+plt.title('Size - no score')
+plt.savefig(THIS_DIR / 'size_no_score.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in limit_confusables_results], label='limit confusables')
+plt.title('Size - limit confusables')
+plt.savefig(THIS_DIR / 'size_limit_confusables.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in disable_chars_output_results], label='disable chars output')
+plt.title('Size - disable chars output')
+plt.savefig(THIS_DIR / 'size_disable_chars_output.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in disable_char_analysis_results], label='disable char analysis')
+plt.title('Size - disable char analysis')
+plt.savefig(THIS_DIR / 'size_disable_char_analysis.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in no_score_limit_confusables_results], label='no score limit confusables')
+plt.title('Size - no score limit confusables')
+plt.savefig(THIS_DIR / 'size_no_score_limit_confusables.png')
+
+plt.clf()
 plt.plot(lengths, [r[1] for r in no_score_disable_chars_output_results], label='no score disable chars output')
-plt.legend()
-plt.title('Response size')
-plt.savefig(THIS_DIR / 'response_size.png')
+plt.title('Size - no score disable chars output')
+plt.savefig(THIS_DIR / 'size_no_score_disable_chars_output.png')
 
 
 print('Done')
