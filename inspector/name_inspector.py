@@ -305,7 +305,7 @@ class Inspector:
 
         return tokenizeds
 
-    def tokenizations_analysis(self, tokenizeds: List[Dict], entities=False) -> List[Dict[str, Any]]:
+    def tokenizations_analysis(self, tokenizeds: List[Dict], entities=False, pos_lemma=True) -> List[Dict[str, Any]]:
         for tokenized in tokenizeds:
             tokens_analysis = []
             for i, token in enumerate(tokenized['tokens']):
@@ -317,13 +317,19 @@ class Inspector:
 
             tokenized['tokens'] = tokens_analysis
 
-        for tokenized in tokenizeds:  # TODO: limit spacy
-            self.spacy(tokenized, entities)
+        if pos_lemma:
+            for tokenized in tokenizeds:  # TODO: limit spacy
+                self.spacy(tokenized, entities)
         return tokenizeds
 
     # assume we got normalized and valid name
-    def analyse_name(self, name: str, tokenization: bool = True, entities: bool = False, limit_confusables: bool = False,
-                     disable_chars_output: bool = False, disable_char_analysis: bool = False):
+    def analyse_name(self, name: str,
+                     tokenization: bool = True,
+                     entities: bool = False,
+                     limit_confusables: bool = False,
+                     truncate_chars_output: int = None,
+                     disable_char_analysis: bool = False,
+                     pos_lemma: bool = True):
         name_analysis = self.analyze_string(name)
 
         if disable_char_analysis:
@@ -338,7 +344,7 @@ class Inspector:
             # count min number of words for tokenization without gaps
             name_analysis['word_count'] = count_words(tokenizeds)
 
-            name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
+            name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities, pos_lemma)
 
             # sum probabilities
             name_analysis['probability'] = sum(
@@ -350,11 +356,10 @@ class Inspector:
 
             self.combine_fields(name_analysis, prefix_to_remove='any_')
 
-            if tokenization:
-                name_analysis['score'] = self.score_name(name_analysis)
+            name_analysis['score'] = self.score_name(name_analysis)
 
-        if disable_chars_output:
-            name_analysis['chars'] = None
+        if truncate_chars_output is not None:
+            name_analysis['chars'] = name_analysis['chars'][:truncate_chars_output]
 
         return name_analysis
 
@@ -456,7 +461,7 @@ class Scorer:
         return 'simple_number' in name_analysis['any_classes']
 
     def word_count(self, name_analysis):
-        return name_analysis['word_count']
+        return name_analysis.get('word_count', None)
 
     def short_name_bonus(self, name_analysis):
         return 1 - min(name_analysis['length'], self.name_length_limit) / (self.name_length_limit + 1)

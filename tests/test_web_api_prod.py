@@ -250,7 +250,7 @@ def test_generator_stress(prod_test_client):
 
 
 @pytest.mark.slow
-def test_inspector_no_score(prod_test_client):
+def test_inspector_no_tokenization(prod_test_client):
     label = 'cat'
     response = prod_test_client.post('/inspector/', json={'label': label, 'tokenization': False})
     assert response.status_code == 200
@@ -268,7 +268,7 @@ def test_inspector_no_score(prod_test_client):
     assert json['ens_is_valid_name']
     assert json['ens_nameprep'] == label
     assert json['idna_encode'] == label
-    assert json['score'] is None
+    assert 0 <= json['score'] <= 1
 
     # order of the returned characters must match input name
     for char, name_char in zip(json['chars'], label):
@@ -313,11 +313,11 @@ def test_inspector_limit_confusables(prod_test_client):
 @pytest.mark.slow
 def test_inspector_disable_chars_output(prod_test_client):
     label = 'cat'
-    response = prod_test_client.post('/inspector/', json={'label': label, 'disable_chars_output': True})
+    response = prod_test_client.post('/inspector/', json={'label': label, 'truncate_chars_output': 0})
     assert response.status_code == 200
     json = response.json()
     print(json)
-    check_inspector_response(label, json, disable_chars_output=True)
+    check_inspector_response(label, json, truncate_chars_output=0)
 
     assert json['word_count'] == 1
     assert json['all_class'] == 'simple_letter'
@@ -331,7 +331,7 @@ def test_inspector_disable_chars_output(prod_test_client):
     assert json['idna_encode'] == label
     assert json['score'] >= 0
 
-    assert json['chars'] is None
+    assert len(json['chars']) == 0
 
     tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
     tok = tokenization['tokens'][0]
@@ -370,3 +370,34 @@ def test_inspector_disable_char_analysis(prod_test_client):
     assert tok['length'] == len(label)
     assert tok['pos'] == 'NOUN'
     assert tok['lemma'] == label
+
+
+@pytest.mark.slow
+def test_inspector_disable_pos_lemma(prod_test_client):
+    label = 'cat'
+    response = prod_test_client.post('/inspector/', json={'label': label, 'pos_lemma': False})
+    assert response.status_code == 200
+    json = response.json()
+    print(json)
+    check_inspector_response(label, json, pos_lemma=False)
+
+    assert json['word_count'] == 1
+    assert json['all_class'] == 'simple_letter'
+    assert json['all_script'] == 'Latin'
+    assert json['any_scripts'] == ['Latin']
+    assert 0 < json['probability']
+    assert json['any_classes'] == ['simple_letter']
+    assert json['all_unicodeblock'] == 'BASIC_LATIN'
+    assert json['ens_is_valid_name']
+    assert json['ens_nameprep'] == label
+    assert json['idna_encode'] == label
+    assert json['score'] >= 0
+
+    assert len(json['chars']) == 3
+
+    tokenization = sorted(json['tokenizations'], key=lambda t: t['probability'])[-1]
+    tok = tokenization['tokens'][0]
+    assert tok['token'] == label
+    assert tok['length'] == len(label)
+    assert tok['pos'] is None
+    assert tok['lemma'] is None
