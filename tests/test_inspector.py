@@ -210,3 +210,27 @@ def test_inspector_numerics():
 
                 char = chr(int(line, 16))
                 assert features.is_number(char), f'{line} not detected as number'
+
+
+@pytest.mark.parametrize(
+    'name, low',
+    [
+        ('mały\u200dkotek', 1),  # invisible
+        ('mały kotek poszedł na spacer i tak', 2),  # len >= 30
+        ('m𝖺ły kotek', 3),  # confusables
+        ('maly☭kotek', 4),  # special
+        # ('20', 5),  # number
+        # ('malykotek', 6),  # letter
+        ('maly🐈', 7),  # emoji
+        ('maly-kotek', 8),  # hyphen
+        ('10', 9),  # simple number
+        # ('gdhdfhgdf', 10),  # word count null
+        # ('abcdefg', 11),  # word count 0
+        ('bardzomaleladnekotki', 12),  # word count 4+
+        ('verymalecats', 13),  # word count 3
+        ('malecats', 14),  # word count 2
+        ('kotek', 15),  # word count 1
+    ]
+)
+def test_scorer(prod_inspector, name, low):
+    assert low <= prod_inspector.analyse_name(name)['score'] * 16 <= low + 1
