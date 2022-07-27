@@ -85,16 +85,16 @@ def test_confusable_simple():
                 print([k, v], len(k), len(v))
 
 
-def test_inspector_word_length(inspector_test_config):
+def test_inspector_word_count(inspector_test_config):
     inspector = inspector_test_config
     result = inspector.analyse_name('laptop')
-    assert result['word_length'] == 1
+    assert result['word_count'] == 1
 
     result = inspector.analyse_name('lapŁtop')
-    assert result['word_length'] == 0
+    assert result['word_count'] == 0
 
     result = inspector.analyse_name('toplap')
-    assert result['word_length'] == 2
+    assert result['word_count'] == 2
 
 
 def test_inspector_combine(inspector_test_config):

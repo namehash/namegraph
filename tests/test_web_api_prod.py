@@ -88,7 +88,7 @@ def test_prod_inspector_long_post(prod_test_client):
 
     json = response.json()
 
-    assert 'name' in json
+    assert 'label' in json
     assert json['tokenizations'] is None
 
 
@@ -101,7 +101,7 @@ def test_prod_inspector_long2_post(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    assert 'name' in json
+    assert 'label' in json
     assert json['tokenizations'] is None
 
 
@@ -114,7 +114,7 @@ def test_inspector_basic(prod_test_client):
 
     check_inspector_response(name, json)
 
-    assert json['word_length'] == 1
+    assert json['word_count'] == 1
     assert json['all_class'] == 'simple_letter'
     assert json['all_script'] == 'Latin'
     assert json['any_scripts'] == ['Latin']
@@ -152,7 +152,7 @@ def test_inspector_special(prod_test_client):
 
     check_inspector_response(name, json)
 
-    assert json['word_length'] == 0
+    assert json['word_count'] == 0
     assert json['all_class'] == 'any_letter'
     assert json['all_script'] == 'Latin'
     assert json['any_scripts'] == ['Latin']
@@ -252,13 +252,13 @@ def test_generator_stress(prod_test_client):
 @pytest.mark.slow
 def test_inspector_no_score(prod_test_client):
     name = 'cat'
-    response = prod_test_client.post('/inspector/', json={'name': name, 'score': False})
+    response = prod_test_client.post('/inspector/', json={'name': name, 'tokenization': False})
     assert response.status_code == 200
     json = response.json()
     print(json)
     check_inspector_response(name, json, tokenization=False)
 
-    assert json['word_length'] is None
+    assert json['word_count'] is None
     assert json['all_class'] == 'simple_letter'
     assert json['all_script'] == 'Latin'
     assert json['any_scripts'] == ['Latin']
@@ -291,7 +291,7 @@ def test_inspector_limit_confusables(prod_test_client):
     print(json)
     check_inspector_response(name, json, limit_confusables=True)
 
-    assert json['word_length'] == 0
+    assert json['word_count'] == 0
     assert json['all_class'] is None
     assert json['all_script'] == 'Latin'
     assert json['any_scripts'] == ['Latin']
@@ -319,7 +319,7 @@ def test_inspector_disable_chars_output(prod_test_client):
     print(json)
     check_inspector_response(name, json, disable_chars_output=True)
 
-    assert json['word_length'] == 1
+    assert json['word_count'] == 1
     assert json['all_class'] == 'simple_letter'
     assert json['all_script'] == 'Latin'
     assert json['any_scripts'] == ['Latin']
@@ -350,7 +350,7 @@ def test_inspector_disable_char_analysis(prod_test_client):
     print(json)
     check_inspector_response(name, json, disable_char_analysis=True)
 
-    assert json['word_length'] == 1
+    assert json['word_count'] == 1
     assert json['all_class'] is None
     assert json['all_script'] is None
     assert json['any_scripts'] is None

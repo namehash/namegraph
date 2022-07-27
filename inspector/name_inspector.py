@@ -89,7 +89,7 @@ class Inspector:
         # name of feature, function, if in filtering mode
         self.features_config: Dict[str, Dict[str, Tuple[Callable, bool]]] = {
             'string': {
-                'name': (self.f.name, True),
+                'label': (self.f.name, True),
                 'length': (self.f.length, True),
                 # 'emoji_count': (self.f.emoji_count, False),
                 # 'bytes': (self.f.bytes, False),
@@ -336,7 +336,7 @@ class Inspector:
             tokenizeds = self.tokenize(name)
 
             # count min number of words for tokenization without gaps
-            name_analysis['word_length'] = count_words(tokenizeds)
+            name_analysis['word_count'] = count_words(tokenizeds)
 
             name_analysis['tokenizations'] = self.tokenizations_analysis(tokenizeds, entities)
 
@@ -456,7 +456,7 @@ class Scorer:
         return 'simple_number' in name_analysis['any_classes']
 
     def word_count(self, name_analysis):
-        return name_analysis['word_length']
+        return name_analysis['word_count']
 
     def short_name_bonus(self, name_analysis):
         return 1 - min(name_analysis['length'], self.name_length_limit) / (self.name_length_limit + 1)
