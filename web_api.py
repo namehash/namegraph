@@ -52,7 +52,7 @@ class Name(BaseModel):
 class InspectorName(BaseModel):
     name: str = Field(title='input name')
     entities: bool = Field(default=False, title='additionally extract entities')
-    score: bool = Field(default=True, title='score name==tokenization',
+    tokenization: bool = Field(default=True, title='enable tokenization',
                         description='if false then tokenization is not performed')
     limit_confusables: bool = Field(default=False, title='limit confusables to 1 element')
     disable_chars_output: bool = Field(default=False,
@@ -192,10 +192,10 @@ class InspectorCharResult(BaseModel):
 
 
 class InspectorResult(BaseModel):
-    name: str = Field(title="input string")
+    label: str = Field(title="input string")
     length: int = Field(title="number of Unicode characters")
-    word_length: Union[int, None] = Field(default=None, title=" minimum number of words in tokenization without gaps",
-                                          description='if gaps are in all tokenizations then result is 0'
+    word_count: Union[int, None] = Field(default=None, title=" minimum number of words in tokenization without gaps",
+                                         description='if gaps are in all tokenizations then result is 0'
                                                       'if tokenization is empty then result is 0'
                                                       'if tokenization was not performed then result is null')
     all_class: Union[str, None] = \
@@ -264,7 +264,7 @@ async def root(name: str):
 @app.post("/inspector/", response_model=InspectorResult)
 async def root(name: InspectorName):
     return inspector.analyse_name(name.name,
-                                  tokenization=name.score,
+                                  tokenization=name.tokenization,
                                   entities=name.entities,
                                   limit_confusables=name.limit_confusables,
                                   disable_chars_output=name.disable_chars_output,

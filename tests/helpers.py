@@ -15,9 +15,9 @@ def check_inspector_response(name,
     Verifies only field names and types without exact values.
     """
     assert sorted(resp.keys()) == sorted([
-        'name',
+        'label',
         'length',
-        'word_length',
+        'word_count',
         'all_class',
         'all_script',
         'any_scripts',
@@ -33,7 +33,7 @@ def check_inspector_response(name,
         'score',
     ])
 
-    assert resp['name'] == name
+    assert resp['label'] == name
     assert resp['length'] == len(name)
 
     if disable_char_analysis:
@@ -51,12 +51,12 @@ def check_inspector_response(name,
         assert resp['tokenizations'] is None or type(resp['tokenizations']) == list
         assert resp['probability'] is None or 0 <= resp['probability'] <= 1
         assert resp['score'] is None or 0 <= resp['score'] <= 1
-        assert resp['word_length'] is None or 0 <= resp['word_length']
+        assert resp['word_count'] is None or 0 <= resp['word_count']
     else:
         assert resp['tokenizations'] is None
         assert resp['probability'] is None
         assert resp['score'] is None
-        assert resp['word_length'] is None
+        assert resp['word_count'] is None
     # all_unicodeblock can be null
 
     assert type(resp['ens_is_valid_name']) == bool
