@@ -130,7 +130,8 @@ def test_script_of(chr, expected):
         ('🤔', True),
         ('a', False),
         ('ア', False),
-        ('\U0000200D', False),
+        ('\U0000200D', False),  # ZWJ
+        ('\U0000200C', False),  # ZWNJ
     ]
 )
 def test_is_emoji(chr, expected):
