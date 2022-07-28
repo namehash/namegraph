@@ -6,8 +6,6 @@ from fastapi.testclient import TestClient
 
 from generator.domains import Domains
 
-from .helpers import check_inspector_response
-
 
 @pytest.fixture(scope="module")
 def test_test_client():
@@ -49,19 +47,3 @@ def test_get(test_test_client):
 
     primary = json['primary']
     assert "discharge" in primary
-
-
-def test_inspector_fast(test_test_client):
-    label = 'cat'
-    response = test_test_client.post('/inspector/', json={'label': label})
-    assert response.status_code == 200
-    json = response.json()
-
-    check_inspector_response(label, json)
-
-
-def test_inspector_negative_score(test_test_client):
-    label = 'fourscoreandsevenyearsagoourfathersbroughtforthonthiscontinentanewnationconceivedinlibertyanddedicatedtothepropositionthatallmenarecreatedequalnowweareengagedinagreatcivilwartestingwhetherthatnationoranynationsoconceivedandsodedicatedcanlongendurewearemetonagreatbattlefieldofthatwarwehavecometodedicateaportionofthatfieldasafinalrestingplaceforthosewhoheregavetheirlivesthatthatnationmightliveitisaltogetherfittingandproperthatweshoulddothisbutinalargersensewecannotdedicatewecannotconsecratewecannothallowthisgroundthebravemenlivinganddeadwhostruggledherehaveconsecrateditfaraboveourpoorpowertoaddordetracttheworldwilllittlenotenorlongrememberwhatwesayherebutitcanneverforgetwhattheydidhereitisforusthelivingrathertobededicatedheretotheunfinishedworkwhichtheywhofoughtherehavethusfarsonoblyadvanceditisratherforustobeherededicatedtothegreattaskremainingbeforeusthatfromthesehonoreddeadwetakeincreaseddevotiontothatcauseforwhichtheyheregavethelastfullmeasureofdevotionthatweherehighlyresolvethatthesedeadshallnothavediedinvainthatthisnationundergodshallhaveanewbirthoffreedomandthatgovernmentofthepeoplebythepeopleforthepeopleshallnotperishfromtheearth.eth'
-    response = test_test_client.post('/inspector/', json={'label': label})
-    assert response.status_code == 200
-    check_inspector_response(label, response.json())
