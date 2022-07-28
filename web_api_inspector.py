@@ -6,7 +6,6 @@ from hydra import initialize, compose
 from pydantic import BaseModel, Field
 from pydantic import BaseSettings
 
-from generator.xgenerator import Generator
 from inspector.name_inspector import Inspector
 
 logger = logging.getLogger('generator')
@@ -21,16 +20,6 @@ settings = Settings()
 app = FastAPI()
 
 
-def init():
-    with initialize(version_base=None, config_path="conf/"):
-        config = compose(config_name=settings.config_name)
-        logger.setLevel(config.app.logging_level)
-        for handler in logger.handlers:
-            handler.setLevel(config.app.logging_level)
-
-        return Generator(config)
-
-
 def init_inspector():
     with initialize(version_base=None, config_path="conf/"):
         config = compose(config_name=settings.config_name)
@@ -41,12 +30,7 @@ def init_inspector():
         return Inspector(config)
 
 
-generator = init()
 inspector = init_inspector()
-
-
-class Name(BaseModel):
-    name: str = Field(title='input name')
 
 
 class InspectorName(BaseModel):
@@ -72,17 +56,6 @@ class Result(BaseModel):
     advertised: List[str] = []
     secondary: List[str] = []
     primary: List[str] = []
-
-
-@app.get("/", response_model=Result)
-async def root(name: str):
-    return generator.generate_names(name)
-
-
-@app.post("/", response_model=Result)
-async def root(name: Name):
-    logger.debug(f'Request received: {name.name}')
-    return generator.generate_names(name.name)
 
 
 class InspectorConfusableCharResult(BaseModel):

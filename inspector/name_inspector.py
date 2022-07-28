@@ -12,7 +12,7 @@ from omegaconf import DictConfig
 
 # http://www.unicode.org/Public/UCD/latest/ucd/Scripts.txt
 # cat Scripts.txt | grep -v -P "^#" | cut -d ";" -f 2 | cut -d ' ' -f 2 | sort -u > script_names.txt
-from generator.tokenization import AllTokenizer
+from inspector.all_tokenizer import AllTokenizer
 from inspector.features import Features
 from inspector.ngrams import Ngrams
 

@@ -244,4 +244,4 @@ def test_scorer_word_count_null(prod_inspector):
     #     - then score is not computed at all
     #   - or name length > tokenization_length_threshold:
     #     - then 2 < score < 3 because of long name penalty
-    assert 10 <= prod_inspector.analyse_name('co poradzisz')['score'] * 16 <= 11
+    assert 10 <= prod_inspector.analyse_name('coporadzisz', tokenization=False)['score'] * 16 <= 11
