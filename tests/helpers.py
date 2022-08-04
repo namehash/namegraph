@@ -1,4 +1,9 @@
 import regex
+from pathlib import Path
+
+
+ROOT_DATA_PATH = Path(__file__).resolve().parent.parent / 'data'
+TESTS_DATA_PATH = Path(__file__).resolve().parent / 'data'
 
 VERSION_REGEX = regex.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
 SPECIAL_CHAR_REGEX = regex.compile(r'[^a-zA-Z0-9.-]')
@@ -19,7 +24,7 @@ def check_generator_response(json):
         assert all(type(item) == str for item in arr)
 
 
-def generate_example_names(count, input_filename='data/primary.csv'):
+def generate_example_names(count, input_filename=ROOT_DATA_PATH / 'primary.csv'):
     with open(input_filename, 'r') as f:
         num_lines = sum(1 for _ in f)
         f.seek(0)

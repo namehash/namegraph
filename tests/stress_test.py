@@ -7,7 +7,7 @@ import argparse
 
 from generator.domains import Domains
 from fastapi.testclient import TestClient
-from tests.helpers import check_generator_response, SPECIAL_CHAR_REGEX
+from helpers import check_generator_response, SPECIAL_CHAR_REGEX
 
 
 def prod_test_client():
