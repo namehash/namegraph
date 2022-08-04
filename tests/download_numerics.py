@@ -1,7 +1,8 @@
 import requests
+from helpers import TESTS_DATA_PATH
 
 
-_FILEPATH = 'tests/data/unicode_numerics.txt'
+_FILEPATH = TESTS_DATA_PATH / 'unicode_numerics.txt'
 
 
 def download_data():
