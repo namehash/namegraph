@@ -7,3 +7,4 @@ data/*.pkl
 data/*.npy
 .idea/
 .coverage
+/data/cache/
