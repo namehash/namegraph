@@ -9,6 +9,7 @@ from generator.generation import (
     W2VGenerator,
     CategoriesGenerator,
     Wikipedia2VGenerator,
+    SubstringMatchGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -157,3 +158,31 @@ def test_wikipedia2vsimilarity():
         generated_names = strategy.apply(tokenized_name)
         print(generated_names)
         assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]
+
+
+def test_substringmatchgenerator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SubstringMatchGenerator(config)
+        tokenized_name = GeneratedName(('00', '-00', '-69-00'))
+        generated_names = strategy.apply(tokenized_name)
+        assert ('00-00-69-00',) in [x.tokens for x in generated_names]
+
+
+def test_substringmatchgenerator_short():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SubstringMatchGenerator(config)
+        tokenized_name = GeneratedName(('4',))
+        generated_names = strategy.apply(tokenized_name)
+        assert ('0000400',) in [x.tokens for x in generated_names]
+
+
+def test_substringmatchgenerator_re_equals_tree():
+    from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl
+
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        re_impl = ReImpl(config)
+        tree_impl = SuffixTreeImpl(config)
+        assert sorted(re_impl.find('0')) == sorted(tree_impl.find('0'))
