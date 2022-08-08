@@ -1,5 +1,5 @@
 import logging
-from typing import Set, Tuple, List
+from typing import List
 
 from omegaconf import DictConfig
 
@@ -27,7 +27,9 @@ class Pipeline:
         self._build()
 
     def apply(self, word: str) -> List[GeneratedName]:
+        input_word = word
         word = GeneratedName((word,))
+
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
             word = normalizer.apply(word)
@@ -56,6 +58,9 @@ class Pipeline:
             logger.debug(f'{filter} filtering')
             suggestions = filter.apply(suggestions)
             logger.debug(f'{filter} done')
+
+        # remove input name from suggestions
+        suggestions = [s for s in suggestions if str(s) != input_word]
 
         return suggestions
 

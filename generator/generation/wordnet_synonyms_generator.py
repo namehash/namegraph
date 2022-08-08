@@ -1,6 +1,5 @@
 import logging
 
-import nltk
 from nltk.corpus import wordnet as wn
 from typing import List, Dict, Tuple
 import itertools
@@ -19,8 +18,6 @@ class WordnetSynonymsGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__()
-        nltk.download("wordnet")
-        nltk.download("omw-1.4")
         wn.synsets('dog')  # init wordnet
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 

@@ -1,6 +1,5 @@
-from hydra import compose, initialize_config_module, initialize
+from hydra import compose, initialize
 
-import pytest
 from pytest import mark
 from typing import List
 
@@ -20,3 +19,4 @@ def test_basic_pipeline(overrides: List[str], expected: List[str]) -> None:
         result = pipeline.apply(config.app.query)
         result = [str(r) for r in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
+        assert config.app.query not in result

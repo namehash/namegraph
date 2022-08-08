@@ -1,5 +1,6 @@
 defaults:
   - pipelines: prod
+  - inspector: prod
   - _self_
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
@@ -7,30 +8,43 @@ app:
   # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered
-  domains: data/domains.sorted.csv
+  domains: data/primary.csv
   # the query the names are generated for
   query: mydomain
   # the number of generated suggestions (TODO: implement)
   suggestions: 100
   # by default no pipelines are defined
-  categories: data/categories/
-  categories_ignored: data/categories/ignore.txt
   logging_level: INFO
-  secondary_market_names: data/empty.json
-  advertised_names: data/empty.json
-  internet_domains: data/top_internet_names.txt
+  secondary_market_names: data/secondary.csv
+  advertised_names: data/empty.csv
+  internet_domains: data/top_internet_names.csv
+  primary_url: primary.csv
+  secondary_url: secondary.csv
+  advertised_url: advertised.csv
+  subnames_url: subnames.txt
+  clubs_url: clubs.csv
+  clubs: data/clubs.csv
+  #for longer names only first 30 characters are taken into consideration
+  name_length_limit: 30
 filtering:
   # List of already registered domains
-  domains: data/domains.sorted.csv
+  domains: data/primary.csv
   subnames: data/subnames.txt
   root_path: ./
 tokenization:
-  dictionary: tests/data/words.txt
+  dictionary: data/words.txt
+  skip_one_letter_words: true
+  skip_non_words: false
+  add_letters_ias: true
+  with_gaps: true
 generation:
-  word2vec_model: glove-twitter-25
+  word2vec_url: embeddings.pkl
+  word2vec_path: data/embeddings.pkl
   suffixes_path: data/suffixes.txt
   prefixes_path: data/prefixes.txt
   limit: 10000
+  wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
+  wikipedia2vec_path: data/wikipedia2vec.pkl
 random_pipeline:
   normalizers:
     - StripEthNormalizer

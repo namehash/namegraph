@@ -8,6 +8,7 @@ from generator.generation import (
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
+    Wikipedia2VGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -121,23 +122,17 @@ def test_categories_csv():
         assert ('my', '0x2', '123') in [x.tokens for x in generated_names]
 
 
-def test_duplicated_categories():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        strategy = CategoriesGenerator(config)
-        assert len(strategy.categories) == 2
-
-
 def test_random():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = RandomGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
         generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
         assert len(
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
                                                            'wikipedia', 'qq',
-                                                           'twitter', 'live', 'global', '00002'}) == 9
+                                                           'twitter', 'live', 'global', '00002'}) == 8
 
 
 def test_secondary_matcher():
@@ -147,8 +142,18 @@ def test_secondary_matcher():
         tokenized_name = GeneratedName(('pay', 'fire', '123'))
         generated_names = strategy.apply(tokenized_name)
         print(generated_names)
-        assert ('pay', 'share') in [x.tokens for x in generated_names]
-        assert ('pay', 'fix') in [x.tokens for x in generated_names]
-        assert ('pay', 'green') in [x.tokens for x in generated_names]
-        assert ('pay', 'trust') in [x.tokens for x in generated_names]
+        assert ('payshare',) in [x.tokens for x in generated_names]
+        assert ('payfix',) in [x.tokens for x in generated_names]
+        assert ('paygreen',) in [x.tokens for x in generated_names]
+        assert ('paytrust',) in [x.tokens for x in generated_names]
         assert ('fire',) in [x.tokens for x in generated_names]
+
+
+def test_wikipedia2vsimilarity():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = Wikipedia2VGenerator(config)
+        tokenized_name = GeneratedName(('billy', 'corgan'))
+        generated_names = strategy.apply(tokenized_name)
+        print(generated_names)
+        assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]

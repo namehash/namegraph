@@ -1,5 +1,3 @@
-from typing import Iterable
-
 from generator.domains import Domains
 from .filter import Filter
 

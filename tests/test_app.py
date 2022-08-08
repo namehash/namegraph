@@ -72,7 +72,7 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=panda", "app.suggestions=1000"], ["panda"]),
+        (["app.query=pandas", "app.suggestions=1000"], ["panda"]),
     ],
 )
 def test_advertised(overrides: List[str], expected: List[str]) -> None:
@@ -86,7 +86,7 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=fire", "app.suggestions=1000"], ["fire"]),
+        (["app.query=fires", "app.suggestions=1000"], ["fire"]),
     ],
 )
 def test_secondary(overrides: List[str], expected: List[str]) -> None:

@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 import itertools
 
 from .name_generator import NameGenerator

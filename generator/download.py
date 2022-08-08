@@ -1,19 +1,29 @@
 import hydra
+import nltk
+
 from omegaconf import DictConfig
-import gensim.downloader as api
-from generator.generation import WordnetSynonymsGenerator
+
+
+def download_wordnet(config):
+    nltk.download("wordnet")
+    nltk.download("omw-1.4")
+
+
+def download_spacy(config):
+    from spacy.cli.download import download
+    download('en_core_web_sm')
+
+
+def download_embeddings(s3_downloader, url, path):
+    s3_downloader.download_file(url, path, override=False)
+    vectors = '.vectors.npy'
+    s3_downloader.download_file(url + vectors, path + vectors, override=False)
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
 def init(config: DictConfig):
-    WordnetSynonymsGenerator(config)
-
-    # convert embeddings to binary
-    model = api.load(config.generation.word2vec_model)
-    model.save('data/embeddings.pkl')
-    del model
-
-    # TODO download files from S3
+    download_wordnet(config)
+    download_spacy(config)
 
 
 if __name__ == "__main__":

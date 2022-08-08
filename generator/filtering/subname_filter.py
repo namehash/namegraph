@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
-from typing import Iterable, Set
+from typing import Set
+
 from .filter import Filter
 
 

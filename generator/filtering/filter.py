@@ -1,4 +1,4 @@
-from typing import List, Tuple, Iterable
+from typing import List, Iterable
 
 from generator.generated_name import GeneratedName
 

@@ -10,7 +10,11 @@ The application can be run:
 * reading queries from stdin
 * reading query as an argument
 
-The first run will download additional resources (e.g. dictionaries).
+Additional resources need to be downloaded:
+```
+python download.py # dictionaries, embeddings
+python download_names.py
+```
 
 ## Queries from stdin
 

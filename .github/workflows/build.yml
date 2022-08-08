@@ -1,0 +1,41 @@
+on:
+  push:
+    branches: [prod]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      ECR_REPOSITORY: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator
+      PROD_IMAGE_TAG: prod-name-generator
+      CLUSTER_NAME: prod-name-generator
+      SERVICE_NAME: prod-name-generator-server
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: login to AWS ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login \
+          --username AWS --password-stdin \
+          ${ECR_REPOSITORY}
+      - name: build image
+        run: |
+          docker build \
+          --build-arg AWS_SECRET_ACCESS_KEY \
+          --build-arg AWS_ACCESS_KEY_ID \
+          -t ${ECR_REPOSITORY}:commit_$(git rev-parse --short "$GITHUB_SHA") \
+          -t ${ECR_REPOSITORY}:${PROD_IMAGE_TAG} \
+          .
+      - name: push image
+        run: docker push --all-tags ${ECR_REPOSITORY}
+
+      - name: deploy
+        run: |
+          aws ecs update-service \
+          --region us-east-1 \
+          --cluster ${CLUSTER_NAME} \
+          --service ${SERVICE_NAME} \
+          --force-new-deployment
