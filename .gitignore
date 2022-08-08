@@ -2,3 +2,7 @@ python3.6.12
 __pycache__
 outputs
 *.egg-info
+data/*.zip
+data/*.pkl
+data/*.npy
+.idea/

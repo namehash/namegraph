@@ -4,7 +4,7 @@ from .tokenizer import Tokenizer
 
 
 class NoneTokenizer(Tokenizer):
-    """Return the input withopout tokenization."""
+    """Return the input without tokenization."""
 
     def __init__(self, config):
         super().__init__()
