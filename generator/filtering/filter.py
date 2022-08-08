@@ -16,8 +16,5 @@ class Filter:
                 tokenized_name.applied_strategies += [self.__class__.__name__]
         return result
 
-    def filter(self, names: Iterable[str]):
-        return [n for n in names if self.filter_name(n)]
-
     def filter_name(self, name: str) -> bool:
         raise NotImplementedError

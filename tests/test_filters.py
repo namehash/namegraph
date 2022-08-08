@@ -14,7 +14,7 @@ def test_domain_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = DomainFilter(config)
-        filtered = filter.filter(['00002', '000436'])
+        filtered = [n for n in ('00002', '000436') if filter.filter_name(n)]
         assert '00002' not in filtered
         assert '000436' in filtered
 
@@ -23,16 +23,16 @@ def test_subname_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = SubnameFilter(config)
-        result = filter.filter(['dog', 'theshit'])
-        assert 'theshit' not in result
-        assert 'dog' in result
+        filtered = [n for n in ('dog', 'theshit') if filter.filter_name(n)]
+        assert 'theshit' not in filtered
+        assert 'dog' in filtered
 
 
 def test_valid_name_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = ValidNameFilter(config)
-        filtered = filter.filter(['dog', 'dog.cat', 'do', 'dog-cat', '-dog', 'dog-', 'dog--cat'])
+        filtered = [n for n in ('dog', 'dog.cat', 'do', 'dog-cat', '-dog', 'dog-', 'dog--cat') if filter.filter_name(n)]
         assert 'dog.cat' not in filtered
         assert 'do' not in filtered
         assert 'dog' in filtered

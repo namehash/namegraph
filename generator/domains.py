@@ -45,7 +45,10 @@ class Domains(metaclass=Singleton):
         self.internet -= self.secondary_market.keys()
         self.internet -= self.advertised.keys()
 
-        self.internet = set(self.validname_filter.filter(self.subname_filter.filter(self.internet)))
+        self.internet = set(
+            n for n in self.internet
+            if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
+        )
         logger.debug('Inited Domains')
 
     def read_csv(self, path: str) -> Set[str]:
