@@ -1,15 +1,12 @@
-from typing import Tuple
+from typing import Tuple, List, Optional
 
 
 class GeneratedName:
     __slots__ = ['tokens', 'applied_strategies']
 
-    def __init__(self, tokens: Tuple[str, ...], applied_strategies=None):
+    def __init__(self, tokens: Tuple[str, ...], applied_strategies: Optional[List[str]] = None):
         self.tokens = tokens
-        if applied_strategies is None:
-            self.applied_strategies = []
-        else:
-            self.applied_strategies = applied_strategies  # history of applied strategies
+        self.applied_strategies = applied_strategies or []  # history of applied strategies
 
     def __str__(self):
         return ''.join(self.tokens)

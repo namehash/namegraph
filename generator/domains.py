@@ -70,8 +70,9 @@ class Domains(metaclass=Singleton):
                 names_prices[name] = float(row[1])
         return names_prices
 
-    def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) -> Tuple[
-        List[GeneratedName], Dict[GeneratedName, float]]:
+    def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
+            -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:
+
         matched: Dict[GeneratedName, float] = {}
         remaining_suggestions: List[GeneratedName] = []
         for suggestion in suggestions:
