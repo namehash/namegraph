@@ -11,8 +11,6 @@ class BigramWordnetTokenizer(Tokenizer):
 
     def __init__(self, config):
         super().__init__()
-        nltk.download("wordnet")
-        nltk.download("omw-1.4")
         wn.synsets('dog')
 
     def tokenize(self, word: str) -> List[Tuple[str, ...]]:
