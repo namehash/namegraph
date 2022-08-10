@@ -12,4 +12,17 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
-
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - PermuteGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
