@@ -3,6 +3,7 @@ from itertools import zip_longest, chain
 from typing import List, Dict
 
 from generator.domains import Domains
+from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
 from omegaconf import DictConfig
 
@@ -83,7 +84,7 @@ class Generator():
     def init_objects(self):
         Domains(self.config)
 
-    def generate_names(self, name: str) -> Dict[str, List[str]]:
+    def generate_names(self, name: str) -> Dict[str, List[GeneratedName]]:
         count = self.config.app.suggestions
         result = Result(self.config)
 

@@ -1,8 +1,9 @@
 import logging
-from typing import Set, Tuple
+from typing import List
 
 from omegaconf import DictConfig
 
+from generator.generated_name import GeneratedName
 from generator.normalization import *
 from generator.tokenization import *
 from generator.generation import *
@@ -25,17 +26,18 @@ class Pipeline:
         self.filters = []
         self._build()
 
-    def apply(self, word: str):
+    def apply(self, word: str) -> List[GeneratedName]:
         input_word = word
+        word = GeneratedName((word,))
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
-            word = normalizer.normalize(word)
+            word = normalizer.apply(word)
 
         # the tokenizers are applied in parallel
         decomposition_set = {}
         for tokenizer in self.tokenizers:
-            decomposition_set.update(dict.fromkeys(tokenizer.tokenize(word)))
+            decomposition_set.update(dict.fromkeys(tokenizer.apply(word)))
 
         logger.debug(f'Tokenization: {decomposition_set}')
 
@@ -44,11 +46,11 @@ class Pipeline:
         for generator in self.generators:
             generator_suggestions = {}
             for decomposition in suggestions:
-                generator_suggestions.update(dict.fromkeys(generator.generate(decomposition)))
+                generator_suggestions.update(dict.fromkeys(generator.apply(decomposition)))
 
             suggestions = generator_suggestions
 
-        suggestions = [''.join(tokens) for tokens in suggestions]
+        # suggestions = [''.join(tokens) for tokens in suggestions]
         logger.info(f'Generated suggestions: {len(suggestions)}')
 
         # the filters are applied sequentially
@@ -58,7 +60,7 @@ class Pipeline:
             logger.debug(f'{filter} done')
 
         # remove input name from suggestions
-        suggestions = [s for s in suggestions if s != input_word]
+        suggestions = [s for s in suggestions if str(s) != input_word]
 
         return suggestions
 

@@ -1,10 +1,12 @@
 import re
-from typing import Iterable, List
+
+from .filter import Filter
 
 
-class ValidNameFilter:
+class ValidNameFilter(Filter):
     def __init__(self, config):
-        pass
+        super().__init__()
+        self.pattern = re.compile(r'^[a-z0-9](-*[a-z0-9])+$')
 
-    def apply(self, names: Iterable[str]) -> List[str]:
-        return [n for n in names if len(n) >= 3 and re.match(r'^[a-z0-9](-*[a-z0-9])+$', n)]
+    def filter_name(self, name: str) -> bool:
+        return len(name) >= 3 and self.pattern.match(name)

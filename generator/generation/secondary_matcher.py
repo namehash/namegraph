@@ -1,5 +1,5 @@
 import collections
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 import wordninja
 

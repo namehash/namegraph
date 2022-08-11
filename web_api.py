@@ -1,11 +1,12 @@
 import logging
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Dict
 
 from fastapi import FastAPI
 from hydra import initialize, compose
 from pydantic import BaseModel, Field
 from pydantic import BaseSettings
 
+from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
@@ -57,28 +58,21 @@ class Result(BaseModel):
     primary: List[str] = []
 
 
+def convert_to_str(result: Dict[str, List[GeneratedName]]):
+    for list_name, gns in result.items():
+        result[list_name] = [str(gn) for gn in gns]
+
+
 @app.get("/", response_model=Result)
 async def root(name: str):
-    return generator.generate_names(name)
+    result = generator.generate_names(name)
+    convert_to_str(result)
+    return result
 
 
 @app.post("/", response_model=Result)
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
-    return generator.generate_names(name.name)
-
-# 
-# @app.get("/inspector/", response_model=InspectorResult)
-# async def root(name: str):
-#     return inspector.analyse_name(name)
-# 
-# 
-# @app.post("/inspector/", response_model=InspectorResult)
-# async def root(name: InspectorName):
-#     return inspector.analyse_name(name.label,
-#                                   tokenization=name.tokenization,
-#                                   entities=name.entities,
-#                                   limit_confusables=name.limit_confusables,
-#                                   truncate_chars_output=name.truncate_chars_output,
-#                                   disable_char_analysis=name.disable_char_analysis,
-#                                   pos_lemma=name.pos_lemma)
+    result = generator.generate_names(name.name)
+    convert_to_str(result)
+    return result

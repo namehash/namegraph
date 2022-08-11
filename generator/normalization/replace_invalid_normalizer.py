@@ -1,9 +1,11 @@
 import re
 
+from .normalizer import Normalizer
 
-class ReplaceInvalidNormalizer:
+
+class ReplaceInvalidNormalizer(Normalizer):
     def __init__(self, config):
-        pass
+        super().__init__()
 
     def normalize(self, name: str) -> str:
         return re.sub(r'[^a-z0-9-]+', '', name)

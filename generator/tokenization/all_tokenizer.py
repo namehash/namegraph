@@ -2,6 +2,8 @@ import collections
 from typing import Tuple, Iterable
 import ahocorasick
 
+from .tokenizer import Tokenizer
+
 
 class DFS:
     def __init__(self, automaton, name, skip_non_words=False, with_gaps=False):
@@ -55,7 +57,7 @@ class DFS:
                     yield from self.dfs(potential_index, result + [(index, potential_index, False)], gap_before=True)
 
 
-class AllTokenizer():
+class AllTokenizer(Tokenizer):
     """Return all tokenizations. It is a generator."""
 
     def __init__(self, config):

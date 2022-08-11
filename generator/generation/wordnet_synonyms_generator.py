@@ -1,7 +1,5 @@
 import logging
-from functools import reduce
 
-import nltk
 from nltk.corpus import wordnet as wn
 from typing import List, Dict, Tuple
 import itertools

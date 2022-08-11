@@ -1,4 +1,7 @@
-class LongNameNormalizer:
+from .normalizer import Normalizer
+
+
+class LongNameNormalizer(Normalizer):
     def __init__(self, config):
         self.name_length_limit = config.app.name_length_limit
 

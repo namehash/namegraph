@@ -3,7 +3,6 @@ from hydra import initialize, compose
 
 from generator.generation import (
     PermuteGenerator,
-    GeneratedName,
     PrefixGenerator,
     SuffixGenerator,
     WordnetSynonymsGenerator,
@@ -11,6 +10,7 @@ from generator.generation import (
     CategoriesGenerator,
     Wikipedia2VGenerator,
 )
+from generator.generated_name import GeneratedName
 
 import pytest
 
