@@ -13,7 +13,10 @@ class Filter:
         for tokenized_name in tokenized_names:
             if self.filter_name(str(tokenized_name)):
                 result.append(tokenized_name)
-                tokenized_name.applied_strategies += [self.__class__.__name__]
+                tokenized_name.applied_strategies = [
+                    strategy + [self.__class__.__name__]
+                    for strategy in tokenized_name.applied_strategies
+                ]
         return result
 
     def filter_name(self, name: str) -> bool:

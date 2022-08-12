@@ -26,6 +26,10 @@ def test_pipeline_override(overrides: List[str], expected: List[str], benchmark)
         config = compose(config_name="prod_config", overrides=overrides)
         generator = Generator(config)
         result = benchmark(generator.generate_names, config.app.query)
+
+        for n in result['primary']:
+            print(n.applied_strategies)
+
         primary = [str(gn) for gn in result['primary']]
         assert len(set(primary).intersection(set(expected))) == len(expected)
         assert len(primary) == config.app.suggestions
