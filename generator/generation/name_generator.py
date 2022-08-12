@@ -13,9 +13,15 @@ class NameGenerator:
     def __init__(self):
         pass
 
-    def apply(self, tokenized_name: GeneratedName) -> List[GeneratedName]:
-        return [GeneratedName(changed, tokenized_name.applied_strategies + [self.__class__.__name__]) for changed in
-                self.generate(tokenized_name.tokens)]
+    def apply(self, tokenized_names: List[GeneratedName]) -> List[GeneratedName]:
+        return [
+            GeneratedName(
+                generated,
+                [sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
+            )
+            for name in tokenized_names
+            for generated in self.generate(name.tokens)
+        ]
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         raise NotImplementedError
