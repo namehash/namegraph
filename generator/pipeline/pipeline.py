@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Dict
 
 from omegaconf import DictConfig
 
@@ -28,27 +28,23 @@ class Pipeline:
 
     def apply(self, word: str) -> List[GeneratedName]:
         input_word = word
-        word = GeneratedName((word,))
+        words = [GeneratedName((word,))]
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
-            word = normalizer.apply(word)
+            words = normalizer.apply(words)
 
         # the tokenizers are applied in parallel
-        decomposition_set = {}
+        decomposition_set: Dict[GeneratedName, None] = {}
         for tokenizer in self.tokenizers:
-            decomposition_set.update(dict.fromkeys(tokenizer.apply(word)))
+            decomposition_set.update(dict.fromkeys(tokenizer.apply(words)))
 
         logger.debug(f'Tokenization: {decomposition_set}')
 
         # the generators are applied sequentially
-        suggestions = decomposition_set
+        suggestions: Dict[GeneratedName, None] = decomposition_set
         for generator in self.generators:
-            generator_suggestions = {}
-            for decomposition in suggestions:
-                generator_suggestions.update(dict.fromkeys(generator.apply(decomposition)))
-
-            suggestions = generator_suggestions
+            suggestions = dict.fromkeys(generator.apply(suggestions.keys()))
 
         # suggestions = [''.join(tokens) for tokens in suggestions]
         logger.info(f'Generated suggestions: {len(suggestions)}')
@@ -59,10 +55,21 @@ class Pipeline:
             suggestions = filter.apply(suggestions)
             logger.debug(f'{filter} done')
 
-        # remove input name from suggestions
-        suggestions = [s for s in suggestions if str(s) != input_word]
+        # remove input name from suggestions, duplicates and aggregating metadata
+        suggestion2obj: Dict[str, GeneratedName] = dict()
+        for suggestion in suggestions:
+            word = str(suggestion)
 
-        return suggestions
+            if word == input_word:
+                continue
+
+            duplicate = suggestion2obj.get(word, None)
+            if duplicate is not None:
+                duplicate.applied_strategies += suggestion.applied_strategies
+            else:
+                suggestion2obj[word] = suggestion
+
+        return list(suggestion2obj.values())
 
     def _build(self):
         for normalizer_class in self.definition.normalizers:

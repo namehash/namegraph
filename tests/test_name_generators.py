@@ -27,7 +27,7 @@ def test_permuter():
         config = compose(config_name="test_config")
         strategy = PermuteGenerator(config)
         tokenized_name = GeneratedName(('asd', 'qwe', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 6
         # print([x.applied_strategies for x in generated_names])
 
@@ -37,7 +37,7 @@ def test_permuter_limit():
         config = compose(config_name="test_config")
         strategy = PermuteGenerator(config)
         tokenized_name = GeneratedName(list(range(10)))  # 3628800 permutations
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == config.generation.limit
 
 
@@ -46,7 +46,7 @@ def test_prefix():
         config = compose(config_name="test_config")
         strategy = PrefixGenerator(config)
         tokenized_name = GeneratedName(('asd', 'qwe', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 2
         assert ('0x', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
         assert ('the', 'asd', 'qwe', '123') in [x.tokens for x in generated_names]
@@ -57,7 +57,7 @@ def test_prefix_prefixed():
         config = compose(config_name="test_config")
         strategy = PrefixGenerator(config)
         tokenized_name = GeneratedName(('0', 'xqwe', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 1
         assert ('0x', '0', 'xqwe', '123') not in [x.tokens for x in generated_names]
         assert ('the', '0', 'xqwe', '123') in [x.tokens for x in generated_names]
@@ -68,7 +68,7 @@ def test_suffix():
         config = compose(config_name="test_config")
         strategy = SuffixGenerator(config)
         tokenized_name = GeneratedName(('asd', 'qwe', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 2
         assert ('asd', 'qwe', '123', 'man') in [x.tokens for x in generated_names]
         assert ('asd', 'qwe', '123', 'coin') in [x.tokens for x in generated_names]
@@ -79,7 +79,7 @@ def test_suffix_suffixed():
         config = compose(config_name="test_config")
         strategy = SuffixGenerator(config)
         tokenized_name = GeneratedName(('asd', 'qwem', 'an'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 1
         assert ('asd', 'qwem', 'an', 'man') not in [x.tokens for x in generated_names]
         assert ('asd', 'qwem', 'an', 'coin') in [x.tokens for x in generated_names]
@@ -90,7 +90,7 @@ def test_wordnetsynonyms():
         config = compose(config_name="test_config")
         strategy = WordnetSynonymsGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('my', 'domain', '123') in [x.tokens for x in generated_names]
         assert ('my', 'area', '123') in [x.tokens for x in generated_names]
 
@@ -101,7 +101,7 @@ def test_w2vsimilarity():
         config = compose(config_name="test_config")
         strategy = W2VGenerator(config)
         tokenized_name = GeneratedName(('my', 'pikachu', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('your', 'pikachu', '123') in [x.tokens for x in generated_names]
         assert ('my', 'mickey', '123') in [x.tokens for x in generated_names]
 
@@ -111,7 +111,7 @@ def test_categories():
         config = compose(config_name="test_config")
         strategy = CategoriesGenerator(config)
         tokenized_name = GeneratedName(('my', 'pol', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('my', 'ukr', '123') in [x.tokens for x in generated_names]
         assert ('my', 'usa', '123') in [x.tokens for x in generated_names]
 
@@ -121,7 +121,7 @@ def test_categories_csv():
         config = compose(config_name="test_config")
         strategy = CategoriesGenerator(config)
         tokenized_name = GeneratedName(('my', '0x8', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('my', '0x1', '123') in [x.tokens for x in generated_names]
         assert ('my', '0x2', '123') in [x.tokens for x in generated_names]
 
@@ -131,7 +131,7 @@ def test_random():
         config = compose(config_name="test_config")
         strategy = RandomGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         print(generated_names)
         assert len(
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
@@ -144,7 +144,7 @@ def test_secondary_matcher():
         config = compose(config_name="test_config")
         strategy = SecondaryMatcher(config)
         tokenized_name = GeneratedName(('pay', 'fire', '123'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         print(generated_names)
         assert ('payshare',) in [x.tokens for x in generated_names]
         assert ('payfix',) in [x.tokens for x in generated_names]
@@ -158,7 +158,7 @@ def test_wikipedia2vsimilarity():
         config = compose(config_name="test_config")
         strategy = Wikipedia2VGenerator(config)
         tokenized_name = GeneratedName(('billy', 'corgan'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         print(generated_names)
         assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]
 
