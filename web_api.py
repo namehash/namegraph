@@ -3,11 +3,17 @@ from typing import List, Dict
 
 from fastapi import FastAPI
 from hydra import initialize, compose
-from pydantic import BaseModel, Field
 from pydantic import BaseSettings
 
 from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
+
+from models import (
+    Name,
+    Result,
+    ResultWithMetadata,
+    Suggestion
+)
 
 logger = logging.getLogger('generator')
 
@@ -45,19 +51,6 @@ generator = init()
 inspector = init_inspector()
 
 
-class Name(BaseModel):
-    name: str = Field(title='input name')
-
-
-class Result(BaseModel):
-    """
-    Input name might be truncated if is too long.
-    """
-    advertised: List[str] = []
-    secondary: List[str] = []
-    primary: List[str] = []
-
-
 def convert_to_str(result: Dict[str, List[GeneratedName]]):
     for list_name, gns in result.items():
         result[list_name] = [str(gn) for gn in gns]
@@ -75,4 +68,30 @@ async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name)
     convert_to_str(result)
+    return result
+
+
+def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
+    return [{
+        'text': str(name),
+        'metadata': {
+            'applied_strategies': name.applied_strategies
+        }
+    } for name in names]
+
+
+@app.get("/metadata", response_model=ResultWithMetadata)
+async def metadata(name: str):
+    result = generator.generate_names(name)
+    for list_name, gns in result.items():
+        result[list_name] = convert_to_suggestion_format(gns)
+    return result
+
+
+@app.post("/metadata", response_model=ResultWithMetadata)
+async def metadata(name: Name):
+    logger.debug(f'Request received: {name.name}')
+    result = generator.generate_names(name.name)
+    for list_name, gns in result.items():
+        result[list_name] = convert_to_suggestion_format(gns)
     return result
