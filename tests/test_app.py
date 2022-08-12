@@ -95,23 +95,3 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
         result = generate(cfg, )[0]
         secondary = [str(gn) for gn in result['secondary']]
         assert len(set(secondary).intersection(set(expected))) == len(expected)
-
-
-@mark.xfail(raises=AssertionError)
-@mark.parametrize(
-    "overrides",
-    [
-        (["app.query=dogcatdog", "app.suggestions=1000"]),
-    ],
-)
-def test_duplicates_in_suggestions(overrides: List[str]) -> None:
-    with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
-        result = generate(cfg, )[0]
-        flattened = [
-            str(gn)
-            for values in result.values()
-            for gn in values
-        ]
-
-        assert len(flattened) == len(set(flattened))

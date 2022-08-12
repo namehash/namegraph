@@ -13,63 +13,56 @@ from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.filtering.domain_filter import DomainFilter
 
+from generator.normalization.normalizer import Normalizer
+from generator.tokenization.tokenizer import Tokenizer
+from generator.generation.name_generator import NameGenerator
+from generator.filtering.filter import Filter
+
 logger = logging.getLogger('generator')
 
 
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
-        self.config = config
-        self.normalizers = []
-        self.tokenizers = []
-        self.generators = []
-        self.filters = []
+        self.config: DictConfig = config
+        self.normalizers: List[Normalizer] = []
+        self.tokenizers: List[Tokenizer] = []
+        self.generators: List[NameGenerator] = []
+        self.filters: List[Filter] = []
         self._build()
 
     def apply(self, word: str) -> List[GeneratedName]:
         input_word = word
-        words = [GeneratedName((word,))]
+        words: List[GeneratedName] = [GeneratedName((word,))]
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
             words = normalizer.apply(words)
 
         # the tokenizers are applied in parallel
-        decomposition_set: Dict[GeneratedName, None] = {}
+        suggestions: List[GeneratedName] = []
         for tokenizer in self.tokenizers:
-            decomposition_set.update(dict.fromkeys(tokenizer.apply(words)))
+            suggestions.extend(tokenizer.apply(words))
 
-        logger.debug(f'Tokenization: {decomposition_set}')
+        suggestions = self._aggregate_duplicates(suggestions, by_tokens=True)  # TODO do we need this?
+        logger.debug(f'Tokenization: {suggestions}')
 
         # the generators are applied sequentially
-        suggestions: Dict[GeneratedName, None] = decomposition_set
         for generator in self.generators:
-            suggestions = dict.fromkeys(generator.apply(suggestions.keys()))
+            suggestions = generator.apply(suggestions)
 
-        # suggestions = [''.join(tokens) for tokens in suggestions]
         logger.info(f'Generated suggestions: {len(suggestions)}')
 
         # the filters are applied sequentially
-        for filter in self.filters:
+        for filter_ in self.filters:
             logger.debug(f'{filter} filtering')
-            suggestions = filter.apply(suggestions)
+            suggestions = filter_.apply(suggestions)
             logger.debug(f'{filter} done')
 
-        # remove input name from suggestions, duplicates and aggregating metadata
-        suggestion2obj: Dict[str, GeneratedName] = dict()
-        for suggestion in suggestions:
-            word = str(suggestion)
+        # remove input name from suggestions
+        suggestions = [s for s in suggestions if str(s) != input_word]
 
-            if word == input_word:
-                continue
-
-            duplicate = suggestion2obj.get(word, None)
-            if duplicate is not None:
-                duplicate.applied_strategies += suggestion.applied_strategies
-            else:
-                suggestion2obj[word] = suggestion
-
-        return list(suggestion2obj.values())
+        return self._aggregate_duplicates(suggestions)
 
     def _build(self):
         for normalizer_class in self.definition.normalizers:
@@ -83,3 +76,19 @@ class Pipeline:
 
         for filter_class in self.definition.filters:
             self.filters.append(globals()[filter_class](self.config))
+
+    def _aggregate_duplicates(self, names: List[GeneratedName], by_tokens: bool = False) -> List[GeneratedName]:
+        names2obj: Dict[str, GeneratedName] = dict()
+        for name in names:
+            if by_tokens:
+                word = name.tokens
+            else:
+                word = str(name)
+
+            duplicate = names2obj.get(word, None)
+            if duplicate is not None:
+                duplicate.applied_strategies += name.applied_strategies
+            else:
+                names2obj[word] = name
+
+        return list(names2obj.values())
