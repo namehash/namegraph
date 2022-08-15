@@ -4,14 +4,16 @@ from itertools import islice
 import hashlib
 import os
 
+from generator.xgenerator import uniq
+
 try:
     from suffixtree import SuffixQueryTree
+
     HAS_SUFFIX_TREE = True
 except Exception:
     HAS_SUFFIX_TREE = False
 
 from .name_generator import NameGenerator
-
 
 CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
 CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
@@ -22,7 +24,8 @@ def _load_lines(path: str) -> List[str]:
     Load unique lines from file, removing .eth suffix.
     '''
     with open(path, 'r') as f:
-        return list(set([line.strip().removesuffix('.eth') for line in f.readlines()]))
+        # return list(set([line.strip().removesuffix('.eth') for line in f.readlines()]))
+        return uniq([line.strip().removesuffix('.eth') for line in f.readlines()])
 
 
 class ReImpl:
@@ -74,11 +77,11 @@ class SubstringMatchGenerator(NameGenerator):
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         pattern = ''.join(tokens)
-        
+
         if len(pattern) <= self.short_heuristic or self.suffix_tree_impl is None:
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
-        
+
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]

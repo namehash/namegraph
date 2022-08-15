@@ -185,4 +185,7 @@ def test_substringmatchgenerator_re_equals_tree():
         config = compose(config_name="test_config")
         re_impl = ReImpl(config)
         tree_impl = SuffixTreeImpl(config)
+
+        assert '00000000000000000000000' in list(re_impl.find('0'))
+        assert '00000000000000000000000' in list(tree_impl.find('0'))
         assert sorted(re_impl.find('0')) == sorted(tree_impl.find('0'))
