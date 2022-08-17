@@ -77,15 +77,6 @@ def test_metadata(overrides: List[str], pipeline_id: int, expected_strategies: L
     [
         (
             ["app.query=dogcatdog", "app.suggestions=1000"],
-            0,
-            [[
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "BigramWordnetTokenizer", "WordnetSynonymsGenerator", "SubnameFilter",
-                "ValidNameFilter"
-            ]]
-        ),
-        (
-            ["app.query=dogcatdog", "app.suggestions=1000"],
             1,
             [[
                 "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
