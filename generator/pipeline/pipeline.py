@@ -44,7 +44,7 @@ class Pipeline:
         for tokenizer in self.tokenizers:
             suggestions.extend(tokenizer.apply(words))
 
-        suggestions = self._aggregate_duplicates(suggestions, by_tokens=True)  # TODO do we need this?
+        suggestions = self._aggregate_duplicates(suggestions, by_tokens=True)
         logger.debug(f'Tokenization: {suggestions}')
 
         # the generators are applied sequentially

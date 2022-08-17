@@ -20,7 +20,7 @@ class Metadata(BaseModel):
 
 
 class Suggestion(BaseModel):
-    text: str
+    name: str
     metadata: Metadata
 
 
