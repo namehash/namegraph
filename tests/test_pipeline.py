@@ -95,7 +95,35 @@ def test_metadata(overrides: List[str], pipeline_id: int, expected_strategies: L
         )
     ]
 )
-def test_metadata_aggregation(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
+def test_metadata_aggregation_same_pipeline(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        pipeline = Pipeline(config.pipelines[pipeline_id], config)
+        result = pipeline.apply(config.app.query)
+
+        for gn in result:
+            assert gn.applied_strategies == expected_strategies
+
+
+@mark.parametrize(
+    "overrides, pipeline_id, expected_strategies",
+    [
+        (
+            ["app.query=dogcat", "app.suggestions=1000"],
+            2,
+            [[
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+            ], [
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+            ]]
+        )
+    ]
+)
+def test_metadata_aggregation_different_pipelines(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config", overrides=overrides)
         pipeline = Pipeline(config.pipelines[pipeline_id], config)

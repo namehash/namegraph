@@ -26,3 +26,18 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+    - BigramWordnetTokenizer
+  generators:
+    - PermuteGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
