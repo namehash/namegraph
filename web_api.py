@@ -73,7 +73,7 @@ async def root(name: Name):
 
 def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
     return [{
-        'text': str(name),
+        'name': str(name),
         'metadata': {
             'applied_strategies': name.applied_strategies
         }

@@ -11,12 +11,12 @@ class Tokenizer:
     def apply(self, tokenized_names: List[GeneratedName]) -> List[GeneratedName]:
         return [
             GeneratedName(
-                subtoken,
+                subtokens,
                 [sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
             )
             for name in tokenized_names
             for token in name.tokens
-            for subtoken in self.tokenize(token)
+            for subtokens in self.tokenize(token)
         ]
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
