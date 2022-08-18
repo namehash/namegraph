@@ -88,3 +88,21 @@ def test_generator_stress(prod_test_client):
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
         check_generator_response(response.json())
+
+
+@pytest.mark.xfail(raises=AssertionError)
+def test_metadata(prod_test_client):
+    client = prod_test_client
+    response = client.post("/metadata", json={"name": "dogcat"})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
+
+    primary = json['primary']
+    assert len(primary) > 0
+    assert sorted(primary[0].keys()) == sorted(["name", "metadata"])
+
+    catdog_result = [name for name in primary if name["name"] == "catdog"]
+    assert len(catdog_result) == 1

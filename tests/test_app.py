@@ -95,3 +95,32 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
         result = generate(cfg, )[0]
         secondary = [str(gn) for gn in result['secondary']]
         assert len(set(secondary).intersection(set(expected))) == len(expected)
+
+
+# no aggregation above pipeline
+@mark.xfail(raises=AssertionError)
+@mark.parametrize(
+    "overrides, expected_strategies",
+    [
+        (
+            ["app.query=dogcat", "app.suggestions=1000"],
+            [[
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+              ], [
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+            ]]
+        )
+    ]
+)
+def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
+    with initialize(version_base=None, config_path="../conf/"):
+        cfg = compose(config_name="test_config", overrides=overrides)
+        result = generate(cfg, )[0]
+
+        catdog_result = [gn for gn in result["primary"] if str(gn) == "catdog"]
+        assert len(catdog_result) == 1
+        assert catdog_result[0].applied_strategies == expected_strategies
