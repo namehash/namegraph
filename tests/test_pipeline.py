@@ -86,7 +86,7 @@ def test_metadata(overrides: List[str], pipeline_id: int, expected_strategies: L
         )
     ]
 )
-def test_metadata_aggregation_same_pipeline(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
+def test_metadata_aggregation_same_strategy(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config", overrides=overrides)
         pipeline = Pipeline(config.pipelines[pipeline_id], config)
@@ -114,7 +114,7 @@ def test_metadata_aggregation_same_pipeline(overrides: List[str], pipeline_id: i
         )
     ]
 )
-def test_metadata_aggregation_different_pipelines(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
+def test_metadata_aggregation_different_strategies(overrides: List[str], pipeline_id: int, expected_strategies: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config", overrides=overrides)
         pipeline = Pipeline(config.pipelines[pipeline_id], config)
