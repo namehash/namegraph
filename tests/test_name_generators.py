@@ -179,7 +179,10 @@ def test_substringmatchgenerator_short():
 
 
 def test_substringmatchgenerator_re_equals_tree():
-    from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl
+    from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
+
+    if not HAS_SUFFIX_TREE:
+        pytest.skip()
 
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
