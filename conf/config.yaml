@@ -1,6 +1,5 @@
 defaults:
   - pipelines: simple
-  - inspector: prod
   - _self_
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.

@@ -1,7 +1,0 @@
-script_names: data/inspector/script_names.txt
-confusables: data/inspector/confusables.json
-unigrams: data/inspector/unigram_freq.csv
-#limit number of tokenization of AllTokenizer
-alltokenizer_limit: 1000
-#longer names are not tokenized
-tokenization_length_threshold: 30
