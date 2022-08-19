@@ -18,6 +18,9 @@ import pytest
 from generator.generation.random_generator import RandomGenerator
 from generator.generation.secondary_matcher import SecondaryMatcher
 
+from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
+needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
+
 
 def test_permuter():
     with initialize(version_base=None, config_path="../conf/"):
@@ -178,6 +181,7 @@ def test_substringmatchgenerator_short():
         assert ('0000400',) in [x.tokens for x in generated_names]
 
 
+@needs_suffix_tree
 def test_substringmatchgenerator_re_equals_tree():
     from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
 
@@ -189,3 +193,13 @@ def test_substringmatchgenerator_re_equals_tree():
         re_impl = ReImpl(config)
         tree_impl = SuffixTreeImpl(config)
         assert sorted(re_impl.find('0')) == sorted(tree_impl.find('0'))
+
+
+@needs_suffix_tree
+def test_substringmatchgenerator_suffixtree_ignores_unicode():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SubstringMatchGenerator(config)
+        tokenized_name = GeneratedName(('٢٣',))
+        generated_names = strategy.apply(tokenized_name)
+        assert len(generated_names) == 0

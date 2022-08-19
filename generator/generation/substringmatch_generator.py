@@ -25,6 +25,13 @@ def _load_lines(path: str) -> List[str]:
         return list(set([line.strip().removesuffix('.eth') for line in f.readlines()]))
 
 
+def _ascii_only(lines: Iterable[str]) -> List[str]:
+    '''
+    Filter out lines that contain non-ASCII characters.
+    '''
+    return [line for line in lines if all(ord(c) < 128 for c in line)]
+
+
 class ReImpl:
     def __init__(self, config):
         lines = _load_lines(config.app.domains)
@@ -37,7 +44,7 @@ class ReImpl:
 
 class SuffixTreeImpl:
     def __init__(self, config):
-        self.lines = _load_lines(config.app.domains)
+        self.lines = _ascii_only(_load_lines(config.app.domains))
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
