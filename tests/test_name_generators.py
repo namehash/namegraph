@@ -182,6 +182,7 @@ def test_substringmatchgenerator_short():
 
 
 @needs_suffix_tree
+@pytest.mark.xfail(reason='Suffix tree ignores unicode')
 def test_substringmatchgenerator_re_equals_tree():
     from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
 
