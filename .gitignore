@@ -6,5 +6,7 @@ data/*.zip
 data/*.pkl
 data/*.npy
 .idea/
+.vscode/
+.DS_Store
 .coverage
 /data/cache/
