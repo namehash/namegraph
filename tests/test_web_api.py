@@ -53,14 +53,14 @@ def test_get(test_test_client):
 
 
 @mark.parametrize(
-    "word",
+    "name",
     [
         "dogcat"
     ]
 )
-def test_metadata_scheme(test_test_client, word: str):
+def test_metadata_scheme(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/metadata", json={"name": word})
+    response = client.post("/metadata", json={"name": name})
 
     assert response.status_code == 200
 
@@ -73,7 +73,7 @@ def test_metadata_scheme(test_test_client, word: str):
 
 
 @mark.parametrize(
-    "word, expected_strategies",
+    "name, expected_strategies",
     [(
         "dogcat",
         [
@@ -90,9 +90,9 @@ def test_metadata_scheme(test_test_client, word: str):
         ]
     )]
 )
-def test_metadata_applied_strategies(test_test_client, word: str, expected_strategies: List[List[str]]):
+def test_metadata_applied_strategies(test_test_client, name: str, expected_strategies: List[List[str]]):
     client = test_test_client
-    response = client.post("/metadata", json={"name": word})
+    response = client.post("/metadata", json={"name": name})
 
     assert response.status_code == 200
 
@@ -112,3 +112,25 @@ def test_metadata_applied_strategies(test_test_client, word: str, expected_strat
 
     for strategy in metadata["applied_strategies"]:
         assert strategy in expected_strategies
+
+
+@mark.parametrize(
+    "name",
+    [
+        "firepower"
+    ]
+)
+def test_count_sorter(test_test_client, name: str):
+    client = test_test_client
+    response = client.post("/metadata", json={"name": name, "sorter": "count"})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert "primary" in json
+
+    primary = json["primary"]
+    assert len(primary) > 0
+
+    scores = [len(gn["metadata"]["applied_strategies"]) for gn in primary]
+    assert all(first >= second for first, second in zip(scores, scores[1:]))

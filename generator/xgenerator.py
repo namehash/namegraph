@@ -63,8 +63,12 @@ class Generator():
         match sorter:
             case 'count':
                 return CountSorter(self.config)
-            case _:
+            case 'round-robin':
                 return RoundRobinSorter(self.config)
+            case _:
+                # TODO do we need this? is it better to silently select the default sorter, instead of informing the
+                # TODO client about the wrong sorter name or smth?
+                raise ValueError(f'{sorter} is not available')
 
     def generate_names(self, name: str, sorter: str = 'round-robin') -> Dict[str, List[GeneratedName]]:
         sorter = self.get_sorter(sorter)

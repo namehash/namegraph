@@ -57,8 +57,8 @@ def convert_to_str(result: Dict[str, List[GeneratedName]]):
 
 
 @app.get("/", response_model=Result)
-async def root(name: str):
-    result = generator.generate_names(name)
+async def root(name: str, sorter: str = 'round-robin'):
+    result = generator.generate_names(name, sorter=sorter)
     convert_to_str(result)
     return result
 
@@ -66,7 +66,7 @@ async def root(name: str):
 @app.post("/", response_model=Result)
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name)
+    result = generator.generate_names(name.name, sorter=name.sorter)
     convert_to_str(result)
     return result
 
@@ -82,8 +82,8 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
 
 
 @app.get("/metadata", response_model=ResultWithMetadata)
-async def metadata(name: str):
-    result = generator.generate_names(name)
+async def metadata(name: str, sorter: str = 'round-robin'):
+    result = generator.generate_names(name, sorter=sorter)
     for list_name, gns in result.items():
         result[list_name] = convert_to_suggestion_format(gns)
     return result
@@ -92,7 +92,7 @@ async def metadata(name: str):
 @app.post("/metadata", response_model=ResultWithMetadata)
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name)
+    result = generator.generate_names(name.name, sorter=name.sorter)
     for list_name, gns in result.items():
         result[list_name] = convert_to_suggestion_format(gns)
     return result
