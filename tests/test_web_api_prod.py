@@ -101,7 +101,6 @@ def test_metadata(prod_test_client):
 
     primary = json['primary']
     assert len(primary) > 0
-    assert sorted(primary[0].keys()) == sorted(["name", "metadata"])
 
     catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1

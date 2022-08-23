@@ -1,5 +1,6 @@
 import os
 import sys
+import itertools
 from typing import List
 
 import pytest
@@ -52,6 +53,26 @@ def test_get(test_test_client):
 
 
 @mark.parametrize(
+    "word",
+    [
+        "dogcat"
+    ]
+)
+def test_metadata_scheme(test_test_client, word: str):
+    client = test_test_client
+    response = client.post("/metadata", json={"name": word})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
+
+    for generated_name in itertools.chain(json["advertised"], json["secondary"], json["primary"]):
+        assert sorted(generated_name.keys()) == sorted(["name", "nameguard_rating", "metadata"])
+        assert sorted(generated_name["metadata"].keys()) == sorted(["applied_strategies"])
+
+
+@mark.parametrize(
     "word, expected_strategies",
     [(
         "dogcat",
@@ -69,7 +90,7 @@ def test_get(test_test_client):
         ]
     )]
 )
-def test_metadata(test_test_client, word: str, expected_strategies: List[List[str]]):
+def test_metadata_applied_strategies(test_test_client, word: str, expected_strategies: List[List[str]]):
     client = test_test_client
     response = client.post("/metadata", json={"name": word})
 
@@ -80,7 +101,6 @@ def test_metadata(test_test_client, word: str, expected_strategies: List[List[st
 
     primary = json['primary']
     assert len(primary) > 0
-    assert sorted(primary[0].keys()) == sorted(["name", "metadata"])
 
     catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1
