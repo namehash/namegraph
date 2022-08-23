@@ -35,7 +35,7 @@ def test_read_main(test_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
     primary = json['primary']
-    assert "discharge" in primary
+    assert "discharge.eth" in primary
 
 
 def test_get(test_test_client):
@@ -48,7 +48,7 @@ def test_get(test_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
     primary = json['primary']
-    assert "discharge" in primary
+    assert "discharge.eth" in primary
 
 
 @mark.parametrize(
@@ -82,7 +82,7 @@ def test_metadata(test_test_client, word: str, expected_strategies: List[List[st
     assert len(primary) > 0
     assert sorted(primary[0].keys()) == sorted(["name", "metadata"])
 
-    catdog_result = [name for name in primary if name["name"] == "catdog"]
+    catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1
 
     metadata = catdog_result[0]["metadata"]
