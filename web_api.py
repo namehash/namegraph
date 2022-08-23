@@ -74,6 +74,7 @@ async def root(name: Name):
 def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
     return [{
         'name': str(name),
+        'nameguard_rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
         'metadata': {
             'applied_strategies': name.applied_strategies
         }
