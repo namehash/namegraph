@@ -21,6 +21,7 @@ class Metadata(BaseModel):
 
 class Suggestion(BaseModel):
     name: str
+    nameguard_rating: str
     metadata: Metadata
 
 
