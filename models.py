@@ -16,13 +16,14 @@ class Result(BaseModel):
 
 
 class Metadata(BaseModel):
-    applied_strategies: List[List[str]]
+    applied_strategies: List[List[str]] = Field(
+        title="lis of steps performed in every pipeline that generated the suggestion")
 
 
 class Suggestion(BaseModel):
-    name: str
-    nameguard_rating: str
-    metadata: Metadata
+    name: str = Field(title="suggested similar name (not label)")
+    nameguard_rating: str = Field(title="NameGuard rating (green or yellow)")
+    metadata: Metadata = Field(title="information how suggestion was generated")
 
 
 class ResultWithMetadata(BaseModel):
