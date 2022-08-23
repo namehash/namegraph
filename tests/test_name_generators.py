@@ -1,3 +1,5 @@
+from typing import List
+
 from pytest import mark
 from hydra import initialize, compose
 
@@ -17,9 +19,16 @@ import pytest
 
 from generator.generation.random_generator import RandomGenerator
 from generator.generation.secondary_matcher import SecondaryMatcher
+from generator.domains import Domains
 
 from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    Domains.remove_self()
+    yield
 
 
 def test_permuter():
@@ -126,13 +135,18 @@ def test_categories_csv():
         assert ('my', '0x2', '123') in [x.tokens for x in generated_names]
 
 
-def test_random():
+@mark.parametrize(
+    "overrides",
+    [
+        ["app.internet_domains=tests/data/top_internet_names_short.csv"]
+    ]
+)
+def test_random(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config", overrides=overrides)
         strategy = RandomGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
         generated_names = strategy.apply([tokenized_name])
-        print(generated_names)
         assert len(
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
                                                            'wikipedia', 'qq',

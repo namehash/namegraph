@@ -66,9 +66,20 @@ class Generator():
             case _:
                 return RoundRobinSorter(self.config)
 
-    def generate_names(self, name: str, sorter: str = 'round-robin') -> Dict[str, List[GeneratedName]]:
+    def generate_names(
+        self,
+        name: str,
+        sorter: str = 'round-robin',
+        min_suggestions: int = None,
+        max_suggestions: int = None
+    ) -> Dict[str, List[GeneratedName]]:
+
+        if min_suggestions is None:
+            min_suggestions = self.config.app.suggestions
+        if max_suggestions is None:
+            max_suggestions = self.config.app.suggestions
+
         sorter = self.get_sorter(sorter)
-        count = self.config.app.suggestions
         result = Result(self.config)
 
         for pipeline in self.pipelines:
@@ -79,17 +90,18 @@ class Generator():
         result.split()
         advertised, secondary, primary = result.combine(sorter)
 
-        if len(primary) < count:
+        while len(primary) < min_suggestions:
             # generate using random pipeline
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
+            print('Random generated', len(random_suggestions))
             result_random = Result(self.config)
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
             _, _, random_names = result_random.combine(sorter)
             primary = aggregate_duplicates(primary + random_names)
 
-        results = {'advertised': advertised[:count],
-                   'secondary': secondary[:count],
-                   'primary': primary[:count]}
+        results = {'advertised': advertised[:max_suggestions],
+                   'secondary': secondary[:max_suggestions],
+                   'primary': primary[:max_suggestions]}
         return results

@@ -105,3 +105,31 @@ def test_metadata(prod_test_client):
 
     catdog_result = [name for name in primary if name["name"] == "catdog"]
     assert len(catdog_result) == 1
+
+
+@pytest.mark.parametrize(
+    "name, min_suggestions, max_suggestions",
+    [
+        ("tubeyou", 10, 10),  # testing padding using random pipeline
+        ("firepower", 50, 100)
+    ]
+)
+def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggestions: int, max_suggestions: int):
+    client = prod_test_client
+    response = client.post("/metadata", json={
+        "name": name,
+        "min_suggestions": min_suggestions,
+        "max_suggestions": max_suggestions
+    })
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert "primary" in json
+
+    primary = json["primary"]
+    unique_names = set([suggestion["name"] for suggestion in primary])
+    assert len(unique_names) == len(primary)
+
+    assert min_suggestions <= len(unique_names)
+    assert len(unique_names) <= max_suggestions

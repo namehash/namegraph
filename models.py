@@ -4,6 +4,12 @@ from pydantic import BaseModel, Field
 
 class Name(BaseModel):
     name: str = Field(title='input name')
+    min_suggestions: int = Field(title='minimal number of suggestions to generate',
+                                 ge=1,
+                                 default=None)
+    max_suggestions: int = Field(title='maximal number of suggestions to generate',
+                                 ge=1,
+                                 default=None)
 
 
 class Result(BaseModel):
