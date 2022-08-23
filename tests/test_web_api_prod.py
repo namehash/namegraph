@@ -50,7 +50,7 @@ def test_prod(prod_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
     primary = json['primary']
-    assert "myfire" in primary
+    assert "myfire.eth" in primary
 
 
 @pytest.mark.execution_timeout(10)
@@ -101,7 +101,7 @@ def test_metadata(prod_test_client):
 
     primary = json['primary']
     assert len(primary) > 0
-    assert sorted(primary[0].keys()) == sorted(["name", "metadata"])
 
-    catdog_result = [name for name in primary if name["name"] == "catdog"]
+    catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
+
     assert len(catdog_result) == 1
