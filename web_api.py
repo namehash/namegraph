@@ -53,7 +53,7 @@ inspector = init_inspector()
 
 def convert_to_str(result: Dict[str, List[GeneratedName]]):
     for list_name, gns in result.items():
-        result[list_name] = [str(gn) for gn in gns]
+        result[list_name] = [str(gn) + '.eth' for gn in gns]
 
 
 @app.get("/", response_model=Result)
@@ -73,7 +73,7 @@ async def root(name: Name):
 
 def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
     return [{
-        'name': str(name),
+        'name': str(name) + '.eth',  # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
         'nameguard_rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
         'metadata': {
             'applied_strategies': name.applied_strategies
