@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 
 class Name(BaseModel):
     name: str = Field(title='input name')
+    sorter: str = Field(title='sorter algorithm', default='round-robin',
+                        regex=r'round-robin|count')
 
 
 class Result(BaseModel):
