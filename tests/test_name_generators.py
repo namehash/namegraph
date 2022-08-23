@@ -168,7 +168,7 @@ def test_substringmatchgenerator():
         config = compose(config_name="test_config")
         strategy = SubstringMatchGenerator(config)
         tokenized_name = GeneratedName(('00', '-00', '-69-00'))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('00-00-69-00',) in [x.tokens for x in generated_names]
 
 
@@ -177,7 +177,7 @@ def test_substringmatchgenerator_short():
         config = compose(config_name="test_config")
         strategy = SubstringMatchGenerator(config)
         tokenized_name = GeneratedName(('4',))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert ('0000400',) in [x.tokens for x in generated_names]
 
 
@@ -202,5 +202,5 @@ def test_substringmatchgenerator_suffixtree_ignores_unicode():
         config = compose(config_name="test_config")
         strategy = SubstringMatchGenerator(config)
         tokenized_name = GeneratedName(('٢٣',))
-        generated_names = strategy.apply(tokenized_name)
+        generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 0
