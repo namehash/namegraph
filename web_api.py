@@ -57,8 +57,8 @@ def convert_to_str(result: Dict[str, List[GeneratedName]]):
 
 
 @app.get("/", response_model=Result)
-async def root(name: str, sorter: str = 'round-robin'):
-    result = generator.generate_names(name, sorter=sorter)
+async def root(name: str, sorter: str = 'round-robin', min_suggestions: int = None, max_suggestions: int = None):
+    result = generator.generate_names(name, sorter=sorter, min_suggestions=min_suggestions, max_suggestions=max_suggestions)
     convert_to_str(result)
     return result
 
@@ -66,7 +66,10 @@ async def root(name: str, sorter: str = 'round-robin'):
 @app.post("/", response_model=Result)
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name, sorter=name.sorter)
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions)
     convert_to_str(result)
     return result
 
@@ -82,8 +85,8 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
 
 
 @app.get("/metadata", response_model=ResultWithMetadata)
-async def metadata(name: str, sorter: str = 'round-robin'):
-    result = generator.generate_names(name, sorter=sorter)
+async def metadata(name: str, sorter: str = 'round-robin', min_suggestions: int = None, max_suggestions: int = None):
+    result = generator.generate_names(name, sorter=sorter, min_suggestions=min_suggestions, max_suggestions=max_suggestions)
     for list_name, gns in result.items():
         result[list_name] = convert_to_suggestion_format(gns)
     return result
@@ -92,7 +95,10 @@ async def metadata(name: str, sorter: str = 'round-robin'):
 @app.post("/metadata", response_model=ResultWithMetadata)
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name, sorter=name.sorter)
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions)
     for list_name, gns in result.items():
         result[list_name] = convert_to_suggestion_format(gns)
     return result

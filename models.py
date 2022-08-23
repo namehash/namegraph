@@ -6,6 +6,12 @@ class Name(BaseModel):
     name: str = Field(title='input name')
     sorter: str = Field(title='sorter algorithm', default='round-robin',
                         regex=r'round-robin|count|length')
+    min_suggestions: int = Field(title='minimal number of suggestions to generate',
+                                 ge=1,
+                                 default=None)
+    max_suggestions: int = Field(title='maximal number of suggestions to generate',
+                                 ge=1,
+                                 default=None)
 
 
 class Result(BaseModel):
