@@ -18,6 +18,8 @@ from generator.tokenization.tokenizer import Tokenizer
 from generator.generation.name_generator import NameGenerator
 from generator.filtering.filter import Filter
 
+from generator.utils import aggregate_duplicates
+
 logger = logging.getLogger('generator')
 
 
@@ -44,7 +46,7 @@ class Pipeline:
         for tokenizer in self.tokenizers:
             suggestions.extend(tokenizer.apply(words))
 
-        suggestions = self._aggregate_duplicates(suggestions, by_tokens=True)
+        suggestions = aggregate_duplicates(suggestions, by_tokens=True)
         logger.debug(f'Tokenization: {suggestions}')
 
         # the generators are applied sequentially
@@ -62,7 +64,7 @@ class Pipeline:
         # remove input name from suggestions
         suggestions = [s for s in suggestions if str(s) != input_word]
 
-        return self._aggregate_duplicates(suggestions)
+        return aggregate_duplicates(suggestions)
 
     def _build(self):
         for normalizer_class in self.definition.normalizers:
@@ -76,19 +78,3 @@ class Pipeline:
 
         for filter_class in self.definition.filters:
             self.filters.append(globals()[filter_class](self.config))
-
-    def _aggregate_duplicates(self, names: List[GeneratedName], by_tokens: bool = False) -> List[GeneratedName]:
-        names2obj: Dict[str, GeneratedName] = dict()
-        for name in names:
-            if by_tokens:
-                word = name.tokens
-            else:
-                word = str(name)
-
-            duplicate = names2obj.get(word, None)
-            if duplicate is not None:
-                duplicate.applied_strategies += name.applied_strategies
-            else:
-                names2obj[word] = name
-
-        return list(names2obj.values())

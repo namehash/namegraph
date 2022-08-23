@@ -51,11 +51,27 @@ def test_get(test_test_client):
     assert "discharge" in primary
 
 
-# no aggregation above the pipelines
-@mark.xfail(raises=AssertionError)
-def test_metadata(test_test_client):
+@mark.parametrize(
+    "word, expected_strategies",
+    [(
+        "dogcat",
+        [
+            [
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+            ],
+            [
+                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
+                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
+                "ValidNameFilter"
+            ]
+        ]
+    )]
+)
+def test_metadata(test_test_client, word: str, expected_strategies: List[List[str]]):
     client = test_test_client
-    response = client.post("/metadata", json={"name": "dogcat"})
+    response = client.post("/metadata", json={"name": word})
 
     assert response.status_code == 200
 
@@ -70,18 +86,8 @@ def test_metadata(test_test_client):
     assert len(catdog_result) == 1
 
     metadata = catdog_result[0]["metadata"]
-    # FIXME how can I use parametrized test and pass fixture to it? according to
-    # FIXME https://github.com/pytest-dev/pytest/issues/6374 we can do that by
-    # FIXME parametrizing fixtures, but that'll be ugly
-    assert "applied_strategies" in metadata and metadata["applied_strategies"] == [
-        [
-            "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-            "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
-            "ValidNameFilter"
-        ],
-        [
-            "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-            "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
-            "ValidNameFilter"
-        ]
-    ]
+    assert "applied_strategies" in metadata
+    assert len(metadata["applied_strategies"]) == 2
+
+    for strategy in metadata["applied_strategies"]:
+        assert strategy in expected_strategies

@@ -5,6 +5,8 @@ from typing import List
 
 from generator.pipeline import Pipeline
 
+from utils import assert_applied_strategies_are_equal
+
 
 @mark.parametrize(
     "overrides, expected",
@@ -69,7 +71,7 @@ def test_metadata(overrides: List[str], pipeline_id: int, expected_strategies: L
         result = pipeline.apply(config.app.query)
 
         for gn in result:
-            assert gn.applied_strategies == expected_strategies
+            assert_applied_strategies_are_equal(gn.applied_strategies, expected_strategies)
 
 
 @mark.parametrize(
@@ -82,7 +84,7 @@ def test_metadata(overrides: List[str], pipeline_id: int, expected_strategies: L
                 "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
                 "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
                 "ValidNameFilter"
-            ]] * 2  # duplicate
+            ]]
         )
     ]
 )
@@ -93,7 +95,7 @@ def test_metadata_aggregation_same_strategy(overrides: List[str], pipeline_id: i
         result = pipeline.apply(config.app.query)
 
         for gn in result:
-            assert gn.applied_strategies == expected_strategies
+            assert_applied_strategies_are_equal(gn.applied_strategies, expected_strategies)
 
 
 @mark.parametrize(
@@ -121,4 +123,4 @@ def test_metadata_aggregation_different_strategies(overrides: List[str], pipelin
         result = pipeline.apply(config.app.query)
 
         for gn in result:
-            assert gn.applied_strategies == expected_strategies
+            assert_applied_strategies_are_equal(gn.applied_strategies, expected_strategies)

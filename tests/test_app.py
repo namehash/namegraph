@@ -9,6 +9,8 @@ from typing import List
 
 from generator.domains import Domains
 
+from utils import assert_applied_strategies_are_equal
+
 
 @pytest.fixture(autouse=True)
 def run_around_tests():
@@ -97,8 +99,6 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
         assert len(set(secondary).intersection(set(expected))) == len(expected)
 
 
-# no aggregation above pipeline
-@mark.xfail(raises=AssertionError)
 @mark.parametrize(
     "overrides, expected_strategies",
     [
@@ -123,4 +123,19 @@ def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
 
         catdog_result = [gn for gn in result["primary"] if str(gn) == "catdog"]
         assert len(catdog_result) == 1
-        assert catdog_result[0].applied_strategies == expected_strategies
+        assert_applied_strategies_are_equal(catdog_result[0].applied_strategies, expected_strategies)
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        (["app.query=tubeyou", "app.suggestions=100000"])
+    ]
+)
+def test_no_duplicates(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        cfg = compose(config_name="test_config", overrides=overrides)
+        result = generate(cfg, )[0]
+
+        unique_results = set([str(gn) for gn in result["primary"]])
+        assert len(unique_results) == len(result["primary"])

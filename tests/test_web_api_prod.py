@@ -90,7 +90,6 @@ def test_generator_stress(prod_test_client):
         check_generator_response(response.json())
 
 
-@pytest.mark.xfail(raises=AssertionError)
 def test_metadata(prod_test_client):
     client = prod_test_client
     response = client.post("/metadata", json={"name": "dogcat"})
