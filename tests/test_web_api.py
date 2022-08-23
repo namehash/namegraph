@@ -103,6 +103,7 @@ def test_metadata_applied_strategies(test_test_client, word: str, expected_strat
     assert len(primary) > 0
 
     catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
+
     assert len(catdog_result) == 1
 
     metadata = catdog_result[0]["metadata"]

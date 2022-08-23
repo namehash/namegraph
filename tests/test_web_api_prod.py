@@ -103,4 +103,5 @@ def test_metadata(prod_test_client):
     assert len(primary) > 0
 
     catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
+
     assert len(catdog_result) == 1
