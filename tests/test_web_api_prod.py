@@ -65,18 +65,6 @@ def test_prod_long(prod_test_client):
     assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
 
-@pytest.mark.execution_timeout(10)
-@pytest.mark.slow
-def test_prod_long_get(prod_test_client):
-    client = prod_test_client
-    response = client.post("/", json={"name": "a" * 40000})
-
-    assert response.status_code == 200
-
-    json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
-
-
 @pytest.mark.slow
 def test_generator_stress(prod_test_client):
     client = prod_test_client
