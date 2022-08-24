@@ -21,7 +21,8 @@ def run_around_tests():
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "app.suggestions=1000"], ["fireability", "fireforce", "firemight"]),
+        (["app.query=firepower", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["fireability", "fireforce", "firemight"]),
     ],
 )
 def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
@@ -30,20 +31,19 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
         result = generate(cfg, )[0]
         primary=[str(gn) for gn in result['primary']]
         assert len(set(primary).intersection(set(expected))) == len(expected)
-        assert len(primary) >= 100
+        assert len(primary) == 1000
 
         assert 'primary' in result
         assert 'secondary' in result
         assert 'advertised' in result
-
-        assert 'wikipedia' in primary  # from random
 
 
 @pytest.mark.slow
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "pipelines=full"], ["firepowercoin"]),
+        (["app.query=firepower", "pipelines=full", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["firepowercoin"]),
     ],
 )
 def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
@@ -58,7 +58,8 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.input=stdin", "app.suggestions=1000"], ["fireability", "fireforce", "firemight"]),
+        (["app.input=stdin", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["fireability", "fireforce", "firemight"]),
     ],
 )
 def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
@@ -68,13 +69,14 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
         result = generate(cfg, )[0]
         primary = [str(gn) for gn in result['primary']]
         assert len(set(primary).intersection(set(expected))) == len(expected)
-        assert len(primary) >= 100
+        assert len(primary) == 1000
 
 
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=pandas", "app.suggestions=1000"], ["panda"]),
+        (["app.query=pandas", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["panda"]),
     ],
 )
 def test_advertised(overrides: List[str], expected: List[str]) -> None:
@@ -88,7 +90,8 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=fires", "app.suggestions=1000"], ["fire"]),
+        (["app.query=fires", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["fire"]),
     ],
 )
 def test_secondary(overrides: List[str], expected: List[str]) -> None:
@@ -103,7 +106,7 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
     "overrides, expected_strategies",
     [
         (
-            ["app.query=dogcat", "app.suggestions=1000"],
+            ["app.query=dogcat", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
             [[
                 "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
                 "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
@@ -129,7 +132,7 @@ def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
 @mark.parametrize(
     "overrides",
     [
-        (["app.query=tubeyou", "app.suggestions=100000"])
+        (["app.query=tubeyou", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"])
     ]
 )
 def test_no_duplicates(overrides: List[str]):

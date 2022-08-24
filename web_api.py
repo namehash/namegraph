@@ -8,12 +8,6 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
-from models import (
-    Name,
-    Result,
-    ResultWithMetadata,
-    Suggestion
-)
 
 logger = logging.getLogger('generator')
 
@@ -51,6 +45,14 @@ generator = init()
 inspector = init_inspector()
 
 
+from models import (
+    Name,
+    Result,
+    ResultWithMetadata,
+    Suggestion
+)
+
+
 def convert_to_str(result: Dict[str, List[GeneratedName]]):
     for list_name, gns in result.items():
         result[list_name] = [str(gn) + '.eth' for gn in gns]
@@ -59,7 +61,10 @@ def convert_to_str(result: Dict[str, List[GeneratedName]]):
 @app.post("/", response_model=Result)
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name, sorter=name.sorter)
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions)
     convert_to_str(result)
     return result
 
@@ -77,7 +82,10 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
 @app.post("/metadata", response_model=ResultWithMetadata)
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name, sorter=name.sorter)
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions)
     for list_name, gns in result.items():
         result[list_name] = convert_to_suggestion_format(gns)
     return result
