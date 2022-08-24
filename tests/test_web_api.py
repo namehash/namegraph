@@ -107,7 +107,7 @@ def test_metadata_applied_strategies(test_test_client,
     json = response.json()
     assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
 
-    primary = json['primary']
+    primary = json["primary"]
     assert len(primary) > 0
 
     result = [name for name in primary if name["name"] == expected_name]
