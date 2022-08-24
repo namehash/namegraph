@@ -29,7 +29,7 @@ def prod_test_client():
 @pytest.mark.slow
 def test_namehash(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth"})
+    response = client.post("/only_names", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth"})
 
     assert response.status_code == 200
 
@@ -37,7 +37,7 @@ def test_namehash(prod_test_client):
 @pytest.mark.slow
 def test_prod(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "fire"})
+    response = client.post("/only_names", json={"name": "fire"})
 
     assert response.status_code == 200
 
@@ -49,7 +49,7 @@ def test_prod(prod_test_client):
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "a" * 40000})
+    response = client.post("/only_names", json={"name": "a" * 40000})
 
     assert response.status_code == 200
 
@@ -60,7 +60,7 @@ def test_generator_stress(prod_test_client):
     max_duration = 2
     for name in generate_example_names(400):
         start = get_time()
-        response = client.post('/', json={'name': name})
+        response = client.post('/only_names', json={'name': name})
         duration = get_time() - start
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
@@ -68,7 +68,7 @@ def test_generator_stress(prod_test_client):
 
 def test_metadata(prod_test_client):
     client = prod_test_client
-    response = client.post("/metadata", json={"name": "dogcat"})
+    response = client.post("/", json={"name": "dogcat"})
 
     assert response.status_code == 200
 
@@ -88,7 +88,7 @@ def test_metadata(prod_test_client):
 )
 def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggestions: int, max_suggestions: int):
     client = prod_test_client
-    response = client.post("/metadata", json={
+    response = client.post("/", json={
         "name": name,
         "min_suggestions": min_suggestions,
         "max_suggestions": max_suggestions

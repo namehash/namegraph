@@ -57,8 +57,8 @@ def convert_to_str(result: List[GeneratedName]):
     return [str(gn) + '.eth' for gn in result]
 
 
-@app.post("/", response_model=list[str])
-async def root(name: Name):
+@app.post("/only_names", response_model=list[str])
+async def only_names(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
@@ -77,7 +77,7 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
     } for name in names]
 
 
-@app.post("/metadata", response_model=list[Suggestion])
+@app.post("/", response_model=list[Suggestion])
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,

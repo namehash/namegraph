@@ -22,13 +22,13 @@ def test_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/only_names?name=aaa.eth")
     return client
 
 
 def test_read_main(test_test_client):
     client = test_test_client
-    response = client.post("/", json={"name": "fire"})
+    response = client.post("/only_names", json={"name": "fire"})
 
     assert response.status_code == 200
 
@@ -47,7 +47,7 @@ def test_read_main(test_test_client):
 )
 def test_metadata_scheme(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/metadata", json={"name": name})
+    response = client.post("/", json={"name": name})
 
     assert response.status_code == 200
 
@@ -83,7 +83,7 @@ def test_metadata_applied_strategies(test_test_client,
                                      expected_strategies: List[List[str]]):
 
     client = test_test_client
-    response = client.post("/metadata", json={"name": name})
+    response = client.post("/", json={"name": name})
 
     assert response.status_code == 200
 
@@ -113,7 +113,7 @@ def test_metadata_applied_strategies(test_test_client,
 )
 def test_count_sorter(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/metadata", json={"name": name, "sorter": "count"})
+    response = client.post("/", json={"name": name, "sorter": "count"})
 
     assert response.status_code == 200
 
@@ -135,7 +135,7 @@ def test_count_sorter(test_test_client, name: str):
 )
 def test_length_sorter(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/metadata", json={"name": name, "sorter": "length"})
+    response = client.post("/", json={"name": name, "sorter": "length"})
 
     assert response.status_code == 200
 
@@ -155,7 +155,7 @@ def test_length_sorter(test_test_client, name: str):
 )
 def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggestions: int, max_suggestions: int):
     client = test_test_client
-    response = client.post("/metadata", json={
+    response = client.post("/", json={
         "name": name,
         "min_suggestions": min_suggestions,
         "max_suggestions": max_suggestions
