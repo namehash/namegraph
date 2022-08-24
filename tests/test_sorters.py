@@ -5,7 +5,7 @@ from pytest import mark
 from hydra import initialize, compose
 
 from generator.generated_name import GeneratedName
-from generator.sorting import CountSorter, RoundRobinSorter
+from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter
 
 from utils import assert_applied_strategies_are_equal
 
@@ -48,7 +48,27 @@ def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[s
         config = compose(config_name="test_config")
         sorter = CountSorter(config)
 
-        print(input[0][0].applied_strategies)
+        sorted_strings = [str(gn) for gn in sorter.sort(input)]
+        assert sorted_strings == expected_strings
+
+
+@mark.parametrize(
+    "input, expected_strings",
+    [(
+        [
+            [GeneratedName(('a' * 15)), GeneratedName(('f' * 10))],
+            [GeneratedName(('vv'))],
+            [GeneratedName(('dddd'))],
+            [GeneratedName(('y' * 4, 'y' * 3))],
+            [GeneratedName(('jjj', 'j', 'j'))]
+        ],
+        ['v'*2, 'd'*4, 'j'*5, 'y'*7, 'f'*10, 'a'*15]
+    )]
+)
+def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        sorter = LengthSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
         assert sorted_strings == expected_strings
@@ -104,6 +124,37 @@ def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: Li
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         sorter = CountSorter(config)
+
+        sorted_names = sorter.sort(input)
+
+        assert len(sorted_names) == len(expected)
+        for name, expected in zip(sorted_names, expected):
+            assert str(name) == str(expected)
+            assert_applied_strategies_are_equal(name.applied_strategies, expected.applied_strategies)
+
+
+@mark.parametrize(
+    "input, expected",
+    [(
+        [
+            [GeneratedName(('aa'), applied_strategies=[['1', '2'], ['1', '3']])],
+            [GeneratedName(('aa'), applied_strategies=[['1', '2', '3']]),
+             GeneratedName(('b'), applied_strategies=[['2']])],
+            [GeneratedName(('b'), applied_strategies=[['2', '3'], ['2']])],
+            [GeneratedName(('ccc'), applied_strategies=[['2'], ['5', '6']])],
+            [GeneratedName(('ccc'), applied_strategies=[['1', '4'], ['5', '6']])]
+        ],
+        [
+            GeneratedName(('b'), applied_strategies=[['2'], ['2', '3']]),
+            GeneratedName(('aa'), applied_strategies=[['1', '2'], ['1', '3'], ['1', '2', '3']]),
+            GeneratedName(('ccc'), applied_strategies=[['1', '4'], ['2'], ['5', '6']]),
+        ]
+    )]
+)
+def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        sorter = LengthSorter(config)
 
         sorted_names = sorter.sort(input)
 
