@@ -100,7 +100,6 @@ class Generator():
             # generate using random pipeline
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
-            print('Random generated', len(random_suggestions))
             result_random = Result(self.config)
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
