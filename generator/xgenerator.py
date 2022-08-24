@@ -96,7 +96,7 @@ class Generator():
         result.split()
         advertised, secondary, primary = result.combine(sorter)
 
-        while len(primary) < min_suggestions:
+        if len(primary) < min_suggestions:
             # generate using random pipeline
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
@@ -105,7 +105,8 @@ class Generator():
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
             _, _, random_names = result_random.combine(sorter)
-            primary = sorter.sort([aggregate_duplicates(primary + random_names)])
+            # TODO do we need to truncate the random suggestions before sorting?
+            primary = sorter.sort([aggregate_duplicates(primary + random_names)[:min_suggestions]])
 
         results = {'advertised': advertised[:max_suggestions],
                    'secondary': secondary[:max_suggestions],
