@@ -33,10 +33,7 @@ def test_read_main(test_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
-
-    primary = json['primary']
-    assert "discharge.eth" in primary
+    assert "discharge.eth" in json
 
 
 @mark.parametrize(
@@ -55,9 +52,8 @@ def test_metadata_scheme(test_test_client, name: str):
     assert response.status_code == 200
 
     json = response.json()
-    assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
 
-    for generated_name in itertools.chain(json["advertised"], json["secondary"], json["primary"]):
+    for generated_name in json:
         assert sorted(generated_name.keys()) == sorted(["name", "nameguard_rating", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted(["applied_strategies"])
 
@@ -92,12 +88,9 @@ def test_metadata_applied_strategies(test_test_client,
     assert response.status_code == 200
 
     json = response.json()
-    assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
+    assert len(json) > 0
 
-    primary = json["primary"]
-    assert len(primary) > 0
-
-    result = [name for name in primary if name["name"] == expected_name]
+    result = [name for name in json if name["name"] == expected_name]
 
     assert len(result) == 1
 
@@ -125,12 +118,9 @@ def test_count_sorter(test_test_client, name: str):
     assert response.status_code == 200
 
     json = response.json()
-    assert "primary" in json
+    assert len(json) > 0
 
-    primary = json["primary"]
-    assert len(primary) > 0
-
-    scores = [len(gn["metadata"]["applied_strategies"]) for gn in primary]
+    scores = [len(gn["metadata"]["applied_strategies"]) for gn in json]
     assert all(first >= second for first, second in zip(scores, scores[1:]))
 
 
@@ -150,13 +140,9 @@ def test_length_sorter(test_test_client, name: str):
     assert response.status_code == 200
 
     json = response.json()
-    assert "primary" in json
+    assert len(json) > 0
 
-    primary = json["primary"]
-    assert len(primary) > 0
-
-    lengths = [len(gn["name"]) for gn in primary]
-    print(lengths, [gn["name"] for gn in primary])
+    lengths = [len(gn["name"]) for gn in json]
     assert all([first <= second for first, second in zip(lengths, lengths[1:])])
 
 
@@ -178,11 +164,8 @@ def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggest
     assert response.status_code == 200
 
     json = response.json()
-    assert "primary" in json
-
-    primary = json["primary"]
-    unique_names = set([suggestion["name"] for suggestion in primary])
-    assert len(unique_names) == len(primary)
+    unique_names = set([suggestion["name"] for suggestion in json])
+    assert len(unique_names) == len(json)
 
     assert min_suggestions <= len(unique_names)
     assert len(unique_names) <= max_suggestions
