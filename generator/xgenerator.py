@@ -19,6 +19,7 @@ class Result:
         self.advertised: List[List[GeneratedName]] = []
         self.secondary: List[List[GeneratedName]] = []
         self.primary: List[List[GeneratedName]] = []
+        self.registered: List[List[GeneratedName]] = []
 
         self.domains = Domains(config)
         self.suggestions: List[List[GeneratedName]] = []
@@ -30,17 +31,21 @@ class Result:
         for pipeline_suggestions in self.suggestions:
             advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
             secondary, remaining_suggestions = self.domains.get_secondary(remaining_suggestions)
-            primary = self.domains.get_primary(remaining_suggestions)
+            primary, registered = self.domains.get_primary(remaining_suggestions)
             self.advertised.append(advertised)
             self.secondary.append(secondary)
             self.primary.append(primary)
+            self.registered.append(registered)
 
-    def combine(self, sorter: Sorter) -> Tuple[List[GeneratedName], List[GeneratedName], List[GeneratedName]]:
+    def combine(self, sorter: Sorter) \
+            -> Tuple[List[GeneratedName], List[GeneratedName], List[GeneratedName], List[GeneratedName]]:
+
         advertised = sorter.sort(self.advertised)
         secondary = sorter.sort(self.secondary)
         primary = sorter.sort(self.primary)
+        registered = sorter.sort(self.registered)
 
-        return advertised, secondary, primary
+        return advertised, secondary, primary, registered
 
 
 class Generator():
@@ -94,7 +99,7 @@ class Generator():
             result.add_pipeline_suggestions(pipeline_suggestions)
 
         result.split()
-        advertised, secondary, primary = result.combine(sorter)
+        advertised, secondary, primary, registered = result.combine(sorter)
 
         if len(primary) < min_suggestions:
             # generate using random pipeline
@@ -103,7 +108,7 @@ class Generator():
             result_random = Result(self.config)
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
-            _, _, random_names = result_random.combine(sorter)
+            _, _, random_names, _ = result_random.combine(sorter)
             # TODO do we need to truncate the random suggestions before sorting?
             primary = sorter.sort([aggregate_duplicates(primary + random_names)[:min_suggestions]])
 
