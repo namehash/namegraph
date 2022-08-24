@@ -95,5 +95,7 @@ class Domains(metaclass=Singleton):
         remaining_suggestions, secondary = self.split(suggestions, self.secondary_market)
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
 
-    def get_primary(self, remaining_suggestions: List[GeneratedName]) -> List[GeneratedName]:
-        return [s for s in remaining_suggestions if s not in self.registered]
+    def get_primary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
+        primary = [s for s in suggestions if s not in self.registered]
+        remaining = [s for s in suggestions if s in self.registered]
+        return primary, remaining
