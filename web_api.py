@@ -8,12 +8,6 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
-from models import (
-    Name,
-    Result,
-    ResultWithMetadata,
-    Suggestion
-)
 
 logger = logging.getLogger('generator')
 
@@ -49,6 +43,14 @@ def init_inspector():
 
 generator = init()
 inspector = init_inspector()
+
+
+from models import (
+    Name,
+    Result,
+    ResultWithMetadata,
+    Suggestion
+)
 
 
 def convert_to_str(result: Dict[str, List[GeneratedName]]):
