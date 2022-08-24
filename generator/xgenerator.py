@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
-from generator.sorting import CountSorter, RoundRobinSorter
+from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter
 from generator.sorting.sorter import Sorter
 from generator.utils import aggregate_duplicates
 
@@ -65,6 +65,8 @@ class Generator():
                 return CountSorter(self.config)
             case 'round-robin':
                 return RoundRobinSorter(self.config)
+            case 'length':
+                return LengthSorter(self.config)
             case _:
                 # TODO do we need this? is it better to silently select the default sorter, instead of informing the
                 # TODO client about the wrong sorter name or smth?
@@ -91,7 +93,7 @@ class Generator():
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
             _, _, random_names = result_random.combine(sorter)
-            primary = aggregate_duplicates(primary + random_names)
+            primary = sorter.sort([aggregate_duplicates(primary + random_names)])
 
         results = {'advertised': advertised[:count],
                    'secondary': secondary[:count],

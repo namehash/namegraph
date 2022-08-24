@@ -117,7 +117,10 @@ def test_metadata_applied_strategies(test_test_client, name: str, expected_strat
 @mark.parametrize(
     "name",
     [
-        "firepower"
+        "firepower",
+        "fire",
+        "dogcat",
+        "anarchy"
     ]
 )
 def test_count_sorter(test_test_client, name: str):
@@ -134,3 +137,29 @@ def test_count_sorter(test_test_client, name: str):
 
     scores = [len(gn["metadata"]["applied_strategies"]) for gn in primary]
     assert all(first >= second for first, second in zip(scores, scores[1:]))
+
+
+@mark.parametrize(
+    "name",
+    [
+        "firepower",
+        "fire",
+        "dogcat",
+        "anarchy"
+    ]
+)
+def test_length_sorter(test_test_client, name: str):
+    client = test_test_client
+    response = client.post("/metadata", json={"name": name, "sorter": "length"})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert "primary" in json
+
+    primary = json["primary"]
+    assert len(primary) > 0
+
+    lengths = [len(gn["name"]) for gn in primary]
+    print(lengths, [gn["name"] for gn in primary])
+    assert all([first <= second for first, second in zip(lengths, lengths[1:])])
