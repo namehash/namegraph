@@ -39,19 +39,6 @@ def test_read_main(test_test_client):
     assert "discharge.eth" in primary
 
 
-def test_get(test_test_client):
-    client = test_test_client
-    response = client.get("/?name=firę")
-
-    assert response.status_code == 200
-
-    json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
-
-    primary = json['primary']
-    assert "discharge.eth" in primary
-
-
 @mark.parametrize(
     "name",
     [
