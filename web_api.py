@@ -53,20 +53,18 @@ from models import (
 )
 
 
-def convert_to_str(result: Dict[str, List[GeneratedName]]):
-    for list_name, gns in result.items():
-        result[list_name] = [str(gn) + '.eth' for gn in gns]
+def convert_to_str(result: List[GeneratedName]):
+    return [str(gn) + '.eth' for gn in result]
 
 
-@app.post("/", response_model=Result)
+@app.post("/", response_model=list[str])
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions)
-    convert_to_str(result)
-    return result
+    return convert_to_str(result)
 
 
 def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
@@ -79,13 +77,11 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
     } for name in names]
 
 
-@app.post("/metadata", response_model=ResultWithMetadata)
+@app.post("/metadata", response_model=list[Suggestion])
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions)
-    for list_name, gns in result.items():
-        result[list_name] = convert_to_suggestion_format(gns)
-    return result
+    return convert_to_suggestion_format(result)

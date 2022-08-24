@@ -83,7 +83,7 @@ class Generator():
         sorter: str = 'round-robin',
         min_suggestions: int = None,
         max_suggestions: int = None
-    ) -> Dict[str, List[GeneratedName]]:
+    ) -> List[GeneratedName]:
 
         if min_suggestions is None:
             min_suggestions = self.config.app.suggestions
@@ -101,7 +101,10 @@ class Generator():
         result.split()
         advertised, secondary, primary, registered = result.combine(sorter)
 
-        if len(primary) < min_suggestions:
+        round_robin_sorter = RoundRobinSorter(self.config)
+        all_results = round_robin_sorter.sort([advertised, secondary, primary, registered])
+
+        if len(all_results) < min_suggestions:
             # generate using random pipeline
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
@@ -110,9 +113,6 @@ class Generator():
             result_random.split()
             _, _, random_names, _ = result_random.combine(sorter)
             # TODO do we need to truncate the random suggestions before sorting?
-            primary = sorter.sort([aggregate_duplicates(primary + random_names)[:min_suggestions]])
+            all_results = sorter.sort([aggregate_duplicates(all_results + random_names)[:min_suggestions]])
 
-        results = {'advertised': advertised[:max_suggestions],
-                   'secondary': secondary[:max_suggestions],
-                   'primary': primary[:max_suggestions]}
-        return results
+        return all_results[:max_suggestions]

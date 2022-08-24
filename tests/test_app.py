@@ -29,13 +29,9 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        primary=[str(gn) for gn in result['primary']]
-        assert len(set(primary).intersection(set(expected))) == len(expected)
-        assert len(primary) == 1000
-
-        assert 'primary' in result
-        assert 'secondary' in result
-        assert 'advertised' in result
+        result = [str(gn) for gn in result]
+        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(result) == 1000
 
 
 @pytest.mark.slow
@@ -50,9 +46,9 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        primary = [str(gn) for gn in result['primary']]
-        assert len(set(primary).intersection(set(expected))) == len(expected)
-        assert len(primary) == cfg.app.suggestions
+        result = [str(gn) for gn in result]
+        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(result) == cfg.app.suggestions
 
 
 @mark.parametrize(
@@ -67,9 +63,9 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
         result = generate(cfg, )[0]
-        primary = [str(gn) for gn in result['primary']]
-        assert len(set(primary).intersection(set(expected))) == len(expected)
-        assert len(primary) == 1000
+        result = [str(gn) for gn in result]
+        assert len(set(result).intersection(set(expected))) == len(expected)
+        assert len(result) == 1000
 
 
 @mark.parametrize(
@@ -83,8 +79,8 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        advertised = [str(gn) for gn in result['advertised']]
-        assert len(set(advertised).intersection(set(expected))) == len(expected)
+        result = [str(gn) for gn in result]
+        assert len(set(result).intersection(set(expected))) == len(expected)
 
 
 @mark.parametrize(
@@ -98,8 +94,8 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        secondary = [str(gn) for gn in result['secondary']]
-        assert len(set(secondary).intersection(set(expected))) == len(expected)
+        result = [str(gn) for gn in result]
+        assert len(set(result).intersection(set(expected))) == len(expected)
 
 
 @mark.parametrize(
@@ -124,7 +120,7 @@ def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
 
-        catdog_result = [gn for gn in result["primary"] if str(gn) == "catdog"]
+        catdog_result = [gn for gn in result if str(gn) == "catdog"]
         assert len(catdog_result) == 1
         assert_applied_strategies_are_equal(catdog_result[0].applied_strategies, expected_strategies)
 
@@ -140,5 +136,5 @@ def test_no_duplicates(overrides: List[str]):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
 
-        unique_results = set([str(gn) for gn in result["primary"]])
-        assert len(unique_results) == len(result["primary"])
+        unique_results = set([str(gn) for gn in result])
+        assert len(unique_results) == len(result)

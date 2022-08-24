@@ -9,9 +9,9 @@ class Name(BaseModel):
     sorter: str = Field(title='sorter algorithm', default='round-robin',
                         regex=r'round-robin|count|length')
     min_suggestions: int = Field(title='minimal number of suggestions to generate',
-                                 ge=1, le=generator.config.generation.limit, default=None)
+                                 ge=1, le=generator.config.generation.limit, default=100)
     max_suggestions: int = Field(title='maximal number of suggestions to generate',
-                                 ge=1, default=None)
+                                 ge=1, default=100)
 
 
 class Result(BaseModel):
@@ -25,7 +25,7 @@ class Result(BaseModel):
 
 class Metadata(BaseModel):
     applied_strategies: List[List[str]] = Field(
-        title="lis of steps performed in every pipeline that generated the suggestion")
+        title="sequence of steps performed in every pipeline that generated the suggestion")
 
 
 class Suggestion(BaseModel):

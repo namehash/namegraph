@@ -17,5 +17,5 @@ def test_pipeline_override(overrides: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]
-        primary = [str(r) for r in result['primary']]
+        primary = [str(r) for r in result]
         assert primary == ['thedog', 'dogman', '0xdog', 'dogcoin']

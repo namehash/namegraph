@@ -27,16 +27,11 @@ def prod_test_client():
 
 
 @pytest.mark.slow
-def test_get_namehash(prod_test_client):
+def test_namehash(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth"})
 
     assert response.status_code == 200
-
-    json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
-
-    primary = json['primary']
 
 
 @pytest.mark.slow
@@ -47,10 +42,7 @@ def test_prod(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
-
-    primary = json['primary']
-    assert "myfire.eth" in primary
+    assert "myfire.eth" in json
 
 
 @pytest.mark.execution_timeout(10)
@@ -60,9 +52,6 @@ def test_prod_long(prod_test_client):
     response = client.post("/", json={"name": "a" * 40000})
 
     assert response.status_code == 200
-
-    json = response.json()
-    assert sorted(list(json.keys())) == sorted(["advertised", "primary", "secondary"])
 
 
 @pytest.mark.slow
@@ -75,7 +64,6 @@ def test_generator_stress(prod_test_client):
         duration = get_time() - start
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
-        check_generator_response(response.json())
 
 
 def test_metadata(prod_test_client):
@@ -85,13 +73,9 @@ def test_metadata(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    assert sorted(json.keys()) == sorted(["advertised", "primary", "secondary"])
+    assert len(json) > 0
 
-    primary = json['primary']
-    assert len(primary) > 0
-
-    catdog_result = [name for name in primary if name["name"] == "catdog.eth"]
-
+    catdog_result = [name for name in json if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1
 
 
@@ -113,11 +97,8 @@ def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggest
     assert response.status_code == 200
 
     json = response.json()
-    assert "primary" in json
-
-    primary = json["primary"]
-    unique_names = set([suggestion["name"] for suggestion in primary])
-    assert len(unique_names) == len(primary)
+    unique_names = set([suggestion["name"] for suggestion in json])
+    assert len(unique_names) == len(json)
 
     assert min_suggestions <= len(unique_names)
     assert len(unique_names) <= max_suggestions
