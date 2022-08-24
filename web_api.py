@@ -56,13 +56,6 @@ def convert_to_str(result: Dict[str, List[GeneratedName]]):
         result[list_name] = [str(gn) + '.eth' for gn in gns]
 
 
-@app.get("/", response_model=Result)
-async def root(name: str, sorter: str = 'round-robin'):
-    result = generator.generate_names(name, sorter=sorter)
-    convert_to_str(result)
-    return result
-
-
 @app.post("/", response_model=Result)
 async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
@@ -79,14 +72,6 @@ def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]
             'applied_strategies': name.applied_strategies
         }
     } for name in names]
-
-
-@app.get("/metadata", response_model=ResultWithMetadata)
-async def metadata(name: str, sorter: str = 'round-robin'):
-    result = generator.generate_names(name, sorter=sorter)
-    for list_name, gns in result.items():
-        result[list_name] = convert_to_suggestion_format(gns)
-    return result
 
 
 @app.post("/metadata", response_model=ResultWithMetadata)

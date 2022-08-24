@@ -41,7 +41,7 @@ def test_read_main(test_test_client):
 
 def test_get(test_test_client):
     client = test_test_client
-    response = client.get("/?name=firę")
+    response = client.post("/", json={"name": "fire"})
 
     assert response.status_code == 200
 

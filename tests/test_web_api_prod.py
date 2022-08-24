@@ -29,7 +29,7 @@ def prod_test_client():
 @pytest.mark.slow
 def test_get_namehash(prod_test_client):
     client = prod_test_client
-    response = client.get("/?name=[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth")
+    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth"})
 
     assert response.status_code == 200
 
@@ -69,7 +69,7 @@ def test_prod_long(prod_test_client):
 @pytest.mark.slow
 def test_prod_long_get(prod_test_client):
     client = prod_test_client
-    response = client.get("/?name=" + 'a' * 40000)
+    response = client.post("/", json={"name": "a" * 40000})
 
     assert response.status_code == 200
 
