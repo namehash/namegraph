@@ -22,17 +22,18 @@ def test_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/only_names?name=aaa.eth")
+    client.post("/", json={"name": "aaa.eth"})
     return client
 
 
 def test_read_main(test_test_client):
     client = test_test_client
-    response = client.post("/only_names", json={"name": "fire"})
+    response = client.post("/", json={"name": "fire", "metadata": False})
 
     assert response.status_code == 200
 
     json = response.json()
+    # print(json)
     assert "discharge.eth" in json
 
 
@@ -54,7 +55,7 @@ def test_metadata_scheme(test_test_client, name: str):
     json = response.json()
 
     for generated_name in json:
-        assert sorted(generated_name.keys()) == sorted(["name", "nameguard_rating", "metadata"])
+        assert sorted(generated_name.keys()) == sorted(["name", "rating", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted(["applied_strategies"])
 
 
