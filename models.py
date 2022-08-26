@@ -5,7 +5,7 @@ from web_api import generator
 
 
 class Name(BaseModel):
-    name: str = Field(..., title='input name')
+    name: str = Field(title='input name')
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('round-robin', title='sorter algorithm',
                         regex=r'round-robin|count|length')

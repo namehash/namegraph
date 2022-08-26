@@ -68,7 +68,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 
 
 @app.post("/", response_model=list[Suggestion])
-async def metadata(name: Name):
+async def root(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
