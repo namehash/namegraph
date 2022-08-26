@@ -22,14 +22,15 @@ def prod_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.post("/", json={"name": "aaa.eth"})
     return client
 
 
 @pytest.mark.slow
 def test_namehash(prod_test_client):
     client = prod_test_client
-    response = client.post("/only_names", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth"})
+    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+                                      "metadata": False})
 
     assert response.status_code == 200
 
@@ -37,7 +38,7 @@ def test_namehash(prod_test_client):
 @pytest.mark.slow
 def test_prod(prod_test_client):
     client = prod_test_client
-    response = client.post("/only_names", json={"name": "fire"})
+    response = client.post("/", json={"name": "fire", "metadata": False})
 
     assert response.status_code == 200
 
@@ -49,7 +50,7 @@ def test_prod(prod_test_client):
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
-    response = client.post("/only_names", json={"name": "a" * 40000})
+    response = client.post("/", json={"name": "a" * 40000, "metadata": False})
 
     assert response.status_code == 200
 
@@ -60,7 +61,7 @@ def test_generator_stress(prod_test_client):
     max_duration = 2
     for name in generate_example_names(400):
         start = get_time()
-        response = client.post('/only_names', json={'name': name})
+        response = client.post('/', json={'name': name, "metadata": False})
         duration = get_time() - start
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'

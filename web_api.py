@@ -47,8 +47,6 @@ inspector = init_inspector()
 
 from models import (
     Name,
-    Result,
-    ResultWithMetadata,
     Suggestion
 )
 
@@ -57,31 +55,27 @@ def convert_to_str(result: List[GeneratedName]):
     return [str(gn) + '.eth' for gn in result]
 
 
-@app.post("/only_names", response_model=list[str])
-async def only_names(name: Name):
-    logger.debug(f'Request received: {name.name}')
-    result = generator.generate_names(name.name,
-                                      sorter=name.sorter,
-                                      min_suggestions=name.min_suggestions,
-                                      max_suggestions=name.max_suggestions)
-    return convert_to_str(result)
-
-
 def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
     return [{
         'name': str(name) + '.eth',  # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
-        'nameguard_rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
+        'rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
         'metadata': {
             'applied_strategies': name.applied_strategies
         }
     } for name in names]
 
 
-@app.post("/", response_model=list[Suggestion])
+@app.post("/", response_model=list[Suggestion] | list[str])
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions)
-    return convert_to_suggestion_format(result)
+
+    if name.metadata:
+        response = convert_to_suggestion_format(result)
+    else:
+        response = convert_to_str(result)
+
+    return response

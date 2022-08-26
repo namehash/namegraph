@@ -6,21 +6,13 @@ from web_api import generator
 
 class Name(BaseModel):
     name: str = Field(title='input name')
+    metadata: bool = Field(title='return all the metadata in response', default=True)
     sorter: str = Field(title='sorter algorithm', default='round-robin',
                         regex=r'round-robin|count|length')
     min_suggestions: int = Field(title='minimal number of suggestions to generate',
                                  ge=1, le=generator.config.generation.limit, default=100)
     max_suggestions: int = Field(title='maximal number of suggestions to generate',
                                  ge=1, default=100)
-
-
-class Result(BaseModel):
-    """
-    Input name might be truncated if is too long.
-    """
-    advertised: List[str] = []
-    secondary: List[str] = []
-    primary: List[str] = []
 
 
 class Metadata(BaseModel):
@@ -30,11 +22,5 @@ class Metadata(BaseModel):
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
-    nameguard_rating: str = Field(title="NameGuard rating (green or yellow)")
+    rating: str = Field(title="NameGuard rating (green or yellow)")
     metadata: Metadata = Field(title="information how suggestion was generated")
-
-
-class ResultWithMetadata(BaseModel):
-    advertised: List[Suggestion] = []
-    secondary: List[Suggestion] = []
-    primary: List[Suggestion] = []
