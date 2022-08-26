@@ -124,3 +124,12 @@ def test_metadata_aggregation_different_strategies(overrides: List[str], pipelin
 
         for gn in result:
             assert_applied_strategies_are_equal(gn.applied_strategies, expected_strategies)
+
+
+def test_removing_input_from_output() -> None:
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config")
+        pipeline = Pipeline(config.pipelines[0], config)
+        result = pipeline.apply('vitalik.eth')
+        result = [str(r) for r in result]
+        assert 'vitalik' not in result
