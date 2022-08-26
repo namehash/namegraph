@@ -33,8 +33,8 @@ def test_read_main(test_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    # print(json)
-    assert "discharge.eth" in json
+    str_names = [name["name"] for name in json]
+    assert "discharge.eth" in str_names
 
 
 @mark.parametrize(

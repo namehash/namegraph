@@ -2,6 +2,7 @@ import logging
 from typing import List, Dict
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from hydra import initialize, compose
 from pydantic import BaseSettings
 
@@ -47,25 +48,26 @@ inspector = init_inspector()
 
 from models import (
     Name,
-    Suggestion
+    Suggestion,
 )
 
 
-def convert_to_str(result: List[GeneratedName]):
-    return [str(gn) + '.eth' for gn in result]
-
-
-def convert_to_suggestion_format(names: List[GeneratedName]) -> List[Suggestion]:
-    return [{
+def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> List[Suggestion]:
+    response = [{
         'name': str(name) + '.eth',  # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
         'rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
-        'metadata': {
-            'applied_strategies': name.applied_strategies
-        }
     } for name in names]
 
+    if include_metadata:
+        for name, name_json in zip(names, response):
+            name_json['metadata'] = {
+                'applied_strategies': name.applied_strategies
+            }
 
-@app.post("/", response_model=list[Suggestion] | list[str])
+    return response
+
+
+@app.post("/", response_model=list[Suggestion])
 async def metadata(name: Name):
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
@@ -73,9 +75,5 @@ async def metadata(name: Name):
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions)
 
-    if name.metadata:
-        response = convert_to_suggestion_format(result)
-    else:
-        response = convert_to_str(result)
-
-    return response
+    response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+    return JSONResponse(response)
