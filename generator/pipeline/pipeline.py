@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import List, Dict
 
 from omegaconf import DictConfig
@@ -62,6 +63,7 @@ class Pipeline:
             logger.debug(f'{filter} done')
 
         # remove input name from suggestions
+        input_word = re.sub(r'\.\w+$', '', input_word)
         suggestions = [s for s in suggestions if str(s) != input_word]
 
         return aggregate_duplicates(suggestions)
