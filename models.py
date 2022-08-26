@@ -24,4 +24,4 @@ class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     rating: str = Field(title="NameGuard rating (green or yellow)")
     metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
-                                         description="if metadata=False")
+                                         description="if metadata=False this key is absent")
