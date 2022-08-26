@@ -43,7 +43,8 @@ def test_prod(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    assert "myfire.eth" in json
+    str_names = [name["name"] for name in json]
+    assert "myfire.eth" in str_names
 
 
 @pytest.mark.execution_timeout(10)

@@ -1,18 +1,18 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from web_api import generator
 
 
 class Name(BaseModel):
-    name: str = Field(title='input name')
-    metadata: bool = Field(title='return all the metadata in response', default=True)
-    sorter: str = Field(title='sorter algorithm', default='round-robin',
+    name: str = Field(..., title='input name')
+    metadata: bool = Field(True, title='return all the metadata in response')
+    sorter: str = Field('round-robin', title='sorter algorithm',
                         regex=r'round-robin|count|length')
-    min_suggestions: int = Field(title='minimal number of suggestions to generate',
-                                 ge=1, le=generator.config.generation.limit, default=100)
-    max_suggestions: int = Field(title='maximal number of suggestions to generate',
-                                 ge=1, default=100)
+    min_suggestions: int = Field(100, title='minimal number of suggestions to generate',
+                                 ge=1, le=generator.config.generation.limit)
+    max_suggestions: int = Field(100, title='maximal number of suggestions to generate',
+                                 ge=1)
 
 
 class Metadata(BaseModel):
@@ -23,4 +23,5 @@ class Metadata(BaseModel):
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     rating: str = Field(title="NameGuard rating (green or yellow)")
-    metadata: Metadata = Field(title="information how suggestion was generated")
+    metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
+                                         description="if metadata=False")
