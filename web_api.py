@@ -55,7 +55,6 @@ from models import (
 def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> List[Suggestion]:
     response = [{
         'name': str(name) + '.eth',  # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
-        'rating': 'green',  # TODO add some logic to GeneratedName depending on the generator
     } for name in names]
 
     if include_metadata:
