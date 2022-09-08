@@ -1,6 +1,7 @@
-import logging
+import logging, random
 from typing import List, Dict
 
+import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from hydra import initialize, compose
@@ -11,6 +12,11 @@ from generator.xgenerator import Generator
 
 
 logger = logging.getLogger('generator')
+
+
+logger.info('Setting all seeds to 0')
+random.seed(0)
+np.random.seed(0)
 
 
 class Settings(BaseSettings):
