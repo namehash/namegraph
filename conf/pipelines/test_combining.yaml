@@ -1,4 +1,5 @@
-- 
+-
+  name: prefix
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -10,7 +11,8 @@
     - PrefixGenerator
   filters:
     - ValidNameFilter
-- 
+-
+  name: suffix
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer

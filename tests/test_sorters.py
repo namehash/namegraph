@@ -5,7 +5,7 @@ from pytest import mark
 from hydra import initialize, compose
 
 from generator.generated_name import GeneratedName
-from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter
+from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
 
 from utils import assert_applied_strategies_are_equal
 
@@ -69,6 +69,26 @@ def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         sorter = LengthSorter(config)
+
+        sorted_strings = [str(gn) for gn in sorter.sort(input)]
+        assert sorted_strings == expected_strings
+
+
+@mark.parametrize(
+    "input, expected_strings",
+    [
+        (
+            [[GeneratedName(('a',), pipeline_name='permute'),
+              GeneratedName(('b',), pipeline_name='permute'),
+              GeneratedName(('c',), pipeline_name='permute')]],
+            ['a', 'b', 'c']
+        ),
+    ]
+)
+def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
+    with initialize(version_base=None, config_path='../conf/'):
+        config = compose(config_name='test_config')
+        sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
         assert sorted_strings == expected_strings
@@ -155,6 +175,35 @@ def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: L
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         sorter = LengthSorter(config)
+
+        sorted_names = sorter.sort(input)
+
+        assert len(sorted_names) == len(expected)
+        for name, expected in zip(sorted_names, expected):
+            assert str(name) == str(expected)
+            assert_applied_strategies_are_equal(name.applied_strategies, expected.applied_strategies)
+
+
+@mark.parametrize(
+    "input, expected",
+    [
+        (
+            [
+                [GeneratedName(('a',), pipeline_name='permute', applied_strategies=[['1'], ['2']]),
+                 GeneratedName(('b',), pipeline_name='permute', applied_strategies=[['2'], ['1']]),
+                 GeneratedName(('a',), pipeline_name='permute', applied_strategies=[['3']])]
+            ],
+            [
+                GeneratedName(('a',), applied_strategies=[['1'], ['2'], ['3']]),
+                GeneratedName(('b',), applied_strategies=[['2'], ['1']])
+            ]
+        ),
+    ]
+)
+def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        sorter = WeightedSamplingSorter(config)
 
         sorted_names = sorter.sort(input)
 

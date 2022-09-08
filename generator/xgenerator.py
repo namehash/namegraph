@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
-from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter
+from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
 from generator.sorting.sorter import Sorter
 from generator.utils import aggregate_duplicates
 
@@ -72,6 +72,8 @@ class Generator():
                 return RoundRobinSorter(self.config)
             case 'length':
                 return LengthSorter(self.config)
+            case 'weighted-sampling':
+                return WeightedSamplingSorter(self.config)
             case _:
                 # TODO do we need this? is it better to silently select the default sorter, instead of informing the
                 # TODO client about the wrong sorter name or smth?

@@ -8,7 +8,7 @@ class Name(BaseModel):
     name: str = Field(title='input name')
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('round-robin', title='sorter algorithm',
-                        regex=r'round-robin|count|length')
+                        regex=r'round-robin|count|length|weighted-sampling')
     min_suggestions: int = Field(100, title='minimal number of suggestions to generate',
                                  ge=1, le=generator.config.generation.limit)
     max_suggestions: int = Field(100, title='maximal number of suggestions to generate',

@@ -2,10 +2,16 @@ from typing import Tuple, List, Optional
 
 
 class GeneratedName:
-    __slots__ = ['tokens', 'applied_strategies']
+    __slots__ = ['tokens', 'pipeline_name', 'applied_strategies']
 
-    def __init__(self, tokens: Tuple[str, ...], applied_strategies: Optional[List[List[str]]] = None):
+    def __init__(self,
+                 tokens: Tuple[str, ...],
+                 pipeline_name: Optional[str] = None,
+                 applied_strategies: Optional[List[List[str]]] = None):
+
         self.tokens = tokens
+
+        self.pipeline_name = pipeline_name
         self.applied_strategies = []  # history of applied strategies
 
         if applied_strategies is not None:

@@ -1,5 +1,6 @@
 # the pipelines used to generate the suggestions
--  
+-
+  name: synonyms
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
