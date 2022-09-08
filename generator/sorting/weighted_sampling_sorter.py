@@ -23,8 +23,6 @@ class WeightedSamplingSorter(Sorter):
             for pipeline_name, generators in self._extract_pipelines_generators().items()
         }
 
-        print(self._extract_pipelines_generators())
-
     def _extract_pipelines_generators(self) -> Dict[str, Tuple[str, ...]]:
         generators_per_pipeline: Dict[str, Tuple[str, ...]] = dict()
         for definition in self.config.pipelines:
@@ -42,14 +40,11 @@ class WeightedSamplingSorter(Sorter):
         return weights / np.sum(weights)
 
     def sort(self, pipelines_suggestions: List[List[GeneratedName]]) -> List[GeneratedName]:
-        print(pipelines_suggestions)
         pipeline_names = [
             suggestions[0].pipeline_name if suggestions else None
             for suggestions in pipelines_suggestions
         ]
-        print(pipeline_names)
         pipeline_weights = self._get_weights(pipeline_names)
-        print(pipeline_weights)
         empty_pipelines = 0
 
         for i, suggestions in enumerate(pipelines_suggestions):
@@ -63,7 +58,6 @@ class WeightedSamplingSorter(Sorter):
 
         while empty_pipelines < len(pipelines_suggestions):
             probabilities = self._normalize_weights(pipeline_weights)
-            print(pipeline_idxs, probabilities)
             idx = np.random.choice(pipeline_idxs, p=probabilities)
 
             suggestions.append(pipelines_suggestions[idx].pop())
