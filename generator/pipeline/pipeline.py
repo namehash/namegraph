@@ -36,7 +36,7 @@ class Pipeline:
 
     def apply(self, word: str) -> List[GeneratedName]:
         input_word = word
-        words: List[GeneratedName] = [GeneratedName((word,))]
+        words: List[GeneratedName] = [GeneratedName((word,), pipeline_name=self.definition.name)]
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:

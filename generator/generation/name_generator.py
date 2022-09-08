@@ -17,7 +17,8 @@ class NameGenerator:
         return [
             GeneratedName(
                 generated,
-                [sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
+                pipeline_name=name.pipeline_name,
+                applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
             )
             for name in tokenized_names
             for generated in self.generate(name.tokens)

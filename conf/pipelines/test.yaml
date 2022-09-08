@@ -1,4 +1,5 @@
-- 
+-
+  name: synonyms
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -13,6 +14,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: permute
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -27,6 +29,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: permute-double-tokenizer
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer

@@ -12,6 +12,7 @@ unicodeblock==0.3.1
 emoji==1.7.0
 pyahocorasick==1.4.4
 csuffixtree==0.3.6
+numpy==1.23.2
 pytest-benchmark
 pytest-timeouts
 web3

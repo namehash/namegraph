@@ -44,7 +44,22 @@ generation:
   limit: 10000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: data/wikipedia2vec.pkl
+sorting:
+  weighted_sampling:
+    use_softmax: false
+    weights:
+      PermuteGenerator: 1
+      PrefixGenerator: 1
+      SuffixGenerator: 1
+      WordnetSynonymsGenerator: 1
+      W2VGenerator: 1
+      CategoriesGenerator: 1
+      RandomGenerator: 1
+      SecondaryMatcher: 1
+      Wikipedia2VGenerator: 1
+      SubstringMatchGenerator: 1
 random_pipeline:
+  name: random
   normalizers:
     - StripEthNormalizer
   tokenizers:

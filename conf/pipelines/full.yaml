@@ -1,4 +1,5 @@
 -
+  name: categories-no-tokenizer
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -11,7 +12,8 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
--  
+-
+  name: permute
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -25,6 +27,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: prefix
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -38,6 +41,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: suffix
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -51,6 +55,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: categories
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -63,7 +68,8 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
--  
+-
+  name: synonyms
   normalizers:
       - StripEthNormalizer
       - UnicodeNormalizer
@@ -77,6 +83,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: w2v
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -90,6 +97,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: random
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
