@@ -14,11 +14,6 @@ from generator.xgenerator import Generator
 logger = logging.getLogger('generator')
 
 
-logger.info('Setting all seeds to 0')
-random.seed(0)
-np.random.seed(0)
-
-
 class Settings(BaseSettings):
     # config_name: str = "test_config"
     config_name: str = "prod_config"
@@ -48,6 +43,12 @@ def init_inspector():
         # return Inspector(config)
 
 
+def seed_all(seed: int):
+    logger.info(f'Setting all seeds to {seed}')
+    random.seed(seed)
+    np.random.seed(seed)
+
+
 generator = init()
 inspector = init_inspector()
 
@@ -74,6 +75,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 
 @app.post("/", response_model=list[Suggestion])
 async def root(name: Name):
+    seed_all(0)
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
