@@ -1,5 +1,4 @@
-from typing import List, Iterable, Tuple, Dict
-from copy import copy
+from typing import List, Tuple, Dict
 
 import numpy as np
 import numpy.typing as npt
@@ -56,7 +55,7 @@ class WeightedSamplingSorter(Sorter):
         pipeline_idxs = list(range(len(pipelines_suggestions)))
         suggestions: List[GeneratedName] = []
 
-        while empty_pipelines < len(pipelines_suggestions):
+        while empty_pipelines < len(pipelines_suggestions) - 1:
             probabilities = self._normalize_weights(pipeline_weights)
             idx = np.random.choice(pipeline_idxs, p=probabilities)
 
@@ -66,6 +65,14 @@ class WeightedSamplingSorter(Sorter):
                 empty_pipelines += 1
             else:
                 pipeline_weights[idx] /= 2
+
+            zero_replaced = np.where(np.isclose(pipeline_weights, 0.0, atol=1.0e-30), 1.0, pipeline_weights)
+            if np.min(zero_replaced) < 1.0e-25:
+                pipeline_weights *= 2
+
+        if empty_pipelines == len(pipelines_suggestions) - 1:
+            idx = np.argmax(map(len, pipelines_suggestions))
+            suggestions += pipelines_suggestions[idx][::-1]
 
         aggregated = aggregate_duplicates(suggestions)
         return aggregated
