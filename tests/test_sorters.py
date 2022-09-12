@@ -1,4 +1,5 @@
 from typing import List
+import itertools
 
 import pytest
 from pytest import mark
@@ -211,3 +212,37 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
         for name, expected in zip(sorted_names, expected):
             assert str(name) == str(expected)
             assert_applied_strategies_are_equal(name.applied_strategies, expected.applied_strategies)
+
+
+@mark.slow
+def test_weighted_sampling_sorter_stress():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+
+        with open(config.app.internet_domains, 'r', encoding='utf-8') as f:
+            words = [d for d in itertools.islice(iter(f), 49999)] + ['pumpkins']
+
+        generated_names = []
+        for (from_idx, to_idx), pipeline_name, generator_name in [((0, 10000), 'permute', 'PermuteGenerator'),
+                                                                  ((10000, 20000), 'w2v', 'W2VGenerator'),
+                                                                  ((20000, 30000), 'random', 'RandomGenerator'),
+                                                                  ((30000, 40000), 'synonyms', 'WordnetSynonymsGenerator'),
+                                                                  ((40000, 50000), 'suffix', 'SuffixGenerator')]:
+            generated_names.append([
+                GeneratedName((word,), pipeline_name=pipeline_name, applied_strategies=[[generator_name]])
+                for word in words[from_idx:to_idx]
+            ])
+
+        sorter = WeightedSamplingSorter(config)
+        sorted_names = sorter.sort(generated_names)
+
+
+@mark.slow
+def test_weighted_sampling_sorter_stress2():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        sorter = WeightedSamplingSorter(config)
+        sorted_names = sorter.sort([[
+            GeneratedName(('abasariatic',), pipeline_name='random', applied_strategies=[['RandomGenerator']])
+            for _ in range(10000)
+        ]])
