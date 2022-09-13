@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
-from generator.utils import softmax, aggregate_duplicates
+from generator.utils import softmax
 
 
 class WeightedSamplingSorter(Sorter):
@@ -49,19 +49,27 @@ class WeightedSamplingSorter(Sorter):
         for i, suggestions in enumerate(pipelines_suggestions):
             pipelines_suggestions[i] = suggestions[::-1]  # so we can pop from it later
             if not suggestions:
-                pipeline_weights[i] = 0
+                pipeline_weights[i] = float('-inf') if self.use_softmax else 0.0
                 empty_pipelines += 1
 
         pipeline_idxs = list(range(len(pipelines_suggestions)))
-        suggestions: List[GeneratedName] = []
+        name2suggestion: Dict[str, GeneratedName] = dict()
 
         while empty_pipelines < len(pipelines_suggestions) - 1:
             probabilities = self._normalize_weights(pipeline_weights)
             idx = np.random.choice(pipeline_idxs, p=probabilities)
 
-            suggestions.append(pipelines_suggestions[idx].pop())
+            while pipelines_suggestions[idx]:
+                suggestion = pipelines_suggestions[idx].pop()
+                name = str(suggestion)
+                if name not in name2suggestion:
+                    name2suggestion[name] = suggestion
+                    break
+
+                name2suggestion[name].add_strategies(suggestion.applied_strategies)
+
             if not pipelines_suggestions[idx]:
-                pipeline_weights[idx] = 0
+                pipeline_weights[idx] = float('-inf') if self.use_softmax else 0.0
                 empty_pipelines += 1
             else:
                 pipeline_weights[idx] /= 2
@@ -72,7 +80,13 @@ class WeightedSamplingSorter(Sorter):
 
         if empty_pipelines == len(pipelines_suggestions) - 1:
             idx = np.argmax(map(len, pipelines_suggestions))
-            suggestions += pipelines_suggestions[idx][::-1]
 
-        aggregated = aggregate_duplicates(suggestions)
-        return aggregated
+            for suggestion in pipelines_suggestions[idx][::-1]:
+                name = str(suggestion)
+                if name in name2suggestion:
+                    name2suggestion[name].add_strategies(suggestion.applied_strategies)
+                else:
+                    name2suggestion[name] = suggestion
+
+        suggestions = list(name2suggestion.values())
+        return suggestions

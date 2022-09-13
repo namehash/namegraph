@@ -215,9 +215,16 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
 
 
 @mark.slow
-def test_weighted_sampling_sorter_stress():
+@mark.parametrize(
+    "overrides",
+    [
+        ("sorting.weighted_sampling.use_softmax=false",),
+        ("sorting.weighted_sampling.use_softmax=true",)
+    ]
+)
+def test_weighted_sampling_sorter_stress(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config", overrides=overrides)
 
         with open(config.app.internet_domains, 'r', encoding='utf-8') as f:
             words = [d for d in itertools.islice(iter(f), 49999)] + ['pumpkins']
@@ -238,11 +245,52 @@ def test_weighted_sampling_sorter_stress():
 
 
 @mark.slow
-def test_weighted_sampling_sorter_stress2():
+@mark.parametrize(
+    "overrides",
+    [
+        ("sorting.weighted_sampling.use_softmax=false",),
+        ("sorting.weighted_sampling.use_softmax=true",)
+    ]
+)
+def test_weighted_sampling_sorter_stress2(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
         sorted_names = sorter.sort([[
             GeneratedName(('abasariatic',), pipeline_name='random', applied_strategies=[['RandomGenerator']])
             for _ in range(10000)
         ]])
+
+
+@mark.slow
+@mark.parametrize(
+    "overrides",
+    [
+        ("sorting.weighted_sampling.use_softmax=false",),
+        ("sorting.weighted_sampling.use_softmax=true",)
+    ]
+)
+def test_weighted_sampling_sorter_weights(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config", overrides=overrides)
+
+        generated_names = []
+        for pipeline_name in [
+            'permute',
+            'suffix',
+            'prefix',
+            'synonyms',
+            'w2v',
+            'categories-no-tokenizer',
+            'secondary',
+            'wiki2v',
+            'substring',
+        ]:
+            generated_names.append([
+                GeneratedName((pipeline_name + str(i),), pipeline_name=pipeline_name)
+                for i in range(100)]
+            )
+
+        sorter = WeightedSamplingSorter(config)
+        sorted_names = sorter.sort(generated_names)
+        print(sorted_names[:30])
