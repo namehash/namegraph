@@ -117,3 +117,18 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  name: substring
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SubstringMatchGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter

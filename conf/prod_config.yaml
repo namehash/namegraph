@@ -51,12 +51,12 @@ sorting:
       PermuteGenerator: 1
       PrefixGenerator: 1
       SuffixGenerator: 1
-      WordnetSynonymsGenerator: 1
-      W2VGenerator: 1
-      CategoriesGenerator: 1
+      WordnetSynonymsGenerator: 5
+      W2VGenerator: 10
+      CategoriesGenerator: 10
       RandomGenerator: 1
       SecondaryMatcher: 1
-      Wikipedia2VGenerator: 1
+      Wikipedia2VGenerator: 15
       SubstringMatchGenerator: 1
 random_pipeline:
   name: random
