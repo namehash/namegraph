@@ -63,7 +63,6 @@ class Generator():
     def init_objects(self):
         Domains(self.config)
 
-    # TODO should we do this like in pipeline.py? using globals()
     def get_sorter(self, sorter: str) -> Sorter:
         match sorter:
             case 'count':
@@ -75,9 +74,7 @@ class Generator():
             case 'weighted-sampling':
                 return WeightedSamplingSorter(self.config)
             case _:
-                # TODO do we need this? is it better to silently select the default sorter, instead of informing the
-                # TODO client about the wrong sorter name or smth?
-                raise ValueError(f'{sorter} is not available')
+                raise ValueError(f'{sorter} is unavailable')
 
     def generate_names(
         self,
@@ -114,7 +111,6 @@ class Generator():
             result_random.add_pipeline_suggestions(random_suggestions)
             result_random.split()
             _, _, random_names, _ = result_random.combine(sorter)
-            # TODO do we need to truncate the random suggestions before sorting?
             all_results = sorter.sort([aggregate_duplicates(all_results + random_names)[:min_suggestions]])
 
         return all_results[:max_suggestions]
