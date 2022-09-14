@@ -1,4 +1,4 @@
-import logging, random
+import logging, random, hashlib
 from typing import List, Dict
 
 import numpy as np
@@ -43,7 +43,11 @@ def init_inspector():
         # return Inspector(config)
 
 
-def seed_all(seed: int):
+def seed_all(seed: int | str):
+    if isinstance(seed, str):
+        hashed = hashlib.md5(seed.encode('utf-8')).digest()
+        seed = int.from_bytes(hashed, 'big') & 0xff_ff_ff_ff
+
     logger.info(f'Setting all seeds to {seed}')
     random.seed(seed)
     np.random.seed(seed)
@@ -75,7 +79,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 
 @app.post("/", response_model=list[Suggestion])
 async def root(name: Name):
-    seed_all(hash(name.name) & 0xff_ff_ff_ff)
+    seed_all(name.name)
     logger.debug(f'Request received: {name.name}')
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
