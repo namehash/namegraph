@@ -1,3 +1,4 @@
+import random
 from typing import List, Tuple, Dict
 
 import numpy as np
@@ -7,6 +8,16 @@ from omegaconf import DictConfig
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
 from generator.utils import softmax
+
+
+def choice(options, probs):
+    x = random.random()
+    cum = 0
+    for i, p in enumerate(probs):
+        cum += p
+        if x < cum:
+            break
+    return options[i]
 
 
 class WeightedSamplingSorter(Sorter):
@@ -57,7 +68,7 @@ class WeightedSamplingSorter(Sorter):
 
         while empty_pipelines < len(pipelines_suggestions) - 1:
             probabilities = self._normalize_weights(pipeline_weights)
-            idx = np.random.choice(pipeline_idxs, p=probabilities)
+            idx = choice(pipeline_idxs, probabilities)
 
             while pipelines_suggestions[idx]:
                 suggestion = pipelines_suggestions[idx].pop()
