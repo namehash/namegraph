@@ -1,4 +1,34 @@
 -
+  name: wiki2v
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - Wikipedia2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: w2v
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - W2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: categories-no-tokenizer
   normalizers:
     - StripEthNormalizer
@@ -9,6 +39,21 @@
     - NoneTokenizer
   generators:
     - CategoriesGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: synonyms
+  normalizers:
+      - StripEthNormalizer
+      - UnicodeNormalizer
+      - NamehashNormalizer
+      - ReplaceInvalidNormalizer
+      - LongNameNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - WordnetSynonymsGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
@@ -69,51 +114,6 @@
     - WordNinjaTokenizer
   generators:
     - SuffixGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
--
-  name: synonyms
-  normalizers:
-      - StripEthNormalizer
-      - UnicodeNormalizer
-      - NamehashNormalizer
-      - ReplaceInvalidNormalizer
-      - LongNameNormalizer
-  tokenizers:
-    - WordNinjaTokenizer
-  generators:
-    - WordnetSynonymsGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
--
-  name: w2v
-  normalizers:
-    - StripEthNormalizer
-    - UnicodeNormalizer
-    - NamehashNormalizer
-    - ReplaceInvalidNormalizer
-    - LongNameNormalizer
-  tokenizers:
-    - WordNinjaTokenizer
-  generators:
-    - W2VGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
--
-  name: wiki2v
-  normalizers:
-    - StripEthNormalizer
-    - UnicodeNormalizer
-    - NamehashNormalizer
-    - ReplaceInvalidNormalizer
-    - LongNameNormalizer
-  tokenizers:
-    - WordNinjaTokenizer
-  generators:
-    - Wikipedia2VGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
