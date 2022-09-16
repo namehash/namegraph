@@ -74,8 +74,7 @@ class WeightedSamplingSorter(Sorter):
             else:
                 pipeline_weights[idx] /= 2
 
-            zero_replaced = np.where(np.isclose(pipeline_weights, 0.0, atol=1.0e-30), 1.0, pipeline_weights)
-            if np.min(zero_replaced) < 1.0e-25:
+            if np.min(pipeline_weights[pipeline_weights > 0.0]) < 1.0e-25:
                 pipeline_weights *= 2
 
         if empty_pipelines == len(pipelines_suggestions) - 1:
