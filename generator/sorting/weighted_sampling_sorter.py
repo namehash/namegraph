@@ -10,14 +10,13 @@ from generator.generated_name import GeneratedName
 from generator.utils import softmax
 
 
-def choice(options, probs):
+def choice(probs):
     x = random.random()
-    cum = 0
+    cum = 0.0
     for i, p in enumerate(probs):
         cum += p
         if x < cum:
-            break
-    return options[i]
+            return i
 
 
 class WeightedSamplingSorter(Sorter):
@@ -63,12 +62,12 @@ class WeightedSamplingSorter(Sorter):
                 pipeline_weights[i] = float('-inf') if self.use_softmax else 0.0
                 empty_pipelines += 1
 
-        pipeline_idxs = list(range(len(pipelines_suggestions)))
         name2suggestion: Dict[str, GeneratedName] = dict()
 
+        probabilities = pipeline_weights
         while empty_pipelines < len(pipelines_suggestions) - 1:
-            probabilities = self._normalize_weights(pipeline_weights)
-            idx = choice(pipeline_idxs, probabilities)
+            probabilities = self._normalize_weights(probabilities)
+            idx = choice(probabilities)
 
             while pipelines_suggestions[idx]:
                 suggestion = pipelines_suggestions[idx].pop()
@@ -80,13 +79,10 @@ class WeightedSamplingSorter(Sorter):
                 name2suggestion[name].add_strategies(suggestion.applied_strategies)
 
             if not pipelines_suggestions[idx]:
-                pipeline_weights[idx] = float('-inf') if self.use_softmax else 0.0
+                probabilities[idx] = float('-inf') if self.use_softmax else 0.0
                 empty_pipelines += 1
             else:
-                pipeline_weights[idx] /= 2
-
-            if np.min(pipeline_weights[pipeline_weights > 0.0]) < 1.0e-25:
-                pipeline_weights *= 2
+                probabilities[idx] /= 2
 
         if empty_pipelines == len(pipelines_suggestions) - 1:
             idx = np.argmax(map(len, pipelines_suggestions))
