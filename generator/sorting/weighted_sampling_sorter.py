@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Collection
 
 import numpy as np
 import numpy.typing as npt
@@ -7,16 +7,16 @@ from omegaconf import DictConfig
 
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
-from generator.utils import softmax
 
 
-def choice(probs):
+def choice(probs: Collection) -> int:
     x = random.random()
     cum = 0.0
     for i, p in enumerate(probs):
         cum += p
         if x < cum:
             return i
+    return len(probs) - 1
 
 
 class WeightedSamplingSorter(Sorter):
@@ -24,7 +24,6 @@ class WeightedSamplingSorter(Sorter):
         super().__init__(config)
         sorter_config = self.config.sorting.weighted_sampling
 
-        self.use_softmax = sorter_config.use_softmax
         self.generator2weight = dict(sorter_config.weights)
 
         self.pipeline_weights: Dict[str, float] = {
@@ -43,9 +42,6 @@ class WeightedSamplingSorter(Sorter):
         return np.array([self.pipeline_weights.get(name, 0) for name in pipeline_names], dtype=np.float32)
 
     def _normalize_weights(self, weights: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
-        if self.use_softmax:
-            return softmax(weights)
-
         return weights / np.sum(weights)
 
     def sort(self, pipelines_suggestions: List[List[GeneratedName]]) -> List[GeneratedName]:
@@ -59,7 +55,7 @@ class WeightedSamplingSorter(Sorter):
         for i, suggestions in enumerate(pipelines_suggestions):
             pipelines_suggestions[i] = suggestions[::-1]  # so we can pop from it later
             if not suggestions:
-                pipeline_weights[i] = float('-inf') if self.use_softmax else 0.0
+                pipeline_weights[i] = 0.0
                 empty_pipelines += 1
 
         name2suggestion: Dict[str, GeneratedName] = dict()
@@ -79,7 +75,7 @@ class WeightedSamplingSorter(Sorter):
                 name2suggestion[name].add_strategies(suggestion.applied_strategies)
 
             if not pipelines_suggestions[idx]:
-                probabilities[idx] = float('-inf') if self.use_softmax else 0.0
+                probabilities[idx] = 0.0
                 empty_pipelines += 1
             else:
                 probabilities[idx] /= 2

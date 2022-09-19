@@ -215,16 +215,9 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
 
 
 @mark.slow
-@mark.parametrize(
-    "overrides",
-    [
-        ("sorting.weighted_sampling.use_softmax=false",),
-        ("sorting.weighted_sampling.use_softmax=true",)
-    ]
-)
-def test_weighted_sampling_sorter_stress(overrides: List[str]):
+def test_weighted_sampling_sorter_stress():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config")
 
         with open(config.app.internet_domains, 'r', encoding='utf-8') as f:
             words = [d for d in itertools.islice(iter(f), 49999)] + ['pumpkins']
@@ -245,16 +238,9 @@ def test_weighted_sampling_sorter_stress(overrides: List[str]):
 
 
 @mark.slow
-@mark.parametrize(
-    "overrides",
-    [
-        ("sorting.weighted_sampling.use_softmax=false",),
-        ("sorting.weighted_sampling.use_softmax=true",)
-    ]
-)
-def test_weighted_sampling_sorter_stress2(overrides: List[str]):
+def test_weighted_sampling_sorter_stress2():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config")
         sorter = WeightedSamplingSorter(config)
         sorted_names = sorter.sort([[
             GeneratedName(('abasariatic',), pipeline_name='random', applied_strategies=[['RandomGenerator']])
@@ -263,16 +249,9 @@ def test_weighted_sampling_sorter_stress2(overrides: List[str]):
 
 
 @mark.slow
-@mark.parametrize(
-    "overrides",
-    [
-        ("sorting.weighted_sampling.use_softmax=false",),
-        ("sorting.weighted_sampling.use_softmax=true",)
-    ]
-)
-def test_weighted_sampling_sorter_weights(overrides: List[str]):
+def test_weighted_sampling_sorter_weights():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config", overrides=overrides)
+        config = compose(config_name="prod_config")
 
         generated_names = []
         for pipeline_name in [
