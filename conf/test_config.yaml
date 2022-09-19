@@ -46,7 +46,6 @@ generation:
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
 sorting:
   weighted_sampling:
-    use_softmax: false
     weights:
       PermuteGenerator: 1
       PrefixGenerator: 1
