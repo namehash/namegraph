@@ -1,4 +1,4 @@
-import random
+import random, logging
 from typing import List, Tuple, Dict, Collection
 
 import numpy as np
@@ -8,6 +8,8 @@ from omegaconf import DictConfig
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
 
+logger = logging.getLogger('generator')
+
 
 def choice(probs: Collection) -> int:
     x = random.random()
@@ -16,6 +18,8 @@ def choice(probs: Collection) -> int:
         cum += p
         if x < cum:
             return i
+    logger.warning(f'probabilities do not sum up to 1.0, but up to {cum}, so that randomized x = {x} is still greater,'
+                   'thus choosing the last one')
     return len(probs) - 1
 
 
