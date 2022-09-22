@@ -18,3 +18,17 @@ def aggregate_duplicates(names: List[GeneratedName], by_tokens: bool = False) ->
             names2obj[word] = name
 
     return list(names2obj.values())
+
+
+def extend_and_aggregate(name2suggestion: Dict[str, GeneratedName],
+                         suggestions: List[GeneratedName]) -> Dict[str, GeneratedName]:
+    for suggestion in suggestions:
+        name = str(suggestion)
+
+        duplicate = name2suggestion.get(name, None)
+        if duplicate is not None:
+            duplicate.add_strategies(suggestion.applied_strategies)
+        else:
+            name2suggestion[name] = suggestion
+
+    return name2suggestion

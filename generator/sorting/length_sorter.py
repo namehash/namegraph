@@ -6,8 +6,16 @@ from generator.utils import aggregate_duplicates
 
 
 class LengthSorter(Sorter):
-    def sort(self, pipelines_suggestions: List[List[GeneratedName]]) -> List[GeneratedName]:
+    def sort(self,
+             pipelines_suggestions: List[List[GeneratedName]],
+             min_suggestions: int = None,
+             max_suggestions: int = None) -> List[GeneratedName]:
+
+        min_suggestions = min_suggestions or self.config.app.suggestions
+        max_suggestions = max_suggestions or self.config.app.suggestions
+
         flattened = [x for sublist in pipelines_suggestions for x in sublist]
         aggregated = aggregate_duplicates(flattened)
 
-        return [x for x in sorted(aggregated, key=lambda y: len(str(y)), reverse=False)]
+        suggestions = [x for x in sorted(aggregated, key=lambda y: len(str(y)), reverse=False)]
+        return self.satisfy_primary_fraction_obligation(suggestions, min_suggestions, max_suggestions)

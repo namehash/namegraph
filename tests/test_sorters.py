@@ -273,3 +273,92 @@ def test_weighted_sampling_sorter_weights():
         sorter = WeightedSamplingSorter(config)
         sorted_names = sorter.sort(generated_names)
         print(sorted_names[:30])
+
+
+@mark.parametrize(
+    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    [
+        (
+            # simple situation: first 2 names in the sorted array satisfies the obligation
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'),   GeneratedName(('ccc',), category='secondary')],
+                [GeneratedName(('dddd',), category='secondary'), GeneratedName(('bb', ), category='primary')]
+            ], ['a', 'bb', 'ccc'], 2, 3
+        ),
+        (
+            # we need 2 primary names, after the second one we have one place left and one primary available,
+            # so we must take it, disregarding the next names in the line
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
+                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            ], ['a', 'bb', 'dddd'], 2, 3
+        ),
+        (
+            # test for off-by-one error while counting used primary names and left primary names
+            ["app.min_primary_fraction=1.5"], [
+                [GeneratedName(('a',),     category='primary'),   GeneratedName(('ccc',), category='secondary')],
+                [GeneratedName(('dddd',),  category='primary'), GeneratedName(('bb', ), category='advertised')],
+                [GeneratedName(('eeeee',), category='registered')]
+            ], ['a', 'bb', 'dddd'], 2, 3
+        ),
+        (
+            # disregarding the fact that the last available primary name is the last, max_suggestions allows us
+            # to take all the generated names, so we keep them in the order defined by the sorter
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
+                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            ], ['a', 'bb', 'ccc', 'dddd'], 2, 4
+        ),
+        (
+            # we need 3 primary names, but have only 2 available, so we take all the names in the order defined by
+            # sorter, until there is just enough place left to take all the rest of available primary names
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
+                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            ], ['a', 'bb', 'dddd'], 3, 3
+        ),
+        (
+            # same as above, we need 2, but have only 1, so we take it as the last element, if we haven't met it yet
+            # (and it is somewhere further away in the order defined by the sorter)
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
+                [GeneratedName(('dddd',), category='advertised'), GeneratedName(('bb', ), category='advertised')]
+            ], ['a', 'ccc'], 2, 2
+        ),
+        (
+            # we need 2 primary names, and have 2 available, but it is a duplicate, so only 1 is left, so we take it,
+            # since it is first in the order, and the take the next from the line
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'),    GeneratedName(('bb',), category='advertised')],
+                [GeneratedName(('dddd',), category='advertised'), GeneratedName(('a', ), category='primary')]
+            ], ['a', 'bb'], 2, 2
+        ),
+        (
+            # we need 2 primary names, but none of them would be taken if we followed the order defined by the sorter,
+            # and we notice that we need 2, so we take 2 of the in the order defined by the sorter
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
+                [GeneratedName(('dddd',), category='primary'),    GeneratedName(('bb', ), category='advertised')]
+            ], ['ccc', 'dddd'], 2, 2
+        ),
+        (
+            # same as above, but we have one place more, so we take one name from the line defined by the sorter
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
+                [GeneratedName(('dddd',), category='primary'),    GeneratedName(('bb', ), category='advertised')]
+            ], ['a', 'ccc', 'dddd'], 3, 3
+        ),
+    ],
+)
+def test_primary_fraction_obligation_length_sorter(overrides: List[str],
+                                                   input_names: List[List[GeneratedName]],
+                                                   expected_strings: List[GeneratedName],
+                                                   min_suggestions: int,
+                                                   max_suggestions: int):
+
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        sorter = LengthSorter(config)
+
+        sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
+        assert sorted_strings == expected_strings
