@@ -16,39 +16,33 @@ logger = logging.getLogger('generator')
 
 class Result:
     def __init__(self, config: DictConfig):
-        self.advertised: List[List[GeneratedName]] = []
-        self.secondary: List[List[GeneratedName]] = []
-        self.primary: List[List[GeneratedName]] = []
-        self.registered: List[List[GeneratedName]] = []
-
         self.domains = Domains(config)
         self.suggestions: List[List[GeneratedName]] = []
 
     def add_pipeline_suggestions(self, pipeline_suggestions: List[GeneratedName]):
         self.suggestions.append(pipeline_suggestions)
 
-    def split(self) -> None:
+    def assign_categories(self) -> None:
         for pipeline_suggestions in self.suggestions:
             advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
             secondary, remaining_suggestions = self.domains.get_secondary(remaining_suggestions)
             primary, registered = self.domains.get_primary(remaining_suggestions)
-            self.advertised.append(advertised)
-            self.secondary.append(secondary)
-            self.primary.append(primary)
-            self.registered.append(registered)
 
-    def combine(self, sorter: Sorter) \
-            -> Tuple[List[GeneratedName], List[GeneratedName], List[GeneratedName], List[GeneratedName]]:
+            for category, suggestions in zip(['advertised', 'secondary', 'primary', 'registered'],
+                                             [advertised, secondary, primary, registered]):
 
-        advertised = sorter.sort(self.advertised)
-        secondary = sorter.sort(self.secondary)
-        primary = sorter.sort(self.primary)
-        registered = sorter.sort(self.registered)
+                for suggestion in suggestions:
+                    suggestion.category = category
 
-        return advertised, secondary, primary, registered
+    def unique_suggestions(self) -> int:
+        return len(set([
+            str(suggestion)
+            for pipeline_suggestions in self.suggestions
+            for suggestion in pipeline_suggestions
+        ]))
 
 
-class Generator():
+class Generator:
     def __init__(self, config: DictConfig):
         self.config = config
 
@@ -79,15 +73,13 @@ class Generator():
     def generate_names(
         self,
         name: str,
-        sorter: str = 'round-robin',
+        sorter: str = 'weighted-sampling',
         min_suggestions: int = None,
         max_suggestions: int = None
     ) -> List[GeneratedName]:
 
-        if min_suggestions is None:
-            min_suggestions = self.config.app.suggestions
-        if max_suggestions is None:
-            max_suggestions = self.config.app.suggestions
+        min_suggestions = min_suggestions or self.config.app.suggestions
+        max_suggestions = max_suggestions or self.config.app.suggestions
 
         sorter = self.get_sorter(sorter)
         result = Result(self.config)
@@ -97,20 +89,13 @@ class Generator():
             logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
             result.add_pipeline_suggestions(pipeline_suggestions)
 
-        result.split()
-        advertised, secondary, primary, registered = result.combine(sorter)
-
-        round_robin_sorter = RoundRobinSorter(self.config)
-        all_results = round_robin_sorter.sort([advertised, secondary, primary, registered])
-
-        if len(all_results) < min_suggestions:
+        if result.unique_suggestions() < min_suggestions:
             # generate using random pipeline
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
-            result_random = Result(self.config)
-            result_random.add_pipeline_suggestions(random_suggestions)
-            result_random.split()
-            _, _, random_names, _ = result_random.combine(sorter)
-            all_results = sorter.sort([aggregate_duplicates(all_results + random_names)[:min_suggestions]])
+            result.add_pipeline_suggestions(random_suggestions)
 
-        return all_results[:max_suggestions]
+        result.assign_categories()
+        suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions)
+
+        return suggestions[:max_suggestions]
