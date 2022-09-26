@@ -500,6 +500,19 @@ def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides
         (
             #
             ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',),   category='advertised'), GeneratedName(('hhhh',), category='secondary')],
+
+                [GeneratedName(('iii',), category='registered'), GeneratedName(('kk',), category='secondary'),
+                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+            ], 7, 9, 0, 0
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
                 [GeneratedName(('ddd',), category='primary'),    GeneratedName(('bb',), category='secondary'),
                  GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
 
