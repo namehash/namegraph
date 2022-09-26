@@ -45,7 +45,7 @@ def test_permuter_limit():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = PermuteGenerator(config)
-        tokenized_name = GeneratedName(list(range(10)))  # 3628800 permutations
+        tokenized_name = GeneratedName(tuple(map(str, range(10))))  # 3628800 permutations
         generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == config.generation.limit
 
