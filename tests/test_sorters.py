@@ -472,6 +472,15 @@ def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides
         (
             #
             ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),    category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered'),
+                 GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),    category='registered'),
+                 GeneratedName(('l',),   category='secondary'),  GeneratedName(('hhhh',),  category='advertised')]
+            ], 4, 5, 1, 1
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
                 [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),     category='secondary'),
                  GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered')],
 
@@ -491,6 +500,19 @@ def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides
                 [GeneratedName(('iii',), category='primary'),    GeneratedName(('kk',), category='secondary'),
                  GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
             ], 2, 2, 2, 2
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='registered'), GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',),   category='secondary'),  GeneratedName(('hhhh',), category='primary')],
+
+                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='secondary'),
+                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+            ], 2, 5, 1, 1
         ),
     ]
 )
