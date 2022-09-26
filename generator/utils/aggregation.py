@@ -21,8 +21,12 @@ def aggregate_duplicates(names: List[GeneratedName], by_tokens: bool = False) ->
 
 
 def extend_and_aggregate(name2suggestion: Dict[str, GeneratedName],
-                         suggestions: List[GeneratedName]) -> Dict[str, GeneratedName]:
+                         suggestions: List[GeneratedName],
+                         max_suggestions: int) -> Dict[str, GeneratedName]:
     for suggestion in suggestions:
+        if len(name2suggestion) >= max_suggestions:
+            break
+
         name = str(suggestion)
 
         duplicate = name2suggestion.get(name, None)

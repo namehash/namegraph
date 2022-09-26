@@ -20,7 +20,7 @@ class Sorter:
                                   all_primary_count: int = None) -> List[GeneratedName]:
 
         if all_primary_count is None:
-            all_primary_count = len({str(s) for s in suggestions if s.category == 'primary'})
+            all_primary_count = len([str(s) for s in suggestions if s.category == 'primary'])
 
         primary_used = 0
         for i, s in enumerate(suggestions):
@@ -28,14 +28,9 @@ class Sorter:
                 primary_used += 1
 
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
-            print(max_suggestions, i, '//', all_primary_count, primary_used)
             if max_suggestions - i == all_primary_count - primary_used:
-                # FIXME aggregate rest of them (should we do that? it's already aggregated)
                 rest_primary = [s for s in suggestions[i:] if s.category == 'primary']
                 assert len(rest_primary) == all_primary_count - primary_used
-
-                print(suggestions[:i])
-                print(rest_primary)
 
                 return suggestions[:i] + rest_primary
 
@@ -46,10 +41,21 @@ class Sorter:
                                             suggestions: List[GeneratedName],
                                             min_suggestions: int,
                                             max_suggestions: int) -> List[GeneratedName]:
+        """
+        Function which tries to satisfy the requirement of minimal primary names fraction in the returned suggestions.
+
+        :param suggestions: aggregated list of generated names. Assuming it has only unique names
+        :param min_suggestions: request parameter specifying minimal number of generated names
+        :param max_suggestions: request parameter specifying maximal number of generated names
+        :return: list of generated names in which the part of primary names either satisfies the requirement
+            or maximizes its part
+        """
+
+        assert len(suggestions) == len({str(s) for s in suggestions})  # asserting there are only unique names
 
         needed_primary_count = int(math.ceil(self.config.app.min_primary_fraction * min_suggestions))
-        primary_count = len({str(s) for s in suggestions[:max_suggestions] if s.category == 'primary'})
-        rest_primary_count = len({str(s) for s in suggestions[max_suggestions:] if s.category == 'primary'})
+        primary_count = len([str(s) for s in suggestions[:max_suggestions] if s.category == 'primary'])
+        rest_primary_count = len([str(s) for s in suggestions[max_suggestions:] if s.category == 'primary'])
 
         if primary_count >= needed_primary_count:
             return suggestions[:max_suggestions]

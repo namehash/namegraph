@@ -4,6 +4,7 @@ from time import time as get_time
 
 import pytest
 from fastapi.testclient import TestClient
+from hydra import initialize, compose
 
 from generator.domains import Domains
 
@@ -104,3 +105,23 @@ def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggest
 
     assert min_suggestions <= len(unique_names)
     assert len(unique_names) <= max_suggestions
+
+
+# @pytest.mark.slow
+# def test_weighted_sampling_sorter_stress(prod_test_client):
+#     with initialize(version_base=None, config_path="../conf/"):
+#         config = compose(config_name="prod_config")
+#         domains = Domains(config)
+#
+#         names = list(domains.registered)[:100] \
+#             + list(domains.advertised)[:100] \
+#             + list(domains.secondary_market)[:100] \
+#             + list(domains.internet)[:100]
+#
+#         for name in names:
+#             response = prod_test_client.post("/", json={
+#                 "name": name,
+#                 "sorter": "weighted-sampling"
+#             })
+#
+#             assert response.status_code == 200
