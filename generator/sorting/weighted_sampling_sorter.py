@@ -44,13 +44,14 @@ class WeightedSamplingSorter(Sorter):
 
         return generators_per_pipeline
 
-    def _get_weights(self, pipeline_names: List[str]) -> npt.NDArray[np.float32]:
+    def _get_weights(self, pipeline_names: List[str]) -> List[float]:
         # TODO is it okay to set 1 as a default weight for unknown pipelines? there is an option to specify it in the config
         # TODO this simplifies testing a little, if the list is empty it will still get rewritten to 0.0
-        return np.array([self.pipeline_weights.get(name, 1) for name in pipeline_names], dtype=np.float32)
+        return [self.pipeline_weights.get(name, 1) for name in pipeline_names]
 
-    def _normalize_weights(self, weights: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
-        return weights / np.sum(weights)
+    def _normalize_weights(self, weights: List[float]) -> List[float]:
+        summed = sum(weights)
+        return [el / summed for el in weights]
 
     def sort(self,
              pipelines_suggestions: List[List[GeneratedName]],
@@ -80,6 +81,7 @@ class WeightedSamplingSorter(Sorter):
                 break
 
         all_primary_count = len(primary_unique_suggestions)
+        possible_primary_count = min(needed_primary_count, all_primary_count)
 
         # defining variables required for the sampling itself and counting emptied pipelines
         pipeline_names = [
@@ -103,7 +105,7 @@ class WeightedSamplingSorter(Sorter):
         while empty_pipelines < len(pipelines_suggestions) - 1 and len(name2suggestion) < max_suggestions:
 
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
-            if max_suggestions - len(name2suggestion) == min(all_primary_count, needed_primary_count) - primary_used:
+            if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
                 # TODO should we use round robin here?
                 name2suggestion = extend_and_aggregate(
                     name2suggestion,
@@ -161,7 +163,7 @@ class WeightedSamplingSorter(Sorter):
 
                 # if there is just enough space left for all the left primary suggestions,
                 # then we simply append them at the end
-                if max_suggestions - len(name2suggestion) == min(all_primary_count,needed_primary_count) - primary_used:
+                if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
                     name2suggestion = extend_and_aggregate(
                         name2suggestion,
                         [s for s in last_pipeline_suggestions[i:] if s.category == 'primary'],
