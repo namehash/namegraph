@@ -62,12 +62,23 @@ class WeightedSamplingSorter(Sorter):
         # defining all the numbers regarding the primary names result fraction requirement
         needed_primary_count = int(math.ceil(self.config.app.min_primary_fraction * min_suggestions))
         primary_used = 0
-        all_primary_count = len({
-            str(suggestion)
-            for pipeline_suggestions in pipelines_suggestions
-            for suggestion in pipeline_suggestions
-            if suggestion.category == 'primary'
-        })
+
+        # checking if there is enough primary names to cover the needed amount
+        enough = False
+        primary_unique_suggestions = set()
+        for pipeline_suggestions in pipelines_suggestions:
+
+            for suggestion in pipeline_suggestions:
+                if suggestion.category == 'primary':
+                    primary_unique_suggestions.add(str(suggestion))
+                    if len(primary_unique_suggestions) >= needed_primary_count:
+                        enough = True
+                        break
+
+            if enough:
+                break
+
+        all_primary_count = len(primary_unique_suggestions)
 
         # defining variables required for the sampling itself and counting emptied pipelines
         pipeline_names = [
