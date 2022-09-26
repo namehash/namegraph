@@ -297,7 +297,7 @@ def test_weighted_sampling_sorter_weights():
             # test for off-by-one error while counting used primary names and left primary names
             ["app.min_primary_fraction=1.5"], [
                 [GeneratedName(('a',),     category='primary'),   GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',),  category='primary'), GeneratedName(('bb', ), category='advertised')],
+                [GeneratedName(('dddd',),  category='primary'),   GeneratedName(('bb', ), category='advertised')],
                 [GeneratedName(('eeeee',), category='registered')]
             ], ['a', 'bb', 'dddd'], 2, 3
         ),
@@ -352,7 +352,7 @@ def test_weighted_sampling_sorter_weights():
 )
 def test_primary_fraction_obligation_length_sorter(overrides: List[str],
                                                    input_names: List[List[GeneratedName]],
-                                                   expected_strings: List[GeneratedName],
+                                                   expected_strings: List[str],
                                                    min_suggestions: int,
                                                    max_suggestions: int):
 
@@ -362,3 +362,158 @@ def test_primary_fraction_obligation_length_sorter(overrides: List[str],
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
         assert sorted_strings == expected_strings
+
+
+@mark.parametrize(
+    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    [
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='primary')]
+            ], ['a', 'bb', 'ccc', 'dddd'], 2, 4
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='primary')]
+            ], ['a', 'bb', 'dddd'], 2, 3
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),   category='primary'),     GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='registered'),  GeneratedName(('dddd', ), category='primary')]
+            ], ['a', 'dddd'], 2, 2
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='advertised'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='primary')]
+            ], ['a', 'bb'], 2, 2
+        ),
+    ],
+)
+def test_primary_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
+                                                              input_names: List[List[GeneratedName]],
+                                                              expected_strings: List[str],
+                                                              min_suggestions: int,
+                                                              max_suggestions: int):
+
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        sorter = WeightedSamplingSorter(config)
+
+        sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
+        assert sorted_strings == expected_strings
+
+
+@mark.parametrize(
+    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    [
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),    category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered')],
+
+                [GeneratedName(('e',), category='advertised'),   GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',), category='primary'),      GeneratedName(('hhhh',), category='primary')]
+            ], ['a', 'hhhh'], 2, 2
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+
+                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='secondary'),
+                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+            ], ['a', 'hhhh'], 2, 2
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='primary'),    GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+
+                [GeneratedName(('iii',), category='primary'),    GeneratedName(('kk',), category='secondary'),
+                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+            ], ['a', 'hhhh', 'ddd', 'iii'], 4, 4
+        ),
+    ]
+)
+def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
+                                                                       input_names: List[List[GeneratedName]],
+                                                                       expected_strings: List[str],
+                                                                       min_suggestions: int,
+                                                                       max_suggestions: int):
+
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        sorter = WeightedSamplingSorter(config)
+
+        sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
+        assert set(sorted_strings) == set(expected_strings)
+
+
+@mark.parametrize(
+    "overrides,input_names,min_suggestions,max_suggestions,min_expected_primary,max_expected_primary",
+    [
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),     category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered')],
+
+                [GeneratedName(('e',), category='advertised'),   GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',), category='primary'),      GeneratedName(('hhhh',), category='primary')]
+            ], 2, 2, 2, 2
+        ),
+        (
+            #
+            ["app.min_primary_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='primary'),    GeneratedName(('bb',), category='secondary'),
+                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
+                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+
+                [GeneratedName(('iii',), category='primary'),    GeneratedName(('kk',), category='secondary'),
+                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+            ], 2, 2, 2, 2
+        ),
+    ]
+)
+def test_primary_fraction_obligation_weighted_sampling_sorter_primary_names_number(
+        overrides: List[str],
+        input_names: List[List[GeneratedName]],
+        min_suggestions: int,
+        max_suggestions: int,
+        min_expected_primary: int,
+        max_expected_primary: int
+):
+
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        sorter = WeightedSamplingSorter(config)
+
+        primary_names_set = {
+            str(name)
+            for sublist in input_names
+            for name in sublist
+            if name.category == 'primary'
+        }
+
+        sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
+        assert len(sorted_strings) <= max_suggestions
+        assert min_expected_primary <= len(primary_names_set & set(sorted_strings)) <= max_expected_primary
