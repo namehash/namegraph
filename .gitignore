@@ -10,3 +10,5 @@ data/*.npy
 .DS_Store
 .coverage
 /data/cache/
+*.pclprof
+profile.py
