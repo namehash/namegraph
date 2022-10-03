@@ -9,7 +9,6 @@ from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
 from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
 from generator.sorting.sorter import Sorter
-from generator.utils import aggregate_duplicates
 
 logger = logging.getLogger('generator')
 

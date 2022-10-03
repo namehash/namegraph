@@ -38,7 +38,8 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "pipelines=full", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+        (["app.query=firepower", "pipelines=full",
+          "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
          ["firepowercoin"]),
     ],
 )
