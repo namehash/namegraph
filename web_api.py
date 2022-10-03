@@ -84,7 +84,8 @@ async def root(name: Name):
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
-                                      max_suggestions=name.max_suggestions)
+                                      max_suggestions=name.max_suggestions,
+                                      min_primary_fraction=name.min_primary_fraction)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
     return JSONResponse(response)
