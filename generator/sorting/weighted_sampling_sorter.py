@@ -43,28 +43,13 @@ class WeightedSamplingSorter(Sorter):
 
         return generators_per_pipeline
 
-    def _get_weights(self, pipeline_names: List[str]) -> List[float]:
-        # TODO is it okay to set 1 as a default weight for unknown pipelines? there is an option to specify it in the config
-        # TODO this simplifies testing a little, if the list is empty it will still get rewritten to 0.0
-        return [self.pipeline_weights.get(name, 1) for name in pipeline_names]
-
-    def _normalize_weights(self, weights: List[float]) -> List[float]:
-        summed = sum(weights)
-        return [el / summed for el in weights]
-
-    def sort(self,
-             pipelines_suggestions: List[List[GeneratedName]],
-             min_suggestions: int = None,
-             max_suggestions: int = None,
-             min_primary_fraction: float = None) -> List[GeneratedName]:
-
-        min_suggestions = min_suggestions or self.default_suggestions_count
-        max_suggestions = max_suggestions or self.default_suggestions_count
-        min_primary_fraction = min_primary_fraction or self.default_min_primary_fraction
+    def _calculate_possible_primary_count(self,
+                                          pipelines_suggestions: List[List[GeneratedName]],
+                                          min_suggestions: int,
+                                          min_primary_fraction: float) -> int:
 
         # defining all the numbers regarding the primary names result fraction requirement
         needed_primary_count = int(math.ceil(min_primary_fraction * min_suggestions))
-        primary_used = 0
 
         # checking if there is enough primary names to cover the needed amount
         enough = False
@@ -83,26 +68,51 @@ class WeightedSamplingSorter(Sorter):
 
         all_primary_count = len(primary_unique_suggestions)
         possible_primary_count = min(needed_primary_count, all_primary_count)
+        return possible_primary_count
 
-        # defining variables required for the sampling itself and counting emptied pipelines
+    def _get_pipeline_weights(self, pipelines_suggestions: List[List[GeneratedName]]) -> List[float]:
         pipeline_names = [
             suggestions[0].pipeline_name if suggestions else None
             for suggestions in pipelines_suggestions
         ]
-        pipeline_weights = self._get_weights(pipeline_names)
+        # TODO is it okay to set 1 as a default weight for unknown pipelines? there is an option to specify it in the config
+        # TODO this simplifies testing a little, if the list is empty it will still get rewritten to 0.0
+        pipeline_weights = [self.pipeline_weights.get(name, 1) for name in pipeline_names]
+        return pipeline_weights
+
+    def _normalize_weights(self, weights: List[float]) -> List[float]:
+        summed = sum(weights)
+        return [el / summed for el in weights]
+
+    def sort(self,
+             pipelines_suggestions: List[List[GeneratedName]],
+             min_suggestions: int = None,
+             max_suggestions: int = None,
+             min_primary_fraction: float = None) -> List[GeneratedName]:
+
+        min_suggestions = min_suggestions or self.default_suggestions_count
+        max_suggestions = max_suggestions or self.default_suggestions_count
+        min_primary_fraction = min_primary_fraction or self.default_min_primary_fraction
+
+        possible_primary_count = self._calculate_possible_primary_count(pipelines_suggestions,
+                                                                        min_suggestions,
+                                                                        min_primary_fraction)
+
+        # defining variables required for the sampling itself and counting emptied pipelines
         empty_pipelines = 0
+        primary_used = 0
+        probabilities = self._get_pipeline_weights(pipelines_suggestions)
 
         # if there are any empty pipelines we take it into account
         for i, suggestions in enumerate(pipelines_suggestions):
             pipelines_suggestions[i] = suggestions[::-1]  # so we can pop from it later
             if not suggestions:
-                pipeline_weights[i] = 0.0
+                probabilities[i] = 0.0
                 empty_pipelines += 1
 
         name2suggestion: Dict[str, GeneratedName] = dict()
 
         # sampling itself
-        probabilities = pipeline_weights
         while empty_pipelines < len(pipelines_suggestions) - 1 and len(name2suggestion) < max_suggestions:
 
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
@@ -125,7 +135,7 @@ class WeightedSamplingSorter(Sorter):
             probabilities = self._normalize_weights(probabilities)
             idx = choice(probabilities)
 
-            # until we get a so far unique (not met yet) suggestion we pop suggestions from the chosen pipeline
+            # until we get a unique (not met yet) suggestion we pop suggestions from the chosen pipeline
             while pipelines_suggestions[idx]:
                 suggestion = pipelines_suggestions[idx].pop()
                 name = str(suggestion)
