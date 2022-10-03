@@ -75,7 +75,8 @@ class Generator:
         name: str,
         sorter: str = 'weighted-sampling',
         min_suggestions: int = None,
-        max_suggestions: int = None
+        max_suggestions: int = None,
+        min_primary_fraction: float = 0.1
     ) -> List[GeneratedName]:
 
         min_suggestions = min_suggestions or self.config.app.suggestions
@@ -96,6 +97,6 @@ class Generator:
             result.add_pipeline_suggestions(random_suggestions)
 
         result.assign_categories()
-        suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions)
+        suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_primary_fraction)
 
         return suggestions[:max_suggestions]

@@ -107,6 +107,34 @@ def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggest
     assert len(unique_names) <= max_suggestions
 
 
+@pytest.mark.parametrize(
+    "name, suggestions, min_primary_fraction, response_code",
+    [
+        ("firepower", 150, 0.0, 200),
+        ("fireworks", 100, 1.0, 200),
+        ("firedrinks", 120, 0.1, 200),
+        ("firepower", 150, -0.1, 422),
+        ("fireworks", 150, 1.1, 422)
+    ]
+)
+def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestions: int,
+                                         min_primary_fraction: float, response_code: int):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": name,
+        "min_suggestions": suggestions,
+        "max_suggestions": suggestions,
+        "min_primary_fraction": min_primary_fraction
+    })
+
+    assert response.status_code == response_code
+
+    if response_code == 200:
+        json = response.json()
+        unique_names = set([suggestion["name"] for suggestion in json])
+        assert len(unique_names) == suggestions
+
+
 # @pytest.mark.slow
 # def test_weighted_sampling_sorter_stress(prod_test_client):
 #     with initialize(version_base=None, config_path="../conf/"):

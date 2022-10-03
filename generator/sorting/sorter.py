@@ -12,6 +12,8 @@ logger = logging.getLogger('generator')
 class Sorter:
     def __init__(self, config: DictConfig):
         self.config = config
+        self.default_suggestions_count = self.config.app.suggestions
+        self.default_min_primary_fraction = self.config.app.min_primary_fraction
 
     def maximize_primary_fraction(self,
                                   suggestions: List[GeneratedName],
@@ -40,20 +42,22 @@ class Sorter:
     def satisfy_primary_fraction_obligation(self,
                                             suggestions: List[GeneratedName],
                                             min_suggestions: int,
-                                            max_suggestions: int) -> List[GeneratedName]:
+                                            max_suggestions: int,
+                                            min_primary_fraction: float) -> List[GeneratedName]:
         """
         Function which tries to satisfy the requirement of minimal primary names fraction in the returned suggestions.
 
         :param suggestions: aggregated list of generated names. Assuming it has only unique names
         :param min_suggestions: request parameter specifying minimal number of generated names
         :param max_suggestions: request parameter specifying maximal number of generated names
+        :param min_primary_fraction: request parameter specifying the minimal factor of primary names in the result
         :return: list of generated names in which the part of primary names either satisfies the requirement
             or maximizes its part
         """
 
         assert len(suggestions) == len({str(s) for s in suggestions})  # asserting there are only unique names
 
-        needed_primary_count = int(math.ceil(self.config.app.min_primary_fraction * min_suggestions))
+        needed_primary_count = int(math.ceil(min_primary_fraction * min_suggestions))
         primary_count = len([str(s) for s in suggestions[:max_suggestions] if s.category == 'primary'])
         rest_primary_count = len([str(s) for s in suggestions[max_suggestions:] if s.category == 'primary'])
 
@@ -74,5 +78,6 @@ class Sorter:
     def sort(self,
              pipelines_suggestions: List[List[GeneratedName]],
              min_suggestions: int = None,
-             max_suggestions: int = None) -> List[GeneratedName]:
+             max_suggestions: int = None,
+             min_primary_fraction: float = None) -> List[GeneratedName]:
         raise NotImplementedError

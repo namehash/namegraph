@@ -13,6 +13,10 @@ class Name(BaseModel):
                                  ge=1, le=generator.config.generation.limit)
     max_suggestions: int = Field(100, title='maximal number of suggestions to generate',
                                  ge=1)
+    min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
+                                        ge=0.0, le=1.0,
+                                        description='ensures at least `min_suggestions * min_primary_fraction` '
+                                                    'primary names will be generated')
 
 
 class Metadata(BaseModel):

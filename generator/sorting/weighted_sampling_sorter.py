@@ -29,7 +29,6 @@ class WeightedSamplingSorter(Sorter):
         super().__init__(config)
         sorter_config = self.config.sorting.weighted_sampling
 
-        self.min_primary_fraction = self.config.app.min_primary_fraction
         self.generator2weight = dict(sorter_config.weights)
 
         self.pipeline_weights: Dict[str, float] = {
@@ -56,13 +55,15 @@ class WeightedSamplingSorter(Sorter):
     def sort(self,
              pipelines_suggestions: List[List[GeneratedName]],
              min_suggestions: int = None,
-             max_suggestions: int = None) -> List[GeneratedName]:
+             max_suggestions: int = None,
+             min_primary_fraction: float = None) -> List[GeneratedName]:
 
-        min_suggestions = min_suggestions or self.config.app.suggestions
-        max_suggestions = max_suggestions or self.config.app.suggestions
+        min_suggestions = min_suggestions or self.default_suggestions_count
+        max_suggestions = max_suggestions or self.default_suggestions_count
+        min_primary_fraction = min_primary_fraction or self.default_min_primary_fraction
 
         # defining all the numbers regarding the primary names result fraction requirement
-        needed_primary_count = int(math.ceil(self.min_primary_fraction * min_suggestions))
+        needed_primary_count = int(math.ceil(min_primary_fraction * min_suggestions))
         primary_used = 0
 
         # checking if there is enough primary names to cover the needed amount
