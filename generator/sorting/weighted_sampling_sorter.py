@@ -139,13 +139,14 @@ class WeightedSamplingSorter(Sorter):
             while pipelines_suggestions[idx]:
                 suggestion = pipelines_suggestions[idx].pop()
                 name = str(suggestion)
-                if name not in name2suggestion:
+                existing_suggestion = name2suggestion.get(name, None)
+                if existing_suggestion is None:
                     name2suggestion[name] = suggestion
                     if suggestion.category == 'primary':
                         primary_used += 1
                     break
 
-                name2suggestion[name].add_strategies(suggestion.applied_strategies)
+                existing_suggestion.add_strategies(suggestion.applied_strategies)
 
             # if the chosen pipeline is emptied, then we update the corresponding variables and set probability to zero
             if not pipelines_suggestions[idx]:
@@ -165,12 +166,13 @@ class WeightedSamplingSorter(Sorter):
             # for each suggestion we add it to the `name2suggestion` or aggregate if it has been met before
             for i, suggestion in enumerate(last_pipeline_suggestions):
                 name = str(suggestion)
-                if name not in name2suggestion:
+                existing_suggestion = name2suggestion.get(name, None)
+                if existing_suggestion is None:
                     name2suggestion[name] = suggestion
                     if suggestion.category == 'primary':
                         primary_used += 1
                 else:
-                    name2suggestion[name].add_strategies(suggestion.applied_strategies)
+                    existing_suggestion.add_strategies(suggestion.applied_strategies)
 
                 # if there is just enough space left for all the left primary suggestions,
                 # then we simply append them at the end
