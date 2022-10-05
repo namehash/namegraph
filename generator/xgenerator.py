@@ -23,12 +23,12 @@ class Result:
 
     def assign_categories(self) -> None:
         for pipeline_suggestions in self.suggestions:
-            advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
-            secondary, remaining_suggestions = self.domains.get_secondary(remaining_suggestions)
+            # advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
+            secondary, remaining_suggestions = self.domains.get_secondary(pipeline_suggestions)
             primary, registered = self.domains.get_primary(remaining_suggestions)
 
-            for category, suggestions in zip(['advertised', 'secondary', 'primary', 'registered'],
-                                             [advertised, secondary, primary, registered]):
+            for category, suggestions in zip(['secondary', 'primary', 'registered'],
+                                             [secondary, primary, registered]):
 
                 for suggestion in suggestions:
                     suggestion.category = category
