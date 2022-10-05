@@ -110,11 +110,6 @@ class Domains(metaclass=Singleton):
                 remaining_suggestions.append(suggestion)
         return remaining_suggestions, matched
 
-    # def get_advertised(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-    #     remaining_suggestions, advertised = self.split(suggestions, self.advertised)
-    #     return [name_price[0] for name_price in
-    #             sorted(advertised.items(), key=lambda name_price: name_price[1], reverse=True)], remaining_suggestions
-
     def get_secondary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
         remaining_suggestions, secondary = self.split(suggestions, self.secondary_market)
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
