@@ -24,7 +24,7 @@ def check_generator_response(json):
         assert all(type(item) == str for item in arr)
 
 
-def generate_example_names(count, input_filename=ROOT_DATA_PATH / 'primary.csv'):
+def generate_example_names(count, input_filename=ROOT_DATA_PATH / 'suggestable_domains.csv'):
     with open(input_filename, 'r') as f:
         num_lines = sum(1 for _ in f)
         f.seek(0)
@@ -36,7 +36,7 @@ def generate_example_names(count, input_filename=ROOT_DATA_PATH / 'primary.csv')
         i = 0
         for line in f:
             # strip \n
-            name = line[:-1]
+            name = line[:-1].split(',')[0]
 
             # skip simple names
             if SPECIAL_CHAR_REGEX.search(name) is None:
