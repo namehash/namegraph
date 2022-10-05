@@ -1,3 +1,4 @@
+import csv
 from typing import List, Tuple, Iterable
 import re
 from itertools import islice
@@ -6,12 +7,12 @@ import os
 
 try:
     from suffixtree import SuffixQueryTree
+
     HAS_SUFFIX_TREE = True
 except Exception:
     HAS_SUFFIX_TREE = False
 
 from .name_generator import NameGenerator
-
 
 CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
 CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
@@ -19,10 +20,18 @@ CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
 
 def _load_lines(path: str) -> List[str]:
     '''
-    Load unique lines from file, removing .eth suffix.
+    Load CSV with domains and return unique taken names, removing .eth suffix.
     '''
-    with open(path, 'r') as f:
-        return list(set([line.strip().removesuffix('.eth') for line in f.readlines()]))
+    with open(path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)
+        names = set()
+        for row in reader:
+            assert len(row) == 3
+            name, interesting_score, status = row
+            if status == 'taken':
+                names.add(name.removesuffix('.eth'))
+        return list(names)
 
 
 def _ascii_only(lines: Iterable[str]) -> List[str]:
@@ -81,11 +90,11 @@ class SubstringMatchGenerator(NameGenerator):
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         pattern = ''.join(tokens)
-        
+
         if len(pattern) <= self.short_heuristic or self.suffix_tree_impl is None:
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
-        
+
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]
