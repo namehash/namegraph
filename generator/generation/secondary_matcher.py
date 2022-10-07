@@ -1,10 +1,11 @@
 import collections
-from typing import List, Tuple
+from typing import List, Tuple, Iterable, Dict
 
 import wordninja
 
 from .name_generator import NameGenerator
 from ..domains import Domains
+from ..utils import sort_by_value
 
 
 class SecondaryMatcher(NameGenerator):
@@ -26,4 +27,4 @@ class SecondaryMatcher(NameGenerator):
         result = []
         for token in tokens:
             result.extend(self.index[token])
-        return result
+        return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.secondary_market, reverse=True)]

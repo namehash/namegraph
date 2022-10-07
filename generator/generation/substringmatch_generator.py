@@ -1,8 +1,7 @@
-import csv
-from typing import List, Tuple, Iterable
-import re
+from typing import List, Tuple, Iterable, Dict
 from itertools import islice
 import hashlib
+import re
 import os
 
 try:
@@ -13,37 +12,24 @@ except Exception:
     HAS_SUFFIX_TREE = False
 
 from .name_generator import NameGenerator
+from ..domains import Domains
+from ..utils import sort_by_value
 
 CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
 CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
-
-
-def _load_lines(path: str) -> List[str]:
-    '''
-    Load CSV with domains and return unique taken names, removing .eth suffix.
-    '''
-    with open(path, newline='') as csvfile:
-        reader = csv.reader(csvfile)
-        next(reader)
-        names = set()
-        for row in reader:
-            assert len(row) == 3
-            name, interesting_score, status = row
-            if status == 'taken':
-                names.add(name.removesuffix('.eth'))
-        return list(names)
 
 
 def _ascii_only(lines: Iterable[str]) -> List[str]:
     '''
     Filter out lines that contain non-ASCII characters.
     '''
-    return [line for line in lines if all(ord(c) < 128 for c in line)]
+    return [line for line in lines if line.isascii()]
 
 
 class ReImpl:
     def __init__(self, config):
-        lines = _load_lines(config.app.domains)
+        self.domains = Domains(config)
+        lines = sort_by_value(self.domains.registered.keys(), self.domains.registered, reverse=True)
         self.data = '\n' + '\n'.join(lines) + '\n'
 
     def find(self, pattern: str) -> Iterable[str]:
@@ -53,7 +39,8 @@ class ReImpl:
 
 class SuffixTreeImpl:
     def __init__(self, config):
-        self.lines = _ascii_only(_load_lines(config.app.domains))
+        self.domains = Domains(config)
+        self.lines = _ascii_only(self.domains.registered.keys())
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
@@ -83,6 +70,7 @@ class SuffixTreeImpl:
 class SubstringMatchGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__()
+        self.domains = Domains(config)
         self.limit = config.generation.limit
         self.short_heuristic = 1
         self.suffix_tree_impl = SuffixTreeImpl(config) if HAS_SUFFIX_TREE else None
@@ -95,6 +83,7 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
+            names = sort_by_value(islice(names, self.limit), self.domains.registered, reverse=True)
 
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]
