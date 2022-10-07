@@ -167,6 +167,24 @@ def test_secondary_matcher():
         assert ('fire',) in [x.tokens for x in generated_names]
 
 
+def test_secondary_matcher_sorting():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SecondaryMatcher(config)
+        tokenized_name = GeneratedName(('fire', 'baba', 'orange'))
+        generated_names = strategy.apply([tokenized_name])
+        generated_tokens = [x.tokens for x in generated_names]
+
+        assert ('orange',) in generated_tokens  # intersting_score = 69.98
+        assert ('alibaba',) in generated_tokens  # intersting_score = 300.0
+        assert ('fire',) in generated_tokens  # intersting_score = 190.5115
+
+        orange_pos = generated_tokens.index(('orange',))
+        alibaba_pos = generated_tokens.index(('alibaba',))
+        fire_pos = generated_tokens.index(('fire',))
+
+        assert alibaba_pos < fire_pos < orange_pos
+
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -193,6 +211,23 @@ def test_substringmatchgenerator_short():
         tokenized_name = GeneratedName(('4',))
         generated_names = strategy.apply([tokenized_name])
         assert ('0000400',) in [x.tokens for x in generated_names]
+
+
+def test_substringmatchgenerator_sorting():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SubstringMatchGenerator(config)
+        tokenized_name = GeneratedName(('0004206',))
+        generated_names = strategy.apply([tokenized_name])
+        generated_tokens = [x.tokens for x in generated_names]
+
+        assert ('00042069',) in generated_tokens  # interesting_score = 988
+        assert ('0000042069',) in generated_tokens  # interesting_score = 227
+
+        longer_pos = generated_tokens.index(('0000042069',))
+        shorter_pos = generated_tokens.index(('00042069',))
+
+        assert shorter_pos < longer_pos
 
 
 @needs_suffix_tree
