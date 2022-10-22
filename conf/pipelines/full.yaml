@@ -104,9 +104,9 @@
     - NamehashNormalizer
     - ReplaceInvalidNormalizer
   tokenizers:
-    - SpecialCharacterAffixGenerator
+    - WordNinjaTokenizer
   generators:
-    - W2VGenerator
+    - SpecialCharacterAffixGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
