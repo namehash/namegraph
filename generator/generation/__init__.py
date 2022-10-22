@@ -9,4 +9,5 @@ from .categories_generator import CategoriesGenerator
 from .random_generator import RandomGenerator
 from .secondary_matcher import SecondaryMatcher
 from .wikipedia2v_generator import Wikipedia2VGenerator
+from .special_character_affix_generator import SpecialCharacterAffixGenerator
 from .substringmatch_generator import SubstringMatchGenerator
