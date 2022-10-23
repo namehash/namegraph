@@ -6,7 +6,8 @@ from .name_generator import NameGenerator
 
 class AbbreviationGenerator(NameGenerator):
     """
-    Add prefix.
+    Returns all the possibilities of different tokens replaced with their abbreviation except the situation,
+    in which no token is replaced.
     """
 
     def __init__(self, config):
