@@ -4,6 +4,7 @@ from pytest import mark
 from hydra import initialize, compose
 
 from generator.generation import (
+    AbbreviationGenerator,
     PermuteGenerator,
     PrefixGenerator,
     SuffixGenerator,
@@ -102,6 +103,20 @@ def test_wordnetsynonyms():
         generated_names = strategy.apply([tokenized_name])
         assert ('my', 'domain', '123') in [x.tokens for x in generated_names]
         assert ('my', 'area', '123') in [x.tokens for x in generated_names]
+
+
+def test_abbreviation_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = AbbreviationGenerator(config)
+        tokenized_name = GeneratedName(('my', 'domain', '123'))
+        generated_names = strategy.apply([tokenized_name])
+
+        assert ('m', 'd', '1') in [x.tokens for x in generated_names]
+        assert ('my', 'd', '123') in [x.tokens for x in generated_names]
+        assert ('my', 'domain', '1') in [x.tokens for x in generated_names]
+
+        assert ('my', 'domain', '123') not in [x.tokens for x in generated_names]
 
 
 @pytest.mark.slow

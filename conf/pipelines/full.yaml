@@ -97,6 +97,20 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: abbreviation
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - AbbreviationGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: random
   normalizers:
     - StripEthNormalizer
