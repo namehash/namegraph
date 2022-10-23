@@ -21,5 +21,5 @@ class HyphenGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         return [
             self._apply_hyphens(tokens, flags)
-            for flags in islice(product((False, True), repeat=len(tokens)-1), 1, self.limit)
+            for flags in islice(product((True, False), repeat=len(tokens)-1), min(2 ** (len(tokens) - 1) - 1, self.limit))
         ]

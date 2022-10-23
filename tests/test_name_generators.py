@@ -122,7 +122,7 @@ def test_hyphen_generator():
         strategy = HyphenGenerator(config)
         tokenized_name = GeneratedName(('my', 'pikachu', '123'))
         generated_names = strategy.apply([tokenized_name])
-        assert ('my', '-', 'pikachu', '-', '123') in [x.tokens for x in generated_names]
+        assert ('my', '-', 'pikachu', '-', '123') == generated_names[0].tokens
         assert ('my', 'pikachu', '-', '123') in [x.tokens for x in generated_names]
         assert ('my', '-', 'pikachu', '123') in [x.tokens for x in generated_names]
         assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
