@@ -1,5 +1,6 @@
 from .name_generator import NameGenerator
 
+from .abbreviation_generator import AbbreviationGenerator
 from .permute_generator import PermuteGenerator
 from .prefix_generator import PrefixGenerator
 from .suffix_generator import SuffixGenerator
