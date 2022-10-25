@@ -5,6 +5,7 @@ from hydra import initialize, compose
 
 from generator.generation import (
     HyphenGenerator,
+    AbbreviationGenerator,
     PermuteGenerator,
     PrefixGenerator,
     SuffixGenerator,
@@ -12,6 +13,7 @@ from generator.generation import (
     W2VGenerator,
     CategoriesGenerator,
     Wikipedia2VGenerator,
+    SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
 )
 from generator.generated_name import GeneratedName
@@ -103,6 +105,23 @@ def test_wordnetsynonyms():
         generated_names = strategy.apply([tokenized_name])
         assert ('my', 'domain', '123') in [x.tokens for x in generated_names]
         assert ('my', 'area', '123') in [x.tokens for x in generated_names]
+
+
+def test_abbreviation_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = AbbreviationGenerator(config)
+        tokenized_name = GeneratedName(('my', 'domain', '123', 'aa22'))
+        generated_names = strategy.apply([tokenized_name])
+        print([x.tokens for x in generated_names])
+
+        assert ('my', 'd', '123', 'aa22') in [x.tokens for x in generated_names]
+        assert ('m', 'd', '123', 'aa22') in [x.tokens for x in generated_names]
+        assert ('m', 'domain', '123', 'aa22') in [x.tokens for x in generated_names]
+
+        assert ('m', 'd', '1', 'aa22') not in [x.tokens for x in generated_names]
+        assert ('my', 'domain', '1', 'aa22') not in [x.tokens for x in generated_names]
+        assert ('my', 'domain', '123', 'aa22') not in [x.tokens for x in generated_names]
 
 
 @pytest.mark.slow
@@ -207,6 +226,16 @@ def test_wikipedia2vsimilarity():
         generated_names = strategy.apply([tokenized_name])
         print(generated_names)
         assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]
+
+
+def test_special_character_affix_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SpecialCharacterAffixGenerator(config)
+        tokenized_name = GeneratedName(('billy', 'corgan'))
+        generated_names = strategy.apply([tokenized_name])
+        assert ('$', 'billy', 'corgan',) in [x.tokens for x in generated_names]
+        assert ('_', 'billy', 'corgan',) in [x.tokens for x in generated_names]
 
 
 def test_substringmatchgenerator():

@@ -1,6 +1,7 @@
 from .name_generator import NameGenerator
 
 from .hyphen_generator import HyphenGenerator
+from .abbreviation_generator import AbbreviationGenerator
 from .permute_generator import PermuteGenerator
 from .prefix_generator import PrefixGenerator
 from .suffix_generator import SuffixGenerator
@@ -10,4 +11,5 @@ from .categories_generator import CategoriesGenerator
 from .random_generator import RandomGenerator
 from .secondary_matcher import SecondaryMatcher
 from .wikipedia2v_generator import Wikipedia2VGenerator
+from .special_character_affix_generator import SpecialCharacterAffixGenerator
 from .substringmatch_generator import SubstringMatchGenerator
