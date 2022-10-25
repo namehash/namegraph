@@ -97,6 +97,20 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: hyphens
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - HyphenGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: special-char-affix
   normalizers:
     - StripEthNormalizer

@@ -4,6 +4,7 @@ from pytest import mark
 from hydra import initialize, compose
 
 from generator.generation import (
+    HyphenGenerator,
     AbbreviationGenerator,
     PermuteGenerator,
     PrefixGenerator,
@@ -132,6 +133,19 @@ def test_w2vsimilarity():
         generated_names = strategy.apply([tokenized_name])
         assert ('your', 'pikachu', '123') in [x.tokens for x in generated_names]
         assert ('my', 'mickey', '123') in [x.tokens for x in generated_names]
+
+
+def test_hyphen_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = HyphenGenerator(config)
+        tokenized_name = GeneratedName(('my', 'pikachu', '123'))
+        generated_names = strategy.apply([tokenized_name])
+        assert ('my', '-', 'pikachu', '-', '123') == generated_names[0].tokens
+        assert ('my', 'pikachu', '-', '123') in [x.tokens for x in generated_names]
+        assert ('my', '-', 'pikachu', '123') in [x.tokens for x in generated_names]
+        assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
+
 
 
 def test_categories():

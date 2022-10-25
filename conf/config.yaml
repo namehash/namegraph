@@ -48,6 +48,7 @@ generation:
 sorting:
   weighted_sampling:
     weights:
+      HyphenGenerator: 1
       AbbreviationGenerator: 1
       PermuteGenerator: 1
       PrefixGenerator: 1
