@@ -32,7 +32,9 @@ def test_valid_name_filter():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         filter = ValidNameFilter(config)
-        filtered = [n for n in ('dog', 'dog.cat', 'do', 'dog-cat', '-dog', 'dog-', 'dog--cat') if filter.filter_name(n)]
+        filtered = [n for n in ('dog', 'dog.cat', 'do', 'dog-cat', '-dog', 'dog-', 'dog--cat',
+                                '$dogcat', '_dogcat', 'dog$cat', 'dogcat_') if filter.filter_name(n)]
+
         assert 'dog.cat' not in filtered
         assert 'do' not in filtered
         assert 'dog' in filtered
@@ -40,3 +42,5 @@ def test_valid_name_filter():
         assert '-dog' not in filtered
         assert 'dog-' not in filtered
         assert 'dog--cat' in filtered
+        assert '$dogcat' in filtered
+        assert '_dogcat' in filtered

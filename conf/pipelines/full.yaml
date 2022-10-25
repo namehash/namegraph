@@ -97,6 +97,20 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: special-char-affix
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SpecialCharacterAffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: abbreviation
   normalizers:
     - StripEthNormalizer

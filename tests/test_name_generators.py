@@ -12,6 +12,7 @@ from generator.generation import (
     W2VGenerator,
     CategoriesGenerator,
     Wikipedia2VGenerator,
+    SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
 )
 from generator.generated_name import GeneratedName
@@ -211,6 +212,16 @@ def test_wikipedia2vsimilarity():
         generated_names = strategy.apply([tokenized_name])
         print(generated_names)
         assert ('the', 'smashing', 'pumpkins',) in [x.tokens for x in generated_names]
+
+
+def test_special_character_affix_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = SpecialCharacterAffixGenerator(config)
+        tokenized_name = GeneratedName(('billy', 'corgan'))
+        generated_names = strategy.apply([tokenized_name])
+        assert ('$', 'billy', 'corgan',) in [x.tokens for x in generated_names]
+        assert ('_', 'billy', 'corgan',) in [x.tokens for x in generated_names]
 
 
 def test_substringmatchgenerator():

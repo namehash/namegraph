@@ -58,6 +58,7 @@ sorting:
       RandomGenerator: 1
       SecondaryMatcher: 1
       Wikipedia2VGenerator: 15
+      SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
 random_pipeline:
   name: random
