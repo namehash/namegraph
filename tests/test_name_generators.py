@@ -124,6 +124,44 @@ def test_abbreviation_generator():
         assert ('my', 'domain', '123', 'aa22') not in [x.tokens for x in generated_names]
 
 
+def test_abbreviation_generator_order():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = AbbreviationGenerator(config)
+        tokenized_name = GeneratedName(('aa', 'bb', 'cc'))
+        generated_names = strategy.apply([tokenized_name])
+        tokens = [x.tokens for x in generated_names]
+
+        one_abbr_indices = [
+            tokens.index(abbr)
+            for abbr in [('a', 'bb', 'cc'),
+                         ('aa', 'b', 'cc'),
+                         ('aa', 'bb', 'c')]
+        ]
+        two_abbr_indices = [
+            tokens.index(abbr)
+            for abbr in [('a', 'b', 'cc'),
+                         ('aa', 'b', 'c'),
+                         ('a', 'bb', 'c')]
+        ]
+        three_abbr_indices = [
+            tokens.index(abbr)
+            for abbr in [('a', 'b', 'c')]
+        ]
+
+        assert all(
+            one_idx < two_idx
+            for one_idx in one_abbr_indices
+            for two_idx in two_abbr_indices
+        )
+
+        assert all(
+            two_idx < three_idx
+            for two_idx in two_abbr_indices
+            for three_idx in three_abbr_indices
+        )
+
+
 @pytest.mark.slow
 def test_w2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
