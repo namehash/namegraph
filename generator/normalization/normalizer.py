@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Any
 
 from generator.generated_name import GeneratedName
 
@@ -8,7 +8,11 @@ class Normalizer:
     def __init__(self):
         pass
 
-    def apply(self, tokenized_names: List[GeneratedName]) -> List[GeneratedName]:
+    def apply(
+            self,
+            tokenized_names: List[GeneratedName],
+            params: Optional[dict[str, Any]] = None
+    ) -> List[GeneratedName]:
         return [
             GeneratedName(
                 tuple(self.normalize(token) for token in name.tokens),
@@ -18,5 +22,6 @@ class Normalizer:
             for name in tokenized_names
         ]
 
+    # todo add params argument here and for all normalizers when needed
     def normalize(self, name: str) -> str:
         raise NotImplementedError

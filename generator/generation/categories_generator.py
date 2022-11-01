@@ -3,7 +3,7 @@ import glob
 import itertools, collections
 import logging
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
 
@@ -72,7 +72,7 @@ class CategoriesGenerator(NameGenerator):
                 self.inverted_categories[token].append(category)
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
         tokens_synsets = [list(lemmas.items()) for lemmas in tokens_synsets]
 

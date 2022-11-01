@@ -2,6 +2,7 @@ from .name_generator import NameGenerator
 
 from .hyphen_generator import HyphenGenerator
 from .abbreviation_generator import AbbreviationGenerator
+from .flag_affix_generator import FlagAffixGenerator
 from .permute_generator import PermuteGenerator
 from .prefix_generator import PrefixGenerator
 from .suffix_generator import SuffixGenerator

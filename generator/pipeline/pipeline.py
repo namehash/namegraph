@@ -1,6 +1,6 @@
+from typing import List, Dict, Any
 import logging
 import re
-from typing import List, Dict
 
 from omegaconf import DictConfig
 
@@ -34,32 +34,34 @@ class Pipeline:
         self.filters: List[Filter] = []
         self._build()
 
-    def apply(self, word: str) -> List[GeneratedName]:
+    def apply(self, word: str, params: dict[str, dict[str, Any]] = None) -> List[GeneratedName]:
+        params = params or dict()
+
         input_word = word
         words: List[GeneratedName] = [GeneratedName((word,), pipeline_name=self.definition.name)]
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
-            words = normalizer.apply(words)
+            words = normalizer.apply(words, params=params.get('normalizer', dict()))
 
         # the tokenizers are applied in parallel
         suggestions: List[GeneratedName] = []
         for tokenizer in self.tokenizers:
-            suggestions.extend(tokenizer.apply(words))
+            suggestions.extend(tokenizer.apply(words, params=params.get('tokenizer', dict())))
 
         suggestions = aggregate_duplicates(suggestions, by_tokens=True)
         logger.debug(f'Tokenization: {suggestions}')
 
         # the generators are applied sequentially
         for generator in self.generators:
-            suggestions = generator.apply(suggestions)
+            suggestions = generator.apply(suggestions, params=params.get('generator', dict()))
 
         logger.info(f'Generated suggestions: {len(suggestions)}')
 
         # the filters are applied sequentially
         for filter_ in self.filters:
             logger.debug(f'{filter} filtering')
-            suggestions = filter_.apply(suggestions)
+            suggestions = filter_.apply(suggestions, params=params.get('filter', dict()))
             logger.debug(f'{filter} done')
 
         # remove input name from suggestions

@@ -1,6 +1,6 @@
 import logging
 from itertools import zip_longest, chain
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 
 from omegaconf import DictConfig
 
@@ -75,8 +75,9 @@ class Generator:
         sorter: str = 'weighted-sampling',
         min_suggestions: int = None,
         max_suggestions: int = None,
-        min_primary_fraction: float = 0.1
-    ) -> List[GeneratedName]:
+        min_primary_fraction: float = 0.1,
+        params: dict[str, dict[str, Any]] = None
+    ) -> list[GeneratedName]:
 
         min_suggestions = min_suggestions or self.config.app.suggestions
         max_suggestions = max_suggestions or self.config.app.suggestions
@@ -85,7 +86,7 @@ class Generator:
         result = Result(self.config)
 
         for pipeline in self.pipelines:
-            pipeline_suggestions = pipeline.apply(name)
+            pipeline_suggestions = pipeline.apply(name, params)
             logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
             result.add_pipeline_suggestions(pipeline_suggestions)
 

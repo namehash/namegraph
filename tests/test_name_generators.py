@@ -6,6 +6,7 @@ from hydra import initialize, compose
 from generator.generation import (
     HyphenGenerator,
     AbbreviationGenerator,
+    FlagAffixGenerator,
     PermuteGenerator,
     PrefixGenerator,
     SuffixGenerator,
@@ -146,6 +147,21 @@ def test_hyphen_generator():
         assert ('my', '-', 'pikachu', '123') in [x.tokens for x in generated_names]
         assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
 
+
+def test_hyphen_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = FlagAffixGenerator(config)
+
+        tokenized_name = GeneratedName(('adam', 'mickiewicz'))
+        generated_names = strategy.apply([tokenized_name], params={'country': 'pl'})
+        assert len(generated_names) == 1
+        assert ('adam', 'mickiewicz', '🇵🇱') == generated_names[0].tokens
+
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={'country': 'ua'})
+        assert len(generated_names) == 1
+        assert ('taras', 'shevchenko', '🇺🇦') == generated_names[0].tokens
 
 
 def test_categories():

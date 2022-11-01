@@ -50,6 +50,7 @@ sorting:
     weights:
       HyphenGenerator: 1
       AbbreviationGenerator: 1
+      FlagAffixGenerator: 1
       PermuteGenerator: 1
       PrefixGenerator: 1
       SuffixGenerator: 1

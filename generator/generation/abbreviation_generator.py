@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from itertools import product, islice
 import re
 
@@ -24,7 +24,7 @@ class AbbreviationGenerator(NameGenerator):
             for token, word_token in zip(tokens, is_word)
         ])
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         word_tokens = tuple([True if self.word_regex.fullmatch(token) else False for token in tokens])
         return [
             self._apply_abbreviations(tokens, flags, word_tokens)
