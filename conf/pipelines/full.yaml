@@ -139,6 +139,20 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: flag-affix
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - FlagAffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: random
   normalizers:
     - StripEthNormalizer

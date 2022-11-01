@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Any
 
 from generator.generated_name import GeneratedName
 
@@ -13,7 +13,11 @@ class NameGenerator:
     def __init__(self):
         pass
 
-    def apply(self, tokenized_names: List[GeneratedName]) -> List[GeneratedName]:
+    def apply(
+            self,
+            tokenized_names: List[GeneratedName],
+            params: Optional[dict[str, Any]] = None
+    ) -> List[GeneratedName]:
         return [
             GeneratedName(
                 generated,
@@ -21,8 +25,8 @@ class NameGenerator:
                 applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
             )
             for name in tokenized_names
-            for generated in self.generate(name.tokens)
+            for generated in self.generate(name.tokens, params or dict())
         ]
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         raise NotImplementedError

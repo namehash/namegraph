@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Any
 import gensim.downloader
 import itertools
 
@@ -26,7 +26,7 @@ class W2VGenerator(NameGenerator):
             raise FileNotFoundError('No embeddings in binary format. Run generator/download.py.')
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         topn = int(10000 ** (1 / max(len(tokens), 1)) + 1)
 
         tokens_synsets = []

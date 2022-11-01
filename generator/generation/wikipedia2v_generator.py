@@ -1,7 +1,7 @@
 import logging
 import re
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Any
 import gensim.downloader
 
 from .name_generator import NameGenerator
@@ -23,7 +23,7 @@ class Wikipedia2VGenerator(NameGenerator):
             print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
             raise FileNotFoundError('No embeddings in binary format. Run generator/download_from_s3.py.')
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         name = '_'.join(tokens)
         query = f'ENTITY/{name}'
 

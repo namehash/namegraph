@@ -1,7 +1,7 @@
 import logging
 
 from nltk.corpus import wordnet as wn
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 import itertools
 import collections
 
@@ -21,7 +21,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         wn.synsets('dog')  # init wordnet
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         result = []
         synsets = [list(self._get_lemmas_for_word(t).items()) for t in tokens]
 

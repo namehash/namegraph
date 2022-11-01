@@ -1,0 +1,14 @@
+-
+  name: flag-affix
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - FlagAffixGenerator
+  filters:
+    - SubnameFilter
+  # todo valid name filter fix

@@ -1,5 +1,5 @@
 import logging, random, hashlib
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import numpy as np
 from fastapi import FastAPI
@@ -17,6 +17,7 @@ logger = logging.getLogger('generator')
 class Settings(BaseSettings):
     # config_name: str = "test_config"
     config_name: str = "prod_config"
+    pipelines: Optional[str] = None
 
 
 settings = Settings()
@@ -25,7 +26,8 @@ app = FastAPI()
 
 def init():
     with initialize(version_base=None, config_path="conf/"):
-        config = compose(config_name=settings.config_name)
+        overrides = [f"pipelines={settings.pipelines}"] if settings.pipelines is not None else []
+        config = compose(config_name=settings.config_name, overrides=overrides)
         logger.setLevel(config.app.logging_level)
         for handler in logger.handlers:
             handler.setLevel(config.app.logging_level)
@@ -81,11 +83,13 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 async def root(name: Name):
     seed_all(name.name)
     logger.debug(f'Request received: {name.name}')
+    params = name.params.dict() if name.params is not None else dict()
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,
-                                      min_primary_fraction=name.min_primary_fraction)
+                                      min_primary_fraction=name.min_primary_fraction,
+                                      params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
     return JSONResponse(response)

@@ -1,5 +1,5 @@
 import collections
-from typing import List, Tuple, Iterable, Dict
+from typing import List, Tuple, Iterable, Dict, Any
 
 import wordninja
 
@@ -23,7 +23,7 @@ class SecondaryMatcher(NameGenerator):
             for token in tokenized:
                 self.index[token].add((name,))
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         result = []
         for token in tokens:
             result.extend(self.index[token])

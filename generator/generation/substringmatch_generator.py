@@ -1,4 +1,4 @@
-from typing import List, Tuple, Iterable, Dict
+from typing import List, Tuple, Iterable, Dict, Any
 from itertools import islice
 import hashlib
 import re
@@ -76,7 +76,7 @@ class SubstringMatchGenerator(NameGenerator):
         self.suffix_tree_impl = SuffixTreeImpl(config) if HAS_SUFFIX_TREE else None
         self.re_impl = ReImpl(config)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         pattern = ''.join(tokens)
 
         if len(pattern) <= self.short_heuristic or self.suffix_tree_impl is None:
