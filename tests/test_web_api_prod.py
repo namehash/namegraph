@@ -168,3 +168,19 @@ def test_prod_leet(prod_test_client):
     str_names = [name["name"] for name in json]
 
     assert "h4ck3r.eth" in str_names
+
+
+@pytest.mark.slow
+def test_prod_flag(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={"name": "fire", "metadata": False, "min_suggestions": 1000, "params": {
+        "generator": {
+            "country": 'pl'
+        }
+    }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    str_names = [name["name"] for name in json]
+    assert "fire🇵🇱.eth" in str_names
