@@ -60,7 +60,7 @@ def test_prod_long(prod_test_client):
 @pytest.mark.slow
 def test_generator_stress(prod_test_client):
     client = prod_test_client
-    max_duration = 2
+    max_duration = 3
     for name in generate_example_names(400):
         start = get_time()
         response = client.post('/', json={'name': name, "metadata": False})
@@ -183,4 +183,5 @@ def test_prod_flag(prod_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
+    print(str_names)
     assert "fire🇵🇱.eth" in str_names

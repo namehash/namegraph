@@ -123,7 +123,7 @@
     - SpecialCharacterAffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+#    - ValidNameFilter
 -
   name: abbreviation
   normalizers:
@@ -151,7 +151,7 @@
     - FlagAffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+#    - ValidNameFilter
 -
   name: leet
   normalizers:
