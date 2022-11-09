@@ -173,15 +173,22 @@ def test_prod_leet(prod_test_client):
 @pytest.mark.slow
 def test_prod_flag(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "fire", "metadata": False, "min_suggestions": 1000, "params": {
-        "generator": {
-            "country": 'pl'
-        }
-    }})
+    response = client.post("/",
+                           json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                                 "max_suggestions": 1000, "params": {
+                                   "generator": {
+                                       "country": 'pl'
+                                   }
+                               }})
 
     assert response.status_code == 200
 
     json = response.json()
     str_names = [name["name"] for name in json]
-    print(str_names)
-    assert "fire🇵🇱.eth" in str_names
+
+    assert "firecar🇵🇱.eth" in str_names
+    assert "_firecar.eth" in str_names
+    assert "$firecar.eth" in str_names
+    assert "fcar.eth" in str_names
+    assert "firec.eth" in str_names
+    assert "fire-car.eth" in str_names
