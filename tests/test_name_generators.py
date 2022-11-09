@@ -186,6 +186,7 @@ def test_hyphen_generator():
         assert ('my', '-', 'pikachu', '123') in [x.tokens for x in generated_names]
         assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
 
+
 @pytest.mark.execution_timeout(1)
 def test_hyphen_generator_long():
     with initialize(version_base=None, config_path="../conf/"):
@@ -194,12 +195,13 @@ def test_hyphen_generator_long():
         tokenized_name = GeneratedName(tuple(['a']*10000))
         generated_names = strategy.apply([tokenized_name])
 
+
 @pytest.mark.execution_timeout(1)
 def test_abbreviation_generator_long():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = AbbreviationGenerator(config)
-        tokenized_name = GeneratedName(tuple(['a']*10000))
+        tokenized_name = GeneratedName(tuple(['aa']*5000))
         generated_names = strategy.apply([tokenized_name])
         
 
