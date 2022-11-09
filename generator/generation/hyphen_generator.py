@@ -19,7 +19,10 @@ class HyphenGenerator(NameGenerator):
         return tuple([token for token in chain.from_iterable(zip(tokens, hyphens)) if token])
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+        if len(tokens) <= 1:
+            return []
         return [
             self._apply_hyphens(tokens, flags)
-            for flags in islice(product((True, False), repeat=len(tokens)-1), min(2 ** (len(tokens) - 1) - 1, self.limit))
+            for flags in
+            islice(product((True, False), repeat=len(tokens) - 1), min(2 ** (len(tokens) - 1) - 1, self.limit))
         ]
