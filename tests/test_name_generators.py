@@ -148,7 +148,7 @@ def test_hyphen_generator():
         assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
 
 
-def test_hyphen_generator():
+def test_flag_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = FlagAffixGenerator(config)
