@@ -1,7 +1,13 @@
 from typing import List, Tuple
+from functools import lru_cache
 import wordninja
 
 from .tokenizer import Tokenizer
+
+
+@lru_cache(64)
+def _tokenizer(name: str) -> List[Tuple[str, ...]]:
+    return [tuple(wordninja.split(name))]
 
 
 class WordNinjaTokenizer(Tokenizer):
@@ -11,4 +17,4 @@ class WordNinjaTokenizer(Tokenizer):
         super().__init__()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
-        return [tuple(wordninja.split(name))]
+        return _tokenizer(name)
