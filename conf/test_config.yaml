@@ -43,6 +43,11 @@ generation:
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
   limit: 10000
+  generator_limits:
+    HyphenGenerator: 256
+    AbbreviationGenerator: 256
+    Wikipedia2VGenerator: 10
+    RandomGenerator: 20000
   wikipedia2vec_url:
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
 sorting:

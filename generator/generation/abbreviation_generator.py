@@ -12,9 +12,7 @@ class AbbreviationGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
-        self.config = config
-        self.limit = self.config.generation.limit
+        super().__init__(config)
         self.word_regex = re.compile(r'[a-zA-Z]{2,}')
 
     def _apply_abbreviations(self, tokens: Tuple[str, ...], flags: Tuple[bool], is_word: Tuple[bool]) -> Tuple[str, ...]:

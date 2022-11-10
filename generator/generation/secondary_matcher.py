@@ -14,7 +14,7 @@ class SecondaryMatcher(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         self.domains = Domains(config)
         # index names
         self.index = collections.defaultdict(set)
