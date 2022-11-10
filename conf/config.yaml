@@ -44,8 +44,8 @@ generation:
   prefixes_path: data/prefixes.txt
   limit: 10000
   generator_limits:
-    HyphenGenerator: 256
-    AbbreviationGenerator: 256
+    HyphenGenerator: 128
+    AbbreviationGenerator: 128
     Wikipedia2VGenerator: 10
     RandomGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
