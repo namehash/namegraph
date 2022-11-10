@@ -16,6 +16,7 @@ from generator.generation import (
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
+    LeetGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -350,3 +351,12 @@ def test_substringmatchgenerator_suffixtree_ignores_unicode():
         tokenized_name = GeneratedName(('٢٣',))
         generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 0
+
+
+def test_leet_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = LeetGenerator(config)
+        tokenized_name = GeneratedName(('You', 'are', 'a', 'leet', 'hacker'))
+        generated_names = strategy.apply([tokenized_name])
+        assert ('u', 'r', '4', '1337', 'h4¢k3r',) in [x.tokens for x in generated_names]
