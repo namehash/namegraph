@@ -12,7 +12,7 @@ class FlagAffixGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         # todo
         self.country2emoji = {
             "AW": "🇦🇼",

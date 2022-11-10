@@ -62,7 +62,7 @@ class CategoriesGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         self.categories: Dict[str, List[str]] = load_categories_from_csv(config)
         # remove_duplicated_categories(self.categories)
 

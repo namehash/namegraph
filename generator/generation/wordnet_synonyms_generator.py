@@ -17,9 +17,9 @@ class WordnetSynonymsGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         wn.synsets('dog')  # init wordnet
-        self.combination_limiter = CombinationLimiter(config.generation.limit)
+        self.combination_limiter = CombinationLimiter(self.limit)
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         result = []

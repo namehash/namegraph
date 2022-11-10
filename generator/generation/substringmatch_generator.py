@@ -69,9 +69,8 @@ class SuffixTreeImpl:
 
 class SubstringMatchGenerator(NameGenerator):
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         self.domains = Domains(config)
-        self.limit = config.generation.limit
         self.short_heuristic = 1
         self.suffix_tree_impl = SuffixTreeImpl(config) if HAS_SUFFIX_TREE else None
         self.re_impl = ReImpl(config)
