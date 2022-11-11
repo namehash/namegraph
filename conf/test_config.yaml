@@ -42,6 +42,7 @@ generation:
   word2vec_path: data/embeddings.pkl
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
+  name2emoji_path: data/name2emoji.json
   limit: 10000
   wikipedia2vec_url:
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
@@ -50,6 +51,7 @@ sorting:
     weights:
       HyphenGenerator: 1
       AbbreviationGenerator: 1
+      EmojiGenerator: 1
       FlagAffixGenerator: 1
       PermuteGenerator: 1
       PrefixGenerator: 1
