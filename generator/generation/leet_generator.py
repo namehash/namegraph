@@ -71,6 +71,9 @@ class LeetGenerator(NameGenerator):
         alphabets: list[tuple[float, dict[str, str], dict[str, str]]] = []
         for letter_map in get_replacement_combinations(letter_subs):
             for sequence_map in get_replacement_combinations(sequence_subs):
+                if all(src == tgt for src, (_, tgt) in letter_map.items()) and all(src == tgt for src, (_, tgt) in sequence_map.items()):
+                    # skip the no-replacement alphabet
+                    continue
                 # alphabet probability is the product of the probabilities of the substitutions
                 logprob = sum(p for p, _ in letter_map.values()) + sum(p for p, _ in sequence_map.values())
                 alphabets.append((logprob, {k: v[1] for k, v in letter_map.items()}, {k: v[1] for k, v in sequence_map.items()}))

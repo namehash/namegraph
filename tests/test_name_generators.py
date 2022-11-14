@@ -360,3 +360,4 @@ def test_leet_generator():
         tokenized_name = GeneratedName(('you', 'are', 'a', 'leet', 'hacker'))
         generated_names = strategy.apply([tokenized_name])
         assert ('u', 'r', '4', '1337', 'h4ck3r',) in [x.tokens for x in generated_names]
+        assert ('you', 'are', 'a', 'leet', 'hacker',) not in [x.tokens for x in generated_names]
