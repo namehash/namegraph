@@ -9,12 +9,21 @@ from .name_generator import NameGenerator
 LEETSPEAK_PATH = 'data/leetspeak.json'
 
 
+def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> list[dict[str, tuple[float, str]]]:
+    '''
+    Given multiple replacement options for each character, return a list of all possible combinations of 1:1 replacements.
+    '''
+    rs = list(replacements.items())
+    combinations = itertools.product(*[[(src, r) for r in tgts] for (src, tgts) in rs])
+    return [{src: r for (src, r) in combination} for combination in combinations]
+
+
 class LeetGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__()
 
         with open(LEETSPEAK_PATH) as f:
-            self._leetspeak: dict[str, dict[str, list[list[str]]]] = json.load(f)
+            leetspeak = json.load(f)
 
         # probability of a full token substitution being used
         self._sequence_logp = math.log2(0.8)
@@ -26,25 +35,26 @@ class LeetGenerator(NameGenerator):
 
         # collect all letter and sequence substitutions with probabilities
         self._letter_replaceables = set()
-        self._letter_subs: list[tuple[float, str, str]] = []
-        for letter, subs in self._leetspeak['letters'].items():
-            logp = 0
+        self._letter_subs: dict[str, list[tuple[float, str]]] = {}
+        for letter, subs in leetspeak['letters'].items():
+            logp = self._letter_logp
             for sub_group in subs:
                 for sub in sub_group:
                     # putting this in the inner loop handles empty substitution groups (used to lower the probability)
                     self._letter_replaceables.add(letter)
-                    self._letter_subs.append((logp, letter, sub))
+                    # add a fake 'no replacement' replacement
+                    self._letter_subs[letter] = self._letter_subs.get(letter, [(self._no_letter_logp, letter)]) + [(logp, sub)]
                 # each group is half as likely as the previous
                 logp -= 1
-        
+
         self._sequence_replaceables = set()
-        self._sequence_subs: list[tuple[float, str, str]] = []
-        for sequence, subs in self._leetspeak['sequences'].items():
-            logp = 0
+        self._sequence_subs: dict[str, list[tuple[float, str]]] = {}
+        for sequence, subs in leetspeak['sequences'].items():
+            logp = self._sequence_logp
             for sub_group in subs:
                 for sub in sub_group:
                     self._sequence_replaceables.add(sequence)
-                    self._sequence_subs.append((logp, sequence, sub))
+                    self._sequence_subs[sequence] = self._sequence_subs.get(sequence, [(self._no_sequence_logp, sequence)]) + [(logp, sub)]
                 logp -= 1
 
     def _get_alphabets(self, sequence_replaceables: set[str], letter_replaceables: set[str]) -> list[tuple[float, dict[str, str], dict[str, str]]]:
@@ -52,42 +62,18 @@ class LeetGenerator(NameGenerator):
         Returns a list of all substitution alphabets (logp, letter_map, sequence_map)
         that can be made with the given replaceables.
         The list is sorted by probability.
-        '''        
+        '''
         # collect all available substitutions
-        letter_subs: list[tuple[float, str, str]] = []
-        for logp, letter, sub in self._letter_subs:
-            if letter in letter_replaceables:
-                letter_subs.append((logp, letter, sub))
-
-        sequence_subs: list[tuple[float, str, str]] = []
-        for logp, sequence, sub in self._sequence_subs:
-            if sequence in sequence_replaceables:
-                sequence_subs.append((logp, sequence, sub))
+        letter_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._letter_subs.items() if k in letter_replaceables}
+        sequence_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._sequence_subs.items() if k in sequence_replaceables}
 
         # for all subsets of substitutions, make an alphabet
         alphabets: list[tuple[float, dict[str, str], dict[str, str]]] = []
-        # TODO allow for empty subsets
-        for letter_subset_len in range(1, len(letter_subs) + 1):
-            # TODO combinations create duplicates because they pick different substitutions for the same letter
-            for letter_subset in itertools.combinations(letter_subs, letter_subset_len):
-                letter_map = {letter: sub for _, letter, sub in letter_subset}
-                
-                for sequence_subset_len in range(1, len(sequence_subs) + 1):
-                    for sequence_subset in itertools.combinations(sequence_subs, sequence_subset_len):
-                        sequence_map = {sequence: sub for _, sequence, sub in sequence_subset}
-        
-                        # alphabet probability is the product of the probabilities of the substitutions
-                        logprob = 0
-                        for logp, _, _ in letter_subset:
-                            logprob += logp + self._letter_logp
-                        for logp, _, _ in sequence_subset:
-                            logprob += logp + self._sequence_logp
-
-                        # include the probability of not using other substitutions
-                        logprob += (len(letter_subs) - letter_subset_len) * self._no_letter_logp
-                        logprob += (len(sequence_subs) - sequence_subset_len) * self._no_sequence_logp
-
-                        alphabets.append((logprob, letter_map, sequence_map))
+        for letter_map in get_replacement_combinations(letter_subs):
+            for sequence_map in get_replacement_combinations(sequence_subs):
+                # alphabet probability is the product of the probabilities of the substitutions
+                logprob = sum(p for p, _ in letter_map.values()) + sum(p for p, _ in sequence_map.values())
+                alphabets.append((logprob, {k: v[1] for k, v in letter_map.items()}, {k: v[1] for k, v in sequence_map.items()}))
         
         alphabets.sort(key=lambda alphabet: alphabet[0], reverse=True)
         return alphabets
