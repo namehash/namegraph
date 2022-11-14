@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterable
 import json
 import itertools
 import math
@@ -9,13 +9,12 @@ from .name_generator import NameGenerator
 LEETSPEAK_PATH = 'data/leetspeak.json'
 
 
-def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> list[dict[str, tuple[float, str]]]:
+def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> Iterable[dict[str, tuple[float, str]]]:
     '''
     Given multiple replacement options for each character, return a list of all possible combinations of 1:1 replacements.
     '''
-    rs = list(replacements.items())
-    combinations = itertools.product(*[[(src, r) for r in tgts] for (src, tgts) in rs])
-    return [{src: r for (src, r) in combination} for combination in combinations]
+    combinations = itertools.product(*[[(src, r) for r in tgts] for (src, tgts) in replacements.items()])
+    return ({src: r for (src, r) in combination} for combination in combinations)
 
 
 class LeetGenerator(NameGenerator):
