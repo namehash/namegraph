@@ -357,6 +357,6 @@ def test_leet_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = LeetGenerator(config)
-        tokenized_name = GeneratedName(('You', 'are', 'a', 'leet', 'hacker'))
+        tokenized_name = GeneratedName(('you', 'are', 'a', 'leet', 'hacker'))
         generated_names = strategy.apply([tokenized_name])
-        assert ('u', 'r', '4', '1337', 'h4¢k3r',) in [x.tokens for x in generated_names]
+        assert ('u', 'r', '4', '1337', 'h4ck3r',) in [x.tokens for x in generated_names]
