@@ -153,6 +153,20 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: leet
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - LeetGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: random
   normalizers:
     - StripEthNormalizer

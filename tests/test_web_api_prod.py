@@ -153,3 +153,18 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 #             })
 #
 #             assert response.status_code == 200
+
+
+@pytest.mark.slow
+def test_prod_leet(prod_test_client):
+    client = prod_test_client
+    response = client.post("/",
+                        json={"name": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                                "max_suggestions": 1000})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    str_names = [name["name"] for name in json]
+
+    assert "h4ck3r.eth" in str_names

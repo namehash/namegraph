@@ -62,6 +62,7 @@ sorting:
       Wikipedia2VGenerator: 1
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
+      LeetGenerator: 1
 random_pipeline:
   name: random
   normalizers:
