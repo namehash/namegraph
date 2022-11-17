@@ -192,3 +192,5 @@ def test_prod_flag(prod_test_client):
     assert "fcar.eth" in str_names
     assert "firec.eth" in str_names
     assert "fire-car.eth" in str_names
+    assert "🅵🅸🆁🅴🅲🅰🆁.eth" in str_names
+    assert "fir3c4r.eth" in str_names
