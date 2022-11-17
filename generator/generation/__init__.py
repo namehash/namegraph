@@ -15,3 +15,4 @@ from .wikipedia2v_generator import Wikipedia2VGenerator
 from .special_character_affix_generator import SpecialCharacterAffixGenerator
 from .substringmatch_generator import SubstringMatchGenerator
 from .leet_generator import LeetGenerator
+from .keycap_generator import KeycapGenerator

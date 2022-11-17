@@ -16,7 +16,7 @@ from generator.generation import (
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
-    LeetGenerator,
+    LeetGenerator, KeycapGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -27,6 +27,7 @@ from generator.generation.secondary_matcher import SecondaryMatcher
 from generator.domains import Domains
 
 from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
+
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
 
@@ -306,6 +307,7 @@ def test_secondary_matcher_sorting():
 
         assert alibaba_pos < fire_pos < orange_pos
 
+
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -394,3 +396,17 @@ def test_leet_generator():
         generated_names = strategy.apply([tokenized_name])
         assert ('u', 'r', '4', '1337', 'h4ck3r',) in [x.tokens for x in generated_names]
         assert ('you', 'are', 'a', 'leet', 'hacker',) not in [x.tokens for x in generated_names]
+
+
+def test_keycap_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = KeycapGenerator(config)
+
+        tokenized_name = GeneratedName(('fire', 'car'))
+        generated_names = strategy.apply([tokenized_name])
+        assert [('🅵🅸🆁🅴🅲🅰🆁',)] == [x.tokens for x in generated_names]
+
+        tokenized_name = GeneratedName(('fire', '-', 'car'))
+        generated_names = strategy.apply([tokenized_name])
+        assert not generated_names

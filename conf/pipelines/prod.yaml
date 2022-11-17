@@ -202,3 +202,16 @@
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  name: keycap
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - KeycapGenerator
+  filters:
+    - SubnameFilter

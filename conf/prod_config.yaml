@@ -68,6 +68,7 @@ sorting:
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
       LeetGenerator: 1
+      KeycapGenerator: 1
 random_pipeline:
   name: random
   normalizers:
