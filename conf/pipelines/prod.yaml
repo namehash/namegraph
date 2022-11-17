@@ -159,7 +159,7 @@
     - SpecialCharacterAffixGenerator
   filters:
     - SubnameFilter
-#    - ValidNameFilter
+    - ValidNameLengthFilter
 -
   name: abbreviation
   normalizers:
@@ -187,7 +187,7 @@
     - FlagAffixGenerator
   filters:
     - SubnameFilter
-#    - ValidNameFilter
+    - ValidNameLengthFilter
 -
   name: leet
   normalizers:
@@ -215,3 +215,4 @@
     - KeycapGenerator
   filters:
     - SubnameFilter
+    - ValidNameLengthFilter

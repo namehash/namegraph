@@ -13,6 +13,7 @@ from generator.sorting import *
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.filtering.domain_filter import DomainFilter
+from generator.filtering.valid_name_length_filter import ValidNameLengthFilter
 
 from generator.normalization.normalizer import Normalizer
 from generator.tokenization.tokenizer import Tokenizer
