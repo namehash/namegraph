@@ -220,6 +220,21 @@ def test_flag_generator():
         assert len(generated_names) == 1
         assert ('taras', 'shevchenko', '🇺🇦') == generated_names[0].tokens
 
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={'country': '123'})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={'country': None})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params=None)
+        assert len(generated_names) == 0
 
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):

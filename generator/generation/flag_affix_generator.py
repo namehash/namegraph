@@ -8,7 +8,8 @@ logger = logging.getLogger('generator')
 
 class FlagAffixGenerator(NameGenerator):
     """
-    Adds suffix in the form of country emoji depending on the request's parameter
+    Adds suffix in the form of country emoji depending on the request's parameter. 
+    If country is null or not in the flags mapping then 0 suggestions are returned.
     """
 
     def __init__(self, config):
@@ -268,7 +269,7 @@ class FlagAffixGenerator(NameGenerator):
         }
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
-        if 'country' not in params:
+        if 'country' not in params or params['country'] is None:
             return []
         elif params['country'].upper() not in self.country2emoji:
             logger.warning(f"No flag for country: {params['country']}")
