@@ -19,7 +19,7 @@ def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]
 
 class LeetGenerator(NameGenerator):
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
 
         with open(LEETSPEAK_PATH) as f:
             leetspeak = json.load(f)
