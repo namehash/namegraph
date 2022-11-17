@@ -159,8 +159,8 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 def test_prod_leet(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                        json={"name": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
-                                "max_suggestions": 1000})
+                           json={"name": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                                 "max_suggestions": 1000})
 
     assert response.status_code == 200
 
@@ -194,3 +194,22 @@ def test_prod_flag(prod_test_client):
     assert "fire-car.eth" in str_names
     assert "🅵🅸🆁🅴🅲🅰🆁.eth" in str_names
     assert "fir3c4r.eth" in str_names
+
+
+@pytest.mark.slow
+def test_prod_short_suggestions(prod_test_client):
+    client = prod_test_client
+    response = client.post("/",
+                           json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                                 "max_suggestions": 1000, "params": {
+                                   "generator": {
+                                       "country": 'pl'
+                                   }
+                               }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    str_names = [name["name"] for name in json]
+
+    assert all([len(name) >= 3 for name in str_names])
