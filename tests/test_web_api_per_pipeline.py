@@ -8,14 +8,21 @@ from fastapi.testclient import TestClient
 from generator.domains import Domains
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='class')
 def flag_affix_pipeline():
     os.environ['PIPELINES'] = 'test_flag_affix'
     yield
     del os.environ['PIPELINES']
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='class')
+def emoji_pipeline():
+    os.environ['PIPELINES'] = 'test_emoji'
+    yield
+    del os.environ['PIPELINES']
+
+
+@pytest.fixture(scope="class")
 def test_client():
     Domains.remove_self()
     os.environ['CONFIG_NAME'] = 'test_config'
@@ -31,27 +38,49 @@ def test_client():
     return client
 
 
-@mark.parametrize(
-    "name, country, expected_suffix",
-    [
-        ("metropolis", "ua", "🇺🇦"),
-        ("atlantis", "pl", "🇵🇱")
-    ]
-)
-def test_country_generator_parameter(flag_affix_pipeline, test_client, name: str, country: str, expected_suffix: str):
-    client = test_client
-    response = client.post("/", json={
-        "name": name,
-        "params": {
-            "generator": {
-                "country": country
+@mark.usefixtures("flag_affix_pipeline")
+class TestFlagAffix:
+    @mark.parametrize(
+        "name, country, expected_suffix",
+        [
+            ("metropolis", "ua", "🇺🇦"),
+            ("atlantis", "pl", "🇵🇱")
+        ]
+    )
+    def test_country_generator_parameter(self, test_client, name: str, country: str, expected_suffix: str):
+        client = test_client
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+                "generator": {
+                    "country": country
+                }
             }
-        }
-    })
+        })
 
-    assert response.status_code == 200
+        assert response.status_code == 200
 
-    json = response.json()
-    names: list[str] = [suggestion["name"] for suggestion in json]
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
 
-    assert any(name.endswith(expected_suffix + '.eth') for name in names)
+        assert any(name.endswith(expected_suffix + '.eth') for name in names)
+
+
+@mark.usefixtures("emoji_pipeline")
+class TestEmoji:
+    @mark.parametrize(
+        "name, expected_names",
+        [
+            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth"]),
+            ("prayforukraine", ["prayfor🇺🇦.eth", "🙏forukraine.eth", "🙏for🇺🇦.eth"]),
+            ("krakowdragon", ["krakow🐉.eth"])
+        ]
+    )
+    def test_emoji_generator_api(self, test_client, name: str, expected_names: list[str]):
+        response = test_client.post("/", json={"name": name})
+        assert response.status_code == 200
+
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+
+        assert set(expected_names).intersection(names) == set(expected_names)
