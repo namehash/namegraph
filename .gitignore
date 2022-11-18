@@ -11,4 +11,7 @@ data/*.npy
 .coverage
 /data/cache/
 *.pclprof
-profile.py
+profiler.py
+*.bin
+*.ipynb
+.ipynb_checkpoints
