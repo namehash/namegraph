@@ -1,0 +1,14 @@
+-
+  name: emoji
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - EmojiGenerator
+  filters:
+    - SubnameFilter
+#    - ValidNameFilter

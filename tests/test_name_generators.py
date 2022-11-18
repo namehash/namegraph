@@ -6,6 +6,7 @@ from hydra import initialize, compose
 from generator.generation import (
     HyphenGenerator,
     AbbreviationGenerator,
+    EmojiGenerator,
     FlagAffixGenerator,
     PermuteGenerator,
     PrefixGenerator,
@@ -236,6 +237,35 @@ def test_flag_generator():
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params=None)
         assert len(generated_names) == 0
+
+def test_emoji_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = EmojiGenerator(config)
+        tokenized_name = GeneratedName(('adore', 'your', 'eyes'))
+        generated_names = strategy.apply([tokenized_name])
+
+        all_tokenized = [gn.tokens for gn in generated_names]
+
+        print(all_tokenized)
+
+        assert ('🥰', 'your', '🤩') in all_tokenized
+        assert ('🥰', 'your', '👀') in all_tokenized
+        assert ('🥰', 'your', '🥽') in all_tokenized
+        assert ('🥰', 'your', 'eyes') in all_tokenized
+        assert ('adore', 'your', '👀') in all_tokenized
+
+        assert ('adore', 'your', 'eyes') not in all_tokenized
+
+
+@pytest.mark.execution_timeout(1)
+def test_emoji_generator_long():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = EmojiGenerator(config)
+        tokenized_name = GeneratedName(('face',) * 1000)
+        generated_names = strategy.apply([tokenized_name])
+
 
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):
