@@ -9,7 +9,7 @@ class SuffixGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         self.suffixes = [line.strip() for line in open(config.generation.suffixes_path)]
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:

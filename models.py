@@ -13,8 +13,8 @@ class TokenizerParams(BaseModel):
 
 
 class GeneratorParams(BaseModel):
-    # todo desription of the parameter after defining...
-    country: str  # todo some validation for country code? no sense to add until defined by the client
+    country: Optional[str] = Field(None, title='user county code',
+                                   description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
 
 
 class FilterParams(BaseModel):
@@ -22,10 +22,10 @@ class FilterParams(BaseModel):
 
 
 class PipelineParams(BaseModel):
-    normalizer: NormalizerParams = Field(dict())
-    tokenizer: TokenizerParams = Field(dict())
-    generator: GeneratorParams = Field(dict())
-    filter: FilterParams = Field(dict())
+    normalizer: Optional[NormalizerParams] = Field(dict())
+    tokenizer: Optional[TokenizerParams] = Field(dict())
+    generator: Optional[GeneratorParams] = Field(dict())
+    filter: Optional[FilterParams] = Field(dict())
 
 
 class Name(BaseModel):

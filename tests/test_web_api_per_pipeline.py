@@ -65,6 +65,89 @@ class TestFlagAffix:
 
         assert any(name.endswith(expected_suffix + '.eth') for name in names)
 
+    def test_country_generator_parameter_no_country(self, test_client):
+        client = test_client
+        name = 'test'
+        country = '123'
+
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+                "generator": {
+                    "country": country
+                }
+            }
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+                "generator": {
+                    "country": '123'
+                }
+            }
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+                "generator": {
+                    "country": None
+                }
+            }
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+                "generator": {
+                }
+            }
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+            "params": {
+            }
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+            "params": None
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
+        response = client.post("/", json={
+            "name": name,
+        })
+        assert response.status_code == 200
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        assert names
+
 
 @mark.usefixtures("emoji_pipeline")
 class TestEmoji:

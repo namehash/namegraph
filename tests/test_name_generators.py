@@ -17,6 +17,7 @@ from generator.generation import (
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
+    LeetGenerator, KeycapGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -27,6 +28,7 @@ from generator.generation.secondary_matcher import SecondaryMatcher
 from generator.domains import Domains
 
 from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
+
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
 
@@ -187,6 +189,24 @@ def test_hyphen_generator():
         assert ('my', 'pikachu', '123') not in [x.tokens for x in generated_names]
 
 
+@pytest.mark.execution_timeout(1)
+def test_hyphen_generator_long():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = HyphenGenerator(config)
+        tokenized_name = GeneratedName(tuple(['a']*10000))
+        generated_names = strategy.apply([tokenized_name])
+
+
+@pytest.mark.execution_timeout(1)
+def test_abbreviation_generator_long():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = AbbreviationGenerator(config)
+        tokenized_name = GeneratedName(tuple(['aa']*5000))
+        generated_names = strategy.apply([tokenized_name])
+        
+
 def test_flag_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -202,6 +222,21 @@ def test_flag_generator():
         assert len(generated_names) == 1
         assert ('taras', 'shevchenko', '🇺🇦') == generated_names[0].tokens
 
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={'country': '123'})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={'country': None})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params={})
+        assert len(generated_names) == 0
+        
+        tokenized_name = GeneratedName(('taras', 'shevchenko'))
+        generated_names = strategy.apply([tokenized_name], params=None)
+        assert len(generated_names) == 0
 
 def test_emoji_generator():
     with initialize(version_base=None, config_path="../conf/"):
@@ -302,6 +337,7 @@ def test_secondary_matcher_sorting():
 
         assert alibaba_pos < fire_pos < orange_pos
 
+
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -380,3 +416,27 @@ def test_substringmatchgenerator_suffixtree_ignores_unicode():
         tokenized_name = GeneratedName(('٢٣',))
         generated_names = strategy.apply([tokenized_name])
         assert len(generated_names) == 0
+
+
+def test_leet_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = LeetGenerator(config)
+        tokenized_name = GeneratedName(('you', 'are', 'a', 'leet', 'hacker'))
+        generated_names = strategy.apply([tokenized_name])
+        assert ('u', 'r', '4', '1337', 'h4ck3r',) in [x.tokens for x in generated_names]
+        assert ('you', 'are', 'a', 'leet', 'hacker',) not in [x.tokens for x in generated_names]
+
+
+def test_keycap_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = KeycapGenerator(config)
+
+        tokenized_name = GeneratedName(('fire', 'car'))
+        generated_names = strategy.apply([tokenized_name])
+        assert [('🅵🅸🆁🅴🅲🅰🆁',)] == [x.tokens for x in generated_names]
+
+        tokenized_name = GeneratedName(('fire', '-', 'car'))
+        generated_names = strategy.apply([tokenized_name])
+        assert not generated_names

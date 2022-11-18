@@ -123,7 +123,7 @@
     - SpecialCharacterAffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
 -
   name: abbreviation
   normalizers:
@@ -151,7 +151,35 @@
     - FlagAffixGenerator
   filters:
     - SubnameFilter
+    - ValidNameLengthFilter
+-
+  name: leet
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - LeetGenerator
+  filters:
+    - SubnameFilter
     - ValidNameFilter
+-
+  name: keycap
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - KeycapGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
 -
   name: emoji
   normalizers:
@@ -165,7 +193,7 @@
     - EmojiGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
 -
   name: random
   normalizers:

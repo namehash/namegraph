@@ -133,6 +133,48 @@
     - SubnameFilter
     - ValidNameFilter
 -
+  name: hyphens
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - HyphenGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: special-char-affix
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - SpecialCharacterAffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+-
+  name: abbreviation
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - AbbreviationGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: flag-affix
   normalizers:
     - StripEthNormalizer
@@ -145,6 +187,35 @@
     - FlagAffixGenerator
   filters:
     - SubnameFilter
+    - ValidNameLengthFilter
+-
+  name: leet
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - LeetGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: keycap
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - WordNinjaTokenizer
+  generators:
+    - KeycapGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
 #    - ValidNameFilter
 -
   name: emoji
@@ -159,4 +230,4 @@
     - EmojiGenerator
   filters:
     - SubnameFilter
-#    - ValidNameFilter
+    - ValidNameLengthFilter

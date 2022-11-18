@@ -44,6 +44,12 @@ generation:
   prefixes_path: tests/data/prefixes.txt
   name2emoji_path: data/name2emoji.json
   limit: 10000
+  generator_limits:
+    HyphenGenerator: 128
+    AbbreviationGenerator: 128
+    EmojiGenerator: 150
+    Wikipedia2VGenerator: 10
+    RandomGenerator: 20000
   wikipedia2vec_url:
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
 sorting:
@@ -64,6 +70,8 @@ sorting:
       Wikipedia2VGenerator: 1
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
+      LeetGenerator: 1
+      KeycapGenerator: 1
 random_pipeline:
   name: random
   normalizers:

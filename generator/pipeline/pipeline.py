@@ -13,6 +13,7 @@ from generator.sorting import *
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.filtering.domain_filter import DomainFilter
+from generator.filtering.valid_name_length_filter import ValidNameLengthFilter
 
 from generator.normalization.normalizer import Normalizer
 from generator.tokenization.tokenizer import Tokenizer
@@ -52,11 +53,14 @@ class Pipeline:
         suggestions = aggregate_duplicates(suggestions, by_tokens=True)
         logger.debug(f'Tokenization: {suggestions}')
 
+        logger.info(
+            f'Start generation')
         # the generators are applied sequentially
         for generator in self.generators:
             suggestions = generator.apply(suggestions, params=params.get('generator', dict()))
 
-        logger.info(f'Generated suggestions: {len(suggestions)}')
+        logger.info(
+            f'Generated suggestions: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
 
         # the filters are applied sequentially
         for filter_ in self.filters:
@@ -67,6 +71,9 @@ class Pipeline:
         # remove input name from suggestions
         input_word = re.sub(r'\.\w+$', '', input_word)
         suggestions = [s for s in suggestions if str(s) != input_word]
+
+        logger.info(
+            f'After filters: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
 
         return aggregate_duplicates(suggestions)
 

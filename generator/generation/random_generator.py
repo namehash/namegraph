@@ -13,9 +13,7 @@ class RandomGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
-        self.config = config
-        self.limit = self.config.generation.limit * 2
+        super().__init__(config)
         self.domains = Domains(config)
 
         if len(self.domains.internet) < self.limit:

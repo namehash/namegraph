@@ -1,5 +1,7 @@
 from typing import List, Tuple, Optional, Any
 
+from omegaconf import DictConfig
+
 from generator.generated_name import GeneratedName
 
 
@@ -10,8 +12,9 @@ class NameGenerator:
     responsible for registering the applied generators.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, config: DictConfig):
+        self.config = config
+        self.limit = config.generation.generator_limits.get(self.__class__.__name__, config.generation.limit)
 
     def apply(
             self,

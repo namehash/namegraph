@@ -16,9 +16,7 @@ class EmojiGenerator(NameGenerator):
     """
 
     def __init__(self, config: DictConfig):
-        super().__init__()
-        self.config = config
-        self.limit = config.generation.limit
+        super().__init__(config)
 
         with open(config.generation.name2emoji_path, 'r', encoding='utf-8') as f:
             self.name2emoji = json.load(f)

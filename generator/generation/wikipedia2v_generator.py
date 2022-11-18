@@ -15,8 +15,7 @@ class Wikipedia2VGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
-        self.config = config
+        super().__init__(config)
         try:
             self.model = gensim.models.keyedvectors.KeyedVectors.load(config.generation.wikipedia2vec_path)
         except FileNotFoundError as e:
@@ -28,7 +27,7 @@ class Wikipedia2VGenerator(NameGenerator):
         query = f'ENTITY/{name}'
 
         try:
-            similar = self.model.most_similar(query, topn=self.config.app.suggestions)
+            similar = self.model.most_similar(query, topn=self.limit)
         except KeyError:
             return []
 

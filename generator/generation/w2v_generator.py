@@ -17,14 +17,14 @@ class W2VGenerator(NameGenerator):
     """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
         # self.model = gensim.downloader.load(config.generation.word2vec_model)
         try:
             self.model = gensim.models.keyedvectors.KeyedVectors.load(config.generation.word2vec_path)
         except FileNotFoundError as e:
             print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
             raise FileNotFoundError('No embeddings in binary format. Run generator/download.py.')
-        self.combination_limiter = CombinationLimiter(config.generation.limit)
+        self.combination_limiter = CombinationLimiter(self.limit)
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         topn = int(10000 ** (1 / max(len(tokens), 1)) + 1)
