@@ -170,3 +170,17 @@ def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggest
 
     assert min_suggestions <= len(unique_names)
     assert len(unique_names) <= max_suggestions
+
+
+def test_min_primary_fraction(test_test_client):
+    client = test_test_client
+    response = client.post("/",
+                           json={"name": 'fire', "sorter": "length", "min_primary_fraction": 1.0, "min_suggestions": 10,
+                                 "max_suggestions": 10})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert len(json) > 0
+    names = [suggestion["name"] for suggestion in json]
+    assert 'iref.eth' not in names
