@@ -275,4 +275,5 @@ class FlagAffixGenerator(NameGenerator):
             logger.warning(f"No flag for country: {params['country']}")
             return []
 
-        return [tokens + (self.country2emoji[params['country'].upper()],)]
+        flag = self.country2emoji[params['country'].upper()]
+        return [tokens + (flag,), (flag,) + tokens]

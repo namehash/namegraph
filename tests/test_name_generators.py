@@ -214,12 +214,13 @@ def test_flag_generator():
 
         tokenized_name = GeneratedName(('adam', 'mickiewicz'))
         generated_names = strategy.apply([tokenized_name], params={'country': 'pl'})
-        assert len(generated_names) == 1
+        assert len(generated_names) == 2
         assert ('adam', 'mickiewicz', '🇵🇱') == generated_names[0].tokens
+        assert ('🇵🇱', 'adam', 'mickiewicz') == generated_names[1].tokens
 
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params={'country': 'ua'})
-        assert len(generated_names) == 1
+        assert len(generated_names) == 2
         assert ('taras', 'shevchenko', '🇺🇦') == generated_names[0].tokens
 
         tokenized_name = GeneratedName(('taras', 'shevchenko'))

@@ -187,6 +187,7 @@ def test_prod_flag(prod_test_client):
     str_names = [name["name"] for name in json]
 
     assert "firecar🇵🇱.eth" in str_names
+    assert "🇵🇱firecar.eth" in str_names
     assert "_firecar.eth" in str_names
     assert "$firecar.eth" in str_names
     assert "fcar.eth" in str_names
