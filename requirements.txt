@@ -11,7 +11,7 @@ regex==2022.9.13
 unicodeblock==0.3.1
 emoji==1.7.0
 pyahocorasick==1.4.4
-csuffixtree==0.3.6
+csuffixtree@https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl
 numpy==1.23.2
 pytest-benchmark
 pytest-timeouts
