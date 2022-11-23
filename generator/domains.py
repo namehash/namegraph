@@ -115,6 +115,6 @@ class Domains(metaclass=Singleton):
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
 
     def get_primary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        primary = [s for s in suggestions if s not in self.registered]
-        remaining = [s for s in suggestions if s in self.registered]
+        primary = [s for s in suggestions if str(s) not in self.registered]
+        remaining = [s for s in suggestions if str(s) in self.registered]
         return primary, remaining

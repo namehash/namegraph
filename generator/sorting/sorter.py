@@ -26,15 +26,15 @@ class Sorter:
 
         primary_used = 0
         for i, s in enumerate(suggestions):
-            if s.category == 'primary':
-                primary_used += 1
-
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
-            if max_suggestions - i == all_primary_count - primary_used:
+            if max_suggestions - i <= all_primary_count - primary_used:
                 rest_primary = [s for s in suggestions[i:] if s.category == 'primary']
-                assert len(rest_primary) == all_primary_count - primary_used
+                assert len(rest_primary) >= all_primary_count - primary_used
 
                 return suggestions[:i] + rest_primary
+
+            if s.category == 'primary':
+                primary_used += 1
 
         logger.warning('weird parameters used, should not get here')
         return suggestions[:max_suggestions]
