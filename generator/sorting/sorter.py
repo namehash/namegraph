@@ -24,6 +24,8 @@ class Sorter:
         if all_primary_count is None:
             all_primary_count = len([str(s) for s in suggestions if s.category == 'primary'])
 
+        needed_primary_count=min(needed_primary_count, all_primary_count)
+        
         primary_used = 0
         for i, s in enumerate(suggestions):
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
@@ -54,6 +56,7 @@ class Sorter:
         :return: list of generated names in which the part of primary names either satisfies the requirement
             or maximizes its part
         """
+        min_primary_fraction=min(min_primary_fraction, 1.0)
 
         assert len(suggestions) == len({str(s) for s in suggestions})  # asserting there are only unique names
 
