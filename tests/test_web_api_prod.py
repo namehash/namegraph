@@ -166,7 +166,7 @@ def test_prod_leet(prod_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
-
+    print(str_names)
     assert "h4ck3r.eth" in str_names
 
 
