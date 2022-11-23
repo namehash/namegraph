@@ -17,7 +17,7 @@ class Sorter:
 
     def maximize_primary_fraction(self,
                                   suggestions: List[GeneratedName],
-                                  min_suggestions: int,
+                                  needed_primary_count: int,
                                   max_suggestions: int,
                                   all_primary_count: int = None) -> List[GeneratedName]:
 
@@ -27,9 +27,9 @@ class Sorter:
         primary_used = 0
         for i, s in enumerate(suggestions):
             # if there is just enough space left for all the left primary suggestions we simply append them at the end
-            if max_suggestions - i <= all_primary_count - primary_used:
+            if max_suggestions - i <= needed_primary_count - primary_used:
                 rest_primary = [s for s in suggestions[i:] if s.category == 'primary']
-                assert len(rest_primary) >= all_primary_count - primary_used
+                assert len(rest_primary) >= needed_primary_count - primary_used
 
                 return suggestions[:i] + rest_primary
 
@@ -71,7 +71,7 @@ class Sorter:
         # if primary_count + rest_primary_count is enough, then it will reach the required threshold
         # otherwise it will use as many primary suggestions as we have
         return self.maximize_primary_fraction(suggestions,
-                                              min_suggestions=min_suggestions,
+                                              needed_primary_count=needed_primary_count,
                                               max_suggestions=max_suggestions,
                                               all_primary_count=primary_count + rest_primary_count)
 
