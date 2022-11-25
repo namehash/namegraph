@@ -434,10 +434,10 @@ def test_keycap_generator():
         config = compose(config_name="test_config")
         strategy = KeycapGenerator(config)
 
-        tokenized_name = GeneratedName(('fire', 'car'))
+        tokenized_name = GeneratedName(('fire', 'cell'))
         generated_names = strategy.apply([tokenized_name])
-        assert [('🅵🅸🆁🅴🅲🅰🆁',)] == [x.tokens for x in generated_names]
+        assert [('🅵🅸🆁🅴🅲🅴🅻🅻',)] == [x.tokens for x in generated_names]
 
-        tokenized_name = GeneratedName(('fire', '-', 'car'))
+        tokenized_name = GeneratedName(('fire', '-', 'cell'))
         generated_names = strategy.apply([tokenized_name])
         assert not generated_names
