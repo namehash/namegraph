@@ -122,6 +122,10 @@ def sort_name2emojis(model: KeyedVectors, name2emojis: dict[str, list[str]], emo
     def best_similarity(base: str, words: list[str]) -> float:
         similarities = []
         for word in words:
+            # if the base is among the words from emojilib we consider it as superior factor
+            if base == word:
+                return 100.0
+
             if word in model:
                 similarity = model.similarity(base, word)
                 similarities.append(similarity)
@@ -159,4 +163,4 @@ if __name__ == '__main__':
     name2sorted_emojis = sort_name2emojis(model, enhanced_name2emojis, emoji2names_normalized)
 
     with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'w', encoding='utf-8') as f:
-        json.dump(enhanced_name2emojis, f, indent=2, ensure_ascii=False)
+        json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False)
