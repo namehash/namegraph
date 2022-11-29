@@ -52,8 +52,9 @@ def is_valid_token(token: str) -> bool:
     if not token or token in STOPWORDS and token not in SKIPPED_STOPWORDS:
         return False
 
-    if '_' in token or ' ' in token:
-        return False
+    for forbidden_symbol in ['_', ' ', '.']:
+        if forbidden_symbol in token:
+            return False
 
     try:
         if myunicode.ens_normalize(token) != token:
@@ -112,7 +113,7 @@ def enhance_names(model: KeyedVectors, name2emojis: dict[str, list[str]], thresh
 
         for synonym in names:
             if is_valid_token(synonym):
-                print(f'GENERATING {synonym} AS A SYNONYM TO {name}')
+                # print(f'GENERATING {synonym} AS A SYNONYM TO {name}')
                 enhanced_name2emojis[synonym].update([(emoji, None) for emoji in emojis])
 
     return {name: list(emojis.keys()) for name, emojis in enhanced_name2emojis.items()}
@@ -158,7 +159,7 @@ if __name__ == '__main__':
 
     emoji2names_normalized = normalize_names(emoji2names)
     name2emojis = invert_emoji2names_mapping(emoji2names_normalized)
-    enhanced_name2emojis = enhance_names(model, name2emojis, topn=20)
+    enhanced_name2emojis = enhance_names(model, name2emojis, topn=75)
 
     name2sorted_emojis = sort_name2emojis(model, enhanced_name2emojis, emoji2names_normalized)
 
