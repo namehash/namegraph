@@ -119,7 +119,7 @@ def enhance_names(model: KeyedVectors, name2emojis: dict[str, list[str]], thresh
     return {name: list(emojis.keys()) for name, emojis in enhanced_name2emojis.items()}
 
 
-def sort_name2emojis(model: KeyedVectors, name2emojis: dict[str, list[str]], emoji2names: dict[str, list[str]]) -> dict[str, list[str]]:
+def sort_name2emojis_by_similarity(model: KeyedVectors, name2emojis: dict[str, list[str]], emoji2names: dict[str, list[str]], frequences: dict[str, int]) -> dict[str, list[str]]:
     def best_similarity(base: str, words: list[str]) -> float:
         similarities = []
         for word in words:
@@ -140,16 +140,29 @@ def sort_name2emojis(model: KeyedVectors, name2emojis: dict[str, list[str]], emo
             continue
 
         # otherwise we do as planned
-        emojis = [(emoji, best_similarity(name, emoji2names[emoji])) for emoji in emojis]
+        emojis = [(emoji, best_similarity(name, emoji2names[emoji]) + 10.0e-9 * frequences.get(emoji, 0.0)) for emoji in emojis]
         sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
         name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
 
     return name2sorted_emojis
 
 
+# def sort_name2emojis_by_frequency(name2emojis: dict[str, list[str]], frequences: dict[str, int]) -> dict[str, list[str]]:
+#     name2sorted_emojis = dict()
+#     missing_emojis = set()
+#     for name, emojis in name2emojis.items():
+#         for emoji in emojis:
+#             if emoji not in frequences:
+#                 missing_emojis.add(emoji)
+#         name2sorted_emojis[name] = sorted(emojis, key=lambda x: frequences.get(x, 0), reverse=True)
+#
+#     print(missing_emojis)
+#     return name2sorted_emojis
+
+
 if __name__ == '__main__':
     model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
-    # model = KeyedVectors.load(str(Path(__file__).parent.parent / 'data' / 'embeddings.pkl'))
+    # model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
     model.init_sims(replace=True)
 
     # processing
@@ -161,7 +174,14 @@ if __name__ == '__main__':
     name2emojis = invert_emoji2names_mapping(emoji2names_normalized)
     enhanced_name2emojis = enhance_names(model, name2emojis, topn=75)
 
-    name2sorted_emojis = sort_name2emojis(model, enhanced_name2emojis, emoji2names_normalized)
+    # with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'r', encoding='utf-8') as f:
+    #     enhanced_name2emojis = json.load(f)
 
-    with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'w', encoding='utf-8') as f:
+    with open(PROJECT_ROOT_DIR / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
+        frequences = {myunicode.ens_normalize(emoji_data['form']): emoji_data['count'] for emoji_data in json.load(f)['tally']}
+
+    name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequences)
+    # name2sorted_emojis = sort_name2emojis_by_frequency(enhanced_name2emojis, frequences)
+
+    with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json', 'w', encoding='utf-8') as f:
         json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False)
