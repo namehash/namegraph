@@ -5,7 +5,7 @@ import re
 import os
 
 try:
-    from suffixtree import SuffixQueryTree
+    from generator.utils import UniSuffixTree
 
     HAS_SUFFIX_TREE = True
 except Exception:
@@ -17,13 +17,6 @@ from ..utils import sort_by_value
 
 CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
 CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
-
-
-def _ascii_only(lines: Iterable[str]) -> List[str]:
-    '''
-    Filter out lines that contain non-ASCII characters.
-    '''
-    return [line for line in lines if line.isascii()]
 
 
 class ReImpl:
@@ -40,7 +33,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = _ascii_only(self.domains.registered.keys())
+        self.lines = self.domains.registered.keys()
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
@@ -51,14 +44,14 @@ class SuffixTreeImpl:
             pass
 
         if cached_hash != latest_hash:
-            self.tree = SuffixQueryTree(False, self.lines)
+            self.tree = UniSuffixTree(self.lines)
             os.makedirs(os.path.dirname(CACHE_TREE_PATH), exist_ok=True)
             os.makedirs(os.path.dirname(CACHE_TREE_HASH_PATH), exist_ok=True)
             self.tree.serialize(CACHE_TREE_PATH)
             with open(CACHE_TREE_HASH_PATH, 'w') as f:
                 f.write(latest_hash + '\n')
         else:
-            self.tree = SuffixQueryTree(False)
+            self.tree = UniSuffixTree()
             # this is quite slow (over 2s)
             self.tree.deserialize(CACHE_TREE_PATH)
 
