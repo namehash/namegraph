@@ -1,3 +1,4 @@
+import sys
 from typing import Optional, Callable, Iterable
 from collections import defaultdict
 from operator import itemgetter
@@ -12,10 +13,10 @@ import nltk
 
 from gensim.models.keyedvectors import KeyedVectors
 from nltk.corpus import stopwords
+
 nltk.download('stopwords')
 
 import myunicode
-
 
 PROJECT_ROOT_DIR = Path(__name__).parent.parent
 TOKEN_SEPARATOR = re.compile(r'[_ ]')
@@ -26,6 +27,17 @@ SKIPPED_STOPWORDS = ['*', '#']
 def download_emoji2names() -> dict[str, list[str]]:
     r = requests.get(f'https://raw.githubusercontent.com/muan/emojilib/main/dist/emoji-en-US.json')
     json_data = json.loads(r.text)
+
+    # normalize emojis, some of them normalize to non-emojis
+    for emoji in list(json_data.keys()):
+        try:
+            normalized_emoji = myunicode.ens_normalize(emoji)
+            if normalized_emoji != emoji:
+                json_data[normalized_emoji] = json_data[emoji]
+                del json_data[emoji]
+        except ValueError:
+            del json_data[emoji]
+
     return json_data
 
 
@@ -36,12 +48,17 @@ def download_all_emojis2names() -> dict[str, list[str]]:
             name = myunicode.emoji_name(emoji)
         except ValueError:
             continue
+        try:
+            if emoji != myunicode.ens_normalize(emoji): continue
+        except ValueError:
+            continue
 
         emojis2names[emoji] = [name]
     return emojis2names
 
 
-def merge_emoji2names(emoji2names: dict[str, list[str]], rest_of_emoji2names: dict[str, list[str]]) -> dict[str, list[str]]:
+def merge_emoji2names(emoji2names: dict[str, list[str]], rest_of_emoji2names: dict[str, list[str]]) -> dict[
+    str, list[str]]:
     emoji2names = deepcopy(emoji2names)
     for emoji, names in rest_of_emoji2names.items():
         emoji2names[emoji] = list(set(emoji2names.get(emoji, [])) | set(names))
@@ -103,7 +120,8 @@ def generate_synonyms(model: KeyedVectors, word: str, threshold: float, topn: Op
     return synonyms
 
 
-def enhance_names(model: KeyedVectors, name2emojis: dict[str, list[str]], threshold: float = 0.5, topn: Optional[int] = None) -> dict[str, list[str]]:
+def enhance_names(model: KeyedVectors, name2emojis: dict[str, list[str]], threshold: float = 0.5,
+                  topn: Optional[int] = None) -> dict[str, list[str]]:
     enhanced_name2emojis: dict[str, dict[str, None]] = defaultdict(dict)
     for name, emojis in name2emojis.items():
         if name not in model:
@@ -115,11 +133,16 @@ def enhance_names(model: KeyedVectors, name2emojis: dict[str, list[str]], thresh
             if is_valid_token(synonym):
                 # print(f'GENERATING {synonym} AS A SYNONYM TO {name}')
                 enhanced_name2emojis[synonym].update([(emoji, None) for emoji in emojis])
+            else:
+                # print('Skipping non-normalized synonym', synonym, file=sys.stderr)
+                pass
 
     return {name: list(emojis.keys()) for name, emojis in enhanced_name2emojis.items()}
 
 
-def sort_name2emojis_by_similarity(model: KeyedVectors, name2emojis: dict[str, list[str]], emoji2names: dict[str, list[str]], frequences: dict[str, int]) -> dict[str, list[str]]:
+def sort_name2emojis_by_similarity(model: KeyedVectors, name2emojis: dict[str, list[str]],
+                                   emoji2names: dict[str, list[str]], frequences: dict[str, int],
+                                   all_emojis2names: dict[str, list[str]]) -> dict[str, list[str]]:
     def best_similarity(base: str, words: list[str]) -> float:
         similarities = []
         for word in words:
@@ -136,11 +159,18 @@ def sort_name2emojis_by_similarity(model: KeyedVectors, name2emojis: dict[str, l
     for name, emojis in name2emojis.items():
         # if base is not in the model we cannot compare it :(
         if name not in model:
-            name2sorted_emojis[name] = emojis
+            # name2sorted_emojis[name] = emojis
+            # sort just by frequency
+            print('Token not in model', name, emojis, file=sys.stderr)
+            emojis = [(emoji, frequences.get(emoji, 0.0)) for emoji in emojis]
+            sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
+            name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
             continue
 
         # otherwise we do as planned
-        emojis = [(emoji, best_similarity(name, emoji2names[emoji]) + 10.0e-9 * frequences.get(emoji, 0.0)) for emoji in emojis]
+        emojis = [(emoji, ((1 if name in all_emojis2names.get(emoji, []) else 0) , best_similarity(name, emoji2names[
+            emoji]), frequences.get(emoji, 0.0))) for emoji in
+                  emojis]
         sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
         name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
 
@@ -161,27 +191,40 @@ def sort_name2emojis_by_similarity(model: KeyedVectors, name2emojis: dict[str, l
 
 
 if __name__ == '__main__':
-    model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
-    # model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
-    model.init_sims(replace=True)
 
     # processing
     emoji2names = download_emoji2names()
     all_emojis2names = download_all_emojis2names()
+    
+   
+    # remove non-emojis
+    for emoji in list(emoji2names.keys()):
+        if emoji not in all_emojis2names:
+            print('Removing non-emoji', emoji, file=sys.stderr)
+            del emoji2names[emoji]
+
     emoji2names = merge_emoji2names(emoji2names, all_emojis2names)
+    # sys.exit()
 
     emoji2names_normalized = normalize_names(emoji2names)
     name2emojis = invert_emoji2names_mapping(emoji2names_normalized)
+
+    model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+    # model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
+    model.init_sims(replace=True)
+
     enhanced_name2emojis = enhance_names(model, name2emojis, topn=75)
 
     # with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'r', encoding='utf-8') as f:
     #     enhanced_name2emojis = json.load(f)
 
     with open(PROJECT_ROOT_DIR / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
-        frequences = {myunicode.ens_normalize(emoji_data['form']): emoji_data['count'] for emoji_data in json.load(f)['tally']}
+        frequences = {myunicode.ens_normalize(emoji_data['form']): emoji_data['count'] for emoji_data in
+                      json.load(f)['tally']}
 
-    name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequences)
+    name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequences,
+                                                        all_emojis2names)
     # name2sorted_emojis = sort_name2emojis_by_frequency(enhanced_name2emojis, frequences)
 
-    with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json', 'w', encoding='utf-8') as f:
-        json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False)
+    with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json.4', 'w', encoding='utf-8') as f:
+        json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
