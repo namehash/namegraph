@@ -248,13 +248,11 @@ def test_emoji_generator():
 
         all_tokenized = [gn.tokens for gn in generated_names]
 
-        print(all_tokenized)
-
         assert ('🥰', 'your', '🤩') in all_tokenized
         assert ('🥰', 'your', '👀') in all_tokenized
-        assert ('🥰', 'your', '🥽') in all_tokenized
-        assert ('🥰', 'your', 'eyes') in all_tokenized
-        assert ('adore', 'your', '👀') in all_tokenized
+        assert ('🥰', 'your', '😵‍💫') in all_tokenized
+        assert ('🥰', 'your', 'eyes') in all_tokenized[:2]
+        assert ('adore', 'your', '👀') in all_tokenized[:2]
 
         assert ('adore', 'your', 'eyes') not in all_tokenized
 
