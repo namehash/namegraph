@@ -33,7 +33,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = self.domains.registered.keys()
+        self.lines = list(self.domains.registered.keys())
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None

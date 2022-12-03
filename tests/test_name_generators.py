@@ -395,7 +395,6 @@ def test_substringmatchgenerator_sorting():
 
 
 @needs_suffix_tree
-@pytest.mark.xfail(reason='Suffix tree ignores unicode')
 def test_substringmatchgenerator_re_equals_tree():
     from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
 
@@ -407,16 +406,6 @@ def test_substringmatchgenerator_re_equals_tree():
         re_impl = ReImpl(config)
         tree_impl = SuffixTreeImpl(config)
         assert sorted(re_impl.find('0')) == sorted(tree_impl.find('0'))
-
-
-@needs_suffix_tree
-def test_substringmatchgenerator_suffixtree_ignores_unicode():
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
-        strategy = SubstringMatchGenerator(config)
-        tokenized_name = GeneratedName(('٢٣',))
-        generated_names = strategy.apply([tokenized_name])
-        assert len(generated_names) == 0
 
 
 def test_leet_generator():
