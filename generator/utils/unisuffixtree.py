@@ -7,7 +7,7 @@ from generator.utils import unicode_wrap
 
 
 class UniSuffixTree:
-    def __init__(self, lines: Optional[list[str]]):
+    def __init__(self, lines: Optional[list[str]] = None):
         if lines is not None:
             self._tree = SuffixQueryTree(False, [unicode_wrap(line) for line in lines])
         else:
