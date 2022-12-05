@@ -48,7 +48,7 @@ def test_prod(prod_test_client):
     assert "myfire.eth" in str_names
 
 
-@pytest.mark.execution_timeout(10)
+@pytest.mark.execution_timeout(20)
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
