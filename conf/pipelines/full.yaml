@@ -195,6 +195,20 @@
     - SubnameFilter
     - ValidNameLengthFilter
 -
+  name: only-primary-random
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - OnlyPrimaryRandomGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
   name: random
   normalizers:
     - StripEthNormalizer

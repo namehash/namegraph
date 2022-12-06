@@ -14,17 +14,19 @@ from generator.generation import (
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
+    RandomGenerator,
+    OnlyPrimaryRandomGenerator,
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
-    LeetGenerator, KeycapGenerator,
+    SecondaryMatcher,
+    LeetGenerator,
+    KeycapGenerator,
 )
 from generator.generated_name import GeneratedName
 
 import pytest
 
-from generator.generation.random_generator import RandomGenerator
-from generator.generation.secondary_matcher import SecondaryMatcher
 from generator.domains import Domains
 
 from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
@@ -302,6 +304,23 @@ def test_random(overrides: List[str]):
             set([x.tokens[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
                                                            'wikipedia', 'qq',
                                                            'twitter', 'live', 'global', '00002'}) == 8
+
+
+@mark.parametrize(
+    "overrides",
+    [
+        ["app.domains=tests/data/suggestable_domains_for_only_primary.csv"]
+    ]
+)
+def test_only_primary_random(overrides: List[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config", overrides=overrides)
+        strategy = OnlyPrimaryRandomGenerator(config)
+        tokenized_name = GeneratedName(('my', 'domain', '123'))
+        generated_names = strategy.apply([tokenized_name])
+
+        expected_names = {'glintpay', 'drbaher', '9852222', 'wanadoo', 'conio', 'indulgente', 'theclown'}
+        assert set([x.tokens[0] for x in generated_names]) & expected_names == expected_names
 
 
 def test_secondary_matcher():

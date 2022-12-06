@@ -22,6 +22,12 @@ def emoji_pipeline():
     del os.environ['PIPELINES']
 
 
+@pytest.fixture(scope='class')
+def hyphen_pipeline():
+    os.environ['PIPELINES'] = 'test_hyphen'
+    yield
+    del os.environ['PIPELINES']
+
 @pytest.fixture(scope="class")
 def test_client():
     Domains.remove_self()
@@ -167,3 +173,21 @@ class TestEmoji:
         names: list[str] = [suggestion["name"] for suggestion in json]
 
         assert set(expected_names).intersection(names) == set(expected_names)
+
+
+# using hyphen generator we simply can assure which primary names are generated
+@mark.usefixtures("hyphen_pipeline")
+class TestOnlyPrimary:
+    def test_only_primary_generator_filling_api(self, test_client):
+        response = test_client.post("/", json={"name": "fiftysix",
+                                               "min_suggestions": 1,
+                                               "max_suggestions": 1,
+                                               "min_primary_fraction": 1.0})
+        assert response.status_code == 200
+
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+        print(names)
+
+        assert len(names) == 1
+        assert names[0] == 'fifty-four.eth'
