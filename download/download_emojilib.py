@@ -220,9 +220,8 @@ if __name__ == '__main__':
     # with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'r', encoding='utf-8') as f:
     #     enhanced_name2emojis = json.load(f)
 
-    with open(PROJECT_ROOT_DIR / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
-        frequences = {myunicode.ens_normalize(emoji_data['form']): emoji_data['count'] for emoji_data in
-                      json.load(f)['tally']}
+    with open(PROJECT_ROOT_DIR / 'data' / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
+        frequences = json.load(f)
 
     name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequences,
                                                         all_emojis2names)
