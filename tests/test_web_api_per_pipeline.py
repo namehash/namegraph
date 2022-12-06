@@ -187,7 +187,6 @@ class TestOnlyPrimary:
 
         json = response.json()
         names: list[str] = [suggestion["name"] for suggestion in json]
-        print(names)
 
         assert len(names) == 1
         assert names[0] == 'fifty-four.eth'

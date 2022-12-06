@@ -96,7 +96,6 @@ class Generator:
 
         for pipeline in self.pipelines:
             pipeline_suggestions = pipeline.apply(name, params)
-            print(pipeline_suggestions)
             logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
             result.add_pipeline_suggestions(pipeline_suggestions)
 
@@ -107,13 +106,11 @@ class Generator:
             result.add_pipeline_suggestions(random_suggestions)
 
         result.assign_categories()
-        print(result.primary_suggestions())
 
         required_primary_suggestions = min_primary_fraction * min_suggestions
         if result.primary_suggestions() < required_primary_suggestions:
             logger.debug('Generate only primary random')
             only_primary_suggestions = self.only_primary_random_pipeline.apply(name)
-            print(only_primary_suggestions)
             result.add_pipeline_suggestions(only_primary_suggestions)
 
         result.assign_categories()
