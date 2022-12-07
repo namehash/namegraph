@@ -20,9 +20,11 @@ class OnlyPrimaryRandomGenerator(NameGenerator):
             logger.warning('the number of primary (available) domains for OnlyPrimaryRandomGenerator is smaller than '
                            'the generation limit')
 
+        self.names, self.probabilities = list(zip(*self.domains.only_primary.items()))
+
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         if len(self.domains.only_primary) >= self.limit:
-            result = random.sample(self.domains.only_primary, self.limit)
+            result = random.choices(self.names, self.probabilities, k=self.limit)
         else:
-            result = self.domains.only_primary
+            result = self.names
         return [(x,) for x in result]
