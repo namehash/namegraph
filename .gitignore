@@ -15,4 +15,3 @@ profiler.py
 *.bin
 *.ipynb
 .ipynb_checkpoints
-ens-emoji-freq.json
