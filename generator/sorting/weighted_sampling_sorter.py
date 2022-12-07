@@ -101,6 +101,7 @@ class WeightedSamplingSorter(Sorter):
         # defining variables required for the sampling itself and counting emptied pipelines
         empty_pipelines = 0
         primary_used = 0
+        sampling_only_primary = False
         probabilities = self._get_pipeline_weights(pipelines_suggestions)
 
         # if there are any empty pipelines we take it into account
@@ -115,21 +116,10 @@ class WeightedSamplingSorter(Sorter):
         # sampling itself
         while empty_pipelines < len(pipelines_suggestions) - 1 and len(name2suggestion) < max_suggestions:
 
-            # if there is just enough space left for all the left primary suggestions we simply append them at the end
+            # if there is just enough space left for all the left primary suggestions we simply turn on the specified
+            # flag, which will skip every sampled suggestion, which is not primary
             if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
-                # TODO should we use round robin here?
-                name2suggestion = extend_and_aggregate(
-                    name2suggestion,
-                    [
-                        suggestion
-                        for pipeline_suggestions in pipelines_suggestions
-                        for suggestion in pipeline_suggestions[::-1]
-                        if suggestion.category == 'primary'
-                    ],
-                    max_suggestions
-                )
-                assert len(name2suggestion) == max_suggestions, 'if this is raised, create a bug issue!!'
-                break
+                sampling_only_primary = True
 
             # otherwise we randomize pipeline from which to get the next suggestion
             probabilities = self._normalize_weights(probabilities)
@@ -141,12 +131,14 @@ class WeightedSamplingSorter(Sorter):
                 name = str(suggestion)
                 existing_suggestion = name2suggestion.get(name, None)
                 if existing_suggestion is None:
-                    name2suggestion[name] = suggestion
-                    if suggestion.category == 'primary':
-                        primary_used += 1
-                    break
-
-                existing_suggestion.add_strategies(suggestion.applied_strategies)
+                    # if the flag is not set, then enter normally, else the suggestion must be primary
+                    if not sampling_only_primary or suggestion.category == 'primary':
+                        name2suggestion[name] = suggestion
+                        if suggestion.category == 'primary':
+                            primary_used += 1
+                        break
+                else:
+                    existing_suggestion.add_strategies(suggestion.applied_strategies)
 
             # if the chosen pipeline is emptied, then we update the corresponding variables and set probability to zero
             if not pipelines_suggestions[idx]:
@@ -165,15 +157,6 @@ class WeightedSamplingSorter(Sorter):
 
             # for each suggestion we add it to the `name2suggestion` or aggregate if it has been met before
             for i, suggestion in enumerate(last_pipeline_suggestions):
-                name = str(suggestion)
-                existing_suggestion = name2suggestion.get(name, None)
-                if existing_suggestion is None:
-                    name2suggestion[name] = suggestion
-                    if suggestion.category == 'primary':
-                        primary_used += 1
-                else:
-                    existing_suggestion.add_strategies(suggestion.applied_strategies)
-
                 # if there is just enough space left for all the left primary suggestions,
                 # then we simply append them at the end
                 if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
@@ -183,6 +166,16 @@ class WeightedSamplingSorter(Sorter):
                         max_suggestions
                     )
                     break
+
+                # otherwise we simply add all the needed suggestions one by one
+                name = str(suggestion)
+                existing_suggestion = name2suggestion.get(name, None)
+                if existing_suggestion is None:
+                    name2suggestion[name] = suggestion
+                    if suggestion.category == 'primary':
+                        primary_used += 1
+                else:
+                    existing_suggestion.add_strategies(suggestion.applied_strategies)
 
                 # if max_suggestion predicate is met, we interrupt the iteration
                 if len(name2suggestion) >= max_suggestions:
