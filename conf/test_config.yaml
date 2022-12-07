@@ -49,6 +49,7 @@ generation:
     AbbreviationGenerator: 128
     EmojiGenerator: 150
     Wikipedia2VGenerator: 10
+    OnlyPrimaryRandomGenerator: 20000
     RandomGenerator: 20000
   wikipedia2vec_url:
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
@@ -65,6 +66,7 @@ sorting:
       WordnetSynonymsGenerator: 1
       W2VGenerator: 1
       CategoriesGenerator: 1
+      OnlyPrimaryRandomGenerator: 1
       RandomGenerator: 1
       SecondaryMatcher: 1
       Wikipedia2VGenerator: 1
@@ -72,6 +74,17 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+only_primary_random_pipeline:
+  name: random
+  normalizers:
+    - StripEthNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - OnlyPrimaryRandomGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
 random_pipeline:
   name: random
   normalizers:

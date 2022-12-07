@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 import pytest
 from pytest import mark
@@ -10,16 +11,16 @@ from generator.domains import Domains
 
 @pytest.fixture(scope='class')
 def flag_affix_pipeline():
-    os.environ['PIPELINES'] = 'test_flag_affix'
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_flag_affix'])
     yield
-    del os.environ['PIPELINES']
+    del os.environ['CONFIG_OVERRIDES']
 
 
 @pytest.fixture(scope='class')
 def emoji_pipeline():
-    os.environ['PIPELINES'] = 'test_emoji'
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_emoji'])
     yield
-    del os.environ['PIPELINES']
+    del os.environ['CONFIG_OVERRIDES']
 
 
 @pytest.fixture(scope="class")
@@ -167,3 +168,29 @@ class TestEmoji:
         names: list[str] = [suggestion["name"] for suggestion in json]
 
         assert set(expected_names).intersection(names) == set(expected_names)
+
+
+@pytest.fixture(scope='class')
+def only_primary():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_hyphen',
+                                                 'app.domains=tests/data/suggestable_domains_for_only_primary.csv'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
+
+
+# using hyphen generator we simply can assure which primary names are generated
+@mark.usefixtures("only_primary")
+class TestOnlyPrimary:
+    def test_only_primary_generator_filling_api(self, test_client):
+        response = test_client.post("/", json={"name": "fiftysix",
+                                               "min_suggestions": 1,
+                                               "max_suggestions": 1,
+                                               "min_primary_fraction": 1.0})
+        assert response.status_code == 200
+
+        json = response.json()
+        names: list[str] = [suggestion["name"] for suggestion in json]
+
+        assert len(names) == 1
+        assert names[0] in {'glintpay.eth', 'drbaher.eth', '9852222.eth', 'wanadoo.eth',
+                            'conio.eth', 'indulgente.eth', 'theclown.eth'}

@@ -31,7 +31,7 @@ class Domains(metaclass=Singleton):
         self.subname_filter = SubnameFilter(config)
         self.validname_filter = ValidNameFilter(config)
 
-        self.registered, self.secondary_market, _ = self.read_csv_domains(
+        self.registered, self.secondary_market, self.available = self.read_csv_domains(
             Path(config.filtering.root_path) / config.app.domains)
         self.registered: Dict[
             str, float]  # = self.read_csv(Path(config.filtering.root_path) / config.filtering.domains)
@@ -52,6 +52,10 @@ class Domains(metaclass=Singleton):
             n for n in self.internet
             if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
         )
+        self.only_primary = {
+            n: v for n, v in self.available.items()
+            if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
+        }
         logger.debug('Inited Domains')
 
     def read_csv(self, path: str) -> Set[str]:

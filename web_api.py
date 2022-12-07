@@ -1,4 +1,4 @@
-import logging, random, hashlib
+import logging, random, hashlib, json
 from typing import List, Dict, Optional
 
 import numpy as np
@@ -17,7 +17,7 @@ logger = logging.getLogger('generator')
 class Settings(BaseSettings):
     # config_name: str = "test_config"
     config_name: str = "prod_config"
-    pipelines: Optional[str] = None
+    config_overrides: Optional[str] = None
 
 
 settings = Settings()
@@ -26,7 +26,7 @@ app = FastAPI()
 
 def init():
     with initialize(version_base=None, config_path="conf/"):
-        overrides = [f"pipelines={settings.pipelines}"] if settings.pipelines is not None else []
+        overrides = json.loads(settings.config_overrides) if settings.config_overrides is not None else []
         config = compose(config_name=settings.config_name, overrides=overrides)
         logger.setLevel(config.app.logging_level)
         for handler in logger.handlers:

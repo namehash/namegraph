@@ -10,6 +10,7 @@ from .suffix_generator import SuffixGenerator
 from .wordnet_synonyms_generator import WordnetSynonymsGenerator
 from .w2v_generator import W2VGenerator
 from .categories_generator import CategoriesGenerator
+from .only_primary_random_generator import OnlyPrimaryRandomGenerator
 from .random_generator import RandomGenerator
 from .secondary_matcher import SecondaryMatcher
 from .wikipedia2v_generator import Wikipedia2VGenerator

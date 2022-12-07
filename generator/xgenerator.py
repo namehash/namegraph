@@ -40,6 +40,14 @@ class Result:
             for suggestion in pipeline_suggestions
         ]))
 
+    def primary_suggestions(self) -> int:
+        return len([
+            suggestion
+            for pipeline_suggestions in self.suggestions
+            for suggestion in pipeline_suggestions
+            if suggestion.category == 'primary'
+        ])
+
 
 class Generator:
     def __init__(self, config: DictConfig):
@@ -50,6 +58,7 @@ class Generator:
             self.pipelines.append(Pipeline(definition, self.config))
 
         self.random_pipeline = Pipeline(self.config.random_pipeline, self.config)
+        self.only_primary_random_pipeline = Pipeline(self.config.only_primary_random_pipeline, self.config)
 
         self.init_objects()
 
@@ -95,6 +104,14 @@ class Generator:
             logger.debug('Generate random')
             random_suggestions = self.random_pipeline.apply(name)
             result.add_pipeline_suggestions(random_suggestions)
+
+        result.assign_categories()
+
+        required_primary_suggestions = min_primary_fraction * min_suggestions
+        if result.primary_suggestions() < required_primary_suggestions:
+            logger.debug('Generate only primary random')
+            only_primary_suggestions = self.only_primary_random_pipeline.apply(name)
+            result.add_pipeline_suggestions(only_primary_suggestions)
 
         result.assign_categories()
         suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_primary_fraction)
