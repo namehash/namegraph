@@ -221,9 +221,9 @@ if __name__ == '__main__':
     #     enhanced_name2emojis = json.load(f)
 
     with open(PROJECT_ROOT_DIR / 'data' / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
-        frequences = json.load(f)
+        frequencies = json.load(f)
 
-    name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequences,
+    name2sorted_emojis = sort_name2emojis_by_similarity(model, enhanced_name2emojis, emoji2names_normalized, frequencies,
                                                         all_emojis2names)
     # name2sorted_emojis = sort_name2emojis_by_frequency(enhanced_name2emojis, frequences)
 
