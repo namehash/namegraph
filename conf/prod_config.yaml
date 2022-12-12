@@ -44,6 +44,9 @@ generation:
   prefixes_path: data/prefixes.txt
   name2emoji_path: data/name2emoji.json
   limit: 10000
+  empty_input_ability:
+    - RandomGenerator
+    - OnlyPrimaryRandomGenerator
   generator_limits:
     HyphenGenerator: 128
     AbbreviationGenerator: 128
