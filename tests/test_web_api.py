@@ -186,8 +186,8 @@ def test_min_primary_fraction(test_test_client):
     assert 'iref.eth' not in names
 
 
-# verifies whether only `RandomGenerator` or `OnlyPrimaryRandomGenerator` has been used,
-# hence no other pipeline has been run
+# verifies whether only `OnlyPrimaryRandomGenerator` has been used since it is specified as the only one, which can
+# work with an empty input in the test config
 def test_empty_input(test_test_client):
     client = test_test_client
     response = client.post("/", json={"name": "",
@@ -205,5 +205,5 @@ def test_empty_input(test_test_client):
         assert any([
             generator in strategy
             for strategy in applied_strategies
-            for generator in ['RandomGenerator', 'OnlyPrimaryRandomGenerator']
+            for generator in ['OnlyPrimaryRandomGenerator']
         ])

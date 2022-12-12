@@ -15,6 +15,7 @@ class NameGenerator:
     def __init__(self, config: DictConfig):
         self.config = config
         self.limit = config.generation.generator_limits.get(self.__class__.__name__, config.generation.limit)
+        self.can_work_with_empty_input = self.__class__.__name__ in config.generation.empty_input_ability
 
     def apply(
             self,
@@ -28,6 +29,7 @@ class NameGenerator:
                 applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
             )
             for name in tokenized_names
+            if name.tokens and any(name.tokens) or self.can_work_with_empty_input
             for generated in self.generate(name.tokens, params or dict())
         ]
 

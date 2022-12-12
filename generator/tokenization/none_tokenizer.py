@@ -10,4 +10,4 @@ class NoneTokenizer(Tokenizer):
         super().__init__()
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
-        return [(name,)]
+        return [(name,)] if name else [tuple()]
