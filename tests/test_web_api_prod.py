@@ -31,9 +31,36 @@ def prod_test_client():
 def test_namehash(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
-                                      "metadata": False})
+                                      "metadata": True})
 
     assert response.status_code == 200
+
+    json = response.json()
+    for name in json:
+        applied_strategies = name['metadata']['applied_strategies']
+        assert any([
+            generator in strategy
+            for strategy in applied_strategies
+            for generator in ['OnlyPrimaryRandomGenerator', 'RandomGenerator']
+        ])
+
+
+@pytest.mark.slow
+def test_namehash_only_primary(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+                                      "metadata": True, "min_primary_fraction": 1.0})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    for name in json:
+        applied_strategies = name['metadata']['applied_strategies']
+        assert any([
+            generator in strategy
+            for strategy in applied_strategies
+            for generator in ['OnlyPrimaryRandomGenerator', 'RandomGenerator']
+        ])
 
 
 @pytest.mark.slow
