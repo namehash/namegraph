@@ -19,9 +19,11 @@ class RandomGenerator(NameGenerator):
         if len(self.domains.internet) < self.limit:
             logger.warning('the number of internet domains for random generator is smaller than the generation limit')
 
+        self.names = list(self.domains.internet)
+
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         if len(self.domains.internet) >= self.limit:
-            result = random.sample(self.domains.internet, self.limit)
+            result = random.sample(self.names, self.limit)
         else:
             result = self.domains.internet
         return [(x,) for x in result]
