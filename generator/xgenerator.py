@@ -94,10 +94,11 @@ class Generator:
         sorter = self.get_sorter(sorter)
         result = Result(self.config)
 
-        for pipeline in self.pipelines:
-            pipeline_suggestions = pipeline.apply(name, params)
-            logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
-            result.add_pipeline_suggestions(pipeline_suggestions)
+        if name:
+            for pipeline in self.pipelines:
+                pipeline_suggestions = pipeline.apply(name, params)
+                logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
+                result.add_pipeline_suggestions(pipeline_suggestions)
 
         if result.unique_suggestions() < min_suggestions:
             # generate using random pipeline
