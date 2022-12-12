@@ -184,3 +184,26 @@ def test_min_primary_fraction(test_test_client):
     assert len(json) > 0
     names = [suggestion["name"] for suggestion in json]
     assert 'iref.eth' not in names
+
+
+# verifies whether only `RandomGenerator` or `OnlyPrimaryRandomGenerator` has been used,
+# hence no other pipeline has been run
+def test_empty_input(test_test_client):
+    client = test_test_client
+    response = client.post("/", json={"name": "",
+                                      "min_primary_fraction": 1.0,
+                                      "min_suggestions": 100,
+                                      "max_suggestions": 100})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    assert len(json) > 0
+
+    for name in json:
+        applied_strategies = name['metadata']['applied_strategies']
+        assert any([
+            generator in strategy
+            for strategy in applied_strategies
+            for generator in ['RandomGenerator', 'OnlyPrimaryRandomGenerator']
+        ])
