@@ -155,7 +155,7 @@ class TestEmoji:
     @mark.parametrize(
         "name, expected_names",
         [
-            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth"]),
+            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth", "🥰your👀.eth"]),
             ("prayforukraine", ["prayfor🇺🇦.eth", "🙏forukraine.eth", "🙏for🇺🇦.eth"]),
             ("krakowdragon", ["krakow🐉.eth"])
         ]

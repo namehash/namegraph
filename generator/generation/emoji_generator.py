@@ -1,5 +1,6 @@
 import logging
 import json
+import math
 from typing import List, Tuple, Any
 from itertools import product, islice
 
@@ -11,10 +12,22 @@ from .name_generator import NameGenerator
 logger = logging.getLogger('generator')
 
 
+def zip_longest_repeat_last(*lists):
+    max_length = max([len(list_) for list_ in lists], default=0)
+    # skipping the last one with all original tokens
+    for i in range(max_length - 1):
+        yield tuple([
+            list_[i] if i < len(list_) else list_[-1]
+            for list_ in lists
+        ])
+
+
 def order_product(*args):
-    return [tuple(i[1] for i in p) for p in
-            sorted(product(*map(enumerate, args)),
-                   key=lambda x: (sum(y[0] for y in x), x))]
+    return [
+        tuple(i[1] for i in p)
+        for p in sorted(product(*map(enumerate, args)),
+                        key=lambda x: (sum(y[0] for y in x), x))
+    ]
 
 
 class EmojiGenerator(NameGenerator):
@@ -31,9 +44,14 @@ class EmojiGenerator(NameGenerator):
         self.combination_limiter = CombinationLimiter(self.limit)
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
-        all_possibilities = [[token] + self.name2emoji.get(token, []) for token in tokens]
+        all_possibilities = [self.name2emoji.get(token, []) + [token] for token in tokens]
 
+        # skipping the name with all the original tokens
+        diverse_results = list(islice(zip_longest_repeat_last(*all_possibilities), self.limit))
+        diverse_results_set = set(diverse_results)
+
+        all_possibilities_count = math.prod(map(len, all_possibilities))
         all_possibilities = self.combination_limiter.limit(all_possibilities)
+        all_results = list(islice(order_product(*all_possibilities), min(self.limit, all_possibilities_count - 1)))
 
-        # skipping the item in which all the original tokens are preserved
-        return list(islice(order_product(*all_possibilities), 1, self.limit))
+        return (diverse_results + [result for result in all_results if result not in diverse_results_set])[:self.limit]
