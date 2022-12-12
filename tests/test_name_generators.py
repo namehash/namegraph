@@ -241,6 +241,7 @@ def test_flag_generator():
         generated_names = strategy.apply([tokenized_name], params=None)
         assert len(generated_names) == 0
 
+
 def test_emoji_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
@@ -253,10 +254,38 @@ def test_emoji_generator():
         assert ('🥰', 'your', '🤩') in all_tokenized
         assert ('🥰', 'your', '👀') in all_tokenized
         assert ('🥰', 'your', '😵‍💫') in all_tokenized
-        assert ('🥰', 'your', 'eyes') in all_tokenized[:2]
-        assert ('adore', 'your', '👀') in all_tokenized[:2]
+        assert ('🥰', 'your', 'eyes') in all_tokenized
+        assert ('adore', 'your', '👀') in all_tokenized
 
         assert ('adore', 'your', 'eyes') not in all_tokenized
+
+
+@mark.parametrize(
+    "input_name, suborder",
+    [
+        (('look', 'into', 'dragon', 'eyes'), [
+            ('look', 'into', '🐉', '👀'),
+            ('look', 'into', '🀄', '😵‍💫'),
+            ('look', 'into', 'dragon', '🤩'),
+            ('look', 'into', '🐉', '🤩'),
+            ('look', 'into', '🐉', 'eyes'),
+        ])
+    ]
+)
+def test_emoji_generator_order(input_name: tuple[str], suborder: list[tuple[str]]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config")
+        strategy = EmojiGenerator(config)
+        tokenized_name = GeneratedName(input_name)
+        generated_names = strategy.apply([tokenized_name])
+
+        all_tokenized = [gn.tokens for gn in generated_names]
+
+        last_index = all_tokenized.index(suborder[0])
+        for next_name in suborder[1:]:
+            index = all_tokenized.index(next_name)
+            assert index > last_index
+            last_index = index
 
 
 @pytest.mark.execution_timeout(1)
