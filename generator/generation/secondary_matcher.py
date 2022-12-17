@@ -10,7 +10,7 @@ from ..utils import sort_by_value
 
 class SecondaryMatcher(NameGenerator):
     """
-    
+    Returns on sale names with at least one the same token.
     """
 
     def __init__(self, config):
