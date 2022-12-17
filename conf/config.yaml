@@ -69,8 +69,7 @@ sorting:
       WordnetSynonymsGenerator: 1
       W2VGenerator: 1
       CategoriesGenerator: 1
-      OnlyPrimaryRandomGenerator: 1
-      RandomGenerator: 1
+      RandomAvailableNameGenerator: 1
       SecondaryMatcher: 1
       Wikipedia2VGenerator: 1
       SpecialCharacterAffixGenerator: 1
@@ -84,18 +83,7 @@ only_primary_random_pipeline:
   tokenizers:
     - NoneTokenizer
   generators:
-    - OnlyPrimaryRandomGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
-random_pipeline:
-  name: random
-  normalizers:
-    - StripEthNormalizer
-  tokenizers:
-    - NoneTokenizer
-  generators:
-    - RandomGenerator
+    - RandomAvailableNameGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
