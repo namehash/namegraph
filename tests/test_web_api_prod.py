@@ -41,7 +41,7 @@ def test_namehash(prod_test_client):
         assert any([
             generator in strategy
             for strategy in applied_strategies
-            for generator in ['OnlyPrimaryRandomGenerator', 'RandomGenerator']
+            for generator in ['RandomAvailableNameGenerator']
         ])
 
 
@@ -59,7 +59,7 @@ def test_namehash_only_primary(prod_test_client):
         assert any([
             generator in strategy
             for strategy in applied_strategies
-            for generator in ['OnlyPrimaryRandomGenerator', 'RandomGenerator']
+            for generator in ['RandomAvailableNameGenerator']
         ])
 
 

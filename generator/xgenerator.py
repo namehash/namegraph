@@ -25,10 +25,10 @@ class Result:
         for pipeline_suggestions in self.suggestions:
             # advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
             secondary, remaining_suggestions = self.domains.get_secondary(pipeline_suggestions)
-            primary, registered = self.domains.get_primary(remaining_suggestions)
+            available, registered = self.domains.get_available(remaining_suggestions)
 
             for category, suggestions in zip(['secondary', 'primary', 'registered'],
-                                             [secondary, primary, registered]):
+                                             [secondary, available, registered]):
 
                 for suggestion in suggestions:
                     suggestion.category = category
@@ -40,7 +40,7 @@ class Result:
             for suggestion in pipeline_suggestions
         ]))
 
-    def primary_suggestions(self) -> int:
+    def available_suggestions(self) -> int:
         return len([
             suggestion
             for pipeline_suggestions in self.suggestions
@@ -57,7 +57,7 @@ class Generator:
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
-        self.only_primary_random_pipeline = Pipeline(self.config.only_primary_random_pipeline, self.config)
+        self.random_available_name_pipeline = Pipeline(self.config.only_primary_random_pipeline, self.config)
 
         self.init_objects()
 
@@ -100,11 +100,13 @@ class Generator:
 
         result.assign_categories()
 
-        required_primary_suggestions = min_primary_fraction * min_suggestions
-        if result.unique_suggestions() < min_suggestions or result.primary_suggestions() < required_primary_suggestions:
-            logger.debug('Generate only primary random')
-            only_primary_suggestions = self.only_primary_random_pipeline.apply(name)
-            result.add_pipeline_suggestions(only_primary_suggestions)
+        required_available_suggestions = min_primary_fraction * min_suggestions
+        if result.unique_suggestions() < min_suggestions or result.available_suggestions() < required_available_suggestions:
+            
+            logger.debug('Generate only available random')
+            only_available_suggestions = self.random_available_name_pipeline.apply(name)
+            print('asd', len(only_available_suggestions), only_available_suggestions)
+            result.add_pipeline_suggestions(only_available_suggestions)
 
         result.assign_categories()
         suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_primary_fraction)
