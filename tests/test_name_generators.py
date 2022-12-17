@@ -15,7 +15,7 @@ from generator.generation import (
     W2VGenerator,
     CategoriesGenerator,
     RandomGenerator,
-    OnlyPrimaryRandomGenerator,
+    RandomAvailableNameGenerator,
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
@@ -344,7 +344,7 @@ def test_random(overrides: List[str]):
 def test_only_primary_random(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config", overrides=overrides)
-        strategy = OnlyPrimaryRandomGenerator(config)
+        strategy = RandomAvailableNameGenerator(config)
         tokenized_name = GeneratedName(('my', 'domain', '123'))
         generated_names = strategy.apply([tokenized_name])
 

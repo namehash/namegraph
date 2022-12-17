@@ -17,9 +17,9 @@ def _softmax(x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     return exps / exps_totals
 
 
-class OnlyPrimaryRandomGenerator(NameGenerator):
+class RandomAvailableNameGenerator(NameGenerator):
     """
-    Sample only primary random names.
+    Sample only available random names.
     """
 
     def __init__(self, config):

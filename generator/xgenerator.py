@@ -57,7 +57,6 @@ class Generator:
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
-        self.random_pipeline = Pipeline(self.config.random_pipeline, self.config)
         self.only_primary_random_pipeline = Pipeline(self.config.only_primary_random_pipeline, self.config)
 
         self.init_objects()
@@ -79,13 +78,13 @@ class Generator:
                 raise ValueError(f'{sorter} is unavailable')
 
     def generate_names(
-        self,
-        name: str,
-        sorter: str = 'weighted-sampling',
-        min_suggestions: int = None,
-        max_suggestions: int = None,
-        min_primary_fraction: float = 0.1,
-        params: dict[str, dict[str, Any]] = None
+            self,
+            name: str,
+            sorter: str = 'weighted-sampling',
+            min_suggestions: int = None,
+            max_suggestions: int = None,
+            min_primary_fraction: float = 0.1,
+            params: dict[str, dict[str, Any]] = None
     ) -> list[GeneratedName]:
 
         min_suggestions = min_suggestions or self.config.app.suggestions
@@ -99,16 +98,10 @@ class Generator:
             logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
             result.add_pipeline_suggestions(pipeline_suggestions)
 
-        if result.unique_suggestions() < min_suggestions:
-            # generate using random pipeline
-            logger.debug('Generate random')
-            random_suggestions = self.random_pipeline.apply(name)
-            result.add_pipeline_suggestions(random_suggestions)
-
         result.assign_categories()
 
         required_primary_suggestions = min_primary_fraction * min_suggestions
-        if result.primary_suggestions() < required_primary_suggestions:
+        if result.unique_suggestions() < min_suggestions or result.primary_suggestions() < required_primary_suggestions:
             logger.debug('Generate only primary random')
             only_primary_suggestions = self.only_primary_random_pipeline.apply(name)
             result.add_pipeline_suggestions(only_primary_suggestions)
