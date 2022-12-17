@@ -26,18 +26,18 @@ class RandomAvailableNameGenerator(NameGenerator):
         super().__init__(config)
         self.domains = Domains(config)
 
-        if len(self.domains.only_primary) < self.limit:
-            logger.warning('the number of primary (available) domains for OnlyPrimaryRandomGenerator is smaller than '
+        if len(self.domains.only_available) < self.limit:
+            logger.warning('the number of primary (available) domains for RandomAvailableNameGenerator is smaller than '
                            'the generation limit')
 
-        self.names, probabilities = list(zip(*self.domains.only_primary.items()))
+        self.names, probabilities = list(zip(*self.domains.only_available.items()))
         # greatest value is 4.0, so that probability of sampling custom name is 20 times higher: exp(4) ~= 20 * exp(1)
         probabilities = np.clip(probabilities, 0.0, 4.0)
         self.probabilities: list[float] = _softmax(probabilities).tolist()
         self.accumulated_probabilities = list(accumulate(self.probabilities))
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
-        if len(self.domains.only_primary) >= self.limit:
+        if len(self.domains.only_available) >= self.limit:
             result = random.choices(self.names, cum_weights=self.accumulated_probabilities, k=self.limit)
         else:
             result = self.names

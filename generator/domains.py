@@ -52,7 +52,7 @@ class Domains(metaclass=Singleton):
             n for n in self.internet
             if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
         )
-        self.only_primary = {
+        self.only_available = {
             n: v for n, v in self.available.items()
             if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
         }
@@ -92,7 +92,7 @@ class Domains(metaclass=Singleton):
                 name, interesting_score, status = row
                 name = strip_eth(name)
                 interesting_score = float(interesting_score)
-                if status == 'taken':
+                if status == 'taken' or status == 'recently_released':
                     taken[name] = interesting_score
                 elif status == 'on_sale':
                     on_sale[name] = interesting_score
@@ -118,7 +118,7 @@ class Domains(metaclass=Singleton):
         remaining_suggestions, secondary = self.split(suggestions, self.secondary_market)
         return [name_price[0] for name_price in secondary.items()], remaining_suggestions
 
-    def get_primary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        primary = [s for s in suggestions if str(s) not in self.registered]
+    def get_available(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
+        available = [s for s in suggestions if str(s) not in self.registered]
         remaining = [s for s in suggestions if str(s) in self.registered]
-        return primary, remaining
+        return available, remaining
