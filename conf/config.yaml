@@ -45,15 +45,13 @@ generation:
   name2emoji_path: data/name2emoji.json
   limit: 10000
   empty_input_ability:
-    - RandomGenerator
-    - OnlyPrimaryRandomGenerator
+    - RandomAvailableNameGenerator
   generator_limits:
     HyphenGenerator: 128
     AbbreviationGenerator: 128
     EmojiGenerator: 150
     Wikipedia2VGenerator: 10
-    OnlyPrimaryRandomGenerator: 20000
-    RandomGenerator: 20000
+    RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: data/wikipedia2vec.pkl
 sorting:
