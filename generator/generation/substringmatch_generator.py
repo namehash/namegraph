@@ -19,13 +19,6 @@ CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
 CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
 
 
-def _ascii_only(lines: Iterable[str]) -> List[str]:
-    '''
-    Filter out lines that contain non-ASCII characters.
-    '''
-    return [line for line in lines if line.isascii()]
-
-
 class ReImpl:
     def __init__(self, config):
         self.domains = Domains(config)
@@ -40,7 +33,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = _ascii_only(self.domains.registered.keys())
+        self.lines = self.domains.registered.keys()
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
