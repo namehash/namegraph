@@ -123,10 +123,9 @@
     - StripEthNormalizer
     - UnicodeNormalizer
     - NamehashNormalizer
-    - ReplaceInvalidNormalizer
     - LongNameNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - SubstringMatchGenerator
   filters:
