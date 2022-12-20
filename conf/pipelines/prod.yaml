@@ -58,7 +58,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
-  name: secondary
+  name: on-sale
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -68,7 +68,7 @@
   tokenizers:
     - WordNinjaTokenizer
   generators:
-    - SecondaryMatcher
+    - OnSaleMatcher
   filters:
     - SubnameFilter
     - ValidNameFilter

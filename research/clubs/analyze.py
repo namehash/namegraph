@@ -9,7 +9,7 @@ with initialize(version_base=None, config_path="../../conf/"):
     config = compose(config_name="prod_config")
     domains = Domains(config)
     categories = load_categories(config)
-    registered = set(domains.registered) | set(domains.secondary_market)
+    registered = set(domains.taken) | set(domains.on_sale)
     result = []
     for category, names in categories.items():
         left = set(names) - registered

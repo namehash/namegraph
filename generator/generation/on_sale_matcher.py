@@ -8,7 +8,7 @@ from ..domains import Domains
 from ..utils import sort_by_value
 
 
-class SecondaryMatcher(NameGenerator):
+class OnSaleMatcher(NameGenerator):
     """
     Returns on sale names with at least one the same token.
     """
@@ -18,7 +18,7 @@ class SecondaryMatcher(NameGenerator):
         self.domains = Domains(config)
         # index names
         self.index = collections.defaultdict(set)
-        for name in self.domains.secondary_market:
+        for name in self.domains.on_sale:
             tokenized = tuple(wordninja.split(name))
             for token in tokenized:
                 self.index[token].add((name,))
@@ -27,4 +27,4 @@ class SecondaryMatcher(NameGenerator):
         result = []
         for token in tokens:
             result.extend(self.index[token])
-        return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.secondary_market, reverse=True)]
+        return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True)]

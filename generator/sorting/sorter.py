@@ -13,74 +13,74 @@ class Sorter:
     def __init__(self, config: DictConfig):
         self.config = config
         self.default_suggestions_count = self.config.app.suggestions
-        self.default_min_primary_fraction = self.config.app.min_primary_fraction
+        self.default_min_available_fraction = self.config.app.min_available_fraction
 
-    def maximize_primary_fraction(self,
-                                  suggestions: List[GeneratedName],
-                                  needed_primary_count: int,
-                                  max_suggestions: int,
-                                  all_primary_count: int = None) -> List[GeneratedName]:
+    def maximize_available_fraction(self,
+                                    suggestions: List[GeneratedName],
+                                    needed_available_count: int,
+                                    max_suggestions: int,
+                                    all_available_count: int = None) -> List[GeneratedName]:
 
-        if all_primary_count is None:
-            all_primary_count = len([str(s) for s in suggestions if s.category == 'primary'])
+        if all_available_count is None:
+            all_available_count = len([str(s) for s in suggestions if s.category == 'available'])
 
-        needed_primary_count=min(needed_primary_count, all_primary_count)
+        needed_available_count = min(needed_available_count, all_available_count)
         
-        primary_used = 0
+        available_used = 0
         for i, s in enumerate(suggestions):
-            # if there is just enough space left for all the left primary suggestions we simply append them at the end
-            if max_suggestions - i <= needed_primary_count - primary_used:
-                rest_primary = [s for s in suggestions[i:] if s.category == 'primary']
-                assert len(rest_primary) >= needed_primary_count - primary_used
+            # if there is just enough space left for all the left available suggestions we simply append them at the end
+            if max_suggestions - i <= needed_available_count - available_used:
+                rest_available = [s for s in suggestions[i:] if s.category == 'available']
+                assert len(rest_available) >= needed_available_count - available_used
 
-                return suggestions[:i] + rest_primary
+                return suggestions[:i] + rest_available
 
-            if s.category == 'primary':
-                primary_used += 1
+            if s.category == 'available':
+                available_used += 1
 
         logger.warning('weird parameters used, should not get here')
         return suggestions[:max_suggestions]
 
-    def satisfy_primary_fraction_obligation(self,
-                                            suggestions: List[GeneratedName],
-                                            min_suggestions: int,
-                                            max_suggestions: int,
-                                            min_primary_fraction: float) -> List[GeneratedName]:
+    def satisfy_available_fraction_obligation(self,
+                                              suggestions: List[GeneratedName],
+                                              min_suggestions: int,
+                                              max_suggestions: int,
+                                              min_available_fraction: float) -> List[GeneratedName]:
         """
-        Function which tries to satisfy the requirement of minimal primary names fraction in the returned suggestions.
+        Function which tries to satisfy the requirement of minimal available names fraction in the returned suggestions.
 
         :param suggestions: aggregated list of generated names. Assuming it has only unique names
         :param min_suggestions: request parameter specifying minimal number of generated names
         :param max_suggestions: request parameter specifying maximal number of generated names
-        :param min_primary_fraction: request parameter specifying the minimal factor of primary names in the result
-        :return: list of generated names in which the part of primary names either satisfies the requirement
+        :param min_available_fraction: request parameter specifying the minimal factor of available names in the result
+        :return: list of generated names in which the part of available names either satisfies the requirement
             or maximizes its part
         """
-        min_primary_fraction=min(min_primary_fraction, 1.0)
+        min_available_fraction = min(min_available_fraction, 1.0)
 
         assert len(suggestions) == len({str(s) for s in suggestions})  # asserting there are only unique names
 
-        needed_primary_count = int(math.ceil(min_primary_fraction * min_suggestions))
-        primary_count = len([str(s) for s in suggestions[:max_suggestions] if s.category == 'primary'])
-        rest_primary_count = len([str(s) for s in suggestions[max_suggestions:] if s.category == 'primary'])
+        needed_available_count = int(math.ceil(min_available_fraction * min_suggestions))
+        available_count = len([str(s) for s in suggestions[:max_suggestions] if s.category == 'available'])
+        rest_available_count = len([str(s) for s in suggestions[max_suggestions:] if s.category == 'available'])
 
-        if primary_count >= needed_primary_count:
+        if available_count >= needed_available_count:
             return suggestions[:max_suggestions]
 
-        if primary_count + rest_primary_count < needed_primary_count:
-            logger.warning('not enough primary suggestions generated '
-                           f'({primary_count + rest_primary_count} out of {needed_primary_count} needed)')
+        if available_count + rest_available_count < needed_available_count:
+            logger.warning('not enough available suggestions generated '
+                           f'({available_count + rest_available_count} out of {needed_available_count} needed)')
 
-        # if primary_count + rest_primary_count is enough, then it will reach the required threshold
-        # otherwise it will use as many primary suggestions as we have
-        return self.maximize_primary_fraction(suggestions,
-                                              needed_primary_count=needed_primary_count,
-                                              max_suggestions=max_suggestions,
-                                              all_primary_count=primary_count + rest_primary_count)
+        # if available_count + rest_available_count is enough, then it will reach the required threshold
+        # otherwise it will use as many available suggestions as we have
+        return self.maximize_available_fraction(suggestions,
+                                                needed_available_count=needed_available_count,
+                                                max_suggestions=max_suggestions,
+                                                all_available_count=available_count + rest_available_count)
 
     def sort(self,
              pipelines_suggestions: List[List[GeneratedName]],
              min_suggestions: int = None,
              max_suggestions: int = None,
-             min_primary_fraction: float = None) -> List[GeneratedName]:
+             min_available_fraction: float = None) -> List[GeneratedName]:
         raise NotImplementedError

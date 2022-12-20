@@ -88,7 +88,7 @@ async def root(name: Name):
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,
-                                      min_primary_fraction=name.min_primary_fraction,
+                                      min_available_fraction=name.min_primary_fraction,
                                       params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
