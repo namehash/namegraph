@@ -18,3 +18,4 @@ profiler.py
 research/emoji_w2v/corpus.txt
 research/emoji_w2v/*.bin
 research/emoji_w2v/*.zip
+!research/emoji_w2v/*.ipynb
