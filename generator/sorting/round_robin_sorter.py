@@ -9,11 +9,11 @@ class RoundRobinSorter(Sorter):
              pipelines_suggestions: List[List[GeneratedName]],
              min_suggestions: int = None,
              max_suggestions: int = None,
-             min_primary_fraction: float = None) -> List[GeneratedName]:
+             min_available_fraction: float = None) -> List[GeneratedName]:
 
         min_suggestions = min_suggestions or self.default_suggestions_count
         max_suggestions = max_suggestions or self.default_suggestions_count
-        min_primary_fraction = min_primary_fraction or self.default_min_primary_fraction
+        min_available_fraction = min_available_fraction or self.default_min_available_fraction
 
         used: Dict[str, GeneratedName] = dict()
         iters: List[Iterator[GeneratedName]] = [iter(l) for l in pipelines_suggestions]
@@ -41,7 +41,7 @@ class RoundRobinSorter(Sorter):
             if all_empty: break
 
         suggestions = list(used.values())
-        return self.satisfy_primary_fraction_obligation(suggestions,
-                                                        min_suggestions,
-                                                        max_suggestions,
-                                                        min_primary_fraction)
+        return self.satisfy_available_fraction_obligation(suggestions,
+                                                          min_suggestions,
+                                                          max_suggestions,
+                                                          min_available_fraction)

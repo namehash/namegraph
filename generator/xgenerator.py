@@ -24,11 +24,11 @@ class Result:
     def assign_categories(self) -> None:
         for pipeline_suggestions in self.suggestions:
             # advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
-            secondary, remaining_suggestions = self.domains.get_secondary(pipeline_suggestions)
-            available, registered = self.domains.get_available(remaining_suggestions)
+            on_sale, remaining_suggestions = self.domains.get_on_sale(pipeline_suggestions)
+            available, taken = self.domains.get_available(remaining_suggestions)
 
-            for category, suggestions in zip(['secondary', 'primary', 'registered'],
-                                             [secondary, available, registered]):
+            for category, suggestions in zip(['on_sale', 'available', 'taken'],
+                                             [on_sale, available, taken]):
 
                 for suggestion in suggestions:
                     suggestion.category = category
@@ -45,7 +45,7 @@ class Result:
             suggestion
             for pipeline_suggestions in self.suggestions
             for suggestion in pipeline_suggestions
-            if suggestion.category == 'primary'
+            if suggestion.category == 'available'
         ])
 
 
@@ -57,7 +57,7 @@ class Generator:
         for definition in self.config.pipelines:
             self.pipelines.append(Pipeline(definition, self.config))
 
-        self.random_available_name_pipeline = Pipeline(self.config.only_primary_random_pipeline, self.config)
+        self.random_available_name_pipeline = Pipeline(self.config.random_available_name_pipeline, self.config)
 
         self.init_objects()
 
@@ -83,7 +83,7 @@ class Generator:
             sorter: str = 'weighted-sampling',
             min_suggestions: int = None,
             max_suggestions: int = None,
-            min_primary_fraction: float = 0.1,
+            min_available_fraction: float = 0.1,
             params: dict[str, dict[str, Any]] = None
     ) -> list[GeneratedName]:
 
@@ -100,15 +100,15 @@ class Generator:
 
         result.assign_categories()
 
-        required_available_suggestions = min_primary_fraction * min_suggestions
-        if result.unique_suggestions() < min_suggestions or result.available_suggestions() < required_available_suggestions:
+        required_available_suggestions = min_available_fraction * min_suggestions
+        if result.unique_suggestions() < min_suggestions \
+                or result.available_suggestions() < required_available_suggestions:
             
             logger.debug('Generate only available random')
             only_available_suggestions = self.random_available_name_pipeline.apply(name)
-            print('asd', len(only_available_suggestions), only_available_suggestions)
             result.add_pipeline_suggestions(only_available_suggestions)
 
         result.assign_categories()
-        suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_primary_fraction)
+        suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_available_fraction)
 
         return suggestions[:max_suggestions]

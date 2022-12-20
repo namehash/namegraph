@@ -19,7 +19,7 @@ from generator.generation import (
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
-    SecondaryMatcher,
+    OnSaleMatcher,
     LeetGenerator,
     KeycapGenerator,
 )
@@ -352,10 +352,10 @@ def test_only_primary_random(overrides: List[str]):
         assert set([x.tokens[0] for x in generated_names]) & expected_names == expected_names
 
 
-def test_secondary_matcher():
+def test_on_sale_matcher():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
-        strategy = SecondaryMatcher(config)
+        strategy = OnSaleMatcher(config)
         tokenized_name = GeneratedName(('pay', 'fire', '123'))
         generated_names = strategy.apply([tokenized_name])
         print(generated_names)
@@ -366,10 +366,10 @@ def test_secondary_matcher():
         assert ('fire',) in [x.tokens for x in generated_names]
 
 
-def test_secondary_matcher_sorting():
+def test_on_sale_matcher_sorting():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
-        strategy = SecondaryMatcher(config)
+        strategy = OnSaleMatcher(config)
         tokenized_name = GeneratedName(('fire', 'baba', 'orange'))
         generated_names = strategy.apply([tokenized_name])
         generated_tokens = [x.tokens for x in generated_names]

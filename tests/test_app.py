@@ -91,7 +91,7 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
          ["fire"]),
     ],
 )
-def test_secondary(overrides: List[str], expected: List[str]) -> None:
+def test_on_sale(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config", overrides=overrides)
         result = generate(cfg, )[0]

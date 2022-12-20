@@ -22,7 +22,7 @@ CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
 class ReImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        lines = sort_by_value(self.domains.registered.keys(), self.domains.registered, reverse=True)
+        lines = sort_by_value(self.domains.taken.keys(), self.domains.taken, reverse=True)
         self.data = '\n' + '\n'.join(lines) + '\n'
 
     def find(self, pattern: str) -> Iterable[str]:
@@ -33,7 +33,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = list(self.domains.registered.keys())
+        self.lines = list(self.domains.taken.keys())
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
@@ -75,7 +75,7 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
-            names = sort_by_value(islice(names, self.limit), self.domains.registered, reverse=True)
+            names = sort_by_value(islice(names, self.limit), self.domains.taken, reverse=True)
 
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]

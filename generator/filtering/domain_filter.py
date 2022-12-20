@@ -10,4 +10,4 @@ class DomainFilter(Filter):
         self.domains = Domains(config)
 
     def filter_name(self, name: str) -> bool:
-        return name not in self.domains.registered
+        return name not in self.domains.taken

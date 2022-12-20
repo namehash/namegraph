@@ -27,7 +27,7 @@ class RandomAvailableNameGenerator(NameGenerator):
         self.domains = Domains(config)
 
         if len(self.domains.only_available) < self.limit:
-            logger.warning('the number of primary (available) domains for RandomAvailableNameGenerator is smaller than '
+            logger.warning('the number of available (primary) domains for RandomAvailableNameGenerator is smaller than '
                            'the generation limit')
 
         self.names, probabilities = list(zip(*self.domains.only_available.items()))
