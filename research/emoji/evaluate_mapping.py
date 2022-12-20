@@ -67,9 +67,8 @@ def evaluate_vulgarisms(mapping: dict[str, list[str]], print_examples: bool = Tr
             print(name)
             if name not in mapping:
                 print(f'  not in the mapping')
-                continue
-
-            print(f'  {tps=}, {fns=}, {fps=}')
+            else:
+                print(f'  {tps=}, {fns=}, {fps=}')
 
         tp += len(tps)
         fn += len(fns)
