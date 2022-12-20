@@ -15,3 +15,6 @@ profiler.py
 *.bin
 *.ipynb
 .ipynb_checkpoints
+research/emoji_w2v/corpus.txt
+research/emoji_w2v/*.bin
+research/emoji_w2v/*.zip
