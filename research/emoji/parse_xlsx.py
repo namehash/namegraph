@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from collections import defaultdict
 from itertools import count
 import json
 
@@ -6,9 +7,18 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
 
-def is_valid_color(color: str) -> bool:
-    valid_colors = ['FFB6D7A8', 'FFD9EAD3']
-    return color in valid_colors
+def get_color(color_hex: str) -> str | None:
+    color_map = {
+        'FFB6D7A8': 'green',
+        'FFD9EAD3': 'green',
+        'FFEA9999': 'red',
+        'FFE6B8AF': 'red',
+        'FFDD7E6B': 'red',
+        'FFF4CCCC': 'red',
+        'FFFFE599': 'yellow',
+        '00000000': 'yellow'
+    }
+    return color_map[color_hex]
 
 
 def parser_xlsx(filepath: str):
@@ -23,18 +33,21 @@ def parser_xlsx(filepath: str):
         if not name:
             break
 
-        emojis = []
+        emojis = defaultdict(list)
         for column in count(4):
             coords = get_column_letter(column) + str(row)
 
             if not ws[coords].value:
                 break
 
-            if is_valid_color(ws[coords].fill.start_color.index):
-                emojis.append(ws[coords].value)
+            color_hex = ws[coords].fill.start_color.index
+            colors.add(color_hex)
 
-        if emojis:
-            name2emojis[name] = emojis
+            color = get_color(color_hex)
+            if color:
+                emojis[color].append(ws[coords].value)
+
+        name2emojis[name] = emojis
 
     return name2emojis
 

@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from pathlib import Path
 import json
 
 
@@ -15,13 +16,18 @@ def f1(tp, fp, fn):
     return 2 * (p * r) / (p + r) if p + r > 0 else 0.0
 
 
-def evaluate_vulgarisms(mapping: dict[str, list[str]], test_data: dict[str, list[str]], print_examples: bool = True) -> None:
+def evaluate(
+        name: str,
+        mapping: dict[str, list[str]],
+        test_data: dict[str, list[str]],
+        print_examples: bool = True
+) -> None:
     # https://bestlifeonline.com/sex-emoji-combinations/
     # https://www.bustle.com/articles/118910-54-clever-new-ways-to-create-sex-emoji
 
     tp, fn, fp = 0, 0, 0
 
-    print('============ VULGARISMS ============')
+    print(f'============ {name} ============')
     for name, emojis in test_data.items():
         emojis = set(emojis)
         mapping_emojis = set(mapping.get(name, []))
@@ -50,13 +56,20 @@ def evaluate_vulgarisms(mapping: dict[str, list[str]], test_data: dict[str, list
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('mapping', type=str, help='path to the json mapping (name -> list of emojis)')
-    parser.add_argument('test_data', type=str, help='path to the json mapping (name -> list of emojis)')
+    parser.add_argument('test_data', type=str, nargs='+', help='path to the json mapping (name -> list of emojis)')
     parser.add_argument('--print_examples', action='store_true', help='print all the true positive, false positive and false negative examples')
     args = parser.parse_args()
 
     with open(args.mapping, 'r', encoding='utf-8') as f:
         mapping = json.load(f)
-    with open(args.test_data, 'r', encoding='utf-8') as f:
-        test_data = json.load(f)
 
-    evaluate_vulgarisms(mapping, test_data, args.print_examples)
+    for test_filepath in args.test_data:
+        path = Path(test_filepath).resolve()
+
+        with path.open('r', encoding='utf-8') as f:
+            test_data = json.load(f)
+
+        if isinstance(list(test_data.values())[0], dict):
+            test_data = {k: v['green'] for k, v in test_data.items() if 'green' in v}
+
+        evaluate(path.name, mapping, test_data, args.print_examples)
