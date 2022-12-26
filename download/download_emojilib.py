@@ -12,6 +12,7 @@ import requests
 import nltk
 
 from gensim.models.keyedvectors import KeyedVectors
+import gensim.downloader
 from nltk.corpus import stopwords
 from tqdm import tqdm
 
@@ -210,6 +211,9 @@ if __name__ == '__main__':
 
     emoji2names_normalized = normalize_names(emoji2names)
     name2emojis = invert_emoji2names_mapping(emoji2names_normalized)
+
+    # model_path = gensim.downloader.load('glove-twitter-200', return_path=True)
+    # model = KeyedVectors.load_word2vec_format(model_path)
 
     model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
     # model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
