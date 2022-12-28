@@ -16,8 +16,14 @@ def download_whatsapp(output_filepath: str) -> None:
     r = requests.get('https://web.whatsapp.com/emoji_suggestions/en.json', headers=HEADERS)
     json_data = json.loads(r.text)
 
+    name2emojis = {
+        name: emojis
+        for name, emojis in json_data.items()
+        if ' ' not in name
+    }
+
     with open(output_filepath, 'w', encoding='utf-8') as f:
-        json.dump(json_data, f, indent=2, ensure_ascii=False)
+        json.dump(name2emojis, f, indent=2, ensure_ascii=False)
 
 
 def download_emojilib(output_filepath: str) -> None:

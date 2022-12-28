@@ -134,9 +134,6 @@
     "🕗",
     "🕛"
   ],
-  "1 eye": [
-    "👁"
-  ],
   "10:00": [
     "🕙"
   ],
@@ -160,9 +157,6 @@
   ],
   "1:30": [
     "🕜"
-  ],
-  "24 hours": [
-    "🏪"
   ],
   "2:00": [
     "🕑"
@@ -203,9 +197,6 @@
   "7:30": [
     "🕢"
   ],
-  "8 ball": [
-    "🎱"
-  ],
   "8:00": [
     "🕗"
   ],
@@ -229,14 +220,8 @@
     "❔",
     "❓"
   ],
-  "AB button": [
-    "🆎"
-  ],
   "ABCD": [
     "🔠"
-  ],
-  "ATM sign": [
-    "🏧"
   ],
   "Afghanistan": [
     "🇦🇫"
@@ -249,9 +234,6 @@
   ],
   "Algeria": [
     "🇩🇿"
-  ],
-  "American Samoa": [
-    "🇦🇸"
   ],
   "Americas": [
     "🌎"
@@ -267,9 +249,6 @@
   ],
   "Antarctica": [
     "🇦🇶"
-  ],
-  "Antigua & Barbuda": [
-    "🇦🇬"
   ],
   "Aquarius": [
     "🏺",
@@ -301,12 +280,6 @@
   ],
   "Azerbaijan": [
     "🇦🇿"
-  ],
-  "B button": [
-    "🅱"
-  ],
-  "BACK arrow": [
-    "🔙"
   ],
   "Bahamas": [
     "🇧🇸"
@@ -341,20 +314,11 @@
   "Bolivia": [
     "🇧🇴"
   ],
-  "Bosnia & Herzegovina": [
-    "🇧🇦"
-  ],
   "Botswana": [
     "🇧🇼"
   ],
   "Brazil": [
     "🇧🇷"
-  ],
-  "British Indian Ocean Territory": [
-    "🇮🇴"
-  ],
-  "British Virgin Islands": [
-    "🇻🇬"
   ],
   "Brunei": [
     "🇧🇳"
@@ -365,17 +329,8 @@
   "Bulgaria": [
     "🇧🇬"
   ],
-  "Burkina Faso": [
-    "🇧🇫"
-  ],
   "Burundi": [
     "🇧🇮"
-  ],
-  "CL button": [
-    "🆑"
-  ],
-  "COOL button": [
-    "🆒"
   ],
   "Cambodia": [
     "🇰🇭"
@@ -386,28 +341,13 @@
   "Canada": [
     "🇨🇦"
   ],
-  "Canary Islands": [
-    "🇮🇨"
-  ],
   "Cancer": [
     "♋",
     "🦀"
   ],
-  "Cape Verde": [
-    "🇨🇻"
-  ],
   "Capricorn": [
     "🐐",
     "♑"
-  ],
-  "Caribbean Netherlands": [
-    "🇧🇶"
-  ],
-  "Cayman Islands": [
-    "🇰🇾"
-  ],
-  "Central African Republic": [
-    "🇨🇫"
   ],
   "Chad": [
     "🇹🇩"
@@ -428,32 +368,11 @@
     "🎅",
     "🎄"
   ],
-  "Christmas Island": [
-    "🇨🇽"
-  ],
-  "Christmas tree": [
-    "🎄"
-  ],
-  "Cocos Keeling Islands": [
-    "🇨🇨"
-  ],
   "Colombia": [
     "🇨🇴"
   ],
   "Comoros": [
     "🇰🇲"
-  ],
-  "Congo Brazzaville": [
-    "🇨🇬"
-  ],
-  "Congo Kinshasa": [
-    "🇨🇩"
-  ],
-  "Cook Islands": [
-    "🇨🇰"
-  ],
-  "Costa Rica": [
-    "🇨🇷"
   ],
   "Croatia": [
     "🇭🇷"
@@ -467,15 +386,6 @@
   "Cyprus": [
     "🇨🇾"
   ],
-  "Czech Republic": [
-    "🇨🇿"
-  ],
-  "Côte d’Ivoire": [
-    "🇨🇮"
-  ],
-  "Democratic Republic of the Congo": [
-    "🇨🇩"
-  ],
   "Denmark": [
     "🇩🇰"
   ],
@@ -485,14 +395,8 @@
   "Dominica": [
     "🇩🇲"
   ],
-  "Dominican Republic": [
-    "🇩🇴"
-  ],
   "Dracula": [
     "🧛‍♂"
-  ],
-  "END arrow": [
-    "🔚"
   ],
   "Ecuador": [
     "🇪🇨"
@@ -500,14 +404,8 @@
   "Egypt": [
     "🇪🇬"
   ],
-  "El Salvador": [
-    "🇸🇻"
-  ],
   "England": [
     "🏴󠁧󠁢󠁥󠁮󠁧󠁿"
-  ],
-  "Equatorial Guinea": [
-    "🇬🇶"
   ],
   "Eritrea": [
     "🇪🇷"
@@ -525,18 +423,6 @@
     "🏤",
     "🏰"
   ],
-  "European Union": [
-    "🇪🇺"
-  ],
-  "FREE button": [
-    "🆓"
-  ],
-  "Falkland Islands": [
-    "🇫🇰"
-  ],
-  "Faroe Islands": [
-    "🇫🇴"
-  ],
   "Fiji": [
     "🇫🇯"
   ],
@@ -545,15 +431,6 @@
   ],
   "France": [
     "🇫🇷"
-  ],
-  "French Guiana": [
-    "🇬🇫"
-  ],
-  "French Polynesia": [
-    "🇵🇫"
-  ],
-  "French Southern Territories": [
-    "🇹🇫"
   ],
   "Gabon": [
     "🇬🇦"
@@ -615,17 +492,11 @@
   "Honduras": [
     "🇭🇳"
   ],
-  "Hong Kong SAR China": [
-    "🇭🇰"
-  ],
   "Hungary": [
     "🇭🇺"
   ],
   "ID": [
     "🪪"
-  ],
-  "ID button": [
-    "🆔"
   ],
   "ILY": [
     "🤟"
@@ -647,9 +518,6 @@
   ],
   "Ireland": [
     "🇮🇪"
-  ],
-  "Isle of Man": [
-    "🇮🇲"
   ],
   "Israel": [
     "🇮🇱"
@@ -696,69 +564,6 @@
     "🎴",
     "🈳"
   ],
-  "Japanese castle": [
-    "🏯"
-  ],
-  "Japanese dolls": [
-    "🎎"
-  ],
-  "Japanese post office": [
-    "🏣"
-  ],
-  "Japanese symbol for beginner": [
-    "🔰"
-  ],
-  "Japanese “acceptable” button": [
-    "🉑"
-  ],
-  "Japanese “application” button": [
-    "🈸"
-  ],
-  "Japanese “bargain” button": [
-    "🉐"
-  ],
-  "Japanese “congratulations” button": [
-    "㊗"
-  ],
-  "Japanese “discount” button": [
-    "🈹"
-  ],
-  "Japanese “free of charge” button": [
-    "🈚"
-  ],
-  "Japanese “here” button": [
-    "🈁"
-  ],
-  "Japanese “monthly amount” button": [
-    "🈷"
-  ],
-  "Japanese “no vacancy” button": [
-    "🈵"
-  ],
-  "Japanese “not free of charge” button": [
-    "🈶"
-  ],
-  "Japanese “open for business” button": [
-    "🈺"
-  ],
-  "Japanese “passing grade” button": [
-    "🈴"
-  ],
-  "Japanese “prohibited” button": [
-    "🈲"
-  ],
-  "Japanese “reserved” button": [
-    "🈯"
-  ],
-  "Japanese “secret” button": [
-    "㊙"
-  ],
-  "Japanese “service charge” button": [
-    "🈂"
-  ],
-  "Japanese “vacancy” button": [
-    "🈳"
-  ],
   "Jersey": [
     "🇯🇪"
   ],
@@ -768,9 +573,6 @@
   "Jewish": [
     "🕍",
     "✡"
-  ],
-  "Jolly Roger": [
-    "🏴‍☠"
   ],
   "Jordan": [
     "🇯🇴"
@@ -795,9 +597,6 @@
   ],
   "Kyrgyzstan": [
     "🇰🇬"
-  ],
-  "LOTR style": [
-    "🧝‍♀"
   ],
   "Laos": [
     "🇱🇦"
@@ -834,9 +633,6 @@
   "Luxembourg": [
     "🇱🇺"
   ],
-  "Macau SAR China": [
-    "🇲🇴"
-  ],
   "Macedonia": [
     "🇲🇰"
   ],
@@ -857,9 +653,6 @@
   ],
   "Malta": [
     "🇲🇹"
-  ],
-  "Marshall Islands": [
-    "🇲🇭"
   ],
   "Martinique": [
     "🇲🇶"
@@ -908,15 +701,6 @@
     "🕌",
     "☪"
   ],
-  "Myanmar Burma": [
-    "🇲🇲"
-  ],
-  "NEW button": [
-    "🆕"
-  ],
-  "NG button": [
-    "🆖"
-  ],
   "Namibia": [
     "🇳🇦"
   ],
@@ -928,12 +712,6 @@
   ],
   "Netherlands": [
     "🇳🇱"
-  ],
-  "New Caledonia": [
-    "🇳🇨"
-  ],
-  "New Zealand": [
-    "🇳🇿"
   ],
   "Nicaragua": [
     "🇳🇮"
@@ -947,35 +725,14 @@
   "Niue": [
     "🇳🇺"
   ],
-  "Norfolk Island": [
-    "🇳🇫"
-  ],
-  "North Korea": [
-    "🇰🇵"
-  ],
-  "Northern Mariana Islands": [
-    "🇲🇵"
-  ],
   "Norway": [
     "🇳🇴"
-  ],
-  "O button": [
-    "🅾"
   ],
   "OK": [
     "👌",
     "🆗",
     "🙆",
     "🙆‍♂"
-  ],
-  "OK button": [
-    "🆗"
-  ],
-  "OK hand": [
-    "👌"
-  ],
-  "ON! arrow": [
-    "🔛"
   ],
   "Oberon": [
     "🧚‍♂"
@@ -990,9 +747,6 @@
   "Orthoptera": [
     "🦗"
   ],
-  "P button": [
-    "🅿"
-  ],
   "Pakistan": [
     "🇵🇰"
   ],
@@ -1002,14 +756,8 @@
   "Palestine": [
     "🇵🇸"
   ],
-  "Palestinian Territories": [
-    "🇵🇸"
-  ],
   "Panama": [
     "🇵🇦"
-  ],
-  "Papua New Guinea": [
-    "🇵🇬"
   ],
   "Paraguay": [
     "🇵🇾"
@@ -1024,9 +772,6 @@
     "🐟",
     "♓"
   ],
-  "Pitcairn Islands": [
-    "🇵🇳"
-  ],
   "Poland": [
     "🇵🇱"
   ],
@@ -1036,14 +781,8 @@
   "Puck": [
     "🧚‍♂"
   ],
-  "Puerto Rico": [
-    "🇵🇷"
-  ],
   "Qatar": [
     "🇶🇦"
-  ],
-  "Republic of the Congo": [
-    "🇨🇬"
   ],
   "Romania": [
     "🇷🇴"
@@ -1057,27 +796,12 @@
   "Réunion": [
     "🇷🇪"
   ],
-  "SOON arrow": [
-    "🔜"
-  ],
-  "SOS button": [
-    "🆘"
-  ],
   "Sagittarius": [
     "🏹",
     "♐"
   ],
   "Samoa": [
     "🇼🇸"
-  ],
-  "San Marino": [
-    "🇸🇲"
-  ],
-  "Santa Claus": [
-    "🎅"
-  ],
-  "Saudi Arabia": [
-    "🇸🇦"
   ],
   "Scorpius": [
     "♏",
@@ -1095,14 +819,8 @@
   "Seychelles": [
     "🇸🇨"
   ],
-  "Sierra Leone": [
-    "🇸🇱"
-  ],
   "Singapore": [
     "🇸🇬"
-  ],
-  "Sint Maarten": [
-    "🇸🇽"
   ],
   "Slovakia": [
     "🇸🇰"
@@ -1110,50 +828,11 @@
   "Slovenia": [
     "🇸🇮"
   ],
-  "Solomon Islands": [
-    "🇸🇧"
-  ],
   "Somalia": [
     "🇸🇴"
   ],
-  "South Africa": [
-    "🇿🇦"
-  ],
-  "South Georgia & South Sandwich Islands": [
-    "🇬🇸"
-  ],
-  "South Korea": [
-    "🇰🇷"
-  ],
-  "South Sudan": [
-    "🇸🇸"
-  ],
   "Spain": [
     "🇪🇸"
-  ],
-  "Sri Lanka": [
-    "🇱🇰"
-  ],
-  "St. Barthélemy": [
-    "🇧🇱"
-  ],
-  "St. Helena": [
-    "🇸🇭"
-  ],
-  "St. Kitts & Nevis": [
-    "🇰🇳"
-  ],
-  "St. Lucia": [
-    "🇱🇨"
-  ],
-  "St. Pierre & Miquelon": [
-    "🇵🇲"
-  ],
-  "St. Vincent & Grenadines": [
-    "🇻🇨"
-  ],
-  "Statue of Liberty": [
-    "🗽"
   ],
   "Sudan": [
     "🇸🇩"
@@ -1173,14 +852,8 @@
   "Syria": [
     "🇸🇾"
   ],
-  "São Tomé & Príncipe": [
-    "🇸🇹"
-  ],
   "T-Rex": [
     "🦖"
-  ],
-  "TOP arrow": [
-    "🔝"
   ],
   "Taiwan": [
     "🇹🇼"
@@ -1213,14 +886,8 @@
   "Tokyo": [
     "🗼"
   ],
-  "Tokyo tower": [
-    "🗼"
-  ],
   "Tonga": [
     "🇹🇴"
-  ],
-  "Trinidad & Tobago": [
-    "🇹🇹"
   ],
   "Triton": [
     "🧜‍♂"
@@ -1234,23 +901,11 @@
   "Turkmenistan": [
     "🇹🇲"
   ],
-  "Turks & Caicos Islands": [
-    "🇹🇨"
-  ],
   "Tuvalu": [
     "🇹🇻"
   ],
-  "Tyrannosaurus Rex": [
-    "🦖"
-  ],
-  "U.S. Virgin Islands": [
-    "🇻🇮"
-  ],
   "UFO": [
     "🛸"
-  ],
-  "UP! button": [
-    "🆙"
   ],
   "Uganda": [
     "🇺🇬"
@@ -1258,29 +913,14 @@
   "Ukraine": [
     "🇺🇦"
   ],
-  "United Arab Emirates": [
-    "🇦🇪"
-  ],
-  "United Kingdom": [
-    "🇬🇧"
-  ],
-  "United States": [
-    "🇺🇸"
-  ],
   "Uruguay": [
     "🇺🇾"
   ],
   "Uzbekistan": [
     "🇺🇿"
   ],
-  "VS button": [
-    "🆚"
-  ],
   "Vanuatu": [
     "🇻🇺"
-  ],
-  "Vatican City": [
-    "🇻🇦"
   ],
   "Venezuela": [
     "🇻🇪"
@@ -1296,12 +936,6 @@
   ],
   "Wales": [
     "🏴󠁧󠁢󠁷󠁬󠁳󠁿"
-  ],
-  "Wallis & Futuna": [
-    "🇼🇫"
-  ],
-  "Western Sahara": [
-    "🇪🇭"
   ],
   "Yemen": [
     "🇾🇪"
@@ -1382,17 +1016,11 @@
   "actress": [
     "🎭"
   ],
-  "adhesive bandage": [
-    "🩹"
-  ],
   "admiration": [
     "🥹"
   ],
   "admission": [
     "🎫",
-    "🎟"
-  ],
-  "admission tickets": [
     "🎟"
   ],
   "adorbs": [
@@ -1416,9 +1044,6 @@
     "👩‍🦲"
   ],
   "aerial": [
-    "🚡"
-  ],
-  "aerial tramway": [
     "🚡"
   ],
   "aeroplane": [
@@ -1454,17 +1079,8 @@
     "🛫",
     "🛬"
   ],
-  "airplane arrival": [
-    "🛬"
-  ],
-  "airplane departure": [
-    "🛫"
-  ],
   "alarm": [
     "🚨",
-    "⏰"
-  ],
-  "alarm clock": [
     "⏰"
   ],
   "alcohol": [
@@ -1483,9 +1099,6 @@
   "alien": [
     "👾",
     "👽"
-  ],
-  "alien monster": [
-    "👾"
   ],
   "aliens": [
     "📡",
@@ -1516,9 +1129,6 @@
   "american": [
     "🏈"
   ],
-  "american football": [
-    "🏈"
-  ],
   "amoeba": [
     "🦠"
   ],
@@ -1528,10 +1138,6 @@
   "amtrak": [
     "🚄",
     "🚅"
-  ],
-  "amusement park": [
-    "🎡",
-    "🎢"
   ],
   "amusementpark": [
     "🎡",
@@ -1559,9 +1165,6 @@
     "😠",
     "😡"
   ],
-  "anger symbol": [
-    "💢"
-  ],
   "angle": [
     "📐",
     "📏"
@@ -1574,16 +1177,7 @@
     "💢",
     "🗯"
   ],
-  "angry face": [
-    "😠"
-  ],
-  "angry face with horns": [
-    "👿"
-  ],
   "anguished": [
-    "😧"
-  ],
-  "anguished face": [
     "😧"
   ],
   "animal": [
@@ -1745,13 +1339,7 @@
     "📡",
     "📶"
   ],
-  "antenna bars": [
-    "📶"
-  ],
   "anticlockwise": [
-    "🔄"
-  ],
-  "anticlockwise arrows button": [
     "🔄"
   ],
   "anxious": [
@@ -1772,9 +1360,6 @@
   "apple": [
     "🍏",
     "🍎"
-  ],
-  "apple pie": [
-    "🥧"
   ],
   "appreciate": [
     "🙏"
@@ -1865,15 +1450,9 @@
     "🖼",
     "🎭"
   ],
-  "articulated lorry": [
-    "🚛"
-  ],
   "artist": [
     "👨‍🎨",
     "👩‍🎨"
-  ],
-  "artist palette": [
-    "🎨"
   ],
   "artsy": [
     "🎨"
@@ -1903,9 +1482,6 @@
   "astonished": [
     "😲"
   ],
-  "astonished face": [
-    "😲"
-  ],
   "astronaut": [
     "👩‍🚀",
     "👨‍🚀"
@@ -1928,9 +1504,6 @@
   "atom": [
     "⚛"
   ],
-  "atom symbol": [
-    "⚛"
-  ],
   "attraction": [
     "🧲"
   ],
@@ -1939,9 +1512,6 @@
   ],
   "australia": [
     "🐨"
-  ],
-  "auto rickshaw": [
-    "🛺"
   ],
   "automated": [
     "🏧"
@@ -2039,23 +1609,8 @@
     "👨‍🍼",
     "🧑‍🍼"
   ],
-  "baby angel": [
-    "👼"
-  ],
-  "baby bottle": [
-    "🍼"
-  ],
-  "baby chick": [
-    "🐤"
-  ],
-  "baby symbol": [
-    "🚼"
-  ],
   "back": [
     "🔙"
-  ],
-  "back door": [
-    "🚪"
   ],
   "backhand": [
     "👈",
@@ -2063,18 +1618,6 @@
     "👆",
     "🤚",
     "👇"
-  ],
-  "backhand index pointing down": [
-    "👇"
-  ],
-  "backhand index pointing left": [
-    "👈"
-  ],
-  "backhand index pointing right": [
-    "👉"
-  ],
-  "backhand index pointing up": [
-    "👆"
   ],
   "backpack": [
     "🎒"
@@ -2102,12 +1645,6 @@
     "🦹‍♀",
     "🦹",
     "🦹‍♂"
-  ],
-  "bad guy": [
-    "🦹‍♂"
-  ],
-  "bad haircut": [
-    "👵"
   ],
   "badge": [
     "📛"
@@ -2148,9 +1685,6 @@
     "🛄",
     "🛅"
   ],
-  "baggage claim": [
-    "🛄"
-  ],
   "bags": [
     "🛄"
   ],
@@ -2164,9 +1698,6 @@
   "balance": [
     "⚖",
     "♎"
-  ],
-  "balance scale": [
-    "⚖"
   ],
   "bald": [
     "👴",
@@ -2201,12 +1732,6 @@
   "ballet": [
     "🩰"
   ],
-  "ballet flat": [
-    "🥿"
-  ],
-  "ballet shoes": [
-    "🩰"
-  ],
   "balloon": [
     "🗯",
     "💬",
@@ -2216,9 +1741,6 @@
   "ballot": [
     "🗳",
     "☑"
-  ],
-  "ballot box with ballot": [
-    "🗳"
   ],
   "ballpoint": [
     "🖊"
@@ -2288,16 +1810,10 @@
     "📊",
     "🧼"
   ],
-  "bar chart": [
-    "📊"
-  ],
   "barber": [
     "💈",
     "💇",
     "💇‍♂"
-  ],
-  "barber pole": [
-    "💈"
   ],
   "barefoot": [
     "👣"
@@ -2319,9 +1835,6 @@
   "baseball": [
     "⚾"
   ],
-  "baseball cap": [
-    "🧢"
-  ],
   "basic": [
     "😐",
     "😑"
@@ -2332,9 +1845,6 @@
   "basketball": [
     "⛹",
     "🏀"
-  ],
-  "basketball player": [
-    "⛹"
   ],
   "bat": [
     "🏏",
@@ -2347,12 +1857,6 @@
   ],
   "bathing": [
     "🧼"
-  ],
-  "bathing suit": [
-    "👙",
-    "🩱",
-    "🩲",
-    "🩳"
   ],
   "bathroom": [
     "🚽"
@@ -2375,9 +1879,6 @@
   "bawling": [
     "😭"
   ],
-  "be quiet": [
-    "🤫"
-  ],
   "beach": [
     "😎",
     "🐋",
@@ -2391,9 +1892,6 @@
     "🌞",
     "🏄‍♀",
     "🩴"
-  ],
-  "beach with umbrella": [
-    "🏖"
   ],
   "beacon": [
     "🚨"
@@ -2414,18 +1912,12 @@
     "🧸",
     "🐻‍❄"
   ],
-  "bear face": [
-    "🐻"
-  ],
   "beard": [
     "🧔",
     "🧔‍♀",
     "🧔‍♂"
   ],
   "bearded": [
-    "🧔"
-  ],
-  "bearded person": [
     "🧔"
   ],
   "bearer": [
@@ -2440,9 +1932,6 @@
     "🫀"
   ],
   "beating": [
-    "💓"
-  ],
-  "beating heart": [
     "💓"
   ],
   "beauty": [
@@ -2472,9 +1961,6 @@
     "🍺",
     "🍻"
   ],
-  "beer mug": [
-    "🍺"
-  ],
   "beetle": [
     "🐞",
     "🪲"
@@ -2497,34 +1983,10 @@
     "🔔",
     "🎐"
   ],
-  "bell pepper": [
-    "🫑"
-  ],
-  "bell with slash": [
-    "🔕"
-  ],
   "bellhop": [
     "🛎"
   ],
-  "bellhop bell": [
-    "🛎"
-  ],
-  "belmont stakes": [
-    "🐎"
-  ],
-  "bench press": [
-    "💪"
-  ],
-  "bent hat": [
-    "🧢"
-  ],
-  "bent leg": [
-    "🦵"
-  ],
   "bento": [
-    "🍱"
-  ],
-  "bento box": [
     "🍱"
   ],
   "berries": [
@@ -2588,14 +2050,6 @@
     "🚴‍♀",
     "🚵‍♀"
   ],
-  "big cat": [
-    "🐯",
-    "🐅",
-    "🐆"
-  ],
-  "big eyes": [
-    "🥺"
-  ],
   "bike": [
     "🚴",
     "🚵",
@@ -2603,12 +2057,6 @@
     "🚲",
     "🚴‍♀",
     "🚵‍♀"
-  ],
-  "bike gang": [
-    "🚲"
-  ],
-  "bike lock": [
-    "🔐"
   ],
   "biking": [
     "🚴",
@@ -2623,9 +2071,6 @@
     "💷",
     "💴",
     "💵"
-  ],
-  "billed cap": [
-    "🧢"
   ],
   "billiard": [
     "🎱"
@@ -2682,9 +2127,6 @@
     "🎈",
     "🥳"
   ],
-  "birthday cake": [
-    "🎂"
-  ],
   "bisexual": [
     "👨‍👨‍👧‍👧",
     "👨‍👨‍👧‍👦",
@@ -2712,33 +2154,6 @@
   "black": [
     "🖤",
     "🐈‍⬛"
-  ],
-  "black cat": [
-    "🐈‍⬛"
-  ],
-  "black circle": [
-    "⚫"
-  ],
-  "black flag": [
-    "🏴"
-  ],
-  "black large square": [
-    "⬛"
-  ],
-  "black medium square": [
-    "◼"
-  ],
-  "black medium-small square": [
-    "◾"
-  ],
-  "black nib": [
-    "✒"
-  ],
-  "black small square": [
-    "▪"
-  ],
-  "black square button": [
-    "🔲"
   ],
   "blades": [
     "🛼"
@@ -2772,9 +2187,6 @@
   "blond": [
     "👵"
   ],
-  "blond-haired person": [
-    "👱"
-  ],
   "blonde": [
     "👩",
     "👱",
@@ -2787,12 +2199,6 @@
   "blood": [
     "🧛‍♂",
     "🧛‍♀"
-  ],
-  "blood type": [
-    "🆎",
-    "🅾",
-    "🅱",
-    "🅰"
   ],
   "blossom": [
     "🌷",
@@ -2830,18 +2236,6 @@
     "🥶",
     "🟦"
   ],
-  "blue book": [
-    "📘"
-  ],
-  "blue bottle": [
-    "🪰"
-  ],
-  "blue circle": [
-    "🔵"
-  ],
-  "blue heart": [
-    "💙"
-  ],
   "blue-faced": [
     "🥶"
   ],
@@ -2860,9 +2254,6 @@
   ],
   "board": [
     "🛹"
-  ],
-  "board game": [
-    "♟"
   ],
   "boat": [
     "🛥",
@@ -2889,9 +2280,6 @@
   ],
   "bodybuilder": [
     "💪"
-  ],
-  "bok choy": [
-    "🥬"
   ],
   "bollywood": [
     "🎥"
@@ -2941,9 +2329,6 @@
     "📑",
     "🔖"
   ],
-  "bookmark tabs": [
-    "📑"
-  ],
   "books": [
     "📚"
   ],
@@ -2985,12 +2370,6 @@
     "🍼",
     "🍾"
   ],
-  "bottle with popping cork": [
-    "🍾"
-  ],
-  "bottoms up": [
-    "🍻"
-  ],
   "boulder": [
     "🪨"
   ],
@@ -3004,14 +2383,8 @@
     "🙇",
     "🙇‍♀"
   ],
-  "bow and arrow": [
-    "🏹"
-  ],
   "bowl": [
     "🍜"
-  ],
-  "bowl with spoon": [
-    "🥣"
   ],
   "bowling": [
     "🎳"
@@ -3061,9 +2434,6 @@
   "brain": [
     "🧠"
   ],
-  "brain fog": [
-    "😶‍🌫"
-  ],
   "branch": [
     "🪹",
     "🪺"
@@ -3096,9 +2466,6 @@
   "breast": [
     "🤱"
   ],
-  "breast feeding": [
-    "🤱"
-  ],
   "breast-feeding": [
     "🤱"
   ],
@@ -3119,13 +2486,7 @@
     "👰‍♂",
     "👰‍♀"
   ],
-  "bride with veil": [
-    "👰"
-  ],
   "bridge": [
-    "🌉"
-  ],
-  "bridge at night": [
     "🌉"
   ],
   "briefcase": [
@@ -3140,9 +2501,6 @@
     "🌝",
     "🔆",
     "🌞"
-  ],
-  "bright button": [
-    "🔆"
   ],
   "bright-eyed": [
     "👧"
@@ -3164,9 +2522,6 @@
     "💔",
     "❤‍🩹"
   ],
-  "broken heart": [
-    "💔"
-  ],
   "brontosaurus": [
     "🦕"
   ],
@@ -3181,9 +2536,6 @@
     "🤎",
     "🟤",
     "🟫"
-  ],
-  "brown shoe": [
-    "🥾"
   ],
   "brr": [
     "🧥"
@@ -3204,18 +2556,11 @@
     "💭",
     "🫧"
   ],
-  "bubble tea": [
-    "🧋"
-  ],
   "bubbles": [
     "🫧"
   ],
   "bucket": [
     "🪣"
-  ],
-  "buckingham palace": [
-    "💂",
-    "💂‍♀"
   ],
   "buddhist": [
     "☸"
@@ -3250,9 +2595,6 @@
     "🌆",
     "🏰"
   ],
-  "building construction": [
-    "🏗"
-  ],
   "bulb": [
     "💡"
   ],
@@ -3273,18 +2615,10 @@
   "bump": [
     "👊"
   ],
-  "bundle up": [
-    "🧣",
-    "🧥"
-  ],
   "bunny": [
     "👯",
     "🐰",
     "🐇"
-  ],
-  "bunny ear": [
-    "👯",
-    "👯‍♂"
   ],
   "buoy": [
     "🛟"
@@ -3310,9 +2644,6 @@
     "🚋",
     "🚐"
   ],
-  "bus stop": [
-    "🚏"
-  ],
   "business": [
     "👩‍💼",
     "👨‍💼",
@@ -3323,12 +2654,6 @@
   ],
   "bust": [
     "👤",
-    "👥"
-  ],
-  "bust in silhouette": [
-    "👤"
-  ],
-  "busts in silhouette": [
     "👥"
   ],
   "butter": [
@@ -3438,9 +2763,6 @@
     "🎦",
     "🤳"
   ],
-  "camera with flash": [
-    "📸"
-  ],
   "camping": [
     "⛺",
     "🏕",
@@ -3464,17 +2786,8 @@
     "🍫",
     "🪅"
   ],
-  "canned food": [
-    "🥫"
-  ],
   "canoe": [
     "🛶"
-  ],
-  "cant even": [
-    "😶"
-  ],
-  "cant watch": [
-    "🙈"
   ],
   "cantaloupe": [
     "🍈"
@@ -3521,15 +2834,6 @@
     "♦",
     "🪧"
   ],
-  "card file box": [
-    "🗃"
-  ],
-  "card index": [
-    "📇"
-  ],
-  "card index dividers": [
-    "🗂"
-  ],
   "cardiac": [
     "💛"
   ],
@@ -3548,13 +2852,7 @@
   "carousel": [
     "🎠"
   ],
-  "carousel horse": [
-    "🎠"
-  ],
   "carp": [
-    "🎏"
-  ],
-  "carp streamer": [
     "🎏"
   ],
   "carrot": [
@@ -3587,9 +2885,6 @@
     "💰",
     "💲"
   ],
-  "cash out": [
-    "💰"
-  ],
   "casino": [
     "🎰"
   ],
@@ -3618,20 +2913,8 @@
     "🐱",
     "🐈‍⬛"
   ],
-  "cat face": [
-    "🐱"
-  ],
-  "cat face with tears of joy": [
-    "😹"
-  ],
-  "cat face with wry smile": [
-    "😼"
-  ],
   "cats": [
     "🐈"
-  ],
-  "caught off guard": [
-    "😦"
   ],
   "caution": [
     "⚠"
@@ -3714,9 +2997,6 @@
     "💳",
     "💲"
   ],
-  "charge it": [
-    "💳"
-  ],
   "charm": [
     "🧿"
   ],
@@ -3730,15 +3010,6 @@
     "📉",
     "📊"
   ],
-  "chart decreasing": [
-    "📉"
-  ],
-  "chart increasing": [
-    "📈"
-  ],
-  "chart increasing with yen": [
-    "💹"
-  ],
   "check": [
     "✅",
     "✔",
@@ -3751,9 +3022,6 @@
     "✅",
     "🛄",
     "✔"
-  ],
-  "checked off": [
-    "☑"
   ],
   "checkered": [
     "🏁"
@@ -3780,9 +3048,6 @@
     "🫕",
     "🪤"
   ],
-  "cheese wedge": [
-    "🧀"
-  ],
   "chef": [
     "🔪",
     "👩‍🍳",
@@ -3800,9 +3065,6 @@
   "chequered": [
     "🏁"
   ],
-  "chequered flag": [
-    "🏁"
-  ],
   "cherries": [
     "🍒"
   ],
@@ -3810,13 +3072,7 @@
     "🌸",
     "🍒"
   ],
-  "cherry blossom": [
-    "🌸"
-  ],
   "chess": [
-    "♟"
-  ],
-  "chess pawn": [
     "♟"
   ],
   "chest": [
@@ -3848,9 +3104,6 @@
   "children": [
     "👶"
   ],
-  "children crossing": [
-    "🚸"
-  ],
   "chill": [
     "😶‍🌫"
   ],
@@ -3871,15 +3124,6 @@
   ],
   "chocolate": [
     "🍫"
-  ],
-  "chocolate bar": [
-    "🍫"
-  ],
-  "chocolate chip": [
-    "🍪"
-  ],
-  "choo choo": [
-    "🚆"
   ],
   "chop": [
     "🥩",
@@ -3903,9 +3147,6 @@
     "🎄",
     "🧑‍🎄"
   ],
-  "christmas tree": [
-    "🌲"
-  ],
   "church": [
     "🔔",
     "👼",
@@ -3913,9 +3154,6 @@
   ],
   "cigarette": [
     "🚬"
-  ],
-  "cinco de mayo": [
-    "🪅"
   ],
   "cinema": [
     "🎥",
@@ -3937,13 +3175,7 @@
     "🟣",
     "🟤"
   ],
-  "circled M": [
-    "Ⓜ"
-  ],
   "circus": [
-    "🎪"
-  ],
-  "circus tent": [
     "🎪"
   ],
   "citrus": [
@@ -3973,16 +3205,7 @@
   "clapper": [
     "🎬"
   ],
-  "clapper board": [
-    "🎬"
-  ],
-  "clapping hands": [
-    "👏"
-  ],
   "classical": [
-    "🏛"
-  ],
-  "classical building": [
     "🏛"
   ],
   "classy": [
@@ -4014,9 +3237,6 @@
     "✊",
     "👊"
   ],
-  "climate change": [
-    "🪸"
-  ],
   "climb": [
     "🪜"
   ],
@@ -4031,9 +3251,6 @@
   "clink": [
     "🍻",
     "🥂"
-  ],
-  "clinking beer mugs": [
-    "🍻"
   ],
   "clipboard": [
     "📋"
@@ -4074,12 +3291,6 @@
     "🔁",
     "🔂"
   ],
-  "clockwise vertical arrows": [
-    "🔃"
-  ],
-  "close call": [
-    "😥"
-  ],
   "closed": [
     "📕",
     "📪",
@@ -4087,21 +3298,6 @@
     "🔒",
     "😚",
     "📫"
-  ],
-  "closed book": [
-    "📕"
-  ],
-  "closed eyes": [
-    "😙"
-  ],
-  "closed mailbox with lowered flag": [
-    "📪"
-  ],
-  "closed mailbox with raised flag": [
-    "📫"
-  ],
-  "closed umbrella": [
-    "🌂"
   ],
   "closet": [
     "🚪",
@@ -4163,18 +3359,6 @@
     "🌫",
     "💭"
   ],
-  "cloud with lightning": [
-    "🌩"
-  ],
-  "cloud with lightning and rain": [
-    "⛈"
-  ],
-  "cloud with rain": [
-    "🌧"
-  ],
-  "cloud with snow": [
-    "🌨"
-  ],
   "cloudy": [
     "⛅"
   ],
@@ -4190,18 +3374,12 @@
     "🍸",
     "♣"
   ],
-  "club suit": [
-    "♣"
-  ],
   "clubs": [
     "♣"
   ],
   "clue": [
     "🗝",
     "🧩"
-  ],
-  "clutch bag": [
-    "👝"
   ],
   "cmon": [
     "🙏"
@@ -4220,9 +3398,6 @@
     "🍸",
     "🤵‍♂",
     "🤵‍♀"
-  ],
-  "cocktail glass": [
-    "🍸"
   ],
   "coconut": [
     "🥥"
@@ -4244,9 +3419,6 @@
   "colada": [
     "🍍"
   ],
-  "colbert emoji": [
-    "🤨"
-  ],
   "cold": [
     "⛄",
     "❄",
@@ -4263,12 +3435,6 @@
     "🥶",
     "🧊",
     "🐻‍❄"
-  ],
-  "cold face": [
-    "🥶"
-  ],
-  "cold teeth": [
-    "🥶"
   ],
   "collage": [
     "📌"
@@ -4366,12 +3532,6 @@
     "🖲",
     "⌨"
   ],
-  "computer disk": [
-    "💽"
-  ],
-  "computer mouse": [
-    "🖱"
-  ],
   "concentrate": [
     "😣"
   ],
@@ -4390,13 +3550,7 @@
   "confetti": [
     "🎊"
   ],
-  "confetti ball": [
-    "🎊"
-  ],
   "confounded": [
-    "😖"
-  ],
-  "confounded face": [
     "😖"
   ],
   "confused": [
@@ -4404,9 +3558,6 @@
     "😖",
     "😵‍💫",
     "🫤"
-  ],
-  "confused face": [
-    "😕"
   ],
   "confusing": [
     "😕"
@@ -4436,10 +3587,6 @@
     "🏗",
     "👷‍♀"
   ],
-  "construction worker": [
-    "👷",
-    "👷‍♀"
-  ],
   "contact": [
     "🔎",
     "📡",
@@ -4449,16 +3596,10 @@
     "🛂",
     "🎛"
   ],
-  "control knobs": [
-    "🎛"
-  ],
   "controller": [
     "🎮"
   ],
   "convenience": [
-    "🏪"
-  ],
-  "convenience store": [
     "🏪"
   ],
   "convoluted": [
@@ -4467,9 +3608,6 @@
   "cook": [
     "👩‍🍳",
     "👨‍🍳"
-  ],
-  "cooked rice": [
-    "🍚"
   ],
   "cookie": [
     "🍪"
@@ -4530,15 +3668,8 @@
   "couch": [
     "🛋"
   ],
-  "couch and lamp": [
-    "🛋"
-  ],
   "counterclockwise": [
     "🔄"
-  ],
-  "country home": [
-    "🏡",
-    "🏠"
   ],
   "couple": [
     "💏",
@@ -4554,21 +3685,12 @@
     "🧑‍🤝‍🧑",
     "👩‍❤‍💋‍👨"
   ],
-  "couple with heart": [
-    "💑",
-    "👩‍❤‍👩",
-    "👨‍❤‍👨",
-    "👩‍❤‍👩"
-  ],
   "cover": [
     "📔"
   ],
   "cow": [
     "🐮",
     "🐄"
-  ],
-  "cow face": [
-    "🐮"
   ],
   "cowboy": [
     "🤠"
@@ -4596,12 +3718,6 @@
     "😜",
     "🤪"
   ],
-  "crazy eyes": [
-    "🤪"
-  ],
-  "crazy face": [
-    "🤪"
-  ],
   "cream": [
     "🍦",
     "🍨"
@@ -4620,19 +3736,10 @@
   "credit": [
     "💳"
   ],
-  "credit card": [
-    "💳"
-  ],
   "crescent": [
     "🌒",
     "🌙",
     "🌘"
-  ],
-  "crescent moon": [
-    "🌙"
-  ],
-  "crescent roll": [
-    "🥐"
   ],
   "cricket": [
     "🏏",
@@ -4652,9 +3759,6 @@
   "crocodile": [
     "🐊"
   ],
-  "crocodile dundee": [
-    "🐊"
-  ],
   "croissant": [
     "🥐"
   ],
@@ -4669,25 +3773,12 @@
     "☦",
     "⛑"
   ],
-  "cross legged": [
-    "🧘‍♂",
-    "🧘‍♀"
-  ],
-  "cross mark button": [
-    "❎"
-  ],
   "crossbones": [
     "☠"
   ],
   "crossed": [
     "🎌",
     "🔀",
-    "⚔"
-  ],
-  "crossed flags": [
-    "🎌"
-  ],
-  "crossed swords": [
     "⚔"
   ],
   "crossing": [
@@ -4726,20 +3817,7 @@
   "crying\nlaughing": [
     "🤣"
   ],
-  "crying cat face": [
-    "😿"
-  ],
-  "crying face": [
-    "😢"
-  ],
-  "crying laughing": [
-    "🤣",
-    "😂"
-  ],
   "crystal": [
-    "🔮"
-  ],
-  "crystal ball": [
     "🔮"
   ],
   "crêpe": [
@@ -4758,41 +3836,22 @@
     "🍶",
     "🍵"
   ],
-  "cup with straw": [
-    "🥤"
-  ],
   "cupcake": [
     "🧁"
   ],
   "cupid": [
     "💘"
   ],
-  "cupped hands": [
-    "🤲"
-  ],
   "curious": [
     "🦝"
-  ],
-  "curious george": [
-    "🐵"
   ],
   "curl": [
     "➰",
     "📃",
     "➿"
   ],
-  "curling stone": [
-    "🥌"
-  ],
   "curls": [
     "💪"
-  ],
-  "curly hair": [
-    "👨‍🦱",
-    "👩‍🦱"
-  ],
-  "curly loop": [
-    "➰"
   ],
   "currency": [
     "💹",
@@ -4803,13 +3862,7 @@
     "💱",
     "💲"
   ],
-  "currency exchange": [
-    "💱"
-  ],
   "curry": [
-    "🍛"
-  ],
-  "curry rice": [
     "🍛"
   ],
   "cursing": [
@@ -4827,9 +3880,6 @@
   "cut": [
     "✂",
     "🪚"
-  ],
-  "cut of meat": [
-    "🥩"
   ],
   "cutting": [
     "✂"
@@ -4859,12 +3909,6 @@
   "dad": [
     "👨‍🍼",
     "🧑‍🍼"
-  ],
-  "dad cap": [
-    "🧢"
-  ],
-  "dad hat": [
-    "🧢"
   ],
   "dagger": [
     "🗡"
@@ -4913,9 +3957,6 @@
   "dash": [
     "💨",
     "〰"
-  ],
-  "dashing away": [
-    "💨"
   ],
   "data": [
     "📈",
@@ -4986,9 +4027,6 @@
   "deaf": [
     "🧏"
   ],
-  "deaf person": [
-    "🧏"
-  ],
   "deal": [
     "🤝"
   ],
@@ -4999,9 +4037,6 @@
     "☠"
   ],
   "deciduous": [
-    "🌳"
-  ],
-  "deciduous tree": [
     "🌳"
   ],
   "decisions": [
@@ -5038,9 +4073,6 @@
     "📦",
     "🚚"
   ],
-  "delivery truck": [
-    "🚚"
-  ],
   "demon": [
     "👿"
   ],
@@ -5055,9 +4087,6 @@
   "department": [
     "🏬"
   ],
-  "department store": [
-    "🏬"
-  ],
   "departure": [
     "🛫"
   ],
@@ -5070,9 +4099,6 @@
   "derelict": [
     "🏚"
   ],
-  "derelict house": [
-    "🏚"
-  ],
   "dermatologist": [
     "😷"
   ],
@@ -5082,13 +4108,7 @@
     "🏜",
     "🌵"
   ],
-  "desert island": [
-    "🏝"
-  ],
   "desktop": [
-    "🖥"
-  ],
-  "desktop computer": [
     "🖥"
   ],
   "desrt": [
@@ -5138,12 +4158,6 @@
     "🔷",
     "♦"
   ],
-  "diamond suit": [
-    "♦"
-  ],
-  "diamond with a dot": [
-    "💠"
-  ],
   "dice": [
     "🎲"
   ],
@@ -5162,9 +4176,6 @@
   "dim": [
     "🔅"
   ],
-  "dim button": [
-    "🔅"
-  ],
   "dinner": [
     "🍽",
     "🐟",
@@ -5180,9 +4191,6 @@
   "diplodocus": [
     "🦕"
   ],
-  "direct hit": [
-    "🎯"
-  ],
   "direction": [
     "↖",
     "⬇",
@@ -5197,12 +4205,6 @@
   "disappointed": [
     "😥",
     "😔",
-    "😞"
-  ],
-  "disappointed but relieved face": [
-    "😥"
-  ],
-  "disappointed face": [
     "😞"
   ],
   "disapproval": [
@@ -5262,9 +4264,6 @@
     "🦪",
     "🤿"
   ],
-  "diving mask": [
-    "🤿"
-  ],
   "division": [
     "➗"
   ],
@@ -5278,18 +4277,12 @@
     "🥴",
     "😵‍💫"
   ],
-  "dizzy face": [
-    "😵"
-  ],
   "djinn": [
     "🧞‍♀",
     "🧞‍♂"
   ],
   "dna": [
     "🧬"
-  ],
-  "do not pass": [
-    "⛔"
   ],
   "doctor": [
     "🏥",
@@ -5316,9 +4309,6 @@
     "🦴",
     "🐕‍🦺"
   ],
-  "dog face": [
-    "🐶"
-  ],
   "dogs": [
     "🐕"
   ],
@@ -5332,17 +4322,11 @@
     "💲",
     "🪙"
   ],
-  "dollar banknote": [
-    "💵"
-  ],
   "dolls": [
     "🪆"
   ],
   "dolphin": [
     "🐬"
-  ],
-  "don't know": [
-    "🫴"
   ],
   "done": [
     "✅",
@@ -5352,18 +4336,12 @@
   "donut": [
     "🍩"
   ],
-  "doo doo": [
-    "💩"
-  ],
   "door": [
     "🚪"
   ],
   "dope": [
     "👌",
     "👍"
-  ],
-  "dotted six-pointed star": [
-    "🔯"
   ],
   "double": [
     "⏬",
@@ -5372,12 +4350,6 @@
     "➿",
     "⏪",
     "⏩"
-  ],
-  "double curly loop": [
-    "➿"
-  ],
-  "double exclamation mark": [
-    "‼"
   ],
   "doubt": [
     "🤷‍♂",
@@ -5404,21 +4376,6 @@
     "📉",
     "👇"
   ],
-  "down arrow": [
-    "⬇"
-  ],
-  "down button": [
-    "🔽"
-  ],
-  "down under": [
-    "🐨"
-  ],
-  "down-left arrow": [
-    "↙"
-  ],
-  "down-right arrow": [
-    "↘"
-  ],
   "downward": [
     "📉"
   ],
@@ -5428,9 +4385,6 @@
   ],
   "dragon": [
     "🐉",
-    "🐲"
-  ],
-  "dragon face": [
     "🐲"
   ],
   "drained": [
@@ -5453,10 +4407,6 @@
     "👜",
     "👝",
     "🥻"
-  ],
-  "dress up": [
-    "🤵‍♂",
-    "🤵‍♀"
   ],
   "dressage": [
     "🐴"
@@ -5508,9 +4458,6 @@
   "driving": [
     "🚗"
   ],
-  "driving range": [
-    "🏌"
-  ],
   "dromedary": [
     "🐪"
   ],
@@ -5521,9 +4468,6 @@
     "💧",
     "☔",
     "🫳"
-  ],
-  "drop of blood": [
-    "🩸"
   ],
   "droplet": [
     "💦",
@@ -5625,12 +4569,6 @@
     "👂",
     "🧏"
   ],
-  "ear of corn": [
-    "🌽"
-  ],
-  "ear with hearing aid": [
-    "🦻"
-  ],
   "earbud": [
     "🎧"
   ],
@@ -5689,15 +4627,6 @@
     "🎱",
     "8⃣"
   ],
-  "eight o’clock": [
-    "🕗"
-  ],
-  "eight-pointed star": [
-    "✴"
-  ],
-  "eight-spoked asterisk": [
-    "✳"
-  ],
   "eight-thirty": [
     "🕣"
   ],
@@ -5713,9 +4642,6 @@
     "🔦",
     "🚃",
     "⚡"
-  ],
-  "electric plug": [
-    "🔌"
   ],
   "electrician": [
     "👩‍🔧",
@@ -5738,9 +4664,6 @@
   ],
   "eleven": [
     "🕦",
-    "🕚"
-  ],
-  "eleven o’clock": [
     "🕚"
   ],
   "eleven-thirty": [
@@ -5805,9 +4728,6 @@
   "empty": [
     "🫙"
   ],
-  "empty nest": [
-    "🪹"
-  ],
   "end": [
     "🔚"
   ],
@@ -5852,9 +4772,6 @@
     "📩",
     "✉"
   ],
-  "envelope with arrow": [
-    "📩"
-  ],
   "epic": [
     "😯",
     "😜",
@@ -5886,9 +4803,6 @@
     "💶",
     "🪙"
   ],
-  "euro banknote": [
-    "💶"
-  ],
   "europe": [
     "🌍"
   ],
@@ -5896,9 +4810,6 @@
     "🌆"
   ],
   "evergreen": [
-    "🌲"
-  ],
-  "evergreen tree": [
     "🌲"
   ],
   "everyone": [
@@ -5957,12 +4868,6 @@
     "❕",
     "‼"
   ],
-  "exclamation mark": [
-    "❗"
-  ],
-  "exclamation question mark": [
-    "⁉"
-  ],
   "exercise": [
     "😳",
     "🙆",
@@ -5989,9 +4894,6 @@
     "💥",
     "🤯"
   ],
-  "exploding head": [
-    "🤯"
-  ],
   "explosion": [
     "💣"
   ],
@@ -6003,16 +4905,10 @@
     "😐",
     "😑"
   ],
-  "expressionless face": [
-    "😑"
-  ],
   "extinguish": [
     "🧯"
   ],
   "extra": [
-    "🛸"
-  ],
-  "extra terrestrial": [
     "🛸"
   ],
   "extraterrestrial": [
@@ -6038,9 +4934,6 @@
     "😝",
     "👁‍🗨",
     "🤪"
-  ],
-  "eye protection": [
-    "🥽"
   ],
   "eyebrow": [
     "🥸"
@@ -6204,76 +5097,9 @@
     "🥵",
     "🥱"
   ],
-  "face blowing a kiss": [
-    "😘"
-  ],
-  "face savouring delicious food": [
-    "😋"
-  ],
-  "face screaming in fear": [
-    "😱"
-  ],
-  "face vomiting": [
-    "🤮"
-  ],
-  "face with cold sweat": [
-    "😓"
-  ],
-  "face with hand over mouth": [
-    "🤭"
-  ],
-  "face with head-bandage": [
-    "🤕"
-  ],
-  "face with medical mask": [
-    "😷"
-  ],
-  "face with monocle": [
-    "🧐"
-  ],
-  "face with open mouth": [
-    "😮"
-  ],
-  "face with open mouth & cold sweat": [
-    "😰"
-  ],
-  "face with raised eyebrow": [
-    "🤨"
-  ],
-  "face with rolling eyes": [
-    "🙄"
-  ],
-  "face with steam from nose": [
-    "😤"
-  ],
-  "face with stuck-out tongue": [
-    "😛"
-  ],
-  "face with stuck-out tongue & closed eyes": [
-    "😝"
-  ],
-  "face with stuck-out tongue & winking eye": [
-    "😜"
-  ],
-  "face with symbols on mouth": [
-    "🤬"
-  ],
-  "face with tears of joy": [
-    "😂"
-  ],
-  "face with thermometer": [
-    "🤒"
-  ],
-  "face without mouth": [
-    "😶"
-  ],
   "facepalm": [
     "🤦‍♂",
     "🤦‍♀"
-  ],
-  "facial hair": [
-    "🧔‍♀",
-    "🧔‍♂"
   ],
   "factory": [
     "🏭",
@@ -6288,22 +5114,6 @@
   "fairy": [
     "🧚‍♂",
     "🧚‍♀"
-  ],
-  "fairy tale": [
-    "👸",
-    "👹",
-    "👾",
-    "👿",
-    "👻",
-    "👼",
-    "👽",
-    "🔮",
-    "🎅",
-    "💀",
-    "🐉",
-    "😈",
-    "😇",
-    "🐲"
   ],
   "fairytale": [
     "👸",
@@ -6329,9 +5139,6 @@
     "🧆"
   ],
   "fall": [
-    "🍂"
-  ],
-  "fallen leaf": [
     "🍂"
   ],
   "falling": [
@@ -6431,22 +5238,6 @@
     "⏩",
     "🏃‍♀"
   ],
-  "fast down button": [
-    "⏬"
-  ],
-  "fast food": [
-    "🍔",
-    "🍟"
-  ],
-  "fast reverse button": [
-    "⏪"
-  ],
-  "fast up button": [
-    "⏫"
-  ],
-  "fast-forward button": [
-    "⏩"
-  ],
   "fat": [
     "🐖"
   ],
@@ -6457,9 +5248,6 @@
   "fax": [
     "📠"
   ],
-  "fax machine": [
-    "📠"
-  ],
   "fear": [
     "😨",
     "😱"
@@ -6467,9 +5255,6 @@
   "fearful": [
     "😨",
     "😱"
-  ],
-  "fearful face": [
-    "😨"
   ],
   "feather": [
     "🪶"
@@ -6520,9 +5305,6 @@
   "ferris": [
     "🎡"
   ],
-  "ferris wheel": [
-    "🎡"
-  ],
   "ferry": [
     "⛴"
   ],
@@ -6549,9 +5331,6 @@
   "field": [
     "🏑"
   ],
-  "field hockey": [
-    "🏑"
-  ],
   "fight": [
     "🥷"
   ],
@@ -6560,12 +5339,6 @@
     "🗄",
     "📁",
     "📂"
-  ],
-  "file cabinet": [
-    "🗄"
-  ],
-  "file folder": [
-    "📁"
   ],
   "filing": [
     "🗄"
@@ -6578,12 +5351,6 @@
     "🎦",
     "📽",
     "🎞"
-  ],
-  "film frames": [
-    "🎞"
-  ],
-  "film projector": [
-    "📽"
   ],
   "fine": [
     "😒",
@@ -6606,9 +5373,6 @@
   "fingers": [
     "🤏"
   ],
-  "fingers crossed": [
-    "🤞"
-  ],
   "finish": [
     "🏁"
   ],
@@ -6618,12 +5382,6 @@
     "🧨",
     "🧯",
     "❤‍🔥"
-  ],
-  "fire engine": [
-    "🚒"
-  ],
-  "fire extinguisher": [
-    "🧯"
   ],
   "firecracker": [
     "🧨"
@@ -6644,12 +5402,6 @@
   "first": [
     "🥇"
   ],
-  "first quarter moon": [
-    "🌓"
-  ],
-  "first quarter moon with face": [
-    "🌛"
-  ],
   "fish": [
     "🐠",
     "🍥",
@@ -6658,9 +5410,6 @@
     "🦈",
     "🐟",
     "♓"
-  ],
-  "fish cake with swirl": [
-    "🍥"
   ],
   "fishes": [
     "🐠",
@@ -6671,9 +5420,6 @@
     "🐟",
     "🚣‍♀",
     "🦦"
-  ],
-  "fishing pole": [
-    "🎣"
   ],
   "fist": [
     "✊",
@@ -6687,9 +5433,6 @@
     "5⃣",
     "🕔",
     "✋"
-  ],
-  "five o’clock": [
-    "🕔"
   ],
   "five-thirty": [
     "🕠"
@@ -6955,9 +5698,6 @@
     "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
     "🏴󠁧󠁢󠁳󠁣󠁴󠁿"
   ],
-  "flag in hole": [
-    "⛳"
-  ],
   "flags": [
     "🏁"
   ],
@@ -6975,9 +5715,6 @@
     "🕺",
     "💃"
   ],
-  "flaming heart": [
-    "❤‍🔥"
-  ],
   "flamingo": [
     "🦩"
   ],
@@ -6986,12 +5723,6 @@
   ],
   "flashlight": [
     "🔦"
-  ],
-  "flat shoe": [
-    "🥿"
-  ],
-  "flat top": [
-    "👱"
   ],
   "flatbed": [
     "🛻"
@@ -7024,14 +5755,8 @@
   "flex": [
     "💪"
   ],
-  "flexed biceps": [
-    "💪"
-  ],
   "flexing": [
     "💪"
-  ],
-  "flip flop": [
-    "🩴"
   ],
   "flipper": [
     "🐬"
@@ -7055,9 +5780,6 @@
   "floppy": [
     "💾"
   ],
-  "floppy disk": [
-    "💾"
-  ],
   "florida": [
     "🐊"
   ],
@@ -7074,14 +5796,8 @@
     "🎴",
     "🪷"
   ],
-  "flower playing cards": [
-    "🎴"
-  ],
   "flu": [
     "🤧"
-  ],
-  "flu shot": [
-    "💉"
   ],
   "fluctuate": [
     "🪀"
@@ -7091,9 +5807,6 @@
     "🐑"
   ],
   "flushed": [
-    "😳"
-  ],
-  "flushed face": [
     "😳"
   ],
   "flutter": [
@@ -7110,12 +5823,6 @@
   "flying": [
     "✈"
   ],
-  "flying disc": [
-    "🥏"
-  ],
-  "flying saucer": [
-    "🛸"
-  ],
   "fml": [
     "💩"
   ],
@@ -7131,9 +5838,6 @@
     "🌁"
   ],
   "folded": [
-    "🙏"
-  ],
-  "folded hands": [
     "🙏"
   ],
   "folder": [
@@ -7196,9 +5900,6 @@
     "🧋",
     "🫘"
   ],
-  "food delivery": [
-    "🥡"
-  ],
   "foot": [
     "👞",
     "🦶",
@@ -7214,10 +5915,6 @@
   ],
   "footprints": [
     "👣"
-  ],
-  "for sure": [
-    "👌",
-    "👍"
   ],
   "forbidden": [
     "🚷",
@@ -7251,12 +5948,6 @@
     "🍽",
     "🍴"
   ],
-  "fork and knife": [
-    "🍴"
-  ],
-  "fork and knife with plate": [
-    "🍽"
-  ],
   "formal": [
     "🎩",
     "🤵",
@@ -7267,9 +5958,6 @@
     "🔮",
     "🔯",
     "🪬"
-  ],
-  "fortune cookie": [
-    "🥠"
   ],
   "forward": [
     "⏩"
@@ -7282,20 +5970,11 @@
     "🖋",
     "⛲"
   ],
-  "fountain pen": [
-    "🖋"
-  ],
   "four": [
     "🕓",
     "🍀",
     "🕟",
     "4⃣"
-  ],
-  "four leaf clover": [
-    "🍀"
-  ],
-  "four o’clock": [
-    "🕓"
   ],
   "four-thirty": [
     "🕟"
@@ -7304,9 +5983,6 @@
     "🦊"
   ],
   "frame": [
-    "🖼"
-  ],
-  "framed picture": [
     "🖼"
   ],
   "frames": [
@@ -7326,16 +6002,7 @@
     "🥖",
     "🍟"
   ],
-  "french fries": [
-    "🍟"
-  ],
-  "fresh cut": [
-    "💈"
-  ],
   "fried": [
-    "🍤"
-  ],
-  "fried shrimp": [
     "🍤"
   ],
   "friend": [
@@ -7364,15 +6031,6 @@
   "frog": [
     "🐸"
   ],
-  "frog face": [
-    "🐸"
-  ],
-  "front door": [
-    "🚪"
-  ],
-  "front-facing baby chick": [
-    "🐥"
-  ],
   "frostbite": [
     "🥶"
   ],
@@ -7383,12 +6041,6 @@
     "☹",
     "🙁",
     "🙍‍♂"
-  ],
-  "frowning face": [
-    "☹"
-  ],
-  "frowning face with open mouth": [
-    "😦"
   ],
   "fruit": [
     "🍍",
@@ -7431,9 +6083,6 @@
   "fuel": [
     "⛽"
   ],
-  "fuel pump": [
-    "⛽"
-  ],
   "fuji": [
     "🗻"
   ],
@@ -7441,12 +6090,6 @@
     "😋",
     "🌕",
     "💯"
-  ],
-  "full moon": [
-    "🌕"
-  ],
-  "full moon with face": [
-    "🌝"
   ],
   "fume": [
     "😤"
@@ -7458,9 +6101,6 @@
     "😜"
   ],
   "funeral": [
-    "⚱"
-  ],
-  "funeral urn": [
     "⚱"
   ],
   "fungus": [
@@ -7520,14 +6160,6 @@
     "♦",
     "🥌"
   ],
-  "game die": [
-    "🎲"
-  ],
-  "game of thrones": [
-    "👑",
-    "🐗",
-    "🐉"
-  ],
   "gamer": [
     "👾"
   ],
@@ -7541,9 +6173,6 @@
     "🐛",
     "🐜"
   ],
-  "garden party": [
-    "👒"
-  ],
   "gardener": [
     "👩‍🌾",
     "👨‍🌾"
@@ -7552,9 +6181,6 @@
     "🧄"
   ],
   "gas": [
-    "⛽"
-  ],
-  "gas station": [
     "⛽"
   ],
   "gasoline": [
@@ -7594,9 +6220,6 @@
     "😳"
   ],
   "gem": [
-    "💎"
-  ],
-  "gem stone": [
     "💎"
   ],
   "gender-neutral": [
@@ -7774,18 +6397,6 @@
     "🌎",
     "🌐"
   ],
-  "globe showing Americas": [
-    "🌎"
-  ],
-  "globe showing Asia-Australia": [
-    "🌏"
-  ],
-  "globe showing Europe-Africa": [
-    "🌍"
-  ],
-  "globe with meridians": [
-    "🌐"
-  ],
   "glove": [
     "🥊",
     "🥎"
@@ -7794,9 +6405,6 @@
     "🧤"
   ],
   "glow": [
-    "🌟"
-  ],
-  "glowing star": [
     "🌟"
   ],
   "goal": [
@@ -7833,28 +6441,11 @@
   "gone": [
     "💨"
   ],
-  "goo goo": [
-    "👶"
-  ],
   "good": [
     "👍",
     "🦸",
     "🦸‍♀",
     "🦸‍♂"
-  ],
-  "good guy": [
-    "🦸‍♂"
-  ],
-  "good job": [
-    "👏"
-  ],
-  "good luck": [
-    "🧧",
-    "🫡"
-  ],
-  "good night": [
-    "💖",
-    "😴"
   ],
   "goodbye": [
     "🫂"
@@ -7878,24 +6469,15 @@
     "💁",
     "💁‍♂"
   ],
-  "got it": [
-    "👌"
-  ],
   "gotcha": [
     "👌",
     "👍"
-  ],
-  "gotta go": [
-    "💨"
   ],
   "graduate": [
     "👨‍🎓",
     "👩‍🎓"
   ],
   "graduation": [
-    "🎓"
-  ],
-  "graduation cap": [
     "🎓"
   ],
   "grain": [
@@ -7956,22 +6538,10 @@
     "🟢",
     "🟩"
   ],
-  "green apple": [
-    "🍏"
-  ],
-  "green book": [
-    "📗"
-  ],
-  "green heart": [
-    "💚"
-  ],
   "greetings": [
     "👋"
   ],
   "grimace": [
-    "😬"
-  ],
-  "grimacing face": [
     "😬"
   ],
   "grin": [
@@ -7984,15 +6554,6 @@
   "grinning": [
     "😬",
     "🤩"
-  ],
-  "grinning cat face with smiling eyes": [
-    "😸"
-  ],
-  "grinning face": [
-    "😀"
-  ],
-  "grinning face with smiling eyes": [
-    "😁"
   ],
   "grizzly": [
     "🐻"
@@ -8011,9 +6572,6 @@
     "🪳"
   ],
   "growing": [
-    "💗"
-  ],
-  "growing heart": [
     "💗"
   ],
   "growl": [
@@ -8046,9 +6604,6 @@
   "guide": [
     "🦮",
     "🪬"
-  ],
-  "guide dog": [
-    "🦮"
   ],
   "guitar": [
     "🎸"
@@ -8083,20 +6638,9 @@
     "😂",
     "😆"
   ],
-  "hail a cab": [
-    "🚖"
-  ],
   "hair": [
     "💇",
     "💇‍♂"
-  ],
-  "hair flick": [
-    "💁",
-    "💁‍♂"
-  ],
-  "hair flip": [
-    "💁",
-    "💁‍♂"
   ],
   "haircut": [
     "👩",
@@ -8128,19 +6672,10 @@
     "⛏",
     "⚒"
   ],
-  "hammer and pick": [
-    "⚒"
-  ],
-  "hammer and wrench": [
-    "🛠"
-  ],
   "hamsa": [
     "🪬"
   ],
   "hamster": [
-    "🐹"
-  ],
-  "hamster face": [
     "🐹"
   ],
   "hand": [
@@ -8240,17 +6775,6 @@
     "😆",
     "🥲"
   ],
-  "happy bday": [
-    "🎂",
-    "🥳"
-  ],
-  "happy birthday": [
-    "🎂",
-    "🥳"
-  ],
-  "hard of hearing": [
-    "🦻"
-  ],
   "hardhat": [
     "👷",
     "👷‍♀"
@@ -8280,9 +6804,6 @@
     "🪓"
   ],
   "hatching": [
-    "🐣"
-  ],
-  "hatching chick": [
     "🐣"
   ],
   "hats": [
@@ -8334,12 +6855,6 @@
     "🙉",
     "🧏"
   ],
-  "hear no evil": [
-    "🙉"
-  ],
-  "hear-no-evil monkey": [
-    "🙉"
-  ],
   "hearing": [
     "👂"
   ],
@@ -8380,18 +6895,6 @@
     "🫰",
     "🫶"
   ],
-  "heart decoration": [
-    "💟"
-  ],
-  "heart suit": [
-    "♥"
-  ],
-  "heart with arrow": [
-    "💘"
-  ],
-  "heart with ribbon": [
-    "💝"
-  ],
   "heartbeat": [
     "💓",
     "🫀"
@@ -8419,30 +6922,6 @@
     "😳",
     "🌞",
     "🫠"
-  ],
-  "heat stroke": [
-    "🥵"
-  ],
-  "heavy check mark": [
-    "✔"
-  ],
-  "heavy division sign": [
-    "➗"
-  ],
-  "heavy dollar sign": [
-    "💲"
-  ],
-  "heavy heart exclamation": [
-    "❣"
-  ],
-  "heavy large circle": [
-    "⭕"
-  ],
-  "heavy minus sign": [
-    "➖"
-  ],
-  "heavy plus sign": [
-    "➕"
   ],
   "hedgehog": [
     "🦔"
@@ -8513,22 +6992,6 @@
   "high": [
     "🔊"
   ],
-  "high five": [
-    "🙏",
-    "✋"
-  ],
-  "high voltage": [
-    "⚡"
-  ],
-  "high-heeled shoe": [
-    "👠"
-  ],
-  "high-speed train": [
-    "🚄"
-  ],
-  "high-speed train with bullet nose": [
-    "🚅"
-  ],
   "highway": [
     "🛣"
   ],
@@ -8584,12 +7047,6 @@
     "🫲",
     "🫴"
   ],
-  "hold on": [
-    "🤌"
-  ],
-  "holding hands": [
-    "🧑‍🤝‍🧑"
-  ],
   "hole": [
     "⛳",
     "🕳"
@@ -8607,11 +7064,6 @@
     "🛖",
     "🪹"
   ],
-  "home improvement": [
-    "🔩",
-    "🔨",
-    "🔧"
-  ],
   "homie": [
     "😏",
     "👏",
@@ -8622,15 +7074,6 @@
     "🐻",
     "🍯",
     "🐝"
-  ],
-  "honey badger": [
-    "🦡"
-  ],
-  "honey jar": [
-    "🍯"
-  ],
-  "honey pot": [
-    "🍯"
   ],
   "honeybee": [
     "🐝"
@@ -8648,9 +7091,6 @@
     "🙌",
     "🎉",
     "🥳"
-  ],
-  "horizontal traffic light": [
-    "🚥"
   ],
   "horn": [
     "📯",
@@ -8684,12 +7124,6 @@
     "🏇",
     "🐴"
   ],
-  "horse face": [
-    "🐴"
-  ],
-  "horse racing": [
-    "🏇"
-  ],
   "horses": [
     "🐴"
   ],
@@ -8711,21 +7145,6 @@
   ],
   "hot\nbeverage": [
     "☕"
-  ],
-  "hot beverage": [
-    "☕"
-  ],
-  "hot dog": [
-    "🌭"
-  ],
-  "hot face": [
-    "🥵"
-  ],
-  "hot pepper": [
-    "🌶"
-  ],
-  "hot springs": [
-    "♨"
   ],
   "hotcake": [
     "🥞"
@@ -8749,9 +7168,6 @@
     "⌛",
     "⏳"
   ],
-  "hourglass with flowing sand": [
-    "⏳"
-  ],
   "hours": [
     "⏰",
     "⏳"
@@ -8761,9 +7177,6 @@
     "🏠",
     "🏚",
     "🏘"
-  ],
-  "house with garden": [
-    "🏡"
   ],
   "hrs": [
     "⏰"
@@ -8777,9 +7190,6 @@
     "🤗",
     "🫂"
   ],
-  "hugging face": [
-    "🤗"
-  ],
   "huh": [
     "🤌"
   ],
@@ -8788,9 +7198,6 @@
     "🐫"
   ],
   "hundred": [
-    "💯"
-  ],
-  "hundred points": [
     "💯"
   ],
   "hungry": [
@@ -8812,9 +7219,6 @@
   "hushed": [
     "😯"
   ],
-  "hushed face": [
-    "😯"
-  ],
   "hut": [
     "🛖"
   ],
@@ -8824,50 +7228,12 @@
   "i": [
     "ℹ"
   ],
-  "i dont believe you": [
-    "😮"
-  ],
-  "i dunno": [
-    "😕",
-    "🤷‍♂",
-    "🤷‍♀"
-  ],
-  "i know": [
-    "🙋",
-    "🙋‍♂"
-  ],
-  "i love you": [
-    "🤟",
-    "🥰"
-  ],
-  "i'm dead": [
-    "💀"
-  ],
-  "i'm done": [
-    "💅"
-  ],
   "ice": [
     "🏒",
     "🍧",
     "🍨",
     "⛸",
     "🧊"
-  ],
-  "ice cream": [
-    "🍦",
-    "🍨"
-  ],
-  "ice cube": [
-    "🧊"
-  ],
-  "ice hockey": [
-    "🏒"
-  ],
-  "ice skate": [
-    "⛸"
-  ],
-  "ice skating": [
-    "⛸"
   ],
   "iceberg": [
     "🧊"
@@ -8940,25 +7306,10 @@
   "impressed": [
     "😳"
   ],
-  "in love": [
-    "😍",
-    "👫",
-    "👬",
-    "🥰"
-  ],
   "inbox": [
     "📥"
   ],
-  "inbox tray": [
-    "📥"
-  ],
-  "inbox zero": [
-    "📥"
-  ],
   "incoming": [
-    "📨"
-  ],
-  "incoming envelope": [
     "📨"
   ],
   "indecisive": [
@@ -8972,9 +7323,6 @@
     "👆",
     "📇",
     "👇"
-  ],
-  "index pointing up": [
-    "☝"
   ],
   "indifference": [
     "🤷‍♂",
@@ -9018,21 +7366,6 @@
     "🔡",
     "🔠",
     "🔢"
-  ],
-  "input latin letters": [
-    "🔤"
-  ],
-  "input latin lowercase": [
-    "🔡"
-  ],
-  "input latin uppercase": [
-    "🔠"
-  ],
-  "input numbers": [
-    "🔢"
-  ],
-  "input symbols": [
-    "🔣"
   ],
   "insect": [
     "🕷",
@@ -9145,9 +7478,6 @@
     "🍯",
     "🫙"
   ],
-  "jazz hands": [
-    "👐"
-  ],
   "jealous": [
     "😒",
     "😐",
@@ -9247,9 +7577,6 @@
     "🥤",
     "🧃"
   ],
-  "juice box": [
-    "🧃"
-  ],
   "jump": [
     "🦘"
   ],
@@ -9282,15 +7609,6 @@
     "🍢",
     "🥙"
   ],
-  "keep it 100": [
-    "💯"
-  ],
-  "keep my mouth shut": [
-    "🤐"
-  ],
-  "kentucky derby": [
-    "🐎"
-  ],
   "key": [
     "🔑",
     "🔐",
@@ -9304,9 +7622,6 @@
     "*⃣",
     "0⃣",
     "3⃣"
-  ],
-  "keycap 10": [
-    "🔟"
   ],
   "keycap10": [
     "🔟"
@@ -9354,9 +7669,6 @@
     "👩‍❤‍💋‍👨",
     "🫦"
   ],
-  "kiss mark": [
-    "💋"
-  ],
   "kisses": [
     "😍",
     "💕",
@@ -9372,21 +7684,6 @@
     "💋",
     "👄",
     "😗"
-  ],
-  "kissing cat face with closed eyes": [
-    "😽"
-  ],
-  "kissing face": [
-    "😗"
-  ],
-  "kissing face with closed eyes": [
-    "😚"
-  ],
-  "kissing face with smiling eyes": [
-    "😙"
-  ],
-  "kitchen knife": [
-    "🔪"
   ],
   "kite": [
     "🪁"
@@ -9452,9 +7749,6 @@
     "🧪",
     "🧫"
   ],
-  "lab coat": [
-    "🥼"
-  ],
   "label": [
     "🏷"
   ],
@@ -9474,17 +7768,11 @@
     "👵",
     "👜"
   ],
-  "lady beetle": [
-    "🐞"
-  ],
   "ladybird": [
     "🐞"
   ],
   "ladybug": [
     "🐞"
-  ],
-  "lai see": [
-    "🧧"
   ],
   "lake": [
     "🚣",
@@ -9508,26 +7796,8 @@
     "🏮",
     "🎃"
   ],
-  "laptop computer": [
-    "💻"
-  ],
   "large": [
     "🤪"
-  ],
-  "large blue diamond": [
-    "🔷"
-  ],
-  "large orange diamond": [
-    "🔶"
-  ],
-  "last quarter moon": [
-    "🌗"
-  ],
-  "last quarter moon with face": [
-    "🌜"
-  ],
-  "last track button": [
-    "⏮"
   ],
   "late": [
     "⏰"
@@ -9542,9 +7812,6 @@
     "🔤",
     "🔡",
     "🔠"
-  ],
-  "latin cross": [
-    "✝"
   ],
   "laugh": [
     "😹",
@@ -9586,12 +7853,6 @@
     "🍃",
     "🔰"
   ],
-  "leaf fluttering in wind": [
-    "🍃"
-  ],
-  "leafy green": [
-    "🥬"
-  ],
   "lebron": [
     "👑"
   ],
@@ -9605,27 +7866,6 @@
     "◀",
     "👈"
   ],
-  "left arrow": [
-    "⬅"
-  ],
-  "left arrow curving right": [
-    "↪"
-  ],
-  "left hand": [
-    "🫲"
-  ],
-  "left luggage": [
-    "🛅"
-  ],
-  "left speech bubble": [
-    "🗨"
-  ],
-  "left-pointing magnifying glass": [
-    "🔍"
-  ],
-  "left-right arrow": [
-    "↔"
-  ],
   "leftwards": [
     "🤛"
   ],
@@ -9636,10 +7876,6 @@
   "legit": [
     "👌",
     "👍"
-  ],
-  "legs crossed": [
-    "🧘‍♂",
-    "🧘‍♀"
   ],
   "lemon": [
     "🍋"
@@ -9655,10 +7891,6 @@
     "👩‍❤‍💋‍👩",
     "🏳‍🌈",
     "👩‍❤‍👩"
-  ],
-  "let's dance": [
-    "🕺",
-    "💃"
   ],
   "letter": [
     "📤",
@@ -9678,9 +7910,6 @@
     "🥬"
   ],
   "level": [
-    "🎚"
-  ],
-  "level slider": [
     "🎚"
   ],
   "lgbt": [
@@ -9755,9 +7984,6 @@
   "life": [
     "🧬"
   ],
-  "life preserver": [
-    "🛟"
-  ],
   "lifesaver": [
     "🛟"
   ],
@@ -9779,12 +8005,6 @@
     "🔆",
     "🧨"
   ],
-  "light bulb": [
-    "💡"
-  ],
-  "light rail": [
-    "🚈"
-  ],
   "lightning": [
     "🌩",
     "⚡"
@@ -9802,21 +8022,12 @@
     "🔗",
     "🖇"
   ],
-  "linked paperclips": [
-    "🖇"
-  ],
   "links": [
     "🔗"
   ],
   "lion": [
     "🦁",
     "♌"
-  ],
-  "lion face": [
-    "🦁"
-  ],
-  "lion order": [
-    "🦁"
   ],
   "lip": [
     "🫦"
@@ -9840,9 +8051,6 @@
   "lit": [
     "🔥"
   ],
-  "lit af": [
-    "🔥"
-  ],
   "litaf": [
     "🔥"
   ],
@@ -9850,14 +8058,8 @@
     "🚯",
     "🚮"
   ],
-  "litter in bin sign": [
-    "🚮"
-  ],
   "litterbin": [
     "🚮"
-  ],
-  "little bit": [
-    "🤏"
   ],
   "lives": [
     "☯"
@@ -9898,12 +8100,6 @@
     "🔐",
     "🔒"
   ],
-  "locked with key": [
-    "🔐"
-  ],
-  "locked with pen": [
-    "🔏"
-  ],
   "locker": [
     "🛅"
   ],
@@ -9939,12 +8135,6 @@
   "lonely": [
     "💔"
   ],
-  "long drum": [
-    "🪘"
-  ],
-  "lood donation": [
-    "🩸"
-  ],
   "look": [
     "👀"
   ],
@@ -9965,16 +8155,10 @@
     "😔",
     "😞"
   ],
-  "losing hair": [
-    "👴"
-  ],
   "lost": [
     "😔"
   ],
   "lotion": [
-    "🧴"
-  ],
-  "lotion bottle": [
     "🧴"
   ],
   "lotus": [
@@ -9983,9 +8167,6 @@
   "loud": [
     "📢",
     "🔊"
-  ],
-  "loudly crying face": [
-    "😭"
   ],
   "loudspeaker": [
     "📢"
@@ -10022,25 +8203,6 @@
     "🫰",
     "🫶"
   ],
-  "love hotel": [
-    "🏩"
-  ],
-  "love letter": [
-    "💌"
-  ],
-  "love rose": [
-    "🌹"
-  ],
-  "love you": [
-    "💑",
-    "😘",
-    "😗",
-    "❤‍🔥",
-    "🫶"
-  ],
-  "love-you gesture": [
-    "🤟"
-  ],
   "lover": [
     "😘"
   ],
@@ -10050,12 +8212,6 @@
   ],
   "low": [
     "🔅"
-  ],
-  "low battery": [
-    "🪫"
-  ],
-  "low power": [
-    "🪫"
   ],
   "lowercase": [
     "🔡"
@@ -10109,9 +8265,6 @@
     "🤬",
     "🧂"
   ],
-  "mad men": [
-    "🍸"
-  ],
   "maddening": [
     "😠",
     "😡"
@@ -10126,9 +8279,6 @@
     "✨",
     "🧙‍♂",
     "🧙‍♀",
-    "🪄"
-  ],
-  "magic wand": [
     "🪄"
   ],
   "magical": [
@@ -10152,12 +8302,6 @@
   "mahjong": [
     "🀄"
   ],
-  "mahjong red dragon": [
-    "🀄"
-  ],
-  "mai tai": [
-    "🍹"
-  ],
   "mail": [
     "📤",
     "📥",
@@ -10180,9 +8324,6 @@
   ],
   "maize": [
     "🌽"
-  ],
-  "major key": [
-    "🔑"
   ],
   "makeup": [
     "💅",
@@ -10274,114 +8415,6 @@
     "🧔‍♂",
     "🫃"
   ],
-  "man and woman holding hands": [
-    "👫"
-  ],
-  "man biking": [
-    "🚴"
-  ],
-  "man bouncing ball": [
-    "⛹"
-  ],
-  "man bowing": [
-    "🙇"
-  ],
-  "man climbing": [
-    "🧗‍♂"
-  ],
-  "man dancing": [
-    "🕺"
-  ],
-  "man elf": [
-    "🧝‍♂"
-  ],
-  "man fairy": [
-    "🧚‍♂"
-  ],
-  "man frowning": [
-    "🙍‍♂"
-  ],
-  "man genie": [
-    "🧞‍♂"
-  ],
-  "man gesturing NO": [
-    "🙅‍♂"
-  ],
-  "man gesturing OK": [
-    "🙆‍♂"
-  ],
-  "man getting haircut": [
-    "💇‍♂"
-  ],
-  "man getting massage": [
-    "💆‍♂"
-  ],
-  "man golfing": [
-    "🏌"
-  ],
-  "man in business suit levitating": [
-    "🕴"
-  ],
-  "man in lotus position": [
-    "🧘‍♂"
-  ],
-  "man in manual wheelchair": [
-    "👨‍🦽"
-  ],
-  "man in motorized wheelchair": [
-    "👨‍🦼"
-  ],
-  "man in steamy room": [
-    "🧖‍♂"
-  ],
-  "man lifting weights": [
-    "🏋"
-  ],
-  "man mage": [
-    "🧙‍♂"
-  ],
-  "man mountain biking": [
-    "🚵"
-  ],
-  "man pouting": [
-    "🙎‍♂"
-  ],
-  "man raising hand": [
-    "🙋‍♂"
-  ],
-  "man rowing boat": [
-    "🚣"
-  ],
-  "man running": [
-    "🏃"
-  ],
-  "man surfing": [
-    "🏄"
-  ],
-  "man swimming": [
-    "🏊"
-  ],
-  "man tipping hand": [
-    "💁‍♂"
-  ],
-  "man vampire": [
-    "🧛‍♂"
-  ],
-  "man walking": [
-    "🚶"
-  ],
-  "man wearing turban": [
-    "👳"
-  ],
-  "man with Chinese cap": [
-    "👲"
-  ],
-  "man with probing cane": [
-    "👨‍🦯"
-  ],
-  "man zombie": [
-    "🧟‍♂"
-  ],
   "manager": [
     "👩‍💼",
     "👨‍💼"
@@ -10395,30 +8428,15 @@
   "manicure": [
     "💅"
   ],
-  "mantelpiece clock": [
-    "🕰"
-  ],
   "mantilla": [
     "🧕"
-  ],
-  "manual wheelchair": [
-    "🦽"
-  ],
-  "man’s shoe": [
-    "👞"
   ],
   "map": [
     "🗺",
     "📍",
     "🗾"
   ],
-  "map of Japan": [
-    "🗾"
-  ],
   "maple": [
-    "🍁"
-  ],
-  "maple leaf": [
     "🍁"
   ],
   "marathon": [
@@ -10460,9 +8478,6 @@
   ],
   "marsupial": [
     "🦘"
-  ],
-  "martial arts": [
-    "🥋"
   ],
   "martini": [
     "🍸"
@@ -10516,9 +8531,6 @@
     "🥧",
     "🥩"
   ],
-  "meat on bone": [
-    "🍖"
-  ],
   "meatball": [
     "🧆"
   ],
@@ -10529,12 +8541,6 @@
     "👩‍🔧",
     "👨‍🔧",
     "🧰"
-  ],
-  "mechanical arm": [
-    "🦾"
-  ],
-  "mechanical leg": [
-    "🦿"
   ],
   "medal": [
     "🎖",
@@ -10604,17 +8610,11 @@
     "👯‍♂",
     "🤼‍♂"
   ],
-  "mending heart": [
-    "❤‍🩹"
-  ],
   "menorah": [
     "🕎"
   ],
   "menstruation": [
     "🩸"
-  ],
-  "men’s room": [
-    "🚹"
   ],
   "meow": [
     "🐈‍⬛"
@@ -10635,9 +8635,6 @@
   ],
   "merperson": [
     "🧜"
-  ],
-  "merry xmas": [
-    "🧑‍🎄"
   ],
   "merwoman": [
     "🧜",
@@ -10674,18 +8671,12 @@
   "microscope": [
     "🔬"
   ],
-  "middle finger": [
-    "🖕"
-  ],
   "mild\nsurprise": [
     "🤨"
   ],
   "military": [
     "🎖",
     "🪖"
-  ],
-  "military medal": [
-    "🎖"
   ],
   "milk": [
     "🥛",
@@ -10694,9 +8685,6 @@
     "🐮",
     "🐄"
   ],
-  "milky way": [
-    "🌌"
-  ],
   "million": [
     "💸",
     "💰",
@@ -10704,9 +8692,6 @@
   ],
   "millionaire": [
     "🚤"
-  ],
-  "mind blown": [
-    "🤯"
   ],
   "mindblown": [
     "🤯"
@@ -10733,9 +8718,6 @@
   "miss": [
     "😢"
   ],
-  "miss you": [
-    "😘"
-  ],
   "moai": [
     "🗿"
   ],
@@ -10745,15 +8727,6 @@
     "📴",
     "📵",
     "📱",
-    "📲"
-  ],
-  "mobile phone": [
-    "📱"
-  ],
-  "mobile phone off": [
-    "📴"
-  ],
-  "mobile phone with arrow": [
     "📲"
   ],
   "mode": [
@@ -10787,15 +8760,6 @@
     "🪙",
     "🫰"
   ],
-  "money bag": [
-    "💰"
-  ],
-  "money with wings": [
-    "💸"
-  ],
-  "money-mouth face": [
-    "🤑"
-  ],
   "moneybag": [
     "💰"
   ],
@@ -10809,9 +8773,6 @@
     "🙉",
     "🙈",
     "🦧"
-  ],
-  "monkey face": [
-    "🐵"
   ],
   "monorail": [
     "🚈",
@@ -10828,9 +8789,6 @@
     "☠",
     "🤖",
     "🧌"
-  ],
-  "monthly amount": [
-    "🈷"
   ],
   "moo": [
     "🐮",
@@ -10851,12 +8809,6 @@
     "🌝",
     "🌜",
     "🌛"
-  ],
-  "moon cake": [
-    "🥮"
-  ],
-  "moon viewing ceremony": [
-    "🎑"
   ],
   "morning": [
     "😘",
@@ -10881,23 +8833,14 @@
   "motor": [
     "🛵"
   ],
-  "motor boat": [
-    "🛥"
-  ],
   "motorboat": [
     "🛥"
   ],
   "motorcycle": [
     "🏍"
   ],
-  "motorized wheelchair": [
-    "🦼"
-  ],
   "motorway": [
     "🛣"
-  ],
-  "mount fuji": [
-    "🗻"
   ],
   "mountain": [
     "🌋",
@@ -10912,21 +8855,9 @@
     "🧗‍♂",
     "🧗‍♀"
   ],
-  "mountain cableway": [
-    "🚠"
-  ],
-  "mountain railway": [
-    "🚞"
-  ],
   "mouse": [
     "🐁",
     "🐭"
-  ],
-  "mouse face": [
-    "🐭"
-  ],
-  "mouse trap": [
-    "🪤"
   ],
   "moustache": [
     "🥸"
@@ -10957,9 +8888,6 @@
     "📽",
     "🎬",
     "🎞"
-  ],
-  "movie camera": [
-    "🎥"
   ],
   "moyai": [
     "🗿"
@@ -11013,27 +8941,12 @@
     "🪕",
     "🪗"
   ],
-  "musical keyboard": [
-    "🎹"
-  ],
-  "musical note": [
-    "🎵"
-  ],
-  "musical notes": [
-    "🎶"
-  ],
-  "musical score": [
-    "🎼"
-  ],
   "mustache": [
     "🥸"
   ],
   "mute": [
     "😶",
     "🔕",
-    "🔇"
-  ],
-  "muted speaker": [
     "🔇"
   ],
   "mwah": [
@@ -11045,13 +8958,7 @@
   "nail": [
     "💅"
   ],
-  "nail polish": [
-    "💅"
-  ],
   "name": [
-    "📛"
-  ],
-  "name badge": [
     "📛"
   ],
   "nanny": [
@@ -11070,9 +8977,6 @@
   ],
   "nasty": [
     "🤢"
-  ],
-  "national park": [
-    "🏞"
   ],
   "nature": [
     "🌋",
@@ -11094,9 +8998,6 @@
     "🧭"
   ],
   "nazar": [
-    "🧿"
-  ],
-  "nazar amulet": [
     "🧿"
   ],
   "neck": [
@@ -11125,9 +9026,6 @@
   "nerd": [
     "🤓"
   ],
-  "nerd face": [
-    "🤓"
-  ],
   "nerves": [
     "😟"
   ],
@@ -11143,29 +9041,14 @@
     "🪹",
     "🪺"
   ],
-  "nesting dolls": [
-    "🪆"
-  ],
   "net": [
     "🥅"
   ],
   "neutral": [
     "😐"
   ],
-  "neutral face": [
-    "😐"
-  ],
   "new": [
     "🆕"
-  ],
-  "new moon": [
-    "🌑"
-  ],
-  "new moon face": [
-    "🌚"
-  ],
-  "new york": [
-    "🗽"
   ],
   "newborn": [
     "🐥",
@@ -11182,12 +9065,6 @@
   "newspaper": [
     "🗞",
     "📰"
-  ],
-  "next scene": [
-    "⏭"
-  ],
-  "next track button": [
-    "⏭"
   ],
   "nexttrack": [
     "⏭"
@@ -11218,15 +9095,9 @@
     "🌉",
     "🥱"
   ],
-  "night with stars": [
-    "🌃"
-  ],
   "nine": [
     "9⃣",
     "🕤",
-    "🕘"
-  ],
-  "nine o’clock": [
     "🕘"
   ],
   "nine-thirty": [
@@ -11253,44 +9124,10 @@
     "🙈",
     "🙅‍♂"
   ],
-  "no bicycles": [
-    "🚳"
-  ],
-  "no entry": [
-    "⛔"
-  ],
-  "no good": [
-    "👎"
-  ],
-  "no littering": [
-    "🚯"
-  ],
-  "no mobile phones": [
-    "📵"
-  ],
-  "no one under eighteen": [
-    "🔞"
-  ],
-  "no pedestrians": [
-    "🚷"
-  ],
-  "no smoking": [
-    "🚭"
-  ],
-  "no vacancy": [
-    "🈵"
-  ],
-  "no way": [
-    "😲",
-    "🤯"
-  ],
   "non-drinking": [
     "🚱"
   ],
   "non-potable": [
-    "🚱"
-  ],
-  "non-potable water": [
     "🚱"
   ],
   "nono": [
@@ -11309,9 +9146,6 @@
   ],
   "north": [
     "⬆"
-  ],
-  "north pole": [
-    "🐻‍❄"
   ],
   "northeast": [
     "↗"
@@ -11347,31 +9181,6 @@
   "not\nimpressed": [
     "😑"
   ],
-  "not amused": [
-    "😐"
-  ],
-  "not free of charge": [
-    "🈶"
-  ],
-  "not funny": [
-    "😐"
-  ],
-  "not impressed": [
-    "😐",
-    "😑"
-  ],
-  "not laughing": [
-    "😐"
-  ],
-  "not sure": [
-    "😕"
-  ],
-  "not telling": [
-    "🤐"
-  ],
-  "not this time": [
-    "😥"
-  ],
   "note": [
     "🎶",
     "💸",
@@ -11387,9 +9196,6 @@
     "📓",
     "📔",
     "📒"
-  ],
-  "notebook with decorative cover": [
-    "📔"
   ],
   "notes": [
     "🎶",
@@ -11435,9 +9241,6 @@
   "nut": [
     "🔩",
     "🥜"
-  ],
-  "nut and bolt": [
-    "🔩"
   ],
   "nutty": [
     "😜"
@@ -11493,9 +9296,6 @@
     "👩‍💼",
     "👨‍💼"
   ],
-  "office building": [
-    "🏢"
-  ],
   "officer": [
     "👮",
     "👮‍♀"
@@ -11509,9 +9309,6 @@
   "oil": [
     "🛢",
     "🪔"
-  ],
-  "oil drum": [
-    "🛢"
   ],
   "ok": [
     "👌",
@@ -11529,25 +9326,6 @@
     "👴",
     "👵",
     "🗝",
-    "🧓"
-  ],
-  "old dude": [
-    "👴"
-  ],
-  "old key": [
-    "🗝"
-  ],
-  "old man": [
-    "👴"
-  ],
-  "old school": [
-    "📼",
-    "📇"
-  ],
-  "old woman": [
-    "👵"
-  ],
-  "older adult": [
     "🧓"
   ],
   "olive": [
@@ -11579,15 +9357,6 @@
   "on": [
     "🔛"
   ],
-  "on point": [
-    "💯"
-  ],
-  "on the mend": [
-    "❤‍🩹"
-  ],
-  "on your knees": [
-    "🧎"
-  ],
   "once": [
     "🔂"
   ],
@@ -11597,40 +9366,13 @@
     "🚘",
     "🚖"
   ],
-  "oncoming automobile": [
-    "🚘"
-  ],
-  "oncoming bus": [
-    "🚍"
-  ],
-  "oncoming fist": [
-    "👊"
-  ],
-  "oncoming police car": [
-    "🚔"
-  ],
-  "oncoming taxi": [
-    "🚖"
-  ],
   "one": [
     "1⃣",
     "🕐",
     "🕜"
   ],
-  "one eye": [
-    "👁"
-  ],
-  "one hump": [
-    "🐪"
-  ],
-  "one o’clock": [
-    "🕐"
-  ],
   "one-piece": [
     "🩲"
-  ],
-  "one-piece swimsuit": [
-    "🩱"
   ],
   "one-thirty": [
     "🕜"
@@ -11662,31 +9404,10 @@
     "😰",
     "😆"
   ],
-  "open book": [
-    "📖"
-  ],
-  "open file folder": [
-    "📂"
-  ],
-  "open for business": [
-    "🈺"
-  ],
-  "open hands": [
-    "👐"
-  ],
-  "open mailbox with lowered flag": [
-    "📭"
-  ],
-  "open mailbox with raised flag": [
-    "📬"
-  ],
   "optical": [
     "💿",
     "💽",
     "📀"
-  ],
-  "optical disk": [
-    "💿"
   ],
   "orange": [
     "🔸",
@@ -11697,12 +9418,6 @@
     "🟠",
     "🟧"
   ],
-  "orange book": [
-    "📙"
-  ],
-  "orange heart": [
-    "🧡"
-  ],
   "orangutan": [
     "🦧"
   ],
@@ -11711,9 +9426,6 @@
   ],
   "ornithology": [
     "🐦"
-  ],
-  "orthodox cross": [
-    "☦"
   ],
   "ostentatious": [
     "🦚"
@@ -11726,9 +9438,6 @@
     "❤‍🩹"
   ],
   "outbox": [
-    "📤"
-  ],
-  "outbox tray": [
     "📤"
   ],
   "outdoors": [
@@ -11747,9 +9456,6 @@
   "outtie": [
     "👋"
   ],
-  "over easy": [
-    "🍳"
-  ],
   "overeat": [
     "🫃",
     "🫄"
@@ -11763,9 +9469,6 @@
   ],
   "oyster": [
     "🦪"
-  ],
-  "oyster pail": [
-    "🥡"
   ],
   "o’clock": [
     "🕓",
@@ -11806,12 +9509,6 @@
     "📃",
     "📄"
   ],
-  "page facing up": [
-    "📄"
-  ],
-  "page with curl": [
-    "📃"
-  ],
   "pager": [
     "📟"
   ],
@@ -11846,12 +9543,6 @@
     "🥥",
     "🪬"
   ],
-  "palm tree": [
-    "🌴"
-  ],
-  "palms up together": [
-    "🤲"
-  ],
   "pamonha": [
     "🫔"
   ],
@@ -11863,9 +9554,6 @@
     "🥞"
   ],
   "panda": [
-    "🐼"
-  ],
-  "panda face": [
     "🐼"
   ],
   "panting": [
@@ -11880,9 +9568,6 @@
     "🗞",
     "📰",
     "📜"
-  ],
-  "paper towels": [
-    "🧻"
   ],
   "paperclip": [
     "📎",
@@ -11913,9 +9598,6 @@
   "part": [
     "〽"
   ],
-  "part alternation mark": [
-    "〽"
-  ],
   "party": [
     "🍹",
     "👯",
@@ -11927,34 +9609,19 @@
     "🥳",
     "🪩"
   ],
-  "party popper": [
-    "🎉"
-  ],
   "partying": [
     "👯",
     "👯‍♂"
-  ],
-  "partying face": [
-    "🥳"
   ],
   "passenger": [
     "🚢",
     "⛴",
     "🛳"
   ],
-  "passenger ship": [
-    "🛳"
-  ],
-  "passing grade": [
-    "🈴"
-  ],
   "passion": [
     "❤‍🔥"
   ],
   "passport": [
-    "🛂"
-  ],
-  "passport control": [
     "🛂"
   ],
   "password": [
@@ -11979,13 +9646,7 @@
     "⏯",
     "⏸"
   ],
-  "pause button": [
-    "⏸"
-  ],
   "paw": [
-    "🐾"
-  ],
-  "paw prints": [
     "🐾"
   ],
   "paws": [
@@ -12008,9 +9669,6 @@
     "✌",
     "🕊",
     "🪷"
-  ],
-  "peace symbol": [
-    "☮"
   ],
   "peaceful": [
     "☮",
@@ -12072,14 +9730,8 @@
   "pensive": [
     "😔"
   ],
-  "pensive face": [
-    "😔"
-  ],
   "people": [
     "👥"
-  ],
-  "people holding hands": [
-    "🧑‍🤝‍🧑"
   ],
   "pepper": [
     "🌶",
@@ -12088,19 +9740,10 @@
   "pepperoni": [
     "🍕"
   ],
-  "perfect score": [
-    "💯"
-  ],
   "performing": [
     "🎭"
   ],
-  "performing arts": [
-    "🎭"
-  ],
   "persevere": [
-    "😣"
-  ],
-  "persevering face": [
     "😣"
   ],
   "person": [
@@ -12131,80 +9774,6 @@
     "🧔‍♂",
     "👩‍❤‍💋‍👨"
   ],
-  "person biking": [
-    "🚴"
-  ],
-  "person bouncing ball": [
-    "⛹"
-  ],
-  "person bowing": [
-    "🙇"
-  ],
-  "person frowning": [
-    "🙍"
-  ],
-  "person gesturing NO": [
-    "🙅"
-  ],
-  "person gesturing OK": [
-    "🙆"
-  ],
-  "person getting haircut": [
-    "💇"
-  ],
-  "person getting massage": [
-    "💆"
-  ],
-  "person golfing": [
-    "🏌"
-  ],
-  "person in bed": [
-    "🛌"
-  ],
-  "person kneeling": [
-    "🧎"
-  ],
-  "person lifting weights": [
-    "🏋"
-  ],
-  "person mountain biking": [
-    "🚵"
-  ],
-  "person pouting": [
-    "🙎"
-  ],
-  "person raising hand": [
-    "🙋",
-    "🙋‍♂"
-  ],
-  "person rowing boat": [
-    "🚣"
-  ],
-  "person running": [
-    "🏃"
-  ],
-  "person standing": [
-    "🧍"
-  ],
-  "person surfing": [
-    "🏄",
-    "🏄‍♀"
-  ],
-  "person swimming": [
-    "🏊"
-  ],
-  "person taking bath": [
-    "🛀"
-  ],
-  "person tipping hand": [
-    "💁"
-  ],
-  "person walking": [
-    "🚶"
-  ],
-  "person wearing turban": [
-    "👳"
-  ],
   "personal": [
     "💻"
   ],
@@ -12219,9 +9788,6 @@
     "🐰",
     "🐱",
     "🐇"
-  ],
-  "petri dish": [
-    "🧫"
   ],
   "pho": [
     "🍜"
@@ -12252,16 +9818,10 @@
     "⚒",
     "🫳"
   ],
-  "pick up": [
-    "🫳"
-  ],
   "pickle": [
     "🥒"
   ],
   "pickup": [
-    "🛻"
-  ],
-  "pickup truck": [
     "🛻"
   ],
   "picnic": [
@@ -12285,17 +9845,8 @@
     "🐖",
     "🐗"
   ],
-  "pig face": [
-    "🐷"
-  ],
-  "pig nose": [
-    "🐽"
-  ],
   "pigtails": [
     "👧"
-  ],
-  "pile of poo": [
-    "💩"
   ],
   "pill": [
     "💊"
@@ -12323,23 +9874,11 @@
   "pinch": [
     "👌"
   ],
-  "pinching hand": [
-    "🤏"
-  ],
   "pine": [
     "🎍"
   ],
-  "pine decoration": [
-    "🎍"
-  ],
-  "pine tree": [
-    "🌲"
-  ],
   "pineapple": [
     "🍍"
-  ],
-  "ping pong": [
-    "🏓"
   ],
   "pingpong": [
     "🏓"
@@ -12352,9 +9891,6 @@
   ],
   "pirate": [
     "🦜",
-    "🏴‍☠"
-  ],
-  "pirate flag": [
     "🏴‍☠"
   ],
   "pissed": [
@@ -12370,14 +9906,8 @@
   "pizza": [
     "🍕"
   ],
-  "piña colada": [
-    "🥥"
-  ],
   "placard": [
     "🪧"
-  ],
-  "place of worship": [
-    "🛐"
   ],
   "plane": [
     "✈",
@@ -12417,12 +9947,6 @@
     "⏯",
     "▶"
   ],
-  "play button": [
-    "▶"
-  ],
-  "play or pause button": [
-    "⏯"
-  ],
   "playful": [
     "🦦"
   ],
@@ -12438,9 +9962,6 @@
   ],
   "plaything": [
     "🧸"
-  ],
-  "pleading face": [
-    "🥺"
   ],
   "please": [
     "🙏",
@@ -12477,9 +9998,6 @@
   "poke": [
     "🫵"
   ],
-  "polar bear": [
-    "🐻‍❄"
-  ],
   "pole": [
     "🎣",
     "💈"
@@ -12488,16 +10006,6 @@
     "🚔",
     "🚓",
     "🚨",
-    "👮",
-    "👮‍♀"
-  ],
-  "police car": [
-    "🚓"
-  ],
-  "police car light": [
-    "🚨"
-  ],
-  "police officer": [
     "👮",
     "👮‍♀"
   ],
@@ -12525,15 +10033,9 @@
   "pool": [
     "👙"
   ],
-  "pool 8 ball": [
-    "🎱"
-  ],
   "poop": [
     "💩",
     "🪠"
-  ],
-  "poor you": [
-    "❤‍🩹"
   ],
   "pop": [
     "🧨"
@@ -12564,22 +10066,13 @@
   "poseidon": [
     "🔱"
   ],
-  "positive negative": [
-    "🧲"
-  ],
   "post": [
     "🏤",
     "🏣",
     "🚩",
     "📯"
   ],
-  "post office": [
-    "🏤"
-  ],
   "postal": [
-    "📯"
-  ],
-  "postal horn": [
     "📯"
   ],
   "postbox": [
@@ -12594,16 +10087,7 @@
     "🍲",
     "🪴"
   ],
-  "pot of food": [
-    "🍲"
-  ],
-  "pot of gold": [
-    "💰"
-  ],
   "potable": [
-    "🚰"
-  ],
-  "potable water": [
     "🚰"
   ],
   "potassium": [
@@ -12622,16 +10106,10 @@
   "poultry": [
     "🍗"
   ],
-  "poultry leg": [
-    "🍗"
-  ],
   "pound": [
     "💷",
     "#⃣",
     "👊"
-  ],
-  "pound banknote": [
-    "💷"
   ],
   "pounds": [
     "💷"
@@ -12644,12 +10122,6 @@
     "😡",
     "😾",
     "🙎‍♂"
-  ],
-  "pouting cat face": [
-    "😾"
-  ],
-  "pouting face": [
-    "😡"
   ],
   "praise": [
     "🙌"
@@ -12668,9 +10140,6 @@
   "prayer": [
     "📿",
     "🤲"
-  ],
-  "prayer beads": [
-    "📿"
   ],
   "preakness": [
     "🐎"
@@ -12692,20 +10161,8 @@
   "pretty": [
     "🦋"
   ],
-  "pretty bird": [
-    "🦚"
-  ],
-  "pretty please": [
-    "🥺"
-  ],
   "pretzel": [
     "🥨"
-  ],
-  "previous scene": [
-    "⏮"
-  ],
-  "previous track": [
-    "⏮"
   ],
   "pride": [
     "🌈",
@@ -12738,9 +10195,6 @@
   ],
   "prize": [
     "🏆"
-  ],
-  "probing cane": [
-    "🦯"
   ],
   "professor": [
     "👨‍🏫",
@@ -12784,9 +10238,6 @@
     "🥲",
     "🥹"
   ],
-  "public address": [
-    "📢"
-  ],
   "publicaddress": [
     "📢"
   ],
@@ -12812,9 +10263,6 @@
   "pumpkin": [
     "🎃"
   ],
-  "pumpkin pie": [
-    "🥧"
-  ],
   "punch": [
     "👊"
   ],
@@ -12834,21 +10282,10 @@
   "puppy": [
     "🐶"
   ],
-  "puppy eyes": [
-    "🥺"
-  ],
   "purple": [
     "💜",
     "🟣",
     "🟪"
-  ],
-  "purple face": [
-    "👿",
-    "😈"
-  ],
-  "purple heart": [
-    "💟",
-    "💜"
   ],
   "purse": [
     "👛",
@@ -12898,10 +10335,6 @@
     "❓",
     "🙋‍♂"
   ],
-  "question mark": [
-    "❔",
-    "❓"
-  ],
   "quick": [
     "🏃",
     "🏃‍♀"
@@ -12918,9 +10351,6 @@
   "rabbit": [
     "🐰",
     "🐇"
-  ],
-  "rabbit face": [
-    "🐰"
   ],
   "raccoon": [
     "🦝"
@@ -12939,9 +10369,6 @@
     "🏁",
     "🏇"
   ],
-  "racing car": [
-    "🏎"
-  ],
   "racquet": [
     "🏸",
     "🎾"
@@ -12953,9 +10380,6 @@
   ],
   "radio": [
     "📻",
-    "🔘"
-  ],
-  "radio button": [
     "🔘"
   ],
   "radioactive": [
@@ -12977,12 +10401,6 @@
     "🚞",
     "🚆"
   ],
-  "railway car": [
-    "🚃"
-  ],
-  "railway track": [
-    "🛤"
-  ],
   "rain": [
     "☂",
     "🌧",
@@ -13001,18 +10419,6 @@
     "🙋",
     "🤚",
     "🙋‍♂"
-  ],
-  "raised fist": [
-    "✊"
-  ],
-  "raised hand": [
-    "✋"
-  ],
-  "raised hand with fingers splayed": [
-    "🖐"
-  ],
-  "raising hands": [
-    "🙌"
   ],
   "ram": [
     "🐏",
@@ -13059,9 +10465,6 @@
   "ready": [
     "🛄"
   ],
-  "real heart": [
-    "🫀"
-  ],
   "realize": [
     "💭"
   ],
@@ -13080,16 +10483,10 @@
     "🎥",
     "⏺"
   ],
-  "record button": [
-    "⏺"
-  ],
   "recreational": [
     "🚙"
   ],
   "recycle": [
-    "♻"
-  ],
-  "recycling symbol": [
     "♻"
   ],
   "red": [
@@ -13105,43 +10502,6 @@
     "🔴",
     "🟥",
     "🫀"
-  ],
-  "red apple": [
-    "🍎"
-  ],
-  "red box": [
-    "🧰"
-  ],
-  "red circle": [
-    "🔴"
-  ],
-  "red envelope": [
-    "🧧"
-  ],
-  "red hair": [
-    "👨‍🦰",
-    "👩‍🦰"
-  ],
-  "red heart": [
-    "❤"
-  ],
-  "red lobster": [
-    "🦞"
-  ],
-  "red meat": [
-    "🥩"
-  ],
-  "red paper lantern": [
-    "🏮"
-  ],
-  "red shirt": [
-    "♟"
-  ],
-  "red triangle pointed down": [
-    "🔻"
-  ],
-  "red triangle pointed up": [
-    "🔺"
   ],
   "red-faced": [
     "🥵"
@@ -13189,9 +10549,6 @@
     "😥",
     "😌"
   ],
-  "relieved face": [
-    "😌"
-  ],
   "religion": [
     "🕎",
     "☯",
@@ -13215,26 +10572,14 @@
   "reminder": [
     "🎗"
   ],
-  "reminder ribbon": [
-    "🎗"
-  ],
   "repairs": [
     "🔨"
   ],
   "repeat": [
     "🔁"
   ],
-  "repeat button": [
-    "🔁"
-  ],
-  "repeat single button": [
-    "🔂"
-  ],
   "reptile": [
     "🦎"
-  ],
-  "rescue worker’s helmet": [
-    "⛑"
   ],
   "respect": [
     "🫡"
@@ -13264,17 +10609,11 @@
   "reverse": [
     "◀"
   ],
-  "reverse button": [
-    "◀"
-  ],
   "revolver": [
     "🔫"
   ],
   "revolving": [
     "🚨",
-    "💞"
-  ],
-  "revolving hearts": [
     "💞"
   ],
   "rewind": [
@@ -13295,12 +10634,6 @@
     "🍙",
     "🍘",
     "🍛"
-  ],
-  "rice ball": [
-    "🍙"
-  ],
-  "rice cracker": [
-    "🍘"
   ],
   "rich": [
     "💶",
@@ -13323,35 +10656,11 @@
     "▶",
     "👉"
   ],
-  "right anger bubble": [
-    "🗯"
-  ],
-  "right arrow": [
-    "➡"
-  ],
-  "right arrow curving down": [
-    "⤵"
-  ],
-  "right arrow curving left": [
-    "↩"
-  ],
-  "right arrow curving up": [
-    "⤴"
-  ],
-  "right hand": [
-    "🫱"
-  ],
-  "right-pointing magnifying glass": [
-    "🔎"
-  ],
   "rightwards": [
     "🤜"
   ],
   "ring": [
     "💍"
-  ],
-  "ringed planet": [
-    "🪐"
   ],
   "rip": [
     "🪦"
@@ -13378,13 +10687,7 @@
   "roasted": [
     "🍠"
   ],
-  "roasted sweet potato": [
-    "🍠"
-  ],
   "robot": [
-    "🤖"
-  ],
-  "robot face": [
     "🤖"
   ],
   "rock": [
@@ -13393,10 +10696,6 @@
     "👊",
     "🥌",
     "🪨"
-  ],
-  "rock climber": [
-    "🧗‍♂",
-    "🧗‍♀"
   ],
   "rock-on": [
     "🤘"
@@ -13425,29 +10724,11 @@
     "🤣",
     "😂"
   ],
-  "roll of paper": [
-    "🧻"
-  ],
   "rolled": [
-    "🗞"
-  ],
-  "rolled-up newspaper": [
     "🗞"
   ],
   "roller": [
     "🎢"
-  ],
-  "roller bag": [
-    "🧳"
-  ],
-  "roller coaster": [
-    "🎢"
-  ],
-  "roller skate": [
-    "🛼"
-  ],
-  "roller skates": [
-    "🛼"
   ],
   "rolling": [
     "🤣",
@@ -13496,9 +10777,6 @@
   "rosette": [
     "🏵"
   ],
-  "round pushpin": [
-    "📍"
-  ],
   "row": [
     "🚣",
     "🚣‍♀"
@@ -13516,18 +10794,12 @@
     "🤴",
     "🫅"
   ],
-  "royal family": [
-    "👑"
-  ],
   "royalty": [
     "👑",
     "🤴",
     "🫅"
   ],
   "rugby": [
-    "🏉"
-  ],
-  "rugby football": [
     "🏉"
   ],
   "ruler": [
@@ -13544,12 +10816,6 @@
     "🏃",
     "👟",
     "🏃‍♀"
-  ],
-  "running shirt": [
-    "🎽"
-  ],
-  "running shoe": [
-    "👟"
   ],
   "rush": [
     "🏃",
@@ -13590,9 +10856,6 @@
   ],
   "safety": [
     "🦺"
-  ],
-  "safety pin": [
-    "🧷"
   ],
   "sailboat": [
     "⛵"
@@ -13640,9 +10903,6 @@
     "🎅",
     "🧑‍🎄"
   ],
-  "santa claus": [
-    "🧑‍🎄"
-  ],
   "santy": [
     "🧑‍🎄"
   ],
@@ -13675,9 +10935,6 @@
   "satellite": [
     "📡",
     "🛰"
-  ],
-  "satellite antenna": [
-    "📡"
   ],
   "satisfied": [
     "😊",
@@ -13764,9 +11021,6 @@
     "🏫",
     "📚"
   ],
-  "school backpack": [
-    "🎒"
-  ],
   "science": [
     "🔎",
     "📡",
@@ -13828,12 +11082,6 @@
   "sea": [
     "🪸"
   ],
-  "sea lion": [
-    "🦭"
-  ],
-  "sea shell": [
-    "🐚"
-  ],
   "seafood": [
     "🍢",
     "🦞"
@@ -13866,12 +11114,6 @@
   ],
   "see": [
     "👀",
-    "🙈"
-  ],
-  "see no evil": [
-    "🙈"
-  ],
-  "see-no-evil monkey": [
     "🙈"
   ],
   "seedling": [
@@ -13911,16 +11153,9 @@
   "set": [
     "📐"
   ],
-  "settle down": [
-    "🏡",
-    "🏠"
-  ],
   "seven": [
     "🕢",
     "7⃣",
-    "🕖"
-  ],
-  "seven o’clock": [
     "🕖"
   ],
   "seven-thirty": [
@@ -13931,9 +11166,6 @@
   ],
   "sewing": [
     "🧵"
-  ],
-  "sewing needle": [
-    "🪡"
   ],
   "sexy": [
     "💋",
@@ -13989,16 +11221,6 @@
   "shaved": [
     "🍧"
   ],
-  "shaved head": [
-    "👨‍🦲",
-    "👩‍🦲"
-  ],
-  "shaved ice": [
-    "🍧"
-  ],
-  "sheaf of rice": [
-    "🌾"
-  ],
   "shedding": [
     "🌳"
   ],
@@ -14034,9 +11256,6 @@
     "🚅"
   ],
   "shinto": [
-    "⛩"
-  ],
-  "shinto shrine": [
     "⛩"
   ],
   "shiny": [
@@ -14086,10 +11305,6 @@
   "shooting": [
     "🌠"
   ],
-  "shooting star": [
-    "🌠",
-    "💫"
-  ],
   "shopping": [
     "👠",
     "🛍",
@@ -14103,9 +11318,6 @@
     "👟",
     "👛",
     "👜"
-  ],
-  "shopping bags": [
-    "🛍"
   ],
   "shortcake": [
     "🍰"
@@ -14131,13 +11343,7 @@
     "🤷‍♂",
     "🤷‍♀"
   ],
-  "shuffle tracks button": [
-    "🔀"
-  ],
   "shush": [
-    "🤫"
-  ],
-  "shushing face": [
     "🤫"
   ],
   "shuttlecock": [
@@ -14165,9 +11371,6 @@
     "☢",
     "🪧"
   ],
-  "sign of the horns": [
-    "🤘"
-  ],
   "signal": [
     "🚥",
     "📶",
@@ -14191,10 +11394,6 @@
   ],
   "silver": [
     "🥈"
-  ],
-  "simple home": [
-    "🏡",
-    "🏠"
   ],
   "sing": [
     "🎤"
@@ -14222,9 +11421,6 @@
     "🕡",
     "🕕",
     "6⃣"
-  ],
-  "six o’clock": [
-    "🕕"
   ],
   "six-thirty": [
     "🕡"
@@ -14264,9 +11460,6 @@
     "⛷",
     "🫕"
   ],
-  "ski lift": [
-    "🚠"
-  ],
   "skier": [
     "⛷"
   ],
@@ -14283,9 +11476,6 @@
     "💀",
     "☠",
     "🩻"
-  ],
-  "skull and crossbones": [
-    "☠"
   ],
   "skunk": [
     "🦨"
@@ -14316,16 +11506,10 @@
     "😪",
     "😴"
   ],
-  "sleeping face": [
-    "😴"
-  ],
   "sleepy": [
     "💤",
     "😩",
     "🥱"
-  ],
-  "sleepy face": [
-    "😪"
   ],
   "sleigh": [
     "🛷"
@@ -14337,9 +11521,6 @@
     "🍕",
     "🍰"
   ],
-  "slice of pie": [
-    "🥧"
-  ],
   "slick": [
     "😏"
   ],
@@ -14348,20 +11529,11 @@
     "😉",
     "🛝"
   ],
-  "slide rule": [
-    "📐"
-  ],
   "slider": [
     "🎚"
   ],
   "sliding": [
     "🛝"
-  ],
-  "slightly frowning face": [
-    "🙁"
-  ],
-  "slightly smiling face": [
-    "🙂"
   ],
   "slip-on": [
     "🥿"
@@ -14370,9 +11542,6 @@
     "🥿"
   ],
   "slot": [
-    "🎰"
-  ],
-  "slot machine": [
     "🎰"
   ],
   "sloth": [
@@ -14400,18 +11569,6 @@
     "🤪",
     "🤏",
     "🫘"
-  ],
-  "small airplane": [
-    "🛩"
-  ],
-  "small amount": [
-    "🤏"
-  ],
-  "small blue diamond": [
-    "🔹"
-  ],
-  "small orange diamond": [
-    "🔸"
   ],
   "smart": [
     "🧠"
@@ -14480,52 +11637,7 @@
     "😇",
     "😆"
   ],
-  "smiling cat face with heart-eyes": [
-    "😻"
-  ],
-  "smiling cat face with open mouth": [
-    "😺"
-  ],
-  "smiling face": [
-    "☺"
-  ],
-  "smiling face with 3 hearts": [
-    "🥰"
-  ],
-  "smiling face with halo": [
-    "😇"
-  ],
-  "smiling face with heart-eyes": [
-    "😍"
-  ],
-  "smiling face with horns": [
-    "😈"
-  ],
-  "smiling face with open mouth": [
-    "😃"
-  ],
-  "smiling face with open mouth & closed eyes": [
-    "😆"
-  ],
-  "smiling face with open mouth & cold sweat": [
-    "😅"
-  ],
-  "smiling face with open mouth & smiling eyes": [
-    "😄"
-  ],
-  "smiling face with smiling eyes": [
-    "😊"
-  ],
-  "smiling face with sunglasses": [
-    "😎"
-  ],
-  "smiling hearts": [
-    "🥰"
-  ],
   "smirk": [
-    "😏"
-  ],
-  "smirking face": [
     "😏"
   ],
   "smoke": [
@@ -14590,9 +11702,6 @@
     "⛷",
     "🛷"
   ],
-  "snow-capped mountain": [
-    "🏔"
-  ],
   "snowboard": [
     "🏂"
   ],
@@ -14605,9 +11714,6 @@
   "snowman": [
     "⛄",
     "☃"
-  ],
-  "snowman without snow": [
-    "⛄"
   ],
   "soak": [
     "🧽"
@@ -14628,9 +11734,6 @@
   "soccer": [
     "⚽"
   ],
-  "soccer ball": [
-    "⚽"
-  ],
   "socks": [
     "🧦"
   ],
@@ -14639,15 +11742,6 @@
   ],
   "soft": [
     "🔈"
-  ],
-  "soft drink": [
-    "🥤"
-  ],
-  "soft ice cream": [
-    "🍦"
-  ],
-  "soft serve": [
-    "🍦"
   ],
   "softball": [
     "🥎"
@@ -14680,9 +11774,6 @@
     "😕",
     "🙇",
     "🙇‍♀"
-  ],
-  "sort of": [
-    "🤏"
   ],
   "sos": [
     "🆘"
@@ -14744,13 +11835,7 @@
     "🌛",
     "🛰"
   ],
-  "space invaders": [
-    "👾"
-  ],
   "spade": [
-    "♠"
-  ],
-  "spade suit": [
     "♠"
   ],
   "spaghetti": [
@@ -14780,46 +11865,19 @@
     "💍",
     "💖"
   ],
-  "sparkling heart": [
-    "💖"
-  ],
   "speak": [
     "🗣",
-    "🙊"
-  ],
-  "speak no evil": [
-    "🙊"
-  ],
-  "speak-no-evil monkey": [
     "🙊"
   ],
   "speaker": [
     "🔇"
   ],
-  "speaker high volume": [
-    "🔊"
-  ],
-  "speaker low volume": [
-    "🔈"
-  ],
-  "speaker medium volume": [
-    "🔉"
-  ],
   "speaking": [
-    "🗣"
-  ],
-  "speaking head": [
     "🗣"
   ],
   "speech": [
     "🗨",
     "💬"
-  ],
-  "speech balloon": [
-    "💬"
-  ],
-  "speech bubble": [
-    "👁‍🗨"
   ],
   "speechless": [
     "😶"
@@ -14844,14 +11902,8 @@
     "🕸",
     "🕷"
   ],
-  "spider web": [
-    "🕸"
-  ],
   "spill": [
     "🫗"
-  ],
-  "spin class": [
-    "🚲"
   ],
   "spinning": [
     "🚲"
@@ -14862,15 +11914,6 @@
   "spiral": [
     "🗓",
     "🗒",
-    "🐚"
-  ],
-  "spiral calendar": [
-    "🗓"
-  ],
-  "spiral notepad": [
-    "🗒"
-  ],
-  "spiral shell": [
     "🐚"
   ],
   "spirit": [
@@ -14922,15 +11965,9 @@
     "🏊‍♀",
     "🛼"
   ],
-  "sport utility vehicle": [
-    "🚙"
-  ],
   "sports": [
     "🥍",
     "🥎"
-  ],
-  "sports medal": [
-    "🏅"
   ],
   "sportutility": [
     "🚙"
@@ -14939,9 +11976,6 @@
     "🦒"
   ],
   "spouting": [
-    "🐳"
-  ],
-  "spouting whale": [
     "🐳"
   ],
   "spring": [
@@ -15022,15 +12056,6 @@
     "🌟",
     "🤩"
   ],
-  "star and crescent": [
-    "☪"
-  ],
-  "star of David": [
-    "✡"
-  ],
-  "star trek": [
-    "🖖"
-  ],
   "star-struck": [
     "🤩"
   ],
@@ -15061,17 +12086,10 @@
     "😤",
     "🚂"
   ],
-  "steam room": [
-    "🧖‍♀",
-    "🧖‍♂"
-  ],
   "steaming": [
     "🍜",
     "☕",
     "♨"
-  ],
-  "steaming bowl": [
-    "🍜"
   ],
   "steamy": [
     "🧖‍♀",
@@ -15079,9 +12097,6 @@
   ],
   "stein": [
     "🍺"
-  ],
-  "step ladder": [
-    "🪜"
   ],
   "stethoscope": [
     "🩺"
@@ -15128,13 +12143,6 @@
     "⏹",
     "✋"
   ],
-  "stop button": [
-    "⏹"
-  ],
-  "stop light": [
-    "🚥",
-    "🚦"
-  ],
   "stoplight": [
     "🚥",
     "🚦"
@@ -15148,16 +12156,6 @@
   ],
   "stradivarius": [
     "🎻"
-  ],
-  "straight edge": [
-    "📏"
-  ],
-  "straight face": [
-    "😐",
-    "😑"
-  ],
-  "straight ruler": [
-    "📏"
   ],
   "straightedge": [
     "📏"
@@ -15220,9 +12218,6 @@
   "studio": [
     "🎙"
   ],
-  "studio microphone": [
-    "🎙"
-  ],
   "study": [
     "📚"
   ],
@@ -15265,9 +12260,6 @@
   "suction": [
     "🪠"
   ],
-  "sudden realization": [
-    "🤭"
-  ],
   "sugar": [
     "🧁"
   ],
@@ -15279,9 +12271,6 @@
   ],
   "summer": [
     "🚤"
-  ],
-  "summer ale": [
-    "🍺"
   ],
   "sun": [
     "⛅",
@@ -15298,18 +12287,6 @@
     "🌆",
     "🌞"
   ],
-  "sun behind large cloud": [
-    "🌥"
-  ],
-  "sun behind rain cloud": [
-    "🌦"
-  ],
-  "sun behind small cloud": [
-    "🌤"
-  ],
-  "sun with face": [
-    "🌞"
-  ],
   "sunflower": [
     "🌻"
   ],
@@ -15321,14 +12298,8 @@
     "☀",
     "🌞"
   ],
-  "sunny side up": [
-    "🍳"
-  ],
   "sunrise": [
     "🌅",
-    "🌄"
-  ],
-  "sunrise over mountains": [
     "🌄"
   ],
   "sunscreen": [
@@ -15340,9 +12311,6 @@
   ],
   "sunshine": [
     "🌞"
-  ],
-  "super bowl": [
-    "🏈"
   ],
   "superhero": [
     "🦸",
@@ -15417,9 +12385,6 @@
   "suspension": [
     "🚟"
   ],
-  "suspension railway": [
-    "🚟"
-  ],
   "suspicious": [
     "😏"
   ],
@@ -15447,9 +12412,6 @@
     "😅",
     "😰"
   ],
-  "sweat droplets": [
-    "💦"
-  ],
   "sweating": [
     "🥵"
   ],
@@ -15475,10 +12437,6 @@
     "😛",
     "🧁",
     "🧃"
-  ],
-  "sweet tooth": [
-    "🍬",
-    "🍫"
   ],
   "swerve": [
     "👐"
@@ -15524,14 +12482,8 @@
   "syringe": [
     "💉"
   ],
-  "t rex": [
-    "🦖"
-  ],
   "t-shirt": [
     "👕"
-  ],
-  "table tennis": [
-    "🏓"
   ],
   "tableware": [
     "🥄"
@@ -15554,9 +12506,6 @@
   "taiwan": [
     "🧋"
   ],
-  "takeout box": [
-    "🥡"
-  ],
   "talisman": [
     "🧿"
   ],
@@ -15566,9 +12515,6 @@
   ],
   "tamale": [
     "🫔"
-  ],
-  "tanabata tree": [
-    "🎋"
   ],
   "tangerine": [
     "🍊"
@@ -15624,9 +12570,6 @@
   "teacup": [
     "🍵"
   ],
-  "teacup without handle": [
-    "🍵"
-  ],
   "teapot": [
     "🫖"
   ],
@@ -15640,16 +12583,10 @@
     "😭",
     "🥲"
   ],
-  "tear-off calendar": [
-    "📆"
-  ],
   "tears": [
     "🤣",
     "😂",
     "😭"
-  ],
-  "tears of joy": [
-    "🥹"
   ],
   "tease": [
     "😉"
@@ -15657,9 +12594,6 @@
   "technologist": [
     "👩‍💻",
     "👨‍💻"
-  ],
-  "teddy bear": [
-    "🧸"
   ],
   "teeth": [
     "😃",
@@ -15680,17 +12614,11 @@
     "📱",
     "📲"
   ],
-  "telephone receiver": [
-    "📞"
-  ],
   "telescope": [
     "🔭"
   ],
   "television": [
     "📺"
-  ],
-  "tell me": [
-    "🫴"
   ],
   "teller": [
     "🏧"
@@ -15704,9 +12632,6 @@
   ],
   "ten": [
     "🕥",
-    "🕙"
-  ],
-  "ten o’clock": [
     "🕙"
   ],
   "ten-thirty": [
@@ -15727,9 +12652,6 @@
   "terrapin": [
     "🐢"
   ],
-  "test tube": [
-    "🧪"
-  ],
   "texas": [
     "🇽🇹"
   ],
@@ -15739,20 +12661,11 @@
   "thank": [
     "🙏"
   ],
-  "thank you": [
-    "🙏"
-  ],
   "thanks": [
     "🙏"
   ],
   "thanksgiving": [
     "🦃"
-  ],
-  "that was close": [
-    "😓"
-  ],
-  "that's crazy": [
-    "😳"
   ],
   "theater": [
     "🎭"
@@ -15778,9 +12691,6 @@
     "🤔",
     "💭"
   ],
-  "thinking face": [
-    "🤔"
-  ],
   "third": [
     "🥉"
   ],
@@ -15804,9 +12714,6 @@
   "thought": [
     "💭"
   ],
-  "thought balloon": [
-    "💭"
-  ],
   "thoughts": [
     "💭"
   ],
@@ -15820,26 +12727,11 @@
     "🕞",
     "3⃣"
   ],
-  "three fingers": [
-    "🤟"
-  ],
-  "three o’clock": [
-    "🕒"
-  ],
   "three-thirty": [
     "🕞"
   ],
-  "throw up": [
-    "🤮"
-  ],
   "thumb": [
     "👎",
-    "👍"
-  ],
-  "thumbs down": [
-    "👎"
-  ],
-  "thumbs up": [
     "👍"
   ],
   "thunder": [
@@ -15874,9 +12766,6 @@
     "🐯",
     "🐅"
   ],
-  "tiger face": [
-    "🐯"
-  ],
   "time": [
     "🕣",
     "🕥",
@@ -15909,9 +12798,6 @@
     "⌛",
     "⏳"
   ],
-  "timer clock": [
-    "⏲"
-  ],
   "tipping": [
     "💁",
     "💁‍♂"
@@ -15932,9 +12818,6 @@
     "😵",
     "🥱"
   ],
-  "tired face": [
-    "😫"
-  ],
   "titanic": [
     "🚢"
   ],
@@ -15943,9 +12826,6 @@
   ],
   "tmi": [
     "🙉"
-  ],
-  "to do list": [
-    "📋"
   ],
   "toadstool": [
     "🍄"
@@ -15967,9 +12847,6 @@
     "🚽",
     "🪠"
   ],
-  "toilet paper": [
-    "🧻"
-  ],
   "toiletry": [
     "🪥"
   ],
@@ -15990,9 +12867,6 @@
     "😜",
     "😝",
     "😛"
-  ],
-  "tongue out": [
-    "🥵"
   ],
   "tool": [
     "🔎",
@@ -16038,9 +12912,6 @@
     "🎩",
     "🔝"
   ],
-  "top hat": [
-    "🎩"
-  ],
   "tophat": [
     "🎩"
   ],
@@ -16078,9 +12949,6 @@
   "tractor": [
     "🚜"
   ],
-  "trade mark": [
-    "™"
-  ],
   "trademark": [
     "™"
   ],
@@ -16111,9 +12979,6 @@
     "🚋",
     "🚃",
     "🚊"
-  ],
-  "tram car": [
-    "🚋"
   ],
   "tramway": [
     "🚡"
@@ -16179,16 +13044,7 @@
     "📐",
     "▶"
   ],
-  "triangular flag": [
-    "🚩"
-  ],
-  "triangular ruler": [
-    "📐"
-  ],
   "trident": [
-    "🔱"
-  ],
-  "trident emblem": [
     "🔱"
   ],
   "trim": [
@@ -16198,10 +13054,6 @@
     "📷",
     "🛄",
     "🚞"
-  ],
-  "triple crown": [
-    "🐎",
-    "🏇"
   ],
   "triste": [
     "😢"
@@ -16233,12 +13085,6 @@
     "🌴",
     "🥭",
     "🦩"
-  ],
-  "tropical drink": [
-    "🍹"
-  ],
-  "tropical fish": [
-    "🐠"
   ],
   "tropics": [
     "🍹"
@@ -16276,9 +13122,6 @@
   ],
   "tubular": [
     "👍"
-  ],
-  "tuk tuk": [
-    "🛺"
   ],
   "tulip": [
     "🌷"
@@ -16319,9 +13162,6 @@
     "🕧",
     "🕛"
   ],
-  "twelve o’clock": [
-    "🕛"
-  ],
   "twelve-thirty": [
     "🕧"
   ],
@@ -16344,24 +13184,6 @@
     "2⃣",
     "🕝"
   ],
-  "two hearts": [
-    "💕"
-  ],
-  "two hump": [
-    "🐫"
-  ],
-  "two men holding hands": [
-    "👬"
-  ],
-  "two o’clock": [
-    "🕑"
-  ],
-  "two women holding hands": [
-    "👭"
-  ],
-  "two-hump camel": [
-    "🐫"
-  ],
   "two-thirty": [
     "🕝"
   ],
@@ -16370,12 +13192,6 @@
   ],
   "typing": [
     "💬"
-  ],
-  "u shape": [
-    "🧲"
-  ],
-  "u there?": [
-    "👋"
   ],
   "uber": [
     "🚕",
@@ -16390,18 +13206,11 @@
     "🙄",
     "🤌"
   ],
-  "ugly duckling": [
-    "🦢"
-  ],
   "uh": [
     "😐",
     "😑"
   ],
   "uh\noh": [
-    "😑"
-  ],
-  "uh oh": [
-    "😐",
     "😑"
   ],
   "uhh": [
@@ -16423,21 +13232,12 @@
     "🏖",
     "☔"
   ],
-  "umbrella on ground": [
-    "⛱"
-  ],
-  "umbrella with rain drops": [
-    "☔"
-  ],
   "umrah": [
     "🕋"
   ],
   "unamused": [
     "😒",
     "😐"
-  ],
-  "unamused face": [
-    "😒"
   ],
   "unbelievable": [
     "😮"
@@ -16451,9 +13251,6 @@
     "🧛‍♂",
     "🧛‍♀"
   ],
-  "under the tuscan sun": [
-    "😚"
-  ],
   "underage": [
     "🔞"
   ],
@@ -16463,9 +13260,6 @@
   "underwear": [
     "🩲",
     "🩳"
-  ],
-  "uneven eyes": [
-    "🥴"
   ],
   "unexpressive": [
     "😑"
@@ -16484,9 +13278,6 @@
     "😞"
   ],
   "unicorn": [
-    "🦄"
-  ],
-  "unicorn face": [
     "🦄"
   ],
   "uniform": [
@@ -16516,24 +13307,6 @@
     "👆",
     "🔝"
   ],
-  "up and to the right": [
-    "📈"
-  ],
-  "up arrow": [
-    "⬆"
-  ],
-  "up button": [
-    "🔼"
-  ],
-  "up-down arrow": [
-    "↕"
-  ],
-  "up-left arrow": [
-    "↖"
-  ],
-  "up-right arrow": [
-    "↗"
-  ],
   "uppercase": [
     "🔠"
   ],
@@ -16546,9 +13319,6 @@
     "🧂"
   ],
   "upside-down": [
-    "🙃"
-  ],
-  "upside-down face": [
     "🙃"
   ],
   "upward": [
@@ -16618,9 +13388,6 @@
   "versus": [
     "🆚"
   ],
-  "vertical traffic light": [
-    "🚦"
-  ],
   "vest": [
     "🦺"
   ],
@@ -16630,18 +13397,12 @@
   "vibration": [
     "📳"
   ],
-  "vibration mode": [
-    "📳"
-  ],
   "vice": [
     "🗜"
   ],
   "victory": [
     "✌",
     "🏆"
-  ],
-  "victory hand": [
-    "✌"
   ],
   "vicuña": [
     "🦙"
@@ -16654,12 +13415,6 @@
     "📻",
     "📼",
     "📽"
-  ],
-  "video camera": [
-    "📹"
-  ],
-  "video game": [
-    "🎮"
   ],
   "videocassette": [
     "📼"
@@ -16682,9 +13437,6 @@
   "vitamin": [
     "💊"
   ],
-  "vitamin c": [
-    "🍊"
-  ],
   "voip": [
     "📞"
   ],
@@ -16705,9 +13457,6 @@
     "🆚"
   ],
   "vulcan": [
-    "🖖"
-  ],
-  "vulcan salute": [
     "🖖"
   ],
   "wacky": [
@@ -16732,10 +13481,6 @@
     "🚶",
     "🚶‍♀"
   ],
-  "walking dead": [
-    "🧟‍♀",
-    "🧟‍♂"
-  ],
   "wall": [
     "🧱"
   ],
@@ -16745,12 +13490,6 @@
   "waning": [
     "🌖",
     "🌘"
-  ],
-  "waning crescent moon": [
-    "🌘"
-  ],
-  "waning gibbous moon": [
-    "🌖"
   ],
   "war": [
     "🥷",
@@ -16778,19 +13517,6 @@
     "🥤",
     "🫗"
   ],
-  "water buffalo": [
-    "🐃"
-  ],
-  "water closet": [
-    "🚾"
-  ],
-  "water polo": [
-    "🤽‍♀",
-    "🤽‍♂"
-  ],
-  "water wave": [
-    "🌊"
-  ],
   "watermelon": [
     "🍉"
   ],
@@ -16807,26 +13533,11 @@
     "🏴",
     "🏳"
   ],
-  "waving hand": [
-    "👋"
-  ],
   "wavy": [
     "〰"
   ],
-  "wavy dash": [
-    "〰"
-  ],
-  "wavy mouth": [
-    "🥴"
-  ],
   "waxing": [
     "🌒",
-    "🌔"
-  ],
-  "waxing crescent moon": [
-    "🌒"
-  ],
-  "waxing gibbous moon": [
     "🌔"
   ],
   "wc": [
@@ -16850,12 +13561,6 @@
   "weary": [
     "😩",
     "🙀"
-  ],
-  "weary cat face": [
-    "🙀"
-  ],
-  "weary face": [
-    "😩"
   ],
   "weather": [
     "⛅",
@@ -16912,9 +13617,6 @@
   "welding": [
     "🥽"
   ],
-  "well done": [
-    "👏"
-  ],
   "west": [
     "⬅"
   ],
@@ -16954,9 +13656,6 @@
     "☸",
     "🛞"
   ],
-  "wheel of dharma": [
-    "☸"
-  ],
   "wheelchair": [
     "♿",
     "👨‍🦼",
@@ -16964,15 +13663,8 @@
     "👨‍🦽",
     "👩‍🦽"
   ],
-  "wheelchair symbol": [
-    "♿"
-  ],
   "wheels": [
     "🛹"
-  ],
-  "where the heart is": [
-    "🏡",
-    "🏠"
   ],
   "whew": [
     "😥"
@@ -16990,49 +13682,6 @@
     "🦷",
     "🤍"
   ],
-  "white circle": [
-    "⚪"
-  ],
-  "white coat": [
-    "🥼"
-  ],
-  "white exclamation mark": [
-    "❕"
-  ],
-  "white flag": [
-    "🏳"
-  ],
-  "white flower": [
-    "💮"
-  ],
-  "white hair": [
-    "👨‍🦳",
-    "👩‍🦳"
-  ],
-  "white hearth": [
-    "💟"
-  ],
-  "white large square": [
-    "⬜"
-  ],
-  "white medium square": [
-    "◻"
-  ],
-  "white medium star": [
-    "⭐"
-  ],
-  "white medium-small square": [
-    "◽"
-  ],
-  "white question mark": [
-    "❔"
-  ],
-  "white small square": [
-    "▫"
-  ],
-  "white square button": [
-    "🔳"
-  ],
   "whoa": [
     "😯",
     "😮",
@@ -17040,9 +13689,6 @@
   ],
   "whoops": [
     "🤭"
-  ],
-  "why not": [
-    "🥺"
   ],
   "wicked": [
     "🖤"
@@ -17056,14 +13702,8 @@
   "wilbur": [
     "🐷"
   ],
-  "wild cabbage": [
-    "🥦"
-  ],
   "wildcard": [
     "🃏"
-  ],
-  "willy wonka": [
-    "🍭"
   ],
   "wilted": [
     "🥀"
@@ -17081,19 +13721,10 @@
     "🌬",
     "🍃"
   ],
-  "wind chime": [
-    "🎐"
-  ],
-  "wind face": [
-    "🌬"
-  ],
   "window": [
     "🪟"
   ],
   "wine": [
-    "🍷"
-  ],
-  "wine glass": [
     "🍷"
   ],
   "wings": [
@@ -17109,17 +13740,11 @@
   "winking": [
     "😉"
   ],
-  "winking face": [
-    "😉"
-  ],
   "winks": [
     "😉"
   ],
   "winner": [
     "🏅"
-  ],
-  "winnie the pooh": [
-    "🍯"
   ],
   "winning": [
     "😎",
@@ -17156,9 +13781,6 @@
     "😵‍💫"
   ],
   "wolf": [
-    "🐺"
-  ],
-  "wolf face": [
     "🐺"
   ],
   "woman": [
@@ -17228,122 +13850,11 @@
     "🧑‍🍼",
     "🧔‍♀"
   ],
-  "woman biking": [
-    "🚴‍♀"
-  ],
-  "woman bowing": [
-    "🙇‍♀"
-  ],
-  "woman climbing": [
-    "🧗‍♀"
-  ],
-  "woman dancing": [
-    "💃"
-  ],
-  "woman elf": [
-    "🧝‍♀"
-  ],
-  "woman fairy": [
-    "🧚‍♀"
-  ],
-  "woman frowning": [
-    "🙍"
-  ],
-  "woman genie": [
-    "🧞‍♀"
-  ],
-  "woman gesturing NO": [
-    "🙅"
-  ],
-  "woman gesturing OK": [
-    "🙆"
-  ],
-  "woman getting haircut": [
-    "💇"
-  ],
-  "woman getting massage": [
-    "💆"
-  ],
-  "woman in lotus position": [
-    "🧘‍♀"
-  ],
-  "woman in manual wheelchair": [
-    "👩‍🦽"
-  ],
-  "woman in motorized wheelchair": [
-    "👩‍🦼"
-  ],
-  "woman in steamy room": [
-    "🧖‍♀"
-  ],
-  "woman lifting weights": [
-    "🏋‍♀"
-  ],
-  "woman mage": [
-    "🧙‍♀"
-  ],
-  "woman mountain biking": [
-    "🚵‍♀"
-  ],
-  "woman pouting": [
-    "🙎"
-  ],
-  "woman raising hand": [
-    "🙋"
-  ],
-  "woman rowing boat": [
-    "🚣‍♀"
-  ],
-  "woman running": [
-    "🏃‍♀"
-  ],
-  "woman surfing": [
-    "🏄‍♀"
-  ],
-  "woman swimming": [
-    "🏊‍♀"
-  ],
-  "woman tipping hand": [
-    "💁"
-  ],
-  "woman vampire": [
-    "🧛‍♀"
-  ],
-  "woman walking": [
-    "🚶‍♀"
-  ],
-  "woman wearing turban": [
-    "👳‍♀"
-  ],
-  "woman with headscarf": [
-    "🧕"
-  ],
-  "woman with probing cane": [
-    "👩‍🦯"
-  ],
-  "woman zombie": [
-    "🧟‍♀"
-  ],
-  "woman’s boot": [
-    "👢"
-  ],
-  "woman’s clothes": [
-    "👚"
-  ],
-  "woman’s hat": [
-    "👒"
-  ],
-  "woman’s sandal": [
-    "👡"
-  ],
   "women": [
     "👯",
     "👭",
     "🤼‍♀",
     "🤵‍♀"
-  ],
-  "women’s room": [
-    "🚺"
   ],
   "wonder": [
     "💭"
@@ -17363,21 +13874,12 @@
     "🐑",
     "🦙"
   ],
-  "woolly mammoth": [
-    "🦣"
-  ],
   "woozy": [
     "😵‍💫"
-  ],
-  "woozy face": [
-    "🥴"
   ],
   "work": [
     "👷",
     "👷‍♀"
-  ],
-  "work out": [
-    "💦"
   ],
   "worker": [
     "👷",
@@ -17396,12 +13898,6 @@
     "🌎",
     "🌐"
   ],
-  "world map": [
-    "🗺"
-  ],
-  "worldwide web": [
-    "🌐"
-  ],
   "worm": [
     "🪱"
   ],
@@ -17409,9 +13905,6 @@
     "😨",
     "😟",
     "🫦"
-  ],
-  "worried face": [
-    "😟"
   ],
   "worry": [
     "😟",
@@ -17431,9 +13924,6 @@
     "🌯"
   ],
   "wrapped": [
-    "🎁"
-  ],
-  "wrapped gift": [
     "🎁"
   ],
   "wrapper": [
@@ -17456,9 +13946,6 @@
   ],
   "writing": [
     "📔"
-  ],
-  "writing hand": [
-    "✍"
   ],
   "wry": [
     "😼"
@@ -17516,9 +14003,6 @@
     "😴",
     "🥱"
   ],
-  "yawning face": [
-    "🥱"
-  ],
   "yay": [
     "👏",
     "😃"
@@ -17533,31 +14017,12 @@
     "🟡",
     "🟨"
   ],
-  "yellow cab": [
-    "🚖"
-  ],
-  "yellow heart": [
-    "💛"
-  ],
-  "yellow taxi": [
-    "🚕",
-    "🚖"
-  ],
   "yen": [
     "💹",
     "💴"
   ],
-  "yen banknote": [
-    "💴"
-  ],
   "yes": [
     "👍",
-    "🫡"
-  ],
-  "yes ma'am": [
-    "🫡"
-  ],
-  "yes sir": [
     "🫡"
   ],
   "yikes": [
@@ -17565,9 +14030,6 @@
     "😰"
   ],
   "yin": [
-    "☯"
-  ],
-  "yin yang": [
     "☯"
   ],
   "yinyang": [
@@ -17633,13 +14095,7 @@
   "zero": [
     "0⃣"
   ],
-  "zip it": [
-    "🤌"
-  ],
   "zipper": [
-    "🤐"
-  ],
-  "zipper-mouth face": [
     "🤐"
   ],
   "zodiac": [
@@ -17701,9 +14157,6 @@
     "😴",
     "🥱"
   ],
-  "Åland Islands": [
-    "🇦🇽"
-  ],
   "“acceptable”": [
     "🉑"
   ],
@@ -17719,9 +14172,6 @@
   "“discount”": [
     "🈹"
   ],
-  "“free of charge”": [
-    "🈚"
-  ],
   "“here”": [
     "🈁"
   ],
@@ -17733,9 +14183,6 @@
   ],
   "“secret”": [
     "㊙"
-  ],
-  "“service charge”": [
-    "🈂"
   ],
   "“vacancy”": [
     "🈳"
