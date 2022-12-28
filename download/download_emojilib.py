@@ -1,10 +1,11 @@
-import sys
+from argparse import ArgumentParser
 from typing import Optional, Callable, Iterable
 from collections import defaultdict
 from operator import itemgetter
 from copy import deepcopy
 from pathlib import Path
 import json
+import sys
 import re
 
 import numpy as np
@@ -74,7 +75,7 @@ def merge_emoji2names(emoji2names: dict[str, list[str]], rest_of_emoji2names: di
     return emoji2names
 
 
-def is_valid_token(token: str) -> bool:
+def is_valid_token(token: str, dictionary: Optional[set[str]] = None) -> bool:
     if not token or token in STOPWORDS and token not in SKIPPED_STOPWORDS:
         return False
 
@@ -89,6 +90,9 @@ def is_valid_token(token: str) -> bool:
         if myunicode.ens_normalize(token) != token:
             return False
     except ValueError:
+        return False
+
+    if dictionary is not None and token not in dictionary:
         return False
 
     return True
@@ -144,17 +148,21 @@ def generate_synonyms(model: KeyedVectors,
 def enhance_names(model: KeyedVectors,
                   name2emojis: dict[str, list[str]],
                   threshold: float = 0.5,
-                  topn: Optional[int] = None) -> dict[str, list[tuple[str, float]]]:
+                  topn: Optional[int] = None,
+                  dictionary: Optional[set[str]] = None) -> dict[str, list[tuple[str, float]]]:
 
     enhanced_name2emojis: dict[str, dict[str, float]] = defaultdict(dict)
     for name, emojis in tqdm(name2emojis.items(), desc='generating synonyms'):
+        if dictionary is not None and name not in dictionary:
+            continue
+
         if name not in model:
             names = [(name, 100.0)]
         else:
             names = generate_synonyms(model, name, threshold, topn)
 
         for synonym, similarity in names:
-            if is_valid_token(synonym):
+            if is_valid_token(synonym, dictionary=dictionary):
                 # print(f'GENERATING {synonym} AS A SYNONYM TO {name}')
                 for emoji in emojis:
                     if similarity > enhanced_name2emojis[synonym].get(emoji, float('-inf')):
@@ -168,7 +176,8 @@ def enhance_names(model: KeyedVectors,
 
 def extract_emojis_from_w2v(model: KeyedVectors,
                             threshold: float = 0.5,
-                            topn: Optional[int] = None) -> dict[str, list[tuple[str, float]]]:
+                            topn: Optional[int] = None,
+                            dictionary: Optional[set[str]] = None) -> dict[str, list[tuple[str, float]]]:
 
     emoji2names: dict[str, list[tuple[str, float]]] = dict()
     for key, index in model.key_to_index.items():
@@ -179,7 +188,9 @@ def extract_emojis_from_w2v(model: KeyedVectors,
         emoji2names[normalized_key] = []
         for synonym, similarity in generate_synonyms(model, key, threshold, topn):
             normalized_synonym = _ens_normalize(synonym)
-            if normalized_synonym is None or myunicode.is_emoji(normalized_synonym):
+            if normalized_synonym is None \
+                    or myunicode.is_emoji(normalized_synonym) \
+                    or not is_valid_token(normalized_synonym, dictionary=dictionary):
                 continue
 
             emoji2names[normalized_key].append((normalized_synonym, similarity))
@@ -258,26 +269,44 @@ def sort_name2emojis_by_similarity(
     return name2sorted_emojis
 
 
-# def sort_name2emojis_by_frequency(name2emojis: dict[str, list[str]], frequences: dict[str, int]) -> dict[str, list[str]]:
-#     name2sorted_emojis = dict()
-#     missing_emojis = set()
-#     for name, emojis in name2emojis.items():
-#         for emoji in emojis:
-#             if emoji not in frequences:
-#                 missing_emojis.add(emoji)
-#         name2sorted_emojis[name] = sorted(emojis, key=lambda x: frequences.get(x, 0), reverse=True)
-#
-#     print(missing_emojis)
-#     return name2sorted_emojis
-
-
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('--output', type=str, default=str(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json'),
+                        help='output filepath')
+    parser.add_argument('--w2v', default='google',
+                        help='word2vec model [google, twitter, built-in, own path]')
+    parser.add_argument('--emoji_w2v', default=None,
+                        help='word2vec model for generating synonyms to emojis [twitter, own path], '
+                             'not using if nothing passed')
+    parser.add_argument('--threshold', type=float, default=0.5,
+                        help='minimal similarity threshold')
+    parser.add_argument('--emoji_threshold', type=float, default=0.5,
+                        help='minimal similarity threshold for emojis')
+    parser.add_argument('--topn', type=int, default=1000,
+                        help='synonyms per word limit (if not passed - limit is 1000)')
+    parser.add_argument('--emoji_topn', type=int, default=1000,
+                        help='synonyms per emoji limit (if not passed - limit is 1000)')
+    parser.add_argument('--both_words', action='store_true',
+                        help='setting this flag obliges both the base word '
+                             'and the synonym to be from the specific dictionary')
+    args = parser.parse_args()
+
+    threshold = args.threshold
+    topn = args.topn
+
+    emoji_threshold = args.emoji_threshold
+    emoji_topn = args.emoji_topn
+
+    if args.both_words:
+        with open(PROJECT_ROOT_DIR / 'data' / 'w2v-dictionary.txt', 'r', encoding='utf-8') as f:
+            dictionary = set([line.strip().lower() for line in f.read().strip().split('\n')])
+    else:
+        dictionary = None
 
     # processing
     emoji2names = download_emoji2names()
     all_emojis2names = download_all_emojis2names()
-    
-   
+
     # remove non-emojis
     for emoji in list(emoji2names.keys()):
         if emoji not in all_emojis2names:
@@ -290,22 +319,36 @@ if __name__ == '__main__':
     emoji2names_normalized = normalize_names(emoji2names)
     name2emojis = invert_emoji2names_mapping(emoji2names_normalized)
 
-    # model_path = gensim.downloader.load('glove-twitter-200', return_path=True)
-    # model = KeyedVectors.load_word2vec_format(model_path)
+    # loading w2v models
+    if args.w2v == 'google':
+        model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+    elif args.w2v == 'twitter':
+        model = gensim.downloader.load('glove-twitter-200', return_path=False)
+    elif args.w2v == 'built-in':
+        model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
+    else:
+        model = KeyedVectors.load_word2vec_format(args.w2v, binary=False)
 
-    model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
-    # model = KeyedVectors.load(str(PROJECT_ROOT_DIR / 'data' / 'embeddings.pkl'))
-    model2 = KeyedVectors.load_word2vec_format(str(PROJECT_ROOT_DIR / 'research' / 'emoji' / 'emoji_w2v' / 'emoji_w2v.bin'), binary=False)
+    if args.emoji_w2v is None:
+        emoji_model = None
+    elif args.emoji_w2v == 'twitter':
+        emoji_model = gensim.downloader.load('glove-twitter-200', return_path=False)
+    else:
+        emoji_model = KeyedVectors.load_word2vec_format(args.emoji_w2v, binary=False)
+
     model.init_sims(replace=True)
-    model2.init_sims(replace=True)
+    if emoji_model is not None:
+        emoji_model.init_sims(replace=True)
 
-    enhanced_name2emojis = enhance_names(model, name2emojis, threshold=0.5, topn=75)
-    emoji_based_name2emojis = extract_emojis_from_w2v(model2, threshold=0.5, topn=50)
+    # continuing processing
+    enhanced_name2emojis = enhance_names(model, name2emojis, threshold=threshold, topn=topn, dictionary=dictionary)
 
-    merged_name2emojis = merge_name2emojis(enhanced_name2emojis, emoji_based_name2emojis)
-
-    # with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json', 'r', encoding='utf-8') as f:
-    #     enhanced_name2emojis = json.load(f)
+    if emoji_model is not None:
+        emoji_based_name2emojis = extract_emojis_from_w2v(emoji_model, threshold=emoji_threshold,
+                                                          topn=emoji_topn, dictionary=dictionary)
+        merged_name2emojis = merge_name2emojis(enhanced_name2emojis, emoji_based_name2emojis)
+    else:
+        merged_name2emojis = enhanced_name2emojis
 
     with open(PROJECT_ROOT_DIR / 'data' / 'ens-emoji-freq.json', 'r', encoding='utf-8') as f:
         frequencies = json.load(f)
@@ -317,7 +360,6 @@ if __name__ == '__main__':
         frequencies,
         all_emojis2names
     )
-    # name2sorted_emojis = sort_name2emojis_by_frequency(enhanced_name2emojis, frequences)
 
-    with open(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json', 'w', encoding='utf-8') as f:
+    with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
