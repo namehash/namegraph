@@ -50,6 +50,7 @@ def evaluate(
     print()
     print(f'tp: {tp}, fn: {fn}, fp: {fp}')
     print(f'recall: {recall(tp, fn):.4f}, precision: {precision(tp, fp):.4f}, f1: {f1(tp, fp, fn):.4f}')
+    # print(f'<td>{recall(tp, fn) * 100:05.2f}%</td> <td>{precision(tp, fp) * 100:05.2f}%</td> <td>{f1(tp, fp, fn) * 100:05.2f}%</td>')
     print(end='\n\n')
 
 
