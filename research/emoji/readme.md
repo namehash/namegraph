@@ -17,7 +17,7 @@ Downloaded from [muan/emojilib](https://github.com/muan/emojilib/blob/main/dist/
 |                 | recall | precision |     f1 |
 |----------------:|-------:|----------:|-------:|
 | **vulgrarisms** | 01.39% |   100.00% | 02.74% |
-|    **whatsapp** | 25.08% |    46.70% | 32.63% |
+|    **whatsapp** | 28.73% |    46.70% | 35.50% |
 | **short words** | 28.65% |    85.67% | 42.94% |
 
 ## 2. embeddings: googlenews
@@ -27,18 +27,18 @@ Mapping generated based on `GoogleNews-vectors-negative300.bin` and using [downl
 |                 | recall | precision |     f1 |
 |----------------:|-------:|----------:|-------:|
 | **vulgrarisms** | 04.17% |    08.57% | 05.61% |
-|    **whatsapp** | 51.56% |    10.90% | 18.00% |
+|    **whatsapp** | 59.70% |    10.90% | 18.44% |
 | **short words** | 98.80% |    34.29% | 50.91% |
 
 ## 3. embeddings: generator built-in
 
 Mapping generated based on embeddings used in `W2VGenerator`and using [download_emojilib.py](../../download/download_emojilib.py) script
 
-|                  | recall | precision |      f1 |
-|-----------------:|-------:|----------:|--------:|
-|  **vulgrarisms** | 08.33% |    00.13% |  00.26% |
-|     **whatsapp** | 52.50% |    01.35% |  02.63% |
-|  **short words** | 82.35% |    01.94% |  03.79% |
+|                  | recall | precision |     f1 |
+|-----------------:|-------:|----------:|-------:|
+|  **vulgrarisms** | 08.33% |    00.13% | 00.26% |
+|     **whatsapp** | 60.80% |    01.35% | 02.64% |
+|  **short words** | 82.35% |    01.94% | 03.79% |
 
 ## 4. embeddings: twitter
 
@@ -47,7 +47,7 @@ Mapping generated based on `glove-twitter-200`and using [download_emojilib.py](.
 |                  | recall | precision |     f1 |
 |-----------------:|-------:|----------:|-------:|
 |  **vulgrarisms** | 09.72% |    00.22% | 00.43% |
-|     **whatsapp** | 56.14% |    02.16% | 04.16% |
+|     **whatsapp** | 65.01% |    02.16% | 04.18% |
 |  **short words** | 90.74% |    03.39% | 06.54% |
 
 ## 5. embeddings: twitter, also add emojis from embeddings
@@ -57,7 +57,7 @@ Mapping generated based on `glove-twitter-200` and by adding emoji synonyms whic
 |                  | recall | precision |     f1 |
 |-----------------:|-------:|----------:|-------:|
 |  **vulgrarisms** | 09.72% |    00.22% | 00.43% |
-|     **whatsapp** | 56.14% |    02.16% | 04.16% |
+|     **whatsapp** | 65.01% |    02.16% | 04.18% |
 |  **short words** | 90.74% |    03.39% | 06.54% |
 
 ## 6. embeddings: fine-tuned twitter, also add emojis from embeddings
@@ -67,7 +67,7 @@ Same as 5, but using our own fine-tuned W2V model
 |                  | recall | precision |     f1 |
 |-----------------:|-------:|----------:|-------:|
 |  **vulgrarisms** | 11.11% |    00.59% | 01.12% |
-|     **whatsapp** | 52.14% |    04.26% | 07.88% |
+|     **whatsapp** | 60.38% |    04.26% | 07.96% |
 |  **short words** | 72.11% |    05.30% | 09.88% |
 
 ## 7. embeddings: googlenews, add emojis from fine-tuned twitter
@@ -77,7 +77,7 @@ Using different models for words synonyms - `GoogleNews-vectors-negative300.bin`
 |                  | recall | precision |     f1 |
 |-----------------:|-------:|----------:|-------:|
 |  **vulgrarisms** | 09.72% |    11.48% | 10.53% |
-|     **whatsapp** | 51.82% |    10.86% | 17.95% |
+|     **whatsapp** | 60.01% |    10.86% | 18.39% |
 |  **short words** | 98.80% |    34.08% | 50.68% |
 
 ## 8. add mapping from embeddings only if both tokens are words
