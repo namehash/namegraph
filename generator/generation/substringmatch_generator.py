@@ -4,12 +4,7 @@ import hashlib
 import re
 import os
 
-try:
-    from generator.utils import UniSuffixTree
-
-    HAS_SUFFIX_TREE = True
-except Exception:
-    HAS_SUFFIX_TREE = False
+from generator.utils.unisuffixtree import UniSuffixTree, HAS_SUFFIX_TREE
 
 from .name_generator import NameGenerator
 from ..domains import Domains

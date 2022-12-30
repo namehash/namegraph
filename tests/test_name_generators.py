@@ -29,7 +29,7 @@ import pytest
 
 from generator.domains import Domains
 
-from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
+from generator.utils.suffixtree import HAS_SUFFIX_TREE
 
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 

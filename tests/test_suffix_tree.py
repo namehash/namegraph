@@ -1,11 +1,11 @@
 import pytest
-from generator.generation.substringmatch_generator import HAS_SUFFIX_TREE
+from generator.utils.unisuffixtree import HAS_SUFFIX_TREE
 
 if not HAS_SUFFIX_TREE:
     pytest.skip('Suffix tree not available', allow_module_level=True)
 
-from generator.utils import UniSuffixTree
-from suffixtree import SuffixQueryTree
+from generator.utils.unisuffixtree import UniSuffixTree
+from generator.utils.suffixtree import SuffixQueryTree
 
 
 def test_bug():
