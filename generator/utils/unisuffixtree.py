@@ -1,5 +1,5 @@
 from typing import Optional
-from suffixtree import SuffixQueryTree
+from generator.utils.suffixtree import SuffixQueryTree, HAS_SUFFIX_TREE
 from generator.utils import unicode_wrap
 
 
