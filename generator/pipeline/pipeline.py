@@ -5,6 +5,7 @@ import re
 from omegaconf import DictConfig
 
 from generator.generated_name import GeneratedName
+from generator.controlflow import *
 from generator.normalization import *
 from generator.tokenization import *
 from generator.generation import *
@@ -29,6 +30,7 @@ class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.config: DictConfig = config
+        self.controlflow: List[ControlFlow] = []
         self.normalizers: List[Normalizer] = []
         self.tokenizers: List[Tokenizer] = []
         self.generators: List[NameGenerator] = []
@@ -40,6 +42,10 @@ class Pipeline:
 
         input_word = word
         words: List[GeneratedName] = [GeneratedName((word,), pipeline_name=self.definition.name)]
+
+        # control flow is applied sequentially
+        for controlflow in self.controlflow:
+            words = controlflow.apply(words, params=params.get('controlflow', dict()))
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
@@ -78,6 +84,10 @@ class Pipeline:
         return aggregate_duplicates(suggestions)
 
     def _build(self):
+        # make control flow optional
+        for controlflow_class in getattr(self.definition, 'controlflow', []):
+            self.controlflow.append(globals()[controlflow_class](self.config))
+
         for normalizer_class in self.definition.normalizers:
             self.normalizers.append(globals()[normalizer_class](self.config))
 
