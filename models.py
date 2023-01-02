@@ -4,6 +4,11 @@ from pydantic import BaseModel, Field
 from web_api import generator
 
 
+class ControlParams(BaseModel):
+    instant_search: bool = Field(False, title='instant search mode',
+                            description='set to `true` to generate instant search suggestions')
+
+
 class NormalizerParams(BaseModel):
     pass
 
@@ -22,6 +27,7 @@ class FilterParams(BaseModel):
 
 
 class PipelineParams(BaseModel):
+    control: Optional[ControlParams] = Field(dict())
     normalizer: Optional[NormalizerParams] = Field(dict())
     tokenizer: Optional[TokenizerParams] = Field(dict())
     generator: Optional[GeneratorParams] = Field(dict())
