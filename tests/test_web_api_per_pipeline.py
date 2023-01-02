@@ -194,3 +194,36 @@ class TestOnlyPrimary:
         assert len(names) == 1
         assert names[0] in {'glintpay.eth', 'drbaher.eth', '9852222.eth', 'wanadoo.eth',
                             'conio.eth', 'indulgente.eth', 'theclown.eth'}
+
+
+@pytest.fixture(scope='class')
+def substring_test_pipeline():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(
+        ['pipelines=test_substring',
+         'app.domains=tests/data/suggestable_domains_for_substring.csv'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
+
+
+@mark.usefixtures("substring_test_pipeline")
+class TestSubstringMatch:
+    def test_normalized(self, test_client):
+        response = test_client.post("/", json={"name": "あかまい"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "akamaihd.eth" in names
+
+    def test_unnormalized(self, test_client):
+        response = test_client.post("/", json={"name": "あかまい"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "あかまいhd.eth" in names
+
+    def test_emoji(self, test_client):
+        response = test_client.post("/", json={"name": "💛"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "i💛you.eth" in names

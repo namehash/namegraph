@@ -143,7 +143,6 @@
     - SubstringMatchGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
 -
   name: hyphens
   normalizers:

@@ -1,0 +1,26 @@
+-
+  name: substring-normalized
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - SubstringMatchGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: substring-unnormalized
+  normalizers:
+    - StripEthNormalizer
+    - NamehashNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - SubstringMatchGenerator
+  filters:
+    - SubnameFilter
