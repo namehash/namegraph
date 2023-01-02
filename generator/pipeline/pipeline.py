@@ -45,7 +45,7 @@ class Pipeline:
 
         # control flow is applied sequentially
         for controlflow in self.controlflow:
-            words = controlflow.apply(words, params=params.get('controlflow', dict()))
+            words = controlflow.apply(words, params=params.get('control', dict()))
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:

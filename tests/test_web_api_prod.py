@@ -241,3 +241,43 @@ def test_prod_short_suggestions(prod_test_client):
     str_names = [name["name"] for name in json]
 
     assert all([len(name) >= 3 for name in str_names])
+
+
+def test_instant_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
+            "control": {
+                "instant_search": True,
+            },
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert not any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])
+
+
+def test_not_instant_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
+            "control": {
+                "instant_search": False,
+            },
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])
