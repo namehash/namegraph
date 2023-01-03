@@ -9,13 +9,12 @@ uvicorn==0.20.0
 requests==2.28.1
 regex==2022.10.31
 unicodeblock==0.3.1
-emoji==1.7.0
+emoji==2.2.0
 pyahocorasick==1.4.4
-csuffixtree@https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl
 numpy==1.24.1
+csuffixtree@https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl
 pytest-benchmark
 pytest-timeouts
-web3
 boto3
 python-dotenv
 more-itertools==9.0.0
