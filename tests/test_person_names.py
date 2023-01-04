@@ -19,15 +19,15 @@ def test_person_names(person_names):
 
     result1 = pn.tokenize1('krzysztofwrobel')
     assert result1[0][1] == 'PL'
-    assert result1[0][2] == ['krzysztof', 'wrobel']
+    assert result1[0][2] == ('krzysztof', 'wrobel')
 
     result2 = pn.tokenize1('kwrobel')
     assert result2[0][1] == 'PL'
-    assert result2[0][2] == ['k', 'wrobel']
+    assert result2[0][2] == ('k', 'wrobel')
 
     result3 = pn.tokenize1('wrobel')
     assert result3[0][1] == 'PL'
-    assert result3[0][2] == ['wrobel']
+    assert result3[0][2] == ('wrobel',)
 
     assert result3[0][0] > result2[0][0] > result1[0][0]
 
