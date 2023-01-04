@@ -70,7 +70,7 @@ class PersonNames:
         interpretation = {}
         interpretation['names'] = [name_stats]
         interpretation['prob'] = name_prob
-        interpretation['tokenization'] = [name]
+        interpretation['tokenization'] = (name,)
         interpretation['genders'] = genders
         return interpretation
 
@@ -91,9 +91,9 @@ class PersonNames:
 
         interpretation = {}
         if initial_first:
-            interpretation['tokenization'] = [initial, name]
+            interpretation['tokenization'] = (initial, name)
         else:
-            interpretation['tokenization'] = [name, initial]
+            interpretation['tokenization'] = (name, initial)
 
         interpretation['names'] = [name_stats]
         interpretation['prob'] = name_prob
@@ -108,7 +108,7 @@ class PersonNames:
                       country, gender_counts in name2_stats.items()}
         interpretation = {}
         interpretation['names'] = [name1_stats, name2_stats]
-        interpretation['tokenization'] = [name1, name2]
+        interpretation['tokenization'] = (name1, name2)
 
         probs = collections.defaultdict(list)
         probs2 = {}
@@ -186,14 +186,14 @@ class PersonNames:
         return interpretations
 
     def tokenize1(self, input_name: str, user_country: str = None, topn: int = 1) -> List[
-        tuple[float, str, List[str], List[str], Dict[str, float]]]:
+        tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
         """Return best country interpretation."""
         all_interpretations = self.score(input_name, user_country)
 
         return all_interpretations[:topn]
 
     def tokenize2(self, input_name: str, user_country: str = None, topn: int = 1) -> List[
-        tuple[float, str, List[str], List[str], Dict[str, float]]]:
+        tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
         """Return interpretation with the highest sum of country probs."""
         results = self.anal(input_name)
 
@@ -211,7 +211,7 @@ class PersonNames:
         return sorted(interpretations, reverse=True)[:topn]
 
     def score(self, input_name: str, user_country: str = None) -> List[
-        tuple[float, str, List[str], List[str], Dict[str, float]]]:
+        tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
         """Return best interpretation."""
         interpretations = self.anal(input_name)
 
