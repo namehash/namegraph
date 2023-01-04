@@ -85,3 +85,13 @@ random_available_name_pipeline:
   filters:
     - SubnameFilter
     - ValidNameFilter
+person_names:
+  firstnames_url: person_names_firstnames.json
+  lastnames_url: person_names_lastnames.json
+  other_url: person_names_other.json
+  country_stats_url: person_names_country_stats.json
+  country_bonus: 100
+  firstnames_path: data/person_names_firstnames.json
+  lastnames_path: data/person_names_lastnames.json
+  other_path: data/person_names_other.json
+  country_stats_path: data/person_names_country_stats.json
