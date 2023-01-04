@@ -47,6 +47,12 @@ def init(config: DictConfig):
     s3_downloader = S3Downloader()
     download_embeddings(s3_downloader, config.generation.word2vec_url, config.generation.word2vec_path)
     download_embeddings(s3_downloader, config.generation.wikipedia2vec_url, config.generation.wikipedia2vec_path)
+    
+    s3_downloader.download_file(config.person_names.firstnames_url, config.person_names.firstnames_path, override=True)
+    s3_downloader.download_file(config.person_names.lastnames_url, config.person_names.lastnames_path, override=True)
+    s3_downloader.download_file(config.person_names.other_url, config.person_names.other_path, override=True)
+    s3_downloader.download_file(config.person_names.country_stats_url, config.person_names.country_stats_path,
+                                override=True)
 
 
 if __name__ == "__main__":
