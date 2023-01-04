@@ -34,19 +34,31 @@ def _ens_normalize(text: str) -> Optional[str]:
         return None
 
 
-def download_emoji2names() -> dict[str, list[str]]:
+def _emoji_name(emoji: str) -> Optional[str]:
+    try:
+        return myunicode.emoji_name(emoji)
+    except ValueError:
+        return None
+
+
+def download_emoji2names(remove_country_abbreviations: bool = False) -> dict[str, list[str]]:
     r = requests.get(f'https://raw.githubusercontent.com/muan/emojilib/main/dist/emoji-en-US.json')
     json_data = json.loads(r.text)
 
     # normalize emojis, some of them normalize to non-emojis
     for emoji in list(json_data.keys()):
-        try:
-            normalized_emoji = myunicode.ens_normalize(emoji)
-            if normalized_emoji != emoji:
-                json_data[normalized_emoji] = json_data[emoji]
-                del json_data[emoji]
-        except ValueError:
+        normalized_emoji = _ens_normalize(emoji)
+        if normalized_emoji is None:
             del json_data[emoji]
+        elif normalized_emoji != emoji:
+            json_data[normalized_emoji] = json_data[emoji]
+            del json_data[emoji]
+
+    if remove_country_abbreviations:
+        for emoji, names in json_data.items():
+            name = _emoji_name(emoji)
+            if name is not None and name.startswith('flag:'):
+                json_data[emoji] = [name for name in names if len(name) >= 3]
 
     return json_data
 
@@ -54,13 +66,11 @@ def download_emoji2names() -> dict[str, list[str]]:
 def download_all_emojis2names() -> dict[str, list[str]]:
     emojis2names = dict()
     for emoji in myunicode.emoji_iterator():
-        try:
-            name = myunicode.emoji_name(emoji)
-        except ValueError:
+        name = _emoji_name(emoji)
+        if name is None:
             continue
-        try:
-            if emoji != myunicode.ens_normalize(emoji): continue
-        except ValueError:
+
+        if emoji != _ens_normalize(emoji):
             continue
 
         emojis2names[emoji] = [name]
@@ -269,6 +279,23 @@ def sort_name2emojis_by_similarity(
     return name2sorted_emojis
 
 
+def extract_gold_mapping(name2emojis: dict[str, list[str]] | dict[str, dict[str, list[str]]]) -> dict[str, list[str]]:
+    if not name2emojis:
+        return dict()
+
+    if isinstance(list(name2emojis.values())[0], dict):
+        return {key: value['green'] for key, value in name2emojis.items() if 'green' in value}
+
+    return name2emojis
+
+
+def override_mapping(name2emojis: dict[str, list[str]], override: dict[str, list[str]]) -> dict[str, list[str]]:
+    # could have been done in one line, but then it makes only a shallow copy
+    new_name2emojis = deepcopy(name2emojis)
+    new_name2emojis.update(override)
+    return new_name2emojis
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--output', type=str, default=str(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json'),
@@ -289,6 +316,10 @@ if __name__ == '__main__':
     parser.add_argument('--both_words', action='store_true',
                         help='setting this flag obliges both the base word '
                              'and the synonym to be from the specific dictionary')
+    parser.add_argument('--remove_country_abbreviations', action='store_true',
+                        help='remove country abbreviations from the downloaded emojilib mapping')
+    parser.add_argument('--overrides', type=str, nargs='+',
+                        help='json files with overrides to the final result')
     args = parser.parse_args()
 
     threshold = args.threshold
@@ -304,7 +335,7 @@ if __name__ == '__main__':
         dictionary = None
 
     # processing
-    emoji2names = download_emoji2names()
+    emoji2names = download_emoji2names(remove_country_abbreviations=args.remove_country_abbreviations)
     all_emojis2names = download_all_emojis2names()
 
     # remove non-emojis
@@ -360,6 +391,13 @@ if __name__ == '__main__':
         frequencies,
         all_emojis2names
     )
+
+    for overrides_path in args.overrides:
+        with open(overrides_path, 'r', encoding='utf-8') as f:
+            overrides_raw = json.load(f)
+            overrides = extract_gold_mapping(overrides_raw)
+
+        name2sorted_emojis = override_mapping(name2sorted_emojis, overrides)
 
     with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
