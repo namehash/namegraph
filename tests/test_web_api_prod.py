@@ -202,10 +202,8 @@ def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
                            json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
-                                 "max_suggestions": 1000, "params": {
-                                   "generator": {
+                                 "max_suggestions": 1000, "params": {                              
                                        "country": 'pl'
-                                   }
                                }})
 
     assert response.status_code == 200
@@ -230,9 +228,7 @@ def test_prod_short_suggestions(prod_test_client):
     response = client.post("/",
                            json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
-                                   "generator": {
                                        "country": 'pl'
-                                   }
                                }})
 
     assert response.status_code == 200
@@ -248,9 +244,7 @@ def test_instant_search(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-            "control": {
                 "instant_search": True,
-            },
         },
     })
     assert response.status_code == 200
@@ -268,9 +262,7 @@ def test_not_instant_search(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-            "control": {
                 "instant_search": False,
-            },
         },
     })
     assert response.status_code == 200
