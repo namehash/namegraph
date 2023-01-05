@@ -53,9 +53,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": country
-                }
+                "country": country
             }
         })
 
@@ -74,9 +72,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": country
-                }
+                "country": country
             }
         })
         assert response.status_code == 200
@@ -87,9 +83,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": '123'
-                }
+                "country": '123'
             }
         })
         assert response.status_code == 200
@@ -100,9 +94,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": None
-                }
+                "country": None
             }
         })
         assert response.status_code == 200
@@ -113,8 +105,6 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                }
             }
         })
         assert response.status_code == 200

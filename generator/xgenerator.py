@@ -84,7 +84,7 @@ class Generator:
             min_suggestions: int = None,
             max_suggestions: int = None,
             min_available_fraction: float = 0.1,
-            params: dict[str, dict[str, Any]] = None
+            params: dict[str, Any] = None
     ) -> list[GeneratedName]:
 
         min_suggestions = min_suggestions or self.config.app.suggestions

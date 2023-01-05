@@ -37,7 +37,7 @@ class Pipeline:
         self.filters: List[Filter] = []
         self._build()
 
-    def apply(self, word: str, params: dict[str, dict[str, Any]] = None) -> List[GeneratedName]:
+    def apply(self, word: str, params: dict[str, Any] = None) -> List[GeneratedName]:
         params = params or dict()
 
         input_word = word
@@ -45,16 +45,16 @@ class Pipeline:
 
         # control flow is applied sequentially
         for controlflow in self.controlflow:
-            words = controlflow.apply(words, params=params.get('control', dict()))
+            words = controlflow.apply(words, params=params)
 
         # the normalizers are applied sequentially
         for normalizer in self.normalizers:
-            words = normalizer.apply(words, params=params.get('normalizer', dict()))
+            words = normalizer.apply(words, params=params)
 
         # the tokenizers are applied in parallel
         suggestions: List[GeneratedName] = []
         for tokenizer in self.tokenizers:
-            suggestions.extend(tokenizer.apply(words, params=params.get('tokenizer', dict())))
+            suggestions.extend(tokenizer.apply(words, params=params))
 
         suggestions = aggregate_duplicates(suggestions, by_tokens=True)
         logger.debug(f'Tokenization: {suggestions}')
@@ -63,7 +63,7 @@ class Pipeline:
             f'Start generation')
         # the generators are applied sequentially
         for generator in self.generators:
-            suggestions = generator.apply(suggestions, params=params.get('generator', dict()))
+            suggestions = generator.apply(suggestions, params=params)
 
         logger.info(
             f'Generated suggestions: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
@@ -71,7 +71,7 @@ class Pipeline:
         # the filters are applied sequentially
         for filter_ in self.filters:
             logger.debug(f'{filter} filtering')
-            suggestions = filter_.apply(suggestions, params=params.get('filter', dict()))
+            suggestions = filter_.apply(suggestions, params=params)
             logger.debug(f'{filter} done')
 
         # remove input name from suggestions
