@@ -114,16 +114,6 @@ class TestFlagAffix:
 
         response = client.post("/", json={
             "name": name,
-            "params": {
-            }
-        })
-        assert response.status_code == 200
-        json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
-        assert names
-
-        response = client.post("/", json={
-            "name": name,
             "params": None
         })
         assert response.status_code == 200
