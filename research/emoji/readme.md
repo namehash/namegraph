@@ -142,14 +142,14 @@ Based on googlenews and our own w2v for emoji synonyms, both tokens must be word
 </table>
 
 
-## 10. with gold overrides
+## 10. with gold overrides and appends
 
-Based on 8.2 using overrides. Full call is `python download/download_emojilib.py --w2v google --topn 75 --emoji_w2v research/emoji/emoji_w2v/emoji_w2v.bin --emoji_topn 50 --both_words --remove_country_abbreviations --overrides research/emoji/gold-mappings/short-words.json research/emoji/gold-mappings/vulgarisms.json`
+Based on 8.2 using overrides. Full call is `python download/download_emojilib.py --w2v google --topn 75 --emoji_w2v research/emoji/emoji_w2v/emoji_w2v.bin --emoji_topn 50 --both_words --remove_country_abbreviations --overrides research/emoji/gold-mappings/short-words.json research/emoji/gold-mappings/vulgarisms.json --appends research/emoji/gold-mappings/flags.json`
 
 |                  |  recall | precision |      f1 |
 |-----------------:|--------:|----------:|--------:|
 |  **vulgrarisms** | 100.00% |   100.00% | 100.00% |
-|     **whatsapp** |  57.64% |    11.11% |  18.62% |
-|  **short words** |  99.24% |    99.89% |  99.56% |
+|     **whatsapp** |  56.41% |    11.75% |  19.44% |
+|  **short words** |  99.24% |    99.78% |  99.51% |
 
 ## 11. limit the maximum number of emoji replacements for a given token
