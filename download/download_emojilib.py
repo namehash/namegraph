@@ -284,7 +284,10 @@ def extract_gold_mapping(name2emojis: dict[str, list[str]] | dict[str, dict[str,
         return dict()
 
     if isinstance(list(name2emojis.values())[0], dict):
-        return {key: value['green'] for key, value in name2emojis.items() if 'green' in value}
+        return {
+            key: value.get('green', [])
+            for key, value in name2emojis.items()
+        }
 
     return name2emojis
 
@@ -296,9 +299,25 @@ def override_mapping(name2emojis: dict[str, list[str]], override: dict[str, list
     return new_name2emojis
 
 
+def append_mapping(name2emojis: dict[str, list[str]], append: dict[str, list[str]]) -> dict[str, list[str]]:
+    new_name2emojis = deepcopy(name2emojis)
+    for name, emojis in append.items():
+        existing_emojis = new_name2emojis.get(name, [])
+        new_name2emojis[name] = deepcopy(emojis)
+        for emoji in existing_emojis:
+            if emoji not in emojis:
+                new_name2emojis[name].append(emoji)
+
+    return new_name2emojis
+
+
+def refactor_mapping(name2emojis: dict[str, list[str]]):
+    return {name: emojis for name, emojis in name2emojis.items() if emojis}
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--output', type=str, default=str(PROJECT_ROOT_DIR / 'data' / 'name2emoji_by_frequency.json'),
+    parser.add_argument('--output', type=str, default=str(PROJECT_ROOT_DIR / 'data' / 'name2emoji.json'),
                         help='output filepath')
     parser.add_argument('--w2v', default='google',
                         help='word2vec model [google, twitter, built-in, own path]')
@@ -320,6 +339,8 @@ if __name__ == '__main__':
                         help='remove country abbreviations from the downloaded emojilib mapping')
     parser.add_argument('--overrides', type=str, nargs='+',
                         help='json files with overrides to the final result')
+    parser.add_argument('--appends', type=str, nargs='+',
+                        help='json files with appends to the final result (appends to the very start)')
     args = parser.parse_args()
 
     threshold = args.threshold
@@ -399,5 +420,13 @@ if __name__ == '__main__':
 
         name2sorted_emojis = override_mapping(name2sorted_emojis, overrides)
 
+    for appends_path in args.appends:
+        with open(appends_path, 'r', encoding='utf-8') as f:
+            append = json.load(f)
+
+        name2sorted_emojis = append_mapping(name2sorted_emojis, append)
+
+    final_name2emojis = refactor_mapping(name2sorted_emojis)
+
     with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(name2sorted_emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
+        json.dump(final_name2emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
