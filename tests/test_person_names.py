@@ -15,17 +15,17 @@ def person_names():
 
 def test_person_names(person_names):
     pn = person_names
-    assert not pn.tokenize1('information')
+    assert not pn.tokenize('information')
 
-    result1 = pn.tokenize1('krzysztofwrobel')
+    result1 = pn.tokenize('krzysztofwrobel')
     assert result1[0][1] == 'PL'
     assert result1[0][2] == ('krzysztof', 'wrobel')
 
-    result2 = pn.tokenize1('kwrobel')
+    result2 = pn.tokenize('kwrobel')
     assert result2[0][1] == 'PL'
     assert result2[0][2] == ('k', 'wrobel')
 
-    result3 = pn.tokenize1('wrobel')
+    result3 = pn.tokenize('wrobel')
     assert result3[0][1] == 'PL'
     assert result3[0][2] == ('wrobel',)
 
@@ -37,12 +37,12 @@ def test_person_names(person_names):
 def test_person_names_english_chinese(person_names, name):
     pn = person_names
 
-    result = pn.tokenize1(name)
+    result = pn.tokenize(name)
     assert result[0][1] != 'CN'
 
 
 def test_person_names_benchmark(person_names, benchmark):
     pn = person_names
-    assert not pn.tokenize1('information')
+    assert not pn.tokenize('information')
 
-    benchmark(pn.tokenize1, 'the')
+    benchmark(pn.tokenize, 'the')
