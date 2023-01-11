@@ -168,7 +168,6 @@ class PersonNames:
         for i in range(1, len(input_name)):
             name1 = input_name[:i]
             name2 = input_name[i:]
-            # print(name1, name2)
             name1_result = copy.copy(self.firstnames.get(name1, None))
             name2_result = copy.copy(self.lastnames.get(name2, None))
             if name1_result and name2_result:
@@ -185,30 +184,12 @@ class PersonNames:
 
         return interpretations
 
-    def tokenize1(self, input_name: str, user_country: str = None, topn: int = 1) -> List[
+    def tokenize(self, input_name: str, user_country: str = None, topn: int = 1) -> List[
         tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
         """Return best country interpretation."""
         all_interpretations = self.score(input_name, user_country)
 
         return all_interpretations[:topn]
-
-    def tokenize2(self, input_name: str, user_country: str = None, topn: int = 1) -> List[
-        tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
-        """Return interpretation with the highest sum of country probs."""
-        results = self.anal(input_name)
-
-        interpretations = []
-        for r in results:
-            if user_country in r['prob']:
-                r['prob'][user_country] = r['prob'][user_country] * self.country_bonus
-
-            probs2 = sorted(r['prob'].items(), key=lambda x: x[1], reverse=True)
-            if not probs2: continue
-            best = probs2[0]
-            interpretations.append(
-                (sum(r['prob'].values()), best[0], r['tokenization'], r['type'], r['genders'].get(best[0], None)))
-
-        return sorted(interpretations, reverse=True)[:topn]
 
     def score(self, input_name: str, user_country: str = None) -> List[
         tuple[float, str, tuple[str, ...], List[str], Dict[str, float]]]:
@@ -220,16 +201,10 @@ class PersonNames:
             if user_country in r['prob']:
                 r['prob'][user_country] = r['prob'][user_country] * self.country_bonus
 
-            # probs2 = sorted(r['prob'].items(), key=lambda x: x[1], reverse=True)[0]
-            # interpretations.append((probs2[1], probs2[0], [result['name'] for result in r['names']], [result['type'] for result in r['names']]))
-
             for country, prob in r['prob'].items():
-                # print('x', prob)
                 all_interpretations.append(
                     (prob, country, r['tokenization'], r['type'], r['genders'].get(country, None)))
-        # print(sorted(interpretations, reverse=True))
-        # for x in all_interpretations:
-        #     print(x)
+
         return sorted(all_interpretations, reverse=True)
 
     def verbose(self, input_name):
@@ -274,9 +249,8 @@ if __name__ == "__main__":
     for name in ['the', 'kwrobel', 'krzysztofwrobel', 'wrobel', 'apohl', 'banana', 'john', 'james', 'david', 'thefirst',
                  'information']:
         # try:
-        r1 = pn.tokenize1(name)
-        r2 = pn.tokenize2(name)
-        print(name, r1, r2)
+        r1 = pn.tokenize(name)
+        print(name, r1)
         # print(pn.score(name))
         # pn.verbose(name)
         # except:

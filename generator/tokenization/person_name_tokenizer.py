@@ -20,8 +20,8 @@ class PersonNameTokenizer(Tokenizer):
         result = []
         for name in tokenized_names:
             for token in name.tokens:
-                for prob, country, tokenized, type, genders in self.pn.tokenize1(
-                        token):  # TODO can't access request country and set user_country=params...
+                for prob, country, tokenized, type, genders in self.pn.tokenize(token,
+                                                                                user_country=params.get('country')):
                     gn = GeneratedName(
                         tokenized,
                         pipeline_name=name.pipeline_name,

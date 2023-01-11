@@ -230,3 +230,31 @@
   filters:
     - SubnameFilter
     - ValidNameLengthFilter
+-
+  name: person-hyphens
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - PersonNameTokenizer
+  generators:
+    - HyphenGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: person-abbreviation
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - PersonNameTokenizer
+  generators:
+    - AbbreviationGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter

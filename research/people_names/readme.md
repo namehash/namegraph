@@ -1,6 +1,6 @@
-parse.py - calculate top N names per country
-aggregate.py - aggregate those data
-simplify.py - lowercase
+* parse.py - calculate top N names per country
+* aggregate.py - aggregate those data
+* simplify.py - lowercase
 
 Missing names from countries (prefixed with X) in FB dump: [internet users, population] 
 
