@@ -12,4 +12,9 @@ class SpecialCharacterAffixGenerator(NameGenerator):
         super().__init__(config)
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
-        return [('_',) + tokens, ('$',) + tokens]
+        return [
+            ('_',) + tokens,
+            ('$',) + tokens,
+            ('Ξ',) + tokens,
+            tokens + ('Ξ',),
+        ]
