@@ -10,7 +10,6 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
-
 logger = logging.getLogger('generator')
 
 
@@ -58,7 +57,6 @@ def seed_all(seed: int | str):
 generator = init()
 inspector = init_inspector()
 
-
 from models import (
     Name,
     Suggestion,
@@ -67,7 +65,8 @@ from models import (
 
 def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> List[Suggestion]:
     response = [{
-        'name': str(name) + '.eth',  # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
+        'name': str(name) + '.eth',
+        # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
     } for name in names]
 
     if include_metadata:
@@ -92,4 +91,6 @@ async def root(name: Name):
                                       params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+    logger.info(json.dumps(['Request&Response', name.dict(), [gn.dict() for gn in result]]))
+
     return JSONResponse(response)

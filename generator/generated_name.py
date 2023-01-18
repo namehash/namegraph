@@ -39,3 +39,11 @@ class GeneratedName:
         # we do not need any duplicates checking, as adding same value to unique values keeps them unique
         for strategy in self.applied_strategies:
             strategy.append(point)
+
+    def dict(self):
+        return {
+            'tokens': self.tokens,
+            'pipeline_name': self.pipeline_name,
+            'category': self.category,
+            'applied_strategies': self.applied_strategies,
+        }
