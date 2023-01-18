@@ -7,8 +7,6 @@ from web_api import generator
 class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
-    instant_search: bool = Field(False, title='instant search mode',
-                                 description='set to `true` to generate instant search suggestions')
     conservative: bool = Field(False, title='instant search mode',
                                  description='set to `true` to generate instant search suggestions')
 

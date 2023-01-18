@@ -16,7 +16,7 @@
 -
   name: w2v
   controlflow:
-    - RunIfNotInstantSearch
+    - RunIfNotConservative
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
