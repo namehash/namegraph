@@ -62,7 +62,7 @@ class Generator:
         self.init_objects()
 
     def init_objects(self):
-        Domains(self.config)
+        self.domains = Domains(self.config)
 
     def get_sorter(self, sorter: str) -> Sorter:
         match sorter:
@@ -103,7 +103,6 @@ class Generator:
         required_available_suggestions = min_available_fraction * min_suggestions
         if result.unique_suggestions() < min_suggestions \
                 or result.available_suggestions() < required_available_suggestions:
-            
             logger.debug('Generate only available random')
             only_available_suggestions = self.random_available_name_pipeline.apply(name)
             result.add_pipeline_suggestions(only_available_suggestions)

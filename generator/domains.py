@@ -101,6 +101,14 @@ class Domains(metaclass=Singleton):
 
         return taken, on_sale, available
 
+    def get_name_status(self, name: str):
+        if name in self.on_sale:
+            return 'on_sale'
+        elif name in self.taken:
+            return 'taken'
+        else:
+            return 'available'
+
     def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
             -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:
 
