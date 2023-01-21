@@ -1,5 +1,5 @@
 import logging, random, hashlib, json
-from typing import List, Dict, Optional
+from typing import List, Optional
 
 import numpy as np
 from fastapi import FastAPI
@@ -8,6 +8,7 @@ from hydra import initialize, compose
 from pydantic import BaseSettings
 
 from generator.generated_name import GeneratedName
+from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
@@ -63,7 +64,7 @@ from models import (
 )
 
 
-def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> List[Suggestion]:
+def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict[str, str]]:
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -81,6 +82,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 @app.post("/", response_model=list[Suggestion])
 async def root(name: Name):
     seed_all(name.name)
+    log_entry = LogEntry()
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
     result = generator.generate_names(name.name,
@@ -91,6 +93,7 @@ async def root(name: Name):
                                       params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
-    logger.info(json.dumps(['Request&Response', name.dict(), [gn.dict() for gn in result]]))
+
+    logger.info(json.dumps(log_entry.create_log_entry(name.dict(), result)))
 
     return JSONResponse(response)
