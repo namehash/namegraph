@@ -16,9 +16,9 @@ class LogEntry:
                            'price': None,
                            'real_status': None,
                            'name_guard': None},
-            'response': [self.convert_suggestion_to_log_entry(gn) for gn in result],
             'start_time': self.start_time,
             'end_time': time.time(),
+            'response': [self.convert_suggestion_to_log_entry(gn) for gn in result],
         }
         return entry
 
