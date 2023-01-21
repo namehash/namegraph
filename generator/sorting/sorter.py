@@ -3,6 +3,7 @@ import logging, math
 
 from omegaconf import DictConfig
 
+from generator.domains import Domains
 from generator.generated_name import GeneratedName
 
 
@@ -22,7 +23,7 @@ class Sorter:
                                     all_available_count: int = None) -> List[GeneratedName]:
 
         if all_available_count is None:
-            all_available_count = len([str(s) for s in suggestions if s.category == 'available'])
+            all_available_count = len([str(s) for s in suggestions if s.category == Domains.AVAILABLE])
 
         needed_available_count = min(needed_available_count, all_available_count)
         

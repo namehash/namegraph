@@ -27,7 +27,7 @@ class Result:
             on_sale, remaining_suggestions = self.domains.get_on_sale(pipeline_suggestions)
             available, taken = self.domains.get_available(remaining_suggestions)
 
-            for category, suggestions in zip(['on_sale', 'available', 'taken'],
+            for category, suggestions in zip([Domains.ON_SALE, Domains.AVAILABLE, Domains.TAKEN],
                                              [on_sale, available, taken]):
 
                 for suggestion in suggestions:
@@ -45,7 +45,7 @@ class Result:
             suggestion
             for pipeline_suggestions in self.suggestions
             for suggestion in pipeline_suggestions
-            if suggestion.category == 'available'
+            if suggestion.category == Domains.AVAILABLE
         ])
 
 

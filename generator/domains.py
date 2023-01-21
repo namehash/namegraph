@@ -25,6 +25,11 @@ class Singleton(type):
 
 
 class Domains(metaclass=Singleton):
+    TAKEN = 'taken'
+    ON_SALE = 'on_sale'
+    AVAILABLE = 'available'
+    RECENTLY_RELEASED = 'recently_released'
+
     def __init__(self, config):
         logger.debug('Initing Domains')
         self.config = config
@@ -92,22 +97,22 @@ class Domains(metaclass=Singleton):
                 name, interesting_score, status = row
                 name = strip_eth(name)
                 interesting_score = float(interesting_score)
-                if status == 'taken' or status == 'recently_released':
+                if status == self.TAKEN or status == self.RECENTLY_RELEASED:
                     taken[name] = interesting_score
-                elif status == 'on_sale':
+                elif status == self.ON_SALE:
                     on_sale[name] = interesting_score
-                elif status == 'available':
+                elif status == self.AVAILABLE:
                     available[name] = interesting_score
 
         return taken, on_sale, available
 
     def get_name_status(self, name: str):
         if name in self.on_sale:
-            return 'on_sale'
+            return self.ON_SALE
         elif name in self.taken:
-            return 'taken'
+            return self.TAKEN
         else:
-            return 'available'
+            return self.AVAILABLE
 
     def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
             -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:
