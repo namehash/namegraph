@@ -82,7 +82,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 @app.post("/", response_model=list[Suggestion])
 async def root(name: Name):
     seed_all(name.name)
-    log_entry = LogEntry()
+    log_entry = LogEntry(generator.domains)
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
     result = generator.generate_names(name.name,
