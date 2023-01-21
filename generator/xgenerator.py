@@ -23,15 +23,8 @@ class Result:
 
     def assign_categories(self) -> None:
         for pipeline_suggestions in self.suggestions:
-            # advertised, remaining_suggestions = self.domains.get_advertised(pipeline_suggestions)
-            on_sale, remaining_suggestions = self.domains.get_on_sale(pipeline_suggestions)
-            available, taken = self.domains.get_available(remaining_suggestions)
-
-            for category, suggestions in zip([Domains.ON_SALE, Domains.AVAILABLE, Domains.TAKEN],
-                                             [on_sale, available, taken]):
-
-                for suggestion in suggestions:
-                    suggestion.category = category
+            for suggestion in pipeline_suggestions:
+                suggestion.category = self.domains.get_name_status(str(suggestion))
 
     def unique_suggestions(self) -> int:
         return len(set([
