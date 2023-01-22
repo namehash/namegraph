@@ -7,6 +7,9 @@ from generator.domains import Domains
 from fastapi.testclient import TestClient
 
 
+# TODO position of first appearance
+# TODO 
+
 def prod_test_client(config):
     Domains.remove_self()
     os.environ['CONFIG_NAME'] = config
@@ -107,6 +110,9 @@ div {
 </style>''')
 
     stats = collections.defaultdict(list)
+    mrr = collections.defaultdict(list)
+    first_position = collections.defaultdict(list)
+    all_positions = collections.defaultdict(list)
     for input_name in input_names:
         f.write(f'<h1>{input_name}</h1>')
 
@@ -193,14 +199,57 @@ div {
             f.write(f'<div class="g100">')
             f.write(f'<h3>{generator_name} {(100 * len(names) / generated):.2f}%</h3>')
             f.write(f'<ol>')
+
+            mrr[generator_name].append(1 / (names[0][1] + 1))
+            first_position[generator_name].append(names[0][1] + 1)
+            positions = []
             for name, i in names:
                 f.write(f'<li>{i + 1}. {name.replace(".eth", "")}</li>')
+                positions.append(i + 1)
             f.write(f'</ol>')
+            all_positions[generator_name].append(positions)
 
             f.write(f'</div>')
         # END 100
 
         f.write(f'</section>')
 
+    f.write(f'<h1>Mean share</h1>')
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
         f.write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>')
+
+    f.write(f'<h1>MRR</h1>')
+    for generator_name, values in sorted(mrr.items(), key=lambda x: sum(x[1]), reverse=True):
+        f.write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>')
+
+    f.write(f'<h1>First position</h1>')
+    for generator_name, values in sorted(first_position.items(), key=lambda x: sum(x[1]) / len(x[1]), reverse=False):
+        f.write(f'<p>{(sum(values) / len(values)):.2f} {generator_name}</p>')
+
+    f.write(f'<h1>MAP</h1>')
+    maps = []
+    for generator_name, positions_lists in all_positions.items():
+        map = []
+        for positions in positions_lists:
+            ap = []
+            for i, position in enumerate(positions):
+                ap.append((i + 1) / position)
+            map.append(sum(ap) / len(ap))
+        maps.append((sum(map) / len(input_names), generator_name))
+
+    for map, generator_name in sorted(maps, reverse=True):
+        f.write(f'<p>{map:.2f} {generator_name}</p>')
+
+    f.write(f'<h1>MAP /map</h1>')
+    maps = []
+    for generator_name, positions_lists in all_positions.items():
+        map = []
+        for positions in positions_lists:
+            ap = []
+            for i, position in enumerate(positions):
+                ap.append((i + 1) / position)
+            map.append(sum(ap) / len(ap))
+        maps.append((sum(map) / len(map), generator_name))
+
+    for map, generator_name in sorted(maps, reverse=True):
+        f.write(f'<p>{map:.2f} {generator_name}</p>')
