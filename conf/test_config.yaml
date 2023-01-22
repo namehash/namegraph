@@ -68,7 +68,7 @@ sorting:
       W2VGenerator: 1
       CategoriesGenerator: 1
       RandomAvailableNameGenerator: 1
-      OnSaleMatcher: 1
+      OnSaleMatchGenerator: 1
       Wikipedia2VGenerator: 1
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
