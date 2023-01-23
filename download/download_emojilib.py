@@ -140,8 +140,9 @@ def generate_synonyms(model: KeyedVectors,
     indices, = np.where(similarities > threshold)
     best_similarities = similarities[indices]
 
-    sorted_similarities = np.argsort(best_similarities)[::-1]
-    sorted_indices = indices[sorted_similarities]
+    sorted_similarities_idxs = np.argsort(best_similarities)[::-1]
+    sorted_similarities = best_similarities[sorted_similarities_idxs]
+    sorted_indices = indices[sorted_similarities_idxs]
 
     if topn is not None:
         sorted_similarities = sorted_similarities[:topn]
