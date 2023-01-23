@@ -12,7 +12,7 @@ from .w2v_generator import W2VGenerator
 from .categories_generator import CategoriesGenerator
 from .random_available_name_generator import RandomAvailableNameGenerator
 from .random_generator import RandomGenerator
-from .on_sale_matcher import OnSaleMatcher
+from .on_sale_matcher import OnSaleMatchGenerator
 from .wikipedia2v_generator import Wikipedia2VGenerator
 from .special_character_affix_generator import SpecialCharacterAffixGenerator
 from .substringmatch_generator import SubstringMatchGenerator

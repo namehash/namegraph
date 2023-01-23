@@ -19,7 +19,7 @@ from generator.generation import (
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
     SubstringMatchGenerator,
-    OnSaleMatcher,
+    OnSaleMatchGenerator,
     LeetGenerator,
     KeycapGenerator,
 )
@@ -196,7 +196,7 @@ def test_hyphen_generator_long():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = HyphenGenerator(config)
-        tokenized_name = GeneratedName(tuple(['a']*10000))
+        tokenized_name = GeneratedName(tuple(['a'] * 10000))
         generated_names = strategy.apply([tokenized_name])
 
 
@@ -205,9 +205,9 @@ def test_abbreviation_generator_long():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
         strategy = AbbreviationGenerator(config)
-        tokenized_name = GeneratedName(tuple(['aa']*5000))
+        tokenized_name = GeneratedName(tuple(['aa'] * 5000))
         generated_names = strategy.apply([tokenized_name])
-        
+
 
 def test_flag_generator():
     with initialize(version_base=None, config_path="../conf/"):
@@ -228,15 +228,15 @@ def test_flag_generator():
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params={'country': '123'})
         assert len(generated_names) == 0
-        
+
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params={'country': None})
         assert len(generated_names) == 0
-        
+
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params={})
         assert len(generated_names) == 0
-        
+
         tokenized_name = GeneratedName(('taras', 'shevchenko'))
         generated_names = strategy.apply([tokenized_name], params=None)
         assert len(generated_names) == 0
@@ -355,7 +355,7 @@ def test_only_primary_random(overrides: List[str]):
 def test_on_sale_matcher():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
-        strategy = OnSaleMatcher(config)
+        strategy = OnSaleMatchGenerator(config)
         tokenized_name = GeneratedName(('pay', 'fire', '123'))
         generated_names = strategy.apply([tokenized_name])
         print(generated_names)
@@ -369,7 +369,7 @@ def test_on_sale_matcher():
 def test_on_sale_matcher_sorting():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config")
-        strategy = OnSaleMatcher(config)
+        strategy = OnSaleMatchGenerator(config)
         tokenized_name = GeneratedName(('fire', 'baba', 'orange'))
         generated_names = strategy.apply([tokenized_name])
         generated_tokens = [x.tokens for x in generated_names]

@@ -8,7 +8,7 @@ from ..domains import Domains
 from ..utils import sort_by_value
 
 
-class OnSaleMatcher(NameGenerator):
+class OnSaleMatchGenerator(NameGenerator):
     """
     Returns on sale names with at least one the same token.
     """
