@@ -25,6 +25,25 @@ PROJECT_ROOT_DIR = Path(__name__).parent.parent
 TOKEN_SEPARATOR = re.compile(r'[_ ]')
 STOPWORDS = set(stopwords.words('english'))
 SKIPPED_STOPWORDS = ['*', '#']
+MODIFIERS = ['🏻', '🏼', '🏽', '🏾', '🏿', '♂', '♀', '🦱', '🦰', '🦳']
+FORBIDDEN_MODIFIERS = [
+    'light skin tone',
+    'medium-light skin tone',
+    'medium skin tone',
+    'medium-dark skin tone',
+    'dark skin tone',
+    'beard',
+    'bald',
+    'blond hair',
+    'curly hair',
+    'red hair',
+    'white hair',
+    'man',
+    'woman',
+    'person',
+    'girl',
+    'boy',
+]
 
 
 def _ens_normalize(text: str) -> Optional[str]:
@@ -54,6 +73,19 @@ def download_emoji2names(remove_country_abbreviations: bool = False) -> dict[str
             json_data[normalized_emoji] = json_data[emoji]
             del json_data[emoji]
 
+        emoji_name = _emoji_name(emoji)
+
+        if emoji_name is not None and ':' in emoji_name:
+            basename, modifier_string = emoji_name.split(':')
+            has_forbidden_modifiers = any([
+                modifier.strip()
+                for modifier in modifier_string.split(',')
+                if modifier.strip() in FORBIDDEN_MODIFIERS
+            ])
+
+            if has_forbidden_modifiers:
+                json_data[emoji] = json_data[emoji][1:]
+
     if remove_country_abbreviations:
         for emoji, names in json_data.items():
             name = _emoji_name(emoji)
@@ -73,12 +105,26 @@ def download_all_emojis2names() -> dict[str, list[str]]:
         if emoji != _ens_normalize(emoji):
             continue
 
-        emojis2names[emoji] = [name]
+        if ':' in name:
+            basename, modifier_string = name.split(':')
+            modifiers = [
+                modifier.strip()
+                for modifier in modifier_string.split(',')
+                if modifier.strip() not in FORBIDDEN_MODIFIERS
+            ]
+
+            emojis2names[emoji] = [basename] + modifiers
+        else:
+            emojis2names[emoji] = [name]
+
     return emojis2names
 
 
-def merge_emoji2names(emoji2names: dict[str, list[str]], rest_of_emoji2names: dict[str, list[str]]) -> dict[
-    str, list[str]]:
+def merge_emoji2names(
+        emoji2names: dict[str, list[str]],
+        rest_of_emoji2names: dict[str, list[str]]
+) -> dict[str, list[str]]:
+
     emoji2names = deepcopy(emoji2names)
     for emoji, names in rest_of_emoji2names.items():
         emoji2names[emoji] = list(set(emoji2names.get(emoji, [])) | set(names))
@@ -129,10 +175,12 @@ def invert_emoji2names_mapping(emoji2names: dict[str, list[str]]) -> dict[str, l
     return {name: list(emojis) for name, emojis in name2emojis.items()}
 
 
-def generate_synonyms(model: KeyedVectors,
-                      word: str,
-                      threshold: float,
-                      topn: Optional[int] = None) -> list[tuple[str, float]]:
+def generate_synonyms(
+        model: KeyedVectors,
+        word: str,
+        threshold: float,
+        topn: Optional[int] = None
+) -> list[tuple[str, float]]:
 
     synonyms: list[tuple[str, float]] = []
 
@@ -156,11 +204,13 @@ def generate_synonyms(model: KeyedVectors,
     return synonyms
 
 
-def enhance_names(model: KeyedVectors,
-                  name2emojis: dict[str, list[str]],
-                  threshold: float = 0.5,
-                  topn: Optional[int] = None,
-                  dictionary: Optional[set[str]] = None) -> dict[str, list[tuple[str, float]]]:
+def enhance_names(
+        model: KeyedVectors,
+        name2emojis: dict[str, list[str]],
+        threshold: float = 0.5,
+        topn: Optional[int] = None,
+        dictionary: Optional[set[str]] = None
+) -> dict[str, list[tuple[str, float]]]:
 
     enhanced_name2emojis: dict[str, dict[str, float]] = defaultdict(dict)
     for name, emojis in tqdm(name2emojis.items(), desc='generating synonyms'):
@@ -185,10 +235,12 @@ def enhance_names(model: KeyedVectors,
     return {name: list(emojis.items()) for name, emojis in enhanced_name2emojis.items()}
 
 
-def extract_emojis_from_w2v(model: KeyedVectors,
-                            threshold: float = 0.5,
-                            topn: Optional[int] = None,
-                            dictionary: Optional[set[str]] = None) -> dict[str, list[tuple[str, float]]]:
+def extract_emojis_from_w2v(
+        model: KeyedVectors,
+        threshold: float = 0.5,
+        topn: Optional[int] = None,
+        dictionary: Optional[set[str]] = None
+) -> dict[str, list[tuple[str, float]]]:
 
     emoji2names: dict[str, list[tuple[str, float]]] = dict()
     for key, index in model.key_to_index.items():
@@ -215,8 +267,10 @@ def extract_emojis_from_w2v(model: KeyedVectors,
     return name2emojis
 
 
-def merge_name2emojis(n2e1: dict[str, list[tuple[str, float]]],
-                      n2e2: dict[str, list[tuple[str, float]]]) -> dict[str, list[tuple[str, float]]]:
+def merge_name2emojis(
+        n2e1: dict[str, list[tuple[str, float]]],
+        n2e2: dict[str, list[tuple[str, float]]]
+) -> dict[str, list[tuple[str, float]]]:
 
     n2e = {
         name: dict(emojis)
@@ -235,6 +289,13 @@ def merge_name2emojis(n2e1: dict[str, list[tuple[str, float]]],
     return {name: list(emojis.items()) for name, emojis in n2e.items()}
 
 
+def has_modifier(emoji: str) -> bool:
+    return any([
+        len(emoji) > 1 and modifier in emoji
+        for modifier in MODIFIERS
+    ])
+
+
 def sort_name2emojis_by_similarity(
         model: KeyedVectors,
         name2emojis: dict[str, list[tuple[str, float]]],
@@ -243,33 +304,12 @@ def sort_name2emojis_by_similarity(
         original_emojis2names: dict[str, list[str]]
 ) -> dict[str, list[str]]:
 
-    def best_similarity(base: str, words: list[str]) -> float:
-        similarities = []
-        for word in words:
-            # if the base is among the words from emojilib we consider it as superior factor
-            if base == word:
-                return 100.0
-
-            if word in model:
-                similarity = model.similarity(base, word)
-                similarities.append(similarity)
-        return max(similarities)
-
     name2sorted_emojis = dict()
     for name, emojis in tqdm(name2emojis.items(), desc='sorting emojis per token'):
-        # if base is not in the model we cannot compare it :(
-        # if name not in model:
-        #     # name2sorted_emojis[name] = emojis
-        #     # sort just by frequency
-        #     print('Token not in model', name, emojis, file=sys.stderr)
-        #     emojis = [(emoji, frequences.get(emoji, 0.0)) for emoji in emojis]
-        #     sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
-        #     name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
-        #     continue
-
         # otherwise we do as planned
         emojis = [
-            (emoji, ((1 if name in original_emojis2names.get(emoji, []) else 0),
+            (emoji, (not has_modifier(emoji),
+                     (1 if name in original_emojis2names.get(emoji, []) else 0),
                      similarity,
                      frequences.get(emoji, 0.0)))
             for emoji, similarity in emojis
@@ -312,8 +352,11 @@ def append_mapping(name2emojis: dict[str, list[str]], append: dict[str, list[str
     return new_name2emojis
 
 
-def refactor_mapping(name2emojis: dict[str, list[str]]):
-    return {name: emojis for name, emojis in name2emojis.items() if emojis}
+def refactor_mapping(
+        name2emojis: dict[str, list[str]],
+        max_emojis_number: int = 1_000_000
+):
+    return {name: emojis[:max_emojis_number] for name, emojis in name2emojis.items() if emojis}
 
 
 if __name__ == '__main__':
@@ -333,6 +376,8 @@ if __name__ == '__main__':
                         help='synonyms per word limit (if not passed - limit is 1000)')
     parser.add_argument('--emoji_topn', type=int, default=1000,
                         help='synonyms per emoji limit (if not passed - limit is 1000)')
+    parser.add_argument('--max_emojis_number', type=int, default=1_000_000,
+                        help='the limit of emojis per token in the final mapping')
     parser.add_argument('--both_words', action='store_true',
                         help='setting this flag obliges both the base word '
                              'and the synonym to be from the specific dictionary')
@@ -414,20 +459,22 @@ if __name__ == '__main__':
         all_emojis2names
     )
 
-    for overrides_path in args.overrides:
-        with open(overrides_path, 'r', encoding='utf-8') as f:
-            overrides_raw = json.load(f)
-            overrides = extract_gold_mapping(overrides_raw)
+    if args.overrides is not None:
+        for overrides_path in args.overrides:
+            with open(overrides_path, 'r', encoding='utf-8') as f:
+                overrides_raw = json.load(f)
+                overrides = extract_gold_mapping(overrides_raw)
 
-        name2sorted_emojis = override_mapping(name2sorted_emojis, overrides)
+            name2sorted_emojis = override_mapping(name2sorted_emojis, overrides)
 
-    for appends_path in args.appends:
-        with open(appends_path, 'r', encoding='utf-8') as f:
-            append = json.load(f)
+    if args.appends is not None:
+        for appends_path in args.appends:
+            with open(appends_path, 'r', encoding='utf-8') as f:
+                append = json.load(f)
 
-        name2sorted_emojis = append_mapping(name2sorted_emojis, append)
+            name2sorted_emojis = append_mapping(name2sorted_emojis, append)
 
-    final_name2emojis = refactor_mapping(name2sorted_emojis)
+    final_name2emojis = refactor_mapping(name2sorted_emojis, max_emojis_number=args.max_emojis_number)
 
     with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(final_name2emojis, f, indent=2, ensure_ascii=False, sort_keys=True)
