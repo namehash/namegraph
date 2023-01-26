@@ -137,7 +137,8 @@ class TestEmoji:
         [
             ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth", "🥰your👀.eth"]),
             ("prayforukraine", ["prayfor🇺🇦.eth", "🙏forukraine.eth", "🙏for🇺🇦.eth"]),
-            ("krakowdragon", ["krakow🐉.eth"])
+            ("krakowdragon", ["krakow🐉.eth"]),
+            ("dragon", ["dragon🐉.eth"])
         ]
     )
     def test_emoji_generator_api(self, test_client, name: str, expected_names: list[str]):
@@ -146,6 +147,7 @@ class TestEmoji:
 
         json = response.json()
         names: list[str] = [suggestion["name"] for suggestion in json]
+        print(names)
 
         assert set(expected_names).intersection(names) == set(expected_names)
 

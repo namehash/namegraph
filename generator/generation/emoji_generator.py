@@ -4,6 +4,7 @@ import math
 from typing import List, Tuple, Any
 from itertools import product, islice
 
+from more_itertools import collapse
 from omegaconf import DictConfig
 
 from .combination_limiter import CombinationLimiter
@@ -45,6 +46,17 @@ class EmojiGenerator(NameGenerator):
 
     def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
         all_possibilities = [self.name2emoji.get(token, []) + [token] for token in tokens]
+
+        if len(tokens) == 1:
+            return [(tokens[0], possibility) for possibility in all_possibilities[0][:-1]]
+
+        if len(tokens) == 2:
+            print(tokens, all_possibilities)
+            first_token_substitutions = [(possibility, tokens[1]) for possibility in all_possibilities[0][:-1]]
+            second_token_substitutions = [(tokens[0], possibility) for possibility in all_possibilities[1][:-1]]
+            min_length = min(len(first_token_substitutions), len(second_token_substitutions))
+            return list(collapse(zip(first_token_substitutions, second_token_substitutions), levels=1)) \
+                + first_token_substitutions[min_length:] + second_token_substitutions[min_length:]
 
         # skipping the name with all the original tokens
         diverse_results = list(islice(zip_longest_repeat_last(*all_possibilities), self.limit))
