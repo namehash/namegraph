@@ -36,7 +36,7 @@ def evaluate(
         fns = emojis - mapping_emojis
         fps = mapping_emojis - emojis
 
-        if print_examples:
+        if print_examples and (tps or fns or fps):
             print(name)
             if name not in mapping:
                 print(f'  not in the mapping fns={emojis}')
