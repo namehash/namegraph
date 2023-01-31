@@ -23,9 +23,10 @@ class Do:
             name.strip_eth_namehash_unicode)
 
     def classify(self, name: TheName):
-        self.ngram_classifier.classify(name)
-        self.person_name_classifier.classify(name)
-        self.add_other_type(name)
+        if name.strip_eth_namehash:
+            self.ngram_classifier.classify(name)
+            self.person_name_classifier.classify(name)
+            self.add_other_type(name)
 
     def add_other_type(self, name):
         OTHER_PROBABILITY = 0.1

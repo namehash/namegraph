@@ -39,7 +39,7 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "pipelines=full",
+        (["app.query=firepower", "pipelines=prod_new",
           "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
          ["firepowercoin"]),
     ],
@@ -106,14 +106,9 @@ def test_on_sale(overrides: List[str], expected: List[str]) -> None:
         (
             ["app.query=dogcat", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
             [[
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
+                "PermuteGenerator", "SubnameFilter",
                 "ValidNameFilter"
-              ], [
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
-                "ValidNameFilter"
-            ]]
+              ]]
         )
     ]
 )

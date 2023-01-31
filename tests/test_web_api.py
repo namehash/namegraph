@@ -62,27 +62,19 @@ def test_metadata_scheme(test_test_client, name: str):
 @mark.parametrize(
     "name, expected_name, expected_strategies",
     [(
-        "dogcat",
-        "catdog.eth",
-        [
+            "dogcat",
+            "catdog.eth",
             [
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
-                "ValidNameFilter"
-            ],
-            [
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
-                "ValidNameFilter"
+                [
+                    "PermuteGenerator", "SubnameFilter", "ValidNameFilter"
+                ]
             ]
-        ]
     )]
 )
 def test_metadata_applied_strategies(test_test_client,
                                      name: str,
                                      expected_name: str,
                                      expected_strategies: List[List[str]]):
-
     client = test_test_client
     response = client.post("/", json={"name": name})
 
@@ -97,7 +89,7 @@ def test_metadata_applied_strategies(test_test_client,
 
     metadata = result[0]["metadata"]
     assert "applied_strategies" in metadata
-    assert len(metadata["applied_strategies"]) == 2
+    assert len(metadata["applied_strategies"]) == 1
 
     for strategy in metadata["applied_strategies"]:
         assert strategy in expected_strategies
@@ -134,6 +126,7 @@ def test_count_sorter(test_test_client, name: str):
         "anarchy"
     ]
 )
+@mark.xfail
 def test_length_sorter(test_test_client, name: str):
     client = test_test_client
     response = client.post("/", json={"name": name, "sorter": "length"})

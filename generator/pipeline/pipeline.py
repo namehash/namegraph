@@ -27,7 +27,7 @@ from generator.utils import aggregate_duplicates
 logger = logging.getLogger('generator')
 
 
-class ResultsIterator:
+class PipelineResultsIterator:
     def __init__(self, suggestions: list[GeneratedName]):
         self.index = 0
         self.suggestions = suggestions
@@ -44,7 +44,7 @@ class ResultsIterator:
         return self
 
     def __next__(self) -> GeneratedName:
-        print('ResultsIterator', self.index,len(self.suggestions))
+        # print('ResultsIterator', self.index,len(self.suggestions))
         if self.index < len(self.suggestions):
             suggestion = self.suggestions[self.index]
             self.index += 1
@@ -68,7 +68,7 @@ class Pipeline:
     def clear_cache(self):
         self.cache.clear()
 
-    def apply(self, name: TheName, interpretation: Interpretation) -> ResultsIterator:
+    def apply(self, name: TheName, interpretation: Interpretation) -> PipelineResultsIterator:
         hash = self.generator.hash(name, interpretation)
         # print('HASH', interpretation.tokenization, hash, len(self.cache))
         if hash not in self.cache:
@@ -80,12 +80,12 @@ class Pipeline:
             for filter_ in self.filters:
                 suggestions = filter_.apply(suggestions)
             # remove input name from suggestions
-            input_word = re.sub(r'\.\w+$', '', name.input_name)  # TODO niewiadomo jaki jest input
+            input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
             suggestions = [s for s in suggestions if str(s) != input_word]
 
             suggestions = aggregate_duplicates(suggestions)
 
-            self.cache[hash] = ResultsIterator(suggestions)
+            self.cache[hash] = PipelineResultsIterator(suggestions)
 
         return self.cache[hash]
         # params = params or dict()

@@ -20,9 +20,11 @@ class NGramClassifier(Classifier):
         # asses probability
         interpretations = []
         for tokenization in tokenizations:
-            probability = self.ngrams.sequence_probability(tokenization)
-            interpretation = Interpretation(self.TYPE, tokenization, probability)
-            interpretations.append(interpretation)
+            if tokenization:
+                probability = self.ngrams.sequence_probability(tokenization)
+                probability =max(probability, 1e-20) #TODO
+                interpretation = Interpretation(self.TYPE, tokenization, probability)
+                interpretations.append(interpretation)
 
         # calculate type prob
         if interpretations:

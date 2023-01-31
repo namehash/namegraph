@@ -49,6 +49,7 @@ class Result:
 
 class MetaSampler:
     def __init__(self, name: TheName, config, pipelines):
+        self.domains = Domains(config)
         self.name = name
         self.sorters = {}
         for type, interpretations in name.interpretations.items():
@@ -67,9 +68,17 @@ class MetaSampler:
                     self.interpretation_weights[type][interpretation] = interpretation.in_type_probability
 
     def sample(self) -> list[GeneratedName]:
+        min_suggestions = self.name.params['min_suggestions']
+        max_suggestions = self.name.params['max_suggestions']
+        min_available_fraction = self.name.params['min_available_fraction']
+        min_available = int(min_suggestions * min_available_fraction)
+
+        count_available = 0
+
         all_suggestions = []
         all_suggestions_str = set()
         while True:
+            if len(all_suggestions) >= max_suggestions: break
             # losuj interpretację
             if not self.types_weights:
                 break
@@ -77,6 +86,8 @@ class MetaSampler:
             sampled_type = random.choices(list(self.types_weights.keys()),
                                           weights=list(self.types_weights.values()))[0]
             # print('Sampled type:', sampled_type, self.types_weights)
+            # print(list(self.interpretation_weights[sampled_type].items()))
+            # print(list([(x.tokenization) for x in self.interpretation_weights[sampled_type].keys()]))
             sampled_interpretation = random.choices(list(self.interpretation_weights[sampled_type].keys()),
                                                     weights=list(self.interpretation_weights[sampled_type].values()))[0]
             # print('Sampled interpretation:', sampled_interpretation.tokenization,
@@ -84,7 +95,8 @@ class MetaSampler:
             # losuj pipeline
             while True:
                 try:
-
+                    if len(all_suggestions) >= max_suggestions: break
+                    
                     sampled_pipeline = next(self.sorters[sampled_interpretation])
                     # for sampled_pipeline in self.sorters[sampled_interpretation]:
                     # print('Sampled pipeline:', sampled_pipeline.definition.name)
@@ -95,17 +107,29 @@ class MetaSampler:
                     added_suggestion = False
                     while True:
                         try:
+                            if len(all_suggestions)>=max_suggestions: break
+                            
                             suggestion = next(suggestions)
                             # wez kolejny jeśli nie spełnia wymagań: duplikat lub nonavailable
                             if str(suggestion) in all_suggestions_str:
                                 continue
                             else:
                                 # sprawdz status
+                                suggestion.category = self.domains.get_name_status(str(suggestion))
+
                                 # jesli ma byc dostpne a nie jest to continue
-                                added_suggestion = True
-                                all_suggestions.append(suggestion)
-                                all_suggestions_str.add(str(suggestion))
-                                break
+                                if suggestion.category == Domains.AVAILABLE or count_available + max_suggestions - len(
+                                        all_suggestions) > min_available:
+                                    added_suggestion = True
+                                    if suggestion.category == Domains.AVAILABLE:
+                                        count_available += 1
+                                    all_suggestions.append(suggestion)
+                                    all_suggestions_str.add(str(suggestion))
+                                    break
+                                else:
+                                    # print('Skip non vailable', min_available, count_available, max_suggestions - len(
+                                    #     all_suggestions))
+                                    continue
                         except StopIteration:
                             # print('Empty pipeline', sampled_interpretation.tokenization, sampled_pipeline.definition.name)
                             # jesli pusty to oznacz pipeline jako zużyty dla tej interpretacji
@@ -174,6 +198,11 @@ class Generator:
 
         min_suggestions = min_suggestions or self.config.app.suggestions
         max_suggestions = max_suggestions or self.config.app.suggestions
+        min_available_fraction = min_available_fraction or self.config.app.min_available_fraction
+
+        params['min_suggestions'] = min_suggestions
+        params['max_suggestions'] = max_suggestions
+        params['min_available_fraction'] = min_available_fraction
 
         name = TheName(name, params)
         self.do.normalize(name)
@@ -181,6 +210,7 @@ class Generator:
 
         for pipeline in self.pipelines:
             pipeline.clear_cache()
+        self.random_available_name_pipeline.clear_cache()
 
         print(name.types_probabilities)
 
@@ -200,7 +230,7 @@ class Generator:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
             all_suggestions.extend(only_available_suggestions)  # TODO dodawaj do osiągnięcia limitu
             print('Generated suggestions 2', len(all_suggestions), len(set([str(x) for x in all_suggestions])))
-            all_suggestions=aggregate_duplicates(all_suggestions)
+            all_suggestions = aggregate_duplicates(all_suggestions)
 
         # all_suggestions = []
         # for i in range(100):

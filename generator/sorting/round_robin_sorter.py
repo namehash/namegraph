@@ -63,7 +63,7 @@ class RoundRobinSorter2(Sorter):
         return self
 
     def __next__(self):
-        print('Robin', self.index , len(self.pipelines), self, [p.definition.name for p in self.pipelines])
+        # print('Robin', self.index , len(self.pipelines), self, [p.definition.name for p in self.pipelines])
         if self.index < len(self.pipelines):
             pipeline = self.pipelines[self.index]
             self.index = (self.index + 1) % len(self.pipelines)
