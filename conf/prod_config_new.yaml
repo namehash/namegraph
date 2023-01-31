@@ -1,5 +1,5 @@
 defaults:
-  - pipelines: test_new
+  - pipelines: test_new_short
   - _self_
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
@@ -7,35 +7,32 @@ app:
   # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered
-  domains: tests/data/suggestable_domains.csv
+  domains: data/suggestable_domains.csv
   # the query the names are generated for
   query: mydomain
   # the number of generated suggestions (TODO: implement)
-  suggestions: 10
-  # the pipelines used to generate the suggestions
-  # Make sure the required class is imported in generator/pipeline/pipeline.py
+  suggestions: 100
+  # by default no pipelines are defined
   logging_level: INFO
-# Configuration for the individual modules. So far all modules share the same config.
-# This might be moved to the pipeline definition.
-#  secondary_market_names: tests/data/secondary.csv
-#  advertised_names: tests/data/advertised.csv
-  internet_domains: tests/data/top_internet_names.csv
+#  secondary_market_names: data/secondary.csv
+#  advertised_names: data/empty.csv
+  internet_domains: data/top_internet_names.csv
   primary_url: suggestable_domains.csv
 #  secondary_url: secondary.csv
 #  advertised_url: advertised.csv
   subnames_url: subnames.txt
   clubs_url: suggestable_clubs.csv
-  clubs: tests/data/suggestable_clubs.csv
+  clubs: data/suggestable_clubs.csv
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
 filtering:
   # List of already registered domains
-#  domains: tests/data/primary.csv
-  subnames: tests/data/subnames.txt
+#  domains: data/primary.csv
+  subnames: data/subnames.txt
   root_path: ./
 tokenization:
-  dictionary: tests/data/words.txt
+  dictionary: data/words.txt
   skip_one_letter_words: true
   skip_non_words: false
   add_letters_ias: true
@@ -43,9 +40,9 @@ tokenization:
 generation:
   word2vec_url: embeddings.pkl
   word2vec_path: data/embeddings.pkl
-  suffixes_path: tests/data/suffixes.txt
-  prefixes_path: tests/data/prefixes.txt
-  name2emoji_path: tests/data/name2emoji.json
+  suffixes_path: data/suffixes.txt
+  prefixes_path: data/prefixes.txt
+  name2emoji_path: data/name2emoji.json
   limit: 10000
   empty_input_ability:
     - RandomAvailableNameGenerator
@@ -53,10 +50,10 @@ generation:
     HyphenGenerator: 128
     AbbreviationGenerator: 128
     EmojiGenerator: 150
-    Wikipedia2VGenerator: 10
+    Wikipedia2VGenerator: 100
     RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
-  wikipedia2vec_path: tests/data/wikipedia2vec.pkl
+  wikipedia2vec_path: data/wikipedia2vec.pkl
 sorting:
   weighted_sampling:
     weights:
@@ -67,12 +64,12 @@ sorting:
       PermuteGenerator: 1
       PrefixGenerator: 1
       SuffixGenerator: 1
-      WordnetSynonymsGenerator: 1
-      W2VGenerator: 1
-      CategoriesGenerator: 1
+      WordnetSynonymsGenerator: 5
+      W2VGenerator: 10
+      CategoriesGenerator: 10
       RandomAvailableNameGenerator: 1
       OnSaleMatchGenerator: 1
-      Wikipedia2VGenerator: 1
+      Wikipedia2VGenerator: 15
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
       LeetGenerator: 1
@@ -102,5 +99,5 @@ ngrams:
   lazy_loading: true
   unigrams: data/ngrams/unigram_freq.csv
   bigrams: data/ngrams/bigram_freq.csv
-  custom_dictionary: tests/data/ngrams/custom_dictionary.txt
+  custom_dictionary: data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000

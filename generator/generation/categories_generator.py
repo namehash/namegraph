@@ -6,11 +6,13 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Any
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
+from ..the_name import TheName, Interpretation
 
 logger = logging.getLogger('generator')
 
+
 def load_categories_from_csv(config):
-    path=config.app.clubs
+    path = config.app.clubs
     categories = collections.defaultdict(list)
     with open(path, newline='') as csvfile:
         reader = csv.reader(csvfile)
@@ -20,6 +22,7 @@ def load_categories_from_csv(config):
             name, category = row
             categories[category].append(name)
     return categories
+
 
 def load_categories(config):
     categories = collections.defaultdict(list)
@@ -72,7 +75,7 @@ class CategoriesGenerator(NameGenerator):
                 self.inverted_categories[token].append(category)
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         tokens_synsets = [self.get_similar(token) for token in tokens]
         tokens_synsets = [list(lemmas.items()) for lemmas in tokens_synsets]
 
@@ -99,3 +102,9 @@ class CategoriesGenerator(NameGenerator):
             for token in self.categories[category]:
                 stats[token] += 1
         return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+
+    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+        return {'tokens': interpretation.tokenization}

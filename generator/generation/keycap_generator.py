@@ -1,6 +1,7 @@
 from typing import List, Tuple, Any
 
 from .name_generator import NameGenerator
+from ..the_name import TheName, Interpretation
 
 
 class KeycapGenerator(NameGenerator):
@@ -20,9 +21,14 @@ class KeycapGenerator(NameGenerator):
             '0': '0⃣', '1': '1⃣', '2': '2⃣', '3': '3⃣', '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣'
         }
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         name = ''.join(tokens)
         try:
             return [(''.join([self.mapping[char] for char in name]),)]
         except KeyError:
             return []
+    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}

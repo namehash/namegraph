@@ -14,8 +14,9 @@ class TheName:
     Stores everything related to one request.
     """
 
-    def __init__(self, input_name):
+    def __init__(self, input_name, params):
         self.input_name = input_name
+        self.params = params
 
         self.types_probabilities: dict[str, float] = {}
         self.interpretations: dict[str, list[Interpretation]] = {}

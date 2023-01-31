@@ -10,9 +10,9 @@ from generator.the_name import TheName
 
 def test_do():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
         do = Do(config)
-        name = TheName('chasered')
+        name = TheName('chasered', {})
         do.do(name)
 
         print(name.types_probabilities)

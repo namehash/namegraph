@@ -79,12 +79,7 @@ sorting:
       KeycapGenerator: 1
 random_available_name_pipeline:
   name: random
-  normalizers:
-    - StripEthNormalizer
-  tokenizers:
-    - NoneTokenizer
-  generators:
-    - RandomAvailableNameGenerator
+  generator: RandomAvailableNameGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter

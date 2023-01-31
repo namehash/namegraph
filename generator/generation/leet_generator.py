@@ -4,12 +4,13 @@ import itertools
 import math
 
 from .name_generator import NameGenerator
-
+from ..the_name import TheName, Interpretation
 
 LEETSPEAK_PATH = 'data/leetspeak.json'
 
 
-def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> Iterable[dict[str, tuple[float, str]]]:
+def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> Iterable[
+    dict[str, tuple[float, str]]]:
     '''
     Given multiple replacement options for each character, return a list of all possible combinations of 1:1 replacements.
     '''
@@ -42,7 +43,8 @@ class LeetGenerator(NameGenerator):
                     # putting this in the inner loop handles empty substitution groups (used to lower the probability)
                     self._letter_replaceables.add(letter)
                     # add a fake 'no replacement' replacement
-                    self._letter_subs[letter] = self._letter_subs.get(letter, [(self._no_letter_logp, letter)]) + [(logp, sub)]
+                    self._letter_subs[letter] = self._letter_subs.get(letter, [(self._no_letter_logp, letter)]) + [
+                        (logp, sub)]
                 # each group is half as likely as the previous
                 logp -= 1
 
@@ -53,30 +55,37 @@ class LeetGenerator(NameGenerator):
             for sub_group in subs:
                 for sub in sub_group:
                     self._sequence_replaceables.add(sequence)
-                    self._sequence_subs[sequence] = self._sequence_subs.get(sequence, [(self._no_sequence_logp, sequence)]) + [(logp, sub)]
+                    self._sequence_subs[sequence] = self._sequence_subs.get(sequence,
+                                                                            [(self._no_sequence_logp, sequence)]) + [
+                                                        (logp, sub)]
                 logp -= 1
 
-    def _get_alphabets(self, sequence_replaceables: set[str], letter_replaceables: set[str]) -> list[tuple[float, dict[str, str], dict[str, str]]]:
+    def _get_alphabets(self, sequence_replaceables: set[str], letter_replaceables: set[str]) -> list[
+        tuple[float, dict[str, str], dict[str, str]]]:
         '''
         Returns a list of all substitution alphabets (logp, letter_map, sequence_map)
         that can be made with the given replaceables.
         The list is sorted by probability.
         '''
         # collect all available substitutions
-        letter_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._letter_subs.items() if k in letter_replaceables}
-        sequence_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._sequence_subs.items() if k in sequence_replaceables}
+        letter_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._letter_subs.items() if
+                                                           k in letter_replaceables}
+        sequence_subs: dict[str, list[tuple[float, str]]] = {k: v for k, v in self._sequence_subs.items() if
+                                                             k in sequence_replaceables}
 
         # for all subsets of substitutions, make an alphabet
         alphabets: list[tuple[float, dict[str, str], dict[str, str]]] = []
         for letter_map in get_replacement_combinations(letter_subs):
             for sequence_map in get_replacement_combinations(sequence_subs):
-                if all(src == tgt for src, (_, tgt) in letter_map.items()) and all(src == tgt for src, (_, tgt) in sequence_map.items()):
+                if all(src == tgt for src, (_, tgt) in letter_map.items()) and all(
+                        src == tgt for src, (_, tgt) in sequence_map.items()):
                     # skip the no-replacement alphabet
                     continue
                 # alphabet probability is the product of the probabilities of the substitutions
                 logprob = sum(p for p, _ in letter_map.values()) + sum(p for p, _ in sequence_map.values())
-                alphabets.append((logprob, {k: v[1] for k, v in letter_map.items()}, {k: v[1] for k, v in sequence_map.items()}))
-        
+                alphabets.append(
+                    (logprob, {k: v[1] for k, v in letter_map.items()}, {k: v[1] for k, v in sequence_map.items()}))
+
         alphabets.sort(key=lambda alphabet: alphabet[0], reverse=True)
         return alphabets
 
@@ -102,10 +111,11 @@ class LeetGenerator(NameGenerator):
             return sequence_map[token]
         return ''.join(letter_map.get(letter, letter) for letter in token)
 
-    def _leetify(self, tokens: tuple[str, ...], letter_map: dict[str, str], sequence_map: dict[str, str]) -> tuple[str, ...]:
+    def _leetify(self, tokens: tuple[str, ...], letter_map: dict[str, str], sequence_map: dict[str, str]) -> tuple[
+        str, ...]:
         return tuple(self._leetify_token(token, letter_map, sequence_map) for token in tokens)
 
-    def generate(self, tokens: tuple[str, ...], params: dict[str, Any]) -> list[tuple[str, ...]]:
+    def generate(self, tokens: tuple[str, ...]) -> list[tuple[str, ...]]:
         # find all replaceable tokens/letters
         sequence_replaceables, letter_replaceables = self._get_tokens_replaceables(tokens)
 
@@ -118,3 +128,9 @@ class LeetGenerator(NameGenerator):
             generated.append(self._leetify(tokens, letter_map, sequence_map))
 
         return generated
+
+    def generate2(self, name: TheName, interpretation: Interpretation) -> list[tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+        return {'tokens': interpretation.tokenization}

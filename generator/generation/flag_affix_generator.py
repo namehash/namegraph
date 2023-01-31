@@ -2,6 +2,7 @@ import logging
 from typing import List, Tuple, Any
 
 from .name_generator import NameGenerator
+from ..the_name import TheName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -268,12 +269,19 @@ class FlagAffixGenerator(NameGenerator):
             "ZW": "🇿🇼"
         }
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
-        if 'country' not in params or params['country'] is None:
-            return []
-        elif params['country'].upper() not in self.country2emoji:
-            logger.warning(f"No flag for country: {params['country']}")
+    def generate(self, tokens: Tuple[str, ...], country: str = None) -> List[Tuple[str, ...]]:
+        if country is None or country.upper() not in self.country2emoji:
             return []
 
-        flag = self.country2emoji[params['country'].upper()]
+        flag = self.country2emoji[country.upper()]
         return [tokens + (flag,), (flag,) + tokens]
+
+    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+        try:
+            country = name.params['country'].upper()
+        except:
+            country = None
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'country': country}
