@@ -2,6 +2,7 @@ import logging
 from itertools import zip_longest, chain
 from typing import List, Dict, Tuple, Any
 
+import wordninja
 from omegaconf import DictConfig
 
 from generator.domains import Domains
@@ -56,6 +57,7 @@ class Generator:
 
     def init_objects(self):
         self.domains = Domains(self.config)
+        wordninja.DEFAULT_LANGUAGE_MODEL = wordninja.LanguageModel(self.config.tokenization.wordninja_dictionary)
 
     def get_sorter(self, sorter: str) -> Sorter:
         match sorter:

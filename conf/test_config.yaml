@@ -33,6 +33,7 @@ filtering:
   root_path: ./
 tokenization:
   dictionary: tests/data/words.txt
+  wordninja_dictionary: data/ngrams/wordninja_dictionary.txt.gz
   skip_one_letter_words: true
   skip_non_words: false
   add_letters_ias: true
