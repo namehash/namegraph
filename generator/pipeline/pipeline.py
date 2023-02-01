@@ -1,21 +1,12 @@
-from typing import List, Dict, Any
+from typing import List
 import logging
 import re
 
 from omegaconf import DictConfig
 
-from generator.generated_name import GeneratedName
 from generator.controlflow import *
-from generator.normalization import *
+from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
 from generator.the_name import Interpretation, TheName
-from generator.tokenization import *
-from generator.generation import *
-from generator.filtering import *
-from generator.sorting import *
-from generator.filtering.subname_filter import SubnameFilter
-from generator.filtering.valid_name_filter import ValidNameFilter
-from generator.filtering.domain_filter import DomainFilter
-from generator.filtering.valid_name_length_filter import ValidNameLengthFilter
 
 from generator.normalization.normalizer import Normalizer
 from generator.tokenization.tokenizer import Tokenizer
@@ -27,31 +18,6 @@ from generator.utils import aggregate_duplicates
 logger = logging.getLogger('generator')
 
 
-class PipelineResultsIterator:
-    def __init__(self, suggestions: list[GeneratedName]):
-        self.index = 0
-        self.suggestions = suggestions
-
-    def __len__(self):
-        return len(self.suggestions)
-
-    def next_suggestion(self):
-        suggestion = self.suggestions[self.index]
-        self.index += 1
-        return suggestion
-
-    def __iter__(self):
-        return self
-
-    def __next__(self) -> GeneratedName:
-        # print('ResultsIterator', self.index,len(self.suggestions))
-        if self.index < len(self.suggestions):
-            suggestion = self.suggestions[self.index]
-            self.index += 1
-            return suggestion
-        raise StopIteration
-
-
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
@@ -61,22 +27,37 @@ class Pipeline:
         self.tokenizers: List[Tokenizer] = []
         self.generators: List[NameGenerator] = []
         self.filters: List[Filter] = []
+
+        logger.info(f'Pipeline {self.definition.name} initing.')
         self._build()
 
         self.cache = {}
+        logger.info(f'Pipeline {self.definition.name} inited.')
 
     def clear_cache(self):
         self.cache.clear()
 
     def apply(self, name: TheName, interpretation: Interpretation) -> PipelineResultsIterator:
+        if interpretation:
+            logger.info(f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
+        else:
+            logger.info(f'Pipeline {self.definition.name} suggestions apply on N {name.input_name}.')
+
         hash = self.generator.hash(name, interpretation)
         # print('HASH', interpretation.tokenization, hash, len(self.cache))
         if hash not in self.cache:
             should_run = [controlflow.should_run(name, interpretation) for controlflow in self.controlflow]
             if all(should_run):  # TODO ok?
 
+                if interpretation:
+                    logger.info(
+                        f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
+                else:
+                    logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
+                    
                 suggestions = self.generator.apply(name, interpretation)
-
+                logger.info('Pipeline suggestions generated.')
+                
                 for s in suggestions:
                     s.pipeline_name = self.definition.name
 
@@ -90,53 +71,9 @@ class Pipeline:
             else:
                 suggestions = []
             self.cache[hash] = PipelineResultsIterator(suggestions)
-
+            logger.info('Pipeline suggestions cached.')
         return self.cache[hash]
-        # params = params or dict()
-        # 
-        # input_word = word
-        # words: List[GeneratedName] = [GeneratedName((word,), pipeline_name=self.definition.name)]
 
-        # control flow is applied sequentially
-        # TODO
-        # for controlflow in self.controlflow:
-        #     words = controlflow.apply(words, params=params)
-
-        # the normalizers are applied sequentially
-        # for normalizer in self.normalizers:
-        #     words = normalizer.apply(words, params=params)
-
-        # the tokenizers are applied in parallel
-        # suggestions: List[GeneratedName] = []
-        # for tokenizer in self.tokenizers:
-        #     suggestions.extend(tokenizer.apply(words, params=params))
-
-        # suggestions = aggregate_duplicates(suggestions, by_tokens=True)
-        # logger.debug(f'Tokenization: {suggestions}')
-        # 
-        # logger.info(
-        #     f'Start generation')
-        # # the generators are applied sequentially
-        # for generator in self.generators:
-        #     suggestions = generator.apply(suggestions, params=params)
-        # 
-        # logger.info(
-        #     f'Generated suggestions: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
-        # 
-        # # the filters are applied sequentially
-        # for filter_ in self.filters:
-        #     logger.debug(f'{filter} filtering')
-        #     suggestions = filter_.apply(suggestions, params=params)
-        #     logger.debug(f'{filter} done')
-        # 
-        # # remove input name from suggestions
-        # input_word = re.sub(r'\.\w+$', '', input_word)
-        # suggestions = [s for s in suggestions if str(s) != input_word]
-        # 
-        # logger.info(
-        #     f'After filters: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
-        # 
-        # return aggregate_duplicates(suggestions)
 
     def _build(self):
         # make control flow optional
