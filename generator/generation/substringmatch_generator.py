@@ -55,6 +55,7 @@ class SuffixTreeImpl:
         inds = self.tree.findStringIdx(pattern)
         return (self.lines[i] for i in inds)
 
+
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
@@ -68,7 +69,8 @@ def roundrobin(*iterables):
             # Remove the iterator we just exhausted from the cycle.
             num_active -= 1
             nexts = cycle(islice(nexts, num_active))
-            
+
+
 class SubstringMatchGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__(config)
@@ -90,8 +92,9 @@ class SubstringMatchGenerator(NameGenerator):
         return [(name,) for name in islice(names, self.limit)]
 
     def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
-        return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name), self.generate(name.strip_eth_namehash_long_name))
-        #TODO: optimize
-        
+        return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),
+                          self.generate(name.strip_eth_namehash_long_name))
+        # TODO: optimize
+
     def prepare_arguments(self, name: TheName, interpretation: Interpretation):
         return {'tokens': (name.strip_eth_namehash_unicode_long_name, name.strip_eth_namehash_long_name)}

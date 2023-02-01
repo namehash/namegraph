@@ -32,6 +32,7 @@ logger = logging.getLogger('generator')
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
+        self.pipeline_name = definition.name
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.normalizers: List[Normalizer] = []
@@ -50,7 +51,8 @@ class Pipeline:
 
     def apply(self, name: TheName, interpretation: Interpretation) -> PipelineResultsIterator:
         if interpretation:
-            logger.info(f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
+            logger.info(
+                f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
         else:
             logger.info(f'Pipeline {self.definition.name} suggestions apply on N {name.input_name}.')
 
@@ -65,12 +67,12 @@ class Pipeline:
                         f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
                 else:
                     logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
-                    
+
                 suggestions = self.generator.apply(name, interpretation)
                 logger.info('Pipeline suggestions generated.')
-                
+
                 for s in suggestions:
-                    s.pipeline_name = self.definition.name
+                    s.pipeline_name = self.pipeline_name
 
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
@@ -84,7 +86,6 @@ class Pipeline:
             self.cache[hash] = PipelineResultsIterator(suggestions)
             logger.info('Pipeline suggestions cached.')
         return self.cache[hash]
-
 
     def _build(self):
         # make control flow optional

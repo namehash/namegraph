@@ -75,6 +75,7 @@ class MetaSampler:
                             suggestion = next(suggestions)
                             # wez kolejny jeśli nie spełnia wymagań: duplikat lub nonavailable
                             if str(suggestion) in all_suggestions_str:
+                                logger.info('Duplicated suggestion')
                                 continue
                             else:
                                 # sprawdz status
@@ -90,6 +91,7 @@ class MetaSampler:
                                     all_suggestions_str.add(str(suggestion))
                                     break
                                 else:
+                                    logger.info('Skipping nonavailable suggestion')
                                     # print('Skip non vailable', min_available, count_available, max_suggestions - len(
                                     #     all_suggestions))
                                     continue
