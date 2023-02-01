@@ -88,7 +88,7 @@ def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[
 )
 def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path='../conf/'):
-        config = compose(config_name='test_config')
+        config = compose(config_name='test_config_new')
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -203,7 +203,7 @@ def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: L
 )
 def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = WeightedSamplingSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -217,7 +217,7 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
 @mark.slow
 def test_weighted_sampling_sorter_stress():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
 
         with open(config.app.internet_domains, 'r', encoding='utf-8') as f:
             words = [d for d in itertools.islice(iter(f), 49999)] + ['pumpkins']
@@ -240,7 +240,7 @@ def test_weighted_sampling_sorter_stress():
 @mark.slow
 def test_weighted_sampling_sorter_stress2():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = WeightedSamplingSorter(config)
         sorted_names = sorter.sort([[
             GeneratedName(('abasariatic',), pipeline_name='random', applied_strategies=[['RandomGenerator']])
@@ -404,7 +404,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
                                                                 max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
@@ -459,7 +459,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
                                                                          max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
@@ -548,7 +548,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
 ):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
         available_names_set = {

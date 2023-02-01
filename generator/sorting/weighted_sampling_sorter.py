@@ -40,7 +40,7 @@ class WeightedSamplingSorter(Sorter):
     def _extract_pipelines_generators(self) -> Dict[str, Tuple[str, ...]]:
         generators_per_pipeline: Dict[str, Tuple[str, ...]] = dict()
         for definition in self.config.pipelines:
-            generators_per_pipeline[definition.name] = tuple(definition.generators)
+            generators_per_pipeline[definition.name] = (definition.generator,)
 
         return generators_per_pipeline
 
