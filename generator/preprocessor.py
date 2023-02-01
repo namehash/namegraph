@@ -32,15 +32,15 @@ class Preprocessor:
     def classify(self, name: TheName):
         if name.strip_eth_namehash:
             self.ngram_classifier.classify(name)
-            self.person_name_classifier.classify(name)
+            # self.person_name_classifier.classify(name)
             self.add_other_type(name)
 
-    def add_other_type(self, name):
+    def add_other_type(self, name: TheName):
         OTHER_PROBABILITY = 0.1
         OTHER_TYPE = 'other'
         name.add_type(OTHER_TYPE, OTHER_PROBABILITY)
 
-        interpretation = Interpretation(OTHER_TYPE, (name.input_name,), 1.0) #TODO none?
+        interpretation = Interpretation(OTHER_TYPE, (name.strip_eth_namehash_unicode_replace_invalid_long_name,), 1.0) #TODO none?
         name.add_interpretation(interpretation)
 
     def do(self, name: TheName):

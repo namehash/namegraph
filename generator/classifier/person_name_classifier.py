@@ -13,7 +13,7 @@ class PersonNameClassifier(Classifier):
     def classify(self, name: TheName):
         normalized_name = name.strip_eth_namehash_unicode_replace_invalid
         # take normalized name and process
-        raw_interpretations = self.pn.tokenize(normalized_name, topn=2)
+        raw_interpretations = self.pn.tokenize(normalized_name, topn=1) #TODO: parameter
 
         # asses probability
         interpretations = []
