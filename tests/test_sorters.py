@@ -23,7 +23,7 @@ from utils import assert_applied_strategies_are_equal
 )
 def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = RoundRobinSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -46,7 +46,7 @@ def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: 
 )
 def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = CountSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -68,7 +68,7 @@ def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[s
 )
 def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = LengthSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -113,7 +113,7 @@ def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_str
 )
 def test_round_robin_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = RoundRobinSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -143,7 +143,7 @@ def test_round_robin_sorter_aggregation(input: List[List[GeneratedName]], expect
 )
 def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = CountSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -174,7 +174,7 @@ def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: Li
 )
 def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = LengthSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -251,7 +251,7 @@ def test_weighted_sampling_sorter_stress2():
 @mark.slow
 def test_weighted_sampling_sorter_weights():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
 
         generated_names = []
         for pipeline_name in [
@@ -357,7 +357,7 @@ def test_available_fraction_obligation_length_sorter(overrides: List[str],
                                                      max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = LengthSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]

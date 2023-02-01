@@ -48,4 +48,4 @@ jobs:
         run: |
             python3 namehash_common/generate_cache.py
       - name: Run tests
-        run: pytest -vv
+        run: pytest -vv --durations=0
