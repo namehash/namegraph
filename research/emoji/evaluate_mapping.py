@@ -71,6 +71,6 @@ if __name__ == '__main__':
             test_data = json.load(f)
 
         if isinstance(list(test_data.values())[0], dict):
-            test_data = {k: v['green'] for k, v in test_data.items() if 'green' in v}
+            test_data = {k: v.get('green', []) for k, v in test_data.items()}
 
         evaluate(path.name, mapping, test_data, args.print_examples)

@@ -18,3 +18,4 @@ pytest-timeouts
 web3
 boto3
 python-dotenv
+more-itertools==9.0.0
