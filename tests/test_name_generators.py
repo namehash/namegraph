@@ -3,7 +3,7 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.do import Do
+from generator.preprocessor import Preprocessor
 from generator.generation import (
     HyphenGenerator,
     AbbreviationGenerator,

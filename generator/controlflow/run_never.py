@@ -1,9 +1,8 @@
-from typing import Optional, Any
-from generator.generated_name import GeneratedName
-from .run_if import RunIf
+from . import ControlFlow
+from ..the_name import TheName, Interpretation
 
 
-class RunNever(RunIf):
+class RunNever(ControlFlow):
     
-    def should_run(self, names: list[GeneratedName], params: Optional[dict[str, Any]]) -> bool:
+    def should_run(self, name: TheName, interpretation: Interpretation) -> bool:
         return False

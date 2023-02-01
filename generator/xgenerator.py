@@ -5,7 +5,7 @@ from typing import List, Dict, Tuple, Any
 
 from omegaconf import DictConfig
 
-from generator.do import Do
+from generator.preprocessor import Preprocessor
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
@@ -68,6 +68,7 @@ class MetaSampler:
                     self.interpretation_weights[type][interpretation] = interpretation.in_type_probability
 
     def sample(self) -> list[GeneratedName]:
+        logger.info('Start sampling')
         min_suggestions = self.name.params['min_suggestions']
         max_suggestions = self.name.params['max_suggestions']
         min_available_fraction = self.name.params['min_available_fraction']
@@ -96,7 +97,7 @@ class MetaSampler:
             while True:
                 try:
                     if len(all_suggestions) >= max_suggestions: break
-                    
+
                     sampled_pipeline = next(self.sorters[sampled_interpretation])
                     # for sampled_pipeline in self.sorters[sampled_interpretation]:
                     # print('Sampled pipeline:', sampled_pipeline.definition.name)
@@ -107,8 +108,8 @@ class MetaSampler:
                     added_suggestion = False
                     while True:
                         try:
-                            if len(all_suggestions)>=max_suggestions: break
-                            
+                            if len(all_suggestions) >= max_suggestions: break
+
                             suggestion = next(suggestions)
                             # wez kolejny jeśli nie spełnia wymagań: duplikat lub nonavailable
                             if str(suggestion) in all_suggestions_str:
@@ -164,7 +165,7 @@ class Generator:
         self.random_available_name_pipeline = Pipeline(self.config.random_available_name_pipeline, self.config)
 
         self.init_objects()
-        self.do = Do(config)
+        self.preprocessor = Preprocessor(config)
 
         self.weights = {}
         for definition in self.config.pipelines:
@@ -195,6 +196,7 @@ class Generator:
             min_available_fraction: float = 0.1,
             params: dict[str, Any] = None
     ) -> list[GeneratedName]:
+        params = params or {}
 
         min_suggestions = min_suggestions or self.config.app.suggestions
         max_suggestions = max_suggestions or self.config.app.suggestions
@@ -205,8 +207,11 @@ class Generator:
         params['min_available_fraction'] = min_available_fraction
 
         name = TheName(name, params)
-        self.do.normalize(name)
-        self.do.classify(name)
+        logger.info('Start normalize')
+        self.preprocessor.normalize(name)
+        logger.info('Start classify')
+        self.preprocessor.classify(name)
+        logger.info('End preprocessing')
 
         for pipeline in self.pipelines:
             pipeline.clear_cache()

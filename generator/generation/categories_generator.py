@@ -107,4 +107,4 @@ class CategoriesGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: TheName, interpretation: Interpretation):
-        return {'tokens': interpretation.tokenization}
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}

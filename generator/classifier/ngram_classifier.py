@@ -13,7 +13,7 @@ class NGramClassifier(Classifier):
         self.ngrams = Ngrams(config)
 
     def classify(self, name: TheName):
-        normalized_name = name.strip_eth_namehash_unicode_replace_invalid
+        normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name
         # take normalized name and tokenize
         tokenizations = self.tokenizer.tokenize(normalized_name)
 

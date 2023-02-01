@@ -24,6 +24,9 @@ class TheName:
         self.strip_eth_namehash = None
         self.strip_eth_namehash_unicode = None
         self.strip_eth_namehash_unicode_replace_invalid = None
+        self.strip_eth_namehash_unicode_replace_invalid_long_name = None
+        self.strip_eth_namehash_unicode_long_name = None
+        self.strip_eth_namehash_long_name = None
 
     def add_type(self, type: str, probability: float):
         self.types_probabilities[type] = probability

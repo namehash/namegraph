@@ -1,15 +1,17 @@
 from generator.classifier.ngram_classifier import NGramClassifier
 from generator.classifier.person_name_classifier import PersonNameClassifier
-from generator.normalization import StripEthNormalizer, NamehashNormalizer, UnicodeNormalizer, ReplaceInvalidNormalizer
+from generator.normalization import StripEthNormalizer, NamehashNormalizer, UnicodeNormalizer, ReplaceInvalidNormalizer, \
+    LongNameNormalizer
 from generator.the_name import TheName, Interpretation
 
 
-class Do:
+class Preprocessor:
     def __init__(self, config):
         self.strip_eth_normalizer = StripEthNormalizer(config)
         self.namehash_normalizer = NamehashNormalizer(config)
         self.unicode_normalizer = UnicodeNormalizer(config)
         self.replace_invalid_normalizer = ReplaceInvalidNormalizer(config)
+        self.long_name_normalizer = LongNameNormalizer(config)
 
         self.ngram_classifier = NGramClassifier(config)
         self.person_name_classifier = PersonNameClassifier(config)
@@ -21,6 +23,11 @@ class Do:
         name.strip_eth_namehash_unicode = self.unicode_normalizer.normalize(name.strip_eth_namehash)
         name.strip_eth_namehash_unicode_replace_invalid = self.replace_invalid_normalizer.normalize(
             name.strip_eth_namehash_unicode)
+        name.strip_eth_namehash_unicode_replace_invalid_long_name = self.long_name_normalizer.normalize(
+            name.strip_eth_namehash_unicode_replace_invalid)
+
+        name.strip_eth_namehash_unicode_long_name = self.long_name_normalizer.normalize(name.strip_eth_namehash_unicode)
+        name.strip_eth_namehash_long_name = self.long_name_normalizer.normalize(name.strip_eth_namehash)
 
     def classify(self, name: TheName):
         if name.strip_eth_namehash:

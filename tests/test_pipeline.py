@@ -3,7 +3,7 @@ from hydra import compose, initialize
 from pytest import mark
 from typing import List
 
-from generator.do import Do
+from generator.preprocessor import Preprocessor
 from generator.pipeline import Pipeline
 from generator.the_name import TheName, Interpretation
 
@@ -12,7 +12,7 @@ from utils import assert_applied_strategies_are_equal
 
 def get_name_and_interpretation(config, name):
     input_name = TheName(name, {})
-    do = Do(config)
+    do = Preprocessor(config)
     do.normalize(input_name)
     do.classify(input_name)
     interpretation = input_name.interpretations['ngram'][0]

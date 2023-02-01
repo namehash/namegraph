@@ -72,19 +72,23 @@ class Pipeline:
         hash = self.generator.hash(name, interpretation)
         # print('HASH', interpretation.tokenization, hash, len(self.cache))
         if hash not in self.cache:
-            suggestions = self.generator.apply(name, interpretation)
+            should_run = [controlflow.should_run(name, interpretation) for controlflow in self.controlflow]
+            if all(should_run):  # TODO ok?
 
-            for s in suggestions:
-                s.pipeline_name = self.definition.name
+                suggestions = self.generator.apply(name, interpretation)
 
-            for filter_ in self.filters:
-                suggestions = filter_.apply(suggestions)
-            # remove input name from suggestions
-            input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
-            suggestions = [s for s in suggestions if str(s) != input_word]
+                for s in suggestions:
+                    s.pipeline_name = self.definition.name
 
-            suggestions = aggregate_duplicates(suggestions)
+                for filter_ in self.filters:
+                    suggestions = filter_.apply(suggestions)
+                # remove input name from suggestions
+                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
+                suggestions = [s for s in suggestions if str(s) != input_word]
 
+                suggestions = aggregate_duplicates(suggestions)
+            else:
+                suggestions = []
             self.cache[hash] = PipelineResultsIterator(suggestions)
 
         return self.cache[hash]

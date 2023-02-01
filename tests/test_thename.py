@@ -1,7 +1,7 @@
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.do import Do
+from generator.preprocessor import Preprocessor
 
 import pytest
 
@@ -11,9 +11,9 @@ from generator.the_name import TheName
 def test_do():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config_new")
-        do = Do(config)
+        do = Preprocessor(config)
         name = TheName('chasered', {})
-        do.do(name)
+        do.preprocessor(name)
 
         print(name.types_probabilities)
         for type, interpretations in name.interpretations.items():

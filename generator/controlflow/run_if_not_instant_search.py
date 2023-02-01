@@ -1,9 +1,8 @@
-from typing import Optional, Any
-from generator.generated_name import GeneratedName
-from .run_if import RunIf
+from . import ControlFlow
+from ..the_name import TheName, Interpretation
 
 
-class RunIfNotConservative(RunIf):
-    
-    def should_run(self, names: list[GeneratedName], params: Optional[dict[str, Any]]) -> bool:
-        return not params.get('conservative', False)
+class RunIfNotConservative(ControlFlow):
+
+    def should_run(self, name: TheName, interpretation: Interpretation) -> bool:
+        return not name.params.get('conservative', False)
