@@ -67,18 +67,7 @@ class Generator:
     def init_objects(self):
         self.domains = Domains(self.config)
 
-    def get_sorter(self, sorter: str) -> Sorter:
-        match sorter:
-            case 'count':
-                return CountSorter(self.config)
-            case 'round-robin':
-                return RoundRobinSorter(self.config)
-            case 'length':
-                return LengthSorter(self.config)
-            case 'weighted-sampling':
-                return WeightedSamplingSorter(self.config)
-            case _:
-                raise ValueError(f'{sorter} is unavailable')
+
 
     def generate_names(
             self,
@@ -112,7 +101,7 @@ class Generator:
 
         print(name.types_probabilities)
 
-        metasampler = MetaSampler(name, self.config, self.pipelines)
+        metasampler = MetaSampler(name, self.config, self.pipelines, sorter)
 
         all_suggestions = metasampler.sample()
 

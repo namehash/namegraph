@@ -3,6 +3,7 @@ from typing import List, Dict, Iterator
 
 from omegaconf import DictConfig
 
+
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
 from generator.the_name import Interpretation, TheName
@@ -52,7 +53,7 @@ class RoundRobinSorter(Sorter):
 
 
 class RoundRobinSorter2(Sorter):
-    def __init__(self, config: DictConfig, pipelines):
+    def __init__(self, config: DictConfig, pipelines: list, weights: dict):
         super().__init__(config)
         self.used_pipelines = set()
         self.pipelines = copy(pipelines)

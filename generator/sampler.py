@@ -1,24 +1,53 @@
 import logging
 import random
+from typing import Dict, Any, Type
 
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
+from generator.pipeline import Pipeline
+from generator.sorting import WeightedSorter
 from generator.sorting.round_robin_sorter import RoundRobinSorter2
+from generator.sorting.sorter import Sorter
 from generator.the_name import TheName
 
 logger = logging.getLogger('generator')
 
 
 class MetaSampler:
-    def __init__(self, name: TheName, config, pipelines):
+
+    def get_weights(self, pipelines: list[Pipeline], type: str, lang: str = 'default') -> dict[Pipeline, float]: #TODO cache?
+        weights = {}
+        for pipeline in pipelines:
+            pipeline_weights = pipeline.definition.weights
+            try:
+                pipeline_weight = pipeline_weights[type][lang]
+            except KeyError:
+                pipeline_weight = pipeline_weights[type]['default']
+            weights[pipeline] = pipeline_weight
+        return weights
+    
+    def get_sorter(self, sorter: str) -> Type[Sorter]:
+        match sorter:
+            case 'count':
+                return RoundRobinSorter2
+            case 'round-robin':
+                return RoundRobinSorter2
+            case 'length':
+                return RoundRobinSorter2
+            case 'weighted-sampling':
+                return WeightedSorter
+            case _:
+                raise ValueError(f'{sorter} is unavailable')
+    
+    def __init__(self, name: TheName, config, pipelines: list[Pipeline], sorter_name: str):
+        self.config=config
         self.domains = Domains(config)
         self.name = name
         self.sorters = {}
         for type, interpretations in name.interpretations.items():
             for interpretation in interpretations:
                 print(type, interpretation.tokenization, interpretation.in_type_probability, interpretation.features)
-                # self.sorters[interpretation] = self.get_sorter(sorter)  # TODO weights
-                self.sorters[interpretation] = RoundRobinSorter2(config, pipelines)  # TODO weights
+                self.sorters[interpretation] = self.get_sorter(sorter_name)(config, pipelines, self.get_weights(pipelines,type))
 
         self.types_weights = {}
         self.interpretation_weights = {}
