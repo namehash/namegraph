@@ -26,7 +26,7 @@ def emoji_pipeline():
 @pytest.fixture(scope="class")
 def test_client():
     Domains.remove_self()
-    os.environ['CONFIG_NAME'] = 'test_config'
+    os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api
     if 'web_api' not in sys.modules:
         import web_api

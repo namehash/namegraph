@@ -13,7 +13,7 @@ def test_do():
         config = compose(config_name="prod_config_new")
         do = Preprocessor(config)
         name = TheName('chasered', {})
-        do.preprocessor(name)
+        do.do(name)
 
         print(name.types_probabilities)
         for type, interpretations in name.interpretations.items():

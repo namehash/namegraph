@@ -111,20 +111,7 @@
     other:
       default: 0.5
 -
-  name: substring-normalized
-  generator: SubstringMatchGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
-  weights:
-    ngram:
-      default: 1
-    person:
-      default: 1
-    other:
-      default: 1
--
-  name: substring-unnormalized
+  name: substring
   generator: SubstringMatchGenerator
   filters:
     - SubnameFilter
