@@ -1,10 +1,12 @@
+import logging
 import random
 
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.sorting.round_robin_sorter import RoundRobinSorter2
 from generator.the_name import TheName
-from generator.xgenerator import logger
+
+logger = logging.getLogger('generator')
 
 
 class MetaSampler:
