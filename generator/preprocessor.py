@@ -32,8 +32,8 @@ class Preprocessor:
     def classify(self, name: TheName):
         if name.strip_eth_namehash:
             self.ngram_classifier.classify(name)
-            # self.person_name_classifier.classify(name)
-            # self.add_other_type(name)
+            self.person_name_classifier.classify(name)
+            self.add_other_type(name)
 
     def add_other_type(self, name: TheName):
         OTHER_PROBABILITY = 0.1

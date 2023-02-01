@@ -21,7 +21,7 @@ if __name__ == '__main__':
     os.chdir(PROJECT_ROOT)
 
     with initialize(version_base=None, config_path='../conf/'):
-        config = compose(config_name='prod_config')
+        config = compose(config_name='prod_config_new')
 
         print('Removing old cache')
         shutil.rmtree(pickle_cache.CACHE_DIR, ignore_errors=True)
