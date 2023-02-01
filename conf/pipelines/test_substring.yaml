@@ -9,4 +9,4 @@
     person:
       default: 0
     other:
-      default: 0
+      default: 1
