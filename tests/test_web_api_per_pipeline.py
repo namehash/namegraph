@@ -26,7 +26,7 @@ def emoji_pipeline():
 @pytest.fixture(scope="class")
 def test_client():
     Domains.remove_self()
-    os.environ['CONFIG_NAME'] = 'test_config'
+    os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api
     if 'web_api' not in sys.modules:
         import web_api
@@ -53,9 +53,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": country
-                }
+                "country": country
             }
         })
 
@@ -74,9 +72,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": country
-                }
+                "country": country
             }
         })
         assert response.status_code == 200
@@ -87,9 +83,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": '123'
-                }
+                "country": '123'
             }
         })
         assert response.status_code == 200
@@ -100,21 +94,7 @@ class TestFlagAffix:
         response = client.post("/", json={
             "name": name,
             "params": {
-                "generator": {
-                    "country": None
-                }
-            }
-        })
-        assert response.status_code == 200
-        json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
-        assert names
-
-        response = client.post("/", json={
-            "name": name,
-            "params": {
-                "generator": {
-                }
+                "country": None
             }
         })
         assert response.status_code == 200
@@ -155,9 +135,10 @@ class TestEmoji:
     @mark.parametrize(
         "name, expected_names",
         [
-            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth"]),
+            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth", "🥰your👀.eth"]),
             ("prayforukraine", ["prayfor🇺🇦.eth", "🙏forukraine.eth", "🙏for🇺🇦.eth"]),
-            ("krakowdragon", ["krakow🐉.eth"])
+            ("krakowdragon", ["krakow🐉.eth"]),
+            ("dragon", ["dragon🐉.eth"])
         ]
     )
     def test_emoji_generator_api(self, test_client, name: str, expected_names: list[str]):
@@ -166,6 +147,7 @@ class TestEmoji:
 
         json = response.json()
         names: list[str] = [suggestion["name"] for suggestion in json]
+        print(names)
 
         assert set(expected_names).intersection(names) == set(expected_names)
 
@@ -194,3 +176,36 @@ class TestOnlyPrimary:
         assert len(names) == 1
         assert names[0] in {'glintpay.eth', 'drbaher.eth', '9852222.eth', 'wanadoo.eth',
                             'conio.eth', 'indulgente.eth', 'theclown.eth'}
+
+
+@pytest.fixture(scope='class')
+def substring_test_pipeline():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(
+        ['pipelines=test_substring',
+         'app.domains=tests/data/suggestable_domains_for_substring.csv'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
+
+
+@mark.usefixtures("substring_test_pipeline")
+class TestSubstringMatch:
+    def test_normalized(self, test_client):
+        response = test_client.post("/", json={"name": "あかまい"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "akamaihd.eth" in names
+
+    def test_unnormalized(self, test_client):
+        response = test_client.post("/", json={"name": "あかまい"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "あかまいhd.eth" in names
+
+    def test_emoji(self, test_client):
+        response = test_client.post("/", json={"name": "💛"})
+        assert response.status_code == 200
+        json = response.json()
+        names = [name["name"] for name in json]
+        assert "i💛you.eth" in names

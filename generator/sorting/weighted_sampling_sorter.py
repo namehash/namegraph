@@ -5,6 +5,7 @@ import numpy as np
 import numpy.typing as npt
 from omegaconf import DictConfig
 
+from generator.domains import Domains
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
 from generator.utils.aggregation import extend_and_aggregate
@@ -39,36 +40,36 @@ class WeightedSamplingSorter(Sorter):
     def _extract_pipelines_generators(self) -> Dict[str, Tuple[str, ...]]:
         generators_per_pipeline: Dict[str, Tuple[str, ...]] = dict()
         for definition in self.config.pipelines:
-            generators_per_pipeline[definition.name] = tuple(definition.generators)
+            generators_per_pipeline[definition.name] = (definition.generator,)
 
         return generators_per_pipeline
 
-    def _calculate_possible_primary_count(self,
+    def _calculate_possible_available_count(self,
                                           pipelines_suggestions: List[List[GeneratedName]],
                                           min_suggestions: int,
-                                          min_primary_fraction: float) -> int:
+                                          min_available_fraction: float) -> int:
 
-        # defining all the numbers regarding the primary names result fraction requirement
-        needed_primary_count = int(math.ceil(min_primary_fraction * min_suggestions))
+        # defining all the numbers regarding the available names result fraction requirement
+        needed_available_count = int(math.ceil(min_available_fraction * min_suggestions))
 
-        # checking if there is enough primary names to cover the needed amount
+        # checking if there is enough available names to cover the needed amount
         enough = False
-        primary_unique_suggestions = set()
+        available_unique_suggestions = set()
         for pipeline_suggestions in pipelines_suggestions:
 
             for suggestion in pipeline_suggestions:
-                if suggestion.category == 'primary':
-                    primary_unique_suggestions.add(str(suggestion))
-                    if len(primary_unique_suggestions) >= needed_primary_count:
+                if suggestion.category == Domains.AVAILABLE:
+                    available_unique_suggestions.add(str(suggestion))
+                    if len(available_unique_suggestions) >= needed_available_count:
                         enough = True
                         break
 
             if enough:
                 break
 
-        all_primary_count = len(primary_unique_suggestions)
-        possible_primary_count = min(needed_primary_count, all_primary_count)
-        return possible_primary_count
+        all_available_count = len(available_unique_suggestions)
+        possible_available_count = min(needed_available_count, all_available_count)
+        return possible_available_count
 
     def _get_pipeline_weights(self, pipelines_suggestions: List[List[GeneratedName]]) -> List[float]:
         pipeline_names = [
@@ -88,20 +89,20 @@ class WeightedSamplingSorter(Sorter):
              pipelines_suggestions: List[List[GeneratedName]],
              min_suggestions: int = None,
              max_suggestions: int = None,
-             min_primary_fraction: float = None) -> List[GeneratedName]:
+             min_available_fraction: float = None) -> List[GeneratedName]:
 
         min_suggestions = min_suggestions or self.default_suggestions_count
         max_suggestions = max_suggestions or self.default_suggestions_count
-        min_primary_fraction = min_primary_fraction or self.default_min_primary_fraction
+        min_available_fraction = min_available_fraction or self.default_min_available_fraction
 
-        possible_primary_count = self._calculate_possible_primary_count(pipelines_suggestions,
+        possible_available_count = self._calculate_possible_available_count(pipelines_suggestions,
                                                                         min_suggestions,
-                                                                        min_primary_fraction)
+                                                                        min_available_fraction)
 
         # defining variables required for the sampling itself and counting emptied pipelines
         empty_pipelines = 0
-        primary_used = 0
-        sampling_only_primary = False
+        available_used = 0
+        sampling_only_available = False
         probabilities = self._get_pipeline_weights(pipelines_suggestions)
 
         # if there are any empty pipelines we take it into account
@@ -116,10 +117,10 @@ class WeightedSamplingSorter(Sorter):
         # sampling itself
         while empty_pipelines < len(pipelines_suggestions) - 1 and len(name2suggestion) < max_suggestions:
 
-            # if there is just enough space left for all the left primary suggestions we simply turn on the specified
-            # flag, which will skip every sampled suggestion, which is not primary
-            if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
-                sampling_only_primary = True
+            # if there is just enough space left for all the left available suggestions we simply turn on the specified
+            # flag, which will skip every sampled suggestion, which is not available
+            if max_suggestions - len(name2suggestion) == possible_available_count - available_used:
+                sampling_only_available = True
 
             # otherwise we randomize pipeline from which to get the next suggestion
             probabilities = self._normalize_weights(probabilities)
@@ -131,11 +132,11 @@ class WeightedSamplingSorter(Sorter):
                 name = str(suggestion)
                 existing_suggestion = name2suggestion.get(name, None)
                 if existing_suggestion is None:
-                    # if the flag is not set, then enter normally, else the suggestion must be primary
-                    if not sampling_only_primary or suggestion.category == 'primary':
+                    # if the flag is not set, then enter normally, else the suggestion must be available
+                    if not sampling_only_available or suggestion.category == Domains.AVAILABLE:
                         name2suggestion[name] = suggestion
-                        if suggestion.category == 'primary':
-                            primary_used += 1
+                        if suggestion.category == Domains.AVAILABLE:
+                            available_used += 1
                         break
                 else:
                     existing_suggestion.add_strategies(suggestion.applied_strategies)
@@ -157,12 +158,12 @@ class WeightedSamplingSorter(Sorter):
 
             # for each suggestion we add it to the `name2suggestion` or aggregate if it has been met before
             for i, suggestion in enumerate(last_pipeline_suggestions):
-                # if there is just enough space left for all the left primary suggestions,
+                # if there is just enough space left for all the left available suggestions,
                 # then we simply append them at the end
-                if max_suggestions - len(name2suggestion) == possible_primary_count - primary_used:
+                if max_suggestions - len(name2suggestion) == possible_available_count - available_used:
                     name2suggestion = extend_and_aggregate(
                         name2suggestion,
-                        [s for s in last_pipeline_suggestions[i:] if s.category == 'primary'],
+                        [s for s in last_pipeline_suggestions[i:] if s.category == Domains.AVAILABLE],
                         max_suggestions
                     )
                     break
@@ -172,8 +173,8 @@ class WeightedSamplingSorter(Sorter):
                 existing_suggestion = name2suggestion.get(name, None)
                 if existing_suggestion is None:
                     name2suggestion[name] = suggestion
-                    if suggestion.category == 'primary':
-                        primary_used += 1
+                    if suggestion.category == Domains.AVAILABLE:
+                        available_used += 1
                 else:
                     existing_suggestion.add_strategies(suggestion.applied_strategies)
 

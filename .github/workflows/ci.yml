@@ -44,5 +44,8 @@ jobs:
             python3 generator/download.py
             python3 generator/download_from_s3.py
             python3 generator/download_names.py
+      - name: Generate cache
+        run: |
+            python3 namehash_common/generate_cache.py
       - name: Run tests
-        run: pytest -vv
+        run: pytest -vv --durations=0

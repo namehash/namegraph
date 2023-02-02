@@ -23,7 +23,7 @@ from utils import assert_applied_strategies_are_equal
 )
 def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = RoundRobinSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -46,7 +46,7 @@ def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: 
 )
 def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = CountSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -68,7 +68,7 @@ def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[s
 )
 def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = LengthSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -88,7 +88,7 @@ def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[
 )
 def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path='../conf/'):
-        config = compose(config_name='test_config')
+        config = compose(config_name='test_config_new')
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input)]
@@ -113,7 +113,7 @@ def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_str
 )
 def test_round_robin_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = RoundRobinSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -143,7 +143,7 @@ def test_round_robin_sorter_aggregation(input: List[List[GeneratedName]], expect
 )
 def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = CountSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -174,7 +174,7 @@ def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: Li
 )
 def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = LengthSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -203,7 +203,7 @@ def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: L
 )
 def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = WeightedSamplingSorter(config)
 
         sorted_names = sorter.sort(input)
@@ -217,7 +217,7 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
 @mark.slow
 def test_weighted_sampling_sorter_stress():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
 
         with open(config.app.internet_domains, 'r', encoding='utf-8') as f:
             words = [d for d in itertools.islice(iter(f), 49999)] + ['pumpkins']
@@ -240,7 +240,7 @@ def test_weighted_sampling_sorter_stress():
 @mark.slow
 def test_weighted_sampling_sorter_stress2():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         sorter = WeightedSamplingSorter(config)
         sorted_names = sorter.sort([[
             GeneratedName(('abasariatic',), pipeline_name='random', applied_strategies=[['RandomGenerator']])
@@ -251,7 +251,7 @@ def test_weighted_sampling_sorter_stress2():
 @mark.slow
 def test_weighted_sampling_sorter_weights():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
 
         generated_names = []
         for pipeline_name in [
@@ -261,7 +261,7 @@ def test_weighted_sampling_sorter_weights():
             'synonyms',
             'w2v',
             'categories-no-tokenizer',
-            'secondary',
+            'on_sale',
             'wiki2v',
             'substring',
         ]:
@@ -280,84 +280,84 @@ def test_weighted_sampling_sorter_weights():
     [
         (
             # simple situation: first 2 names in the sorted array satisfies the obligation
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'),   GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',), category='secondary'), GeneratedName(('bb', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'),   GeneratedName(('ccc',), category='on_sale')],
+                [GeneratedName(('dddd',), category='on_sale'),     GeneratedName(('bb', ), category='available')]
             ], ['a', 'bb', 'ccc'], 2, 3
         ),
         (
-            # we need 2 primary names, after the second one we have one place left and one primary available,
+            # we need 2 available names, after the second one we have one place left and one available available,
             # so we must take it, disregarding the next names in the line
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('ccc',), category='on_sale')],
+                [GeneratedName(('dddd',), category='available'), GeneratedName(('bb', ), category='advertised')]
             ], ['a', 'bb', 'dddd'], 2, 3
         ),
         (
-            # test for off-by-one error while counting used primary names and left primary names
-            ["app.min_primary_fraction=1.5"], [
-                [GeneratedName(('a',),     category='primary'),   GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',),  category='primary'),   GeneratedName(('bb', ), category='advertised')],
-                [GeneratedName(('eeeee',), category='registered')]
+            # test for off-by-one error while counting used available names and left available names
+            ["app.min_available_fraction=1.5"], [
+                [GeneratedName(('a',),     category='available'), GeneratedName(('ccc',), category='on_sale')],
+                [GeneratedName(('dddd',),  category='available'), GeneratedName(('bb', ), category='advertised')],
+                [GeneratedName(('eeeee',), category='taken')]
             ], ['a', 'bb', 'dddd'], 2, 3
         ),
         (
-            # disregarding the fact that the last available primary name is the last, max_suggestions allows us
+            # disregarding the fact that the last possible available name is the last, max_suggestions allows us
             # to take all the generated names, so we keep them in the order defined by the sorter
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('ccc',), category='on_sale')],
+                [GeneratedName(('dddd',), category='available'), GeneratedName(('bb', ), category='advertised')]
             ], ['a', 'bb', 'ccc', 'dddd'], 2, 4
         ),
         (
-            # we need 3 primary names, but have only 2 available, so we take all the names in the order defined by
-            # sorter, until there is just enough place left to take all the rest of available primary names
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'), GeneratedName(('ccc',), category='secondary')],
-                [GeneratedName(('dddd',), category='primary'), GeneratedName(('bb', ), category='advertised')]
+            # we need 3 available names, but have only 2 available, so we take all the names in the order defined by
+            # sorter, until there is just enough place left to take all the rest of possible available names
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('ccc',), category='on_sale')],
+                [GeneratedName(('dddd',), category='available'), GeneratedName(('bb', ), category='advertised')]
             ], ['a', 'bb', 'dddd'], 3, 3
         ),
         (
             # same as above, we need 2, but have only 1, so we take it as the last element, if we haven't met it yet
             # (and it is somewhere further away in the order defined by the sorter)
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='taken'),      GeneratedName(('ccc',), category='available')],
                 [GeneratedName(('dddd',), category='advertised'), GeneratedName(('bb', ), category='advertised')]
             ], ['a', 'ccc'], 2, 2
         ),
         (
-            # we need 2 primary names, and have 2 available, but it is a duplicate, so only 1 is left, so we take it,
+            # we need 2 available names, and have 2 available, but it is a duplicate, so only 1 is left, so we take it,
             # since it is first in the order, and the take the next from the line
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'),    GeneratedName(('bb',), category='advertised')],
-                [GeneratedName(('dddd',), category='advertised'), GeneratedName(('a', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'),  GeneratedName(('bb',), category='advertised')],
+                [GeneratedName(('dddd',), category='advertised'), GeneratedName(('a', ), category='available')]
             ], ['a', 'bb'], 2, 2
         ),
         (
-            # we need 2 primary names, but none of them would be taken if we followed the order defined by the sorter,
+            # we need 2 available names, but none of them would be taken if we followed the order defined by the sorter,
             # and we notice that we need 2, so we take 2 of the in the order defined by the sorter
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
-                [GeneratedName(('dddd',), category='primary'),    GeneratedName(('bb', ), category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='taken'),     GeneratedName(('ccc',), category='available')],
+                [GeneratedName(('dddd',), category='available'), GeneratedName(('bb', ), category='advertised')]
             ], ['ccc', 'dddd'], 2, 2
         ),
         (
             # same as above, but we have one place more, so we take one name from the line defined by the sorter
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='registered'), GeneratedName(('ccc',), category='primary')],
-                [GeneratedName(('dddd',), category='primary'),    GeneratedName(('bb', ), category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='taken'),     GeneratedName(('ccc',), category='available')],
+                [GeneratedName(('dddd',), category='available'), GeneratedName(('bb', ), category='advertised')]
             ], ['a', 'ccc', 'dddd'], 3, 3
         ),
     ],
 )
-def test_primary_fraction_obligation_length_sorter(overrides: List[str],
-                                                   input_names: List[List[GeneratedName]],
-                                                   expected_strings: List[str],
-                                                   min_suggestions: int,
-                                                   max_suggestions: int):
+def test_available_fraction_obligation_length_sorter(overrides: List[str],
+                                                     input_names: List[List[GeneratedName]],
+                                                     expected_strings: List[str],
+                                                     min_suggestions: int,
+                                                     max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = LengthSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
@@ -369,42 +369,42 @@ def test_primary_fraction_obligation_length_sorter(overrides: List[str],
     [
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('dddd', ), category='available')]
             ], ['a', 'bb', 'ccc', 'dddd'], 2, 4
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('dddd', ), category='available')]
             ], ['a', 'bb', 'dddd'], 2, 3
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),   category='primary'),     GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='registered'),  GeneratedName(('dddd', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),   category='available'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='taken'),     GeneratedName(('dddd', ), category='available')]
             ], ['a', 'dddd'], 2, 2
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),    category='primary'),   GeneratedName(('bb',), category='advertised'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='primary')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),    category='available'), GeneratedName(('bb',), category='advertised'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('a', ), category='available')]
             ], ['a', 'bb'], 2, 2
         ),
     ],
 )
-def test_primary_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
-                                                              input_names: List[List[GeneratedName]],
-                                                              expected_strings: List[str],
-                                                              min_suggestions: int,
-                                                              max_suggestions: int):
+def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
+                                                                input_names: List[List[GeneratedName]],
+                                                                expected_strings: List[str],
+                                                                min_suggestions: int,
+                                                                max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
@@ -416,50 +416,50 @@ def test_primary_fraction_obligation_weighted_sampling_sorter(overrides: List[st
     [
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),    category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),   category='available'), GeneratedName(('bb',),    category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),   GeneratedName(('dddd', ), category='taken')],
 
-                [GeneratedName(('e',), category='advertised'),   GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',), category='primary'),      GeneratedName(('hhhh',), category='primary')]
+                [GeneratedName(('e',), category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',), category='available'),  GeneratedName(('hhhh',), category='available')]
             ], ['a', 'hhhh'], 2, 2
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('a', ), category='taken')],
 
-                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',),   category='available'),  GeneratedName(('hhhh',), category='available')],
 
-                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='secondary'),
-                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='on_sale'),
+                 GeneratedName(('jjj',), category='on_sale'),    GeneratedName(('m', ), category='taken')],
             ], ['a', 'hhhh'], 2, 2
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('ddd',), category='primary'),    GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='available'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),   GeneratedName(('a', ), category='taken')],
 
-                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',),   category='available'),  GeneratedName(('hhhh',), category='available')],
 
-                [GeneratedName(('iii',), category='primary'),    GeneratedName(('kk',), category='secondary'),
-                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+                [GeneratedName(('iii',), category='available'), GeneratedName(('kk',), category='on_sale'),
+                 GeneratedName(('jjj',), category='on_sale'),   GeneratedName(('m', ), category='taken')],
             ], ['a', 'hhhh', 'ddd', 'iii'], 4, 4
         ),
     ]
 )
-def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
-                                                                       input_names: List[List[GeneratedName]],
-                                                                       expected_strings: List[str],
-                                                                       min_suggestions: int,
-                                                                       max_suggestions: int):
+def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
+                                                                         input_names: List[List[GeneratedName]],
+                                                                         expected_strings: List[str],
+                                                                         min_suggestions: int,
+                                                                         max_suggestions: int):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
@@ -467,97 +467,97 @@ def test_primary_fraction_obligation_weighted_sampling_sorter_no_order(overrides
 
 
 @mark.parametrize(
-    "overrides,input_names,min_suggestions,max_suggestions,min_expected_primary,max_expected_primary",
+    "overrides,input_names,min_suggestions,max_suggestions,min_expected_available,max_expected_available",
     [
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),    category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered'),
-                 GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),    category='registered'),
-                 GeneratedName(('l',),   category='secondary'),  GeneratedName(('hhhh',),  category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),   category='available'),  GeneratedName(('bb',),    category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('dddd', ), category='taken'),
+                 GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),    category='taken'),
+                 GeneratedName(('l',),   category='on_sale'),   GeneratedName(('hhhh',),   category='advertised')]
             ], 4, 5, 1, 1
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),   category='secondary'),  GeneratedName(('bb',),    category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered'),
-                 GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),    category='registered'),
-                 GeneratedName(('l',),   category='secondary'),  GeneratedName(('hhhh',),  category='advertised')]
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),   category='on_sale'),    GeneratedName(('bb',),    category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('dddd', ), category='taken'),
+                 GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),    category='taken'),
+                 GeneratedName(('l',),   category='on_sale'),    GeneratedName(('hhhh',),  category='advertised')]
             ], 4, 5, 0, 0
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('a',),   category='primary'),    GeneratedName(('bb',),     category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('dddd', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('a',),   category='available'), GeneratedName(('bb',),    category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),   GeneratedName(('dddd', ), category='taken')],
 
-                [GeneratedName(('e',), category='advertised'),   GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',), category='primary'),      GeneratedName(('hhhh',), category='primary')]
+                [GeneratedName(('e',), category='advertised'),  GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',), category='available'),   GeneratedName(('hhhh',), category='available')]
             ], 2, 2, 2, 2
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='advertised'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),    GeneratedName(('a', ), category='taken')],
 
-                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',),   category='advertised'), GeneratedName(('hhhh',), category='secondary')],
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',),   category='advertised'), GeneratedName(('hhhh',), category='on_sale')],
 
-                [GeneratedName(('iii',), category='registered'), GeneratedName(('kk',), category='secondary'),
-                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+                [GeneratedName(('iii',), category='taken'),    GeneratedName(('kk',), category='on_sale'),
+                 GeneratedName(('jjj',), category='on_sale'),  GeneratedName(('m', ), category='taken')],
             ], 7, 9, 0, 0
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('ddd',), category='primary'),    GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='available'), GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),   GeneratedName(('a', ), category='taken')],
 
-                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',),   category='primary'),    GeneratedName(('hhhh',), category='primary')],
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',),   category='available'),  GeneratedName(('hhhh',), category='available')],
 
-                [GeneratedName(('iii',), category='primary'),    GeneratedName(('kk',), category='secondary'),
-                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+                [GeneratedName(('iii',), category='available'),  GeneratedName(('kk',), category='on_sale'),
+                 GeneratedName(('jjj',), category='on_sale'),    GeneratedName(('m', ), category='taken')],
             ], 2, 2, 2, 2
         ),
         (
             #
-            ["app.min_primary_fraction=1.0"], [
-                [GeneratedName(('ddd',), category='registered'), GeneratedName(('bb',), category='secondary'),
-                 GeneratedName(('ccc',), category='secondary'),  GeneratedName(('a', ), category='registered')],
+            ["app.min_available_fraction=1.0"], [
+                [GeneratedName(('ddd',), category='taken'),    GeneratedName(('bb',), category='on_sale'),
+                 GeneratedName(('ccc',), category='on_sale'),  GeneratedName(('a', ), category='taken')],
 
-                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='registered'),
-                 GeneratedName(('a',),   category='secondary'),  GeneratedName(('hhhh',), category='primary')],
+                [GeneratedName(('e',),   category='advertised'), GeneratedName(('ff',),   category='taken'),
+                 GeneratedName(('a',),   category='on_sale'),    GeneratedName(('hhhh',), category='available')],
 
-                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='secondary'),
-                 GeneratedName(('jjj',), category='secondary'),  GeneratedName(('m', ), category='registered')],
+                [GeneratedName(('iii',), category='advertised'), GeneratedName(('kk',), category='on_sale'),
+                 GeneratedName(('jjj',), category='on_sale'),    GeneratedName(('m', ), category='taken')],
             ], 2, 5, 1, 1
         ),
     ]
 )
-def test_primary_fraction_obligation_weighted_sampling_sorter_primary_names_number(
+def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
         overrides: List[str],
         input_names: List[List[GeneratedName]],
         min_suggestions: int,
         max_suggestions: int,
-        min_expected_primary: int,
-        max_expected_primary: int
+        min_expected_available: int,
+        max_expected_available: int
 ):
 
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         sorter = WeightedSamplingSorter(config)
 
-        primary_names_set = {
+        available_names_set = {
             str(name)
             for sublist in input_names
             for name in sublist
-            if name.category == 'primary'
+            if name.category == 'available'
         }
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
         assert len(sorted_strings) <= max_suggestions
-        assert min_expected_primary <= len(primary_names_set & set(sorted_strings)) <= max_expected_primary
+        assert min_expected_available <= len(available_names_set & set(sorted_strings)) <= max_expected_available

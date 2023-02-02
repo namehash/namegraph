@@ -15,9 +15,9 @@ def test_domains():
         config = compose(config_name="test_config")
         domains = Domains(config)
         assert 'live' in domains.internet
-        assert 'fire' in domains.secondary_market
+        assert 'fire' in domains.on_sale
         # assert 'panda' in domains.advertised
-        assert '00002' in domains.registered
+        assert '00002' in domains.taken
 
 
 def test_domains_filtering():
@@ -30,10 +30,10 @@ def test_domains_filtering():
         # assert 'global' not in domains.secondary_market
         # assert 'global' not in domains.internet
         # assert 'global' not in domains.registered
-        assert '00002' in domains.registered
+        assert '00002' in domains.taken
         assert '00002' not in domains.internet
-        assert '000' in domains.secondary_market
-        assert '002' not in domains.registered
+        assert '000' in domains.on_sale
+        assert '002' not in domains.taken
 
 
 def test_domains_singleton():

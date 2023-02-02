@@ -1,0 +1,12 @@
+-
+  name: substring-normalized
+  generator: SubstringMatchGenerator
+  filters:
+    - SubnameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 1

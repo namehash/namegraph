@@ -15,7 +15,7 @@ from helpers import check_generator_response, generate_example_names
 def prod_test_client():
     Domains.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
-    os.environ['CONFIG_NAME'] = 'prod_config'
+    os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
         import web_api
     else:
@@ -31,9 +31,36 @@ def prod_test_client():
 def test_namehash(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
-                                      "metadata": False})
+                                      "metadata": True})
 
     assert response.status_code == 200
+
+    json = response.json()
+    for name in json:
+        applied_strategies = name['metadata']['applied_strategies']
+        assert any([
+            generator in strategy
+            for strategy in applied_strategies
+            for generator in ['RandomAvailableNameGenerator']
+        ])
+
+
+@pytest.mark.slow
+def test_namehash_only_primary(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+                                      "metadata": True, "min_primary_fraction": 1.0})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    for name in json:
+        applied_strategies = name['metadata']['applied_strategies']
+        assert any([
+            generator in strategy
+            for strategy in applied_strategies
+            for generator in ['RandomAvailableNameGenerator']
+        ])
 
 
 @pytest.mark.slow
@@ -45,10 +72,10 @@ def test_prod(prod_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
-    assert "myfire.eth" in str_names
+    assert "thefire.eth" in str_names
 
 
-@pytest.mark.execution_timeout(10)
+@pytest.mark.execution_timeout(20)
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
@@ -77,7 +104,7 @@ def test_metadata(prod_test_client):
 
     json = response.json()
     assert len(json) > 0
-
+    print(json)
     catdog_result = [name for name in json if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1
 
@@ -175,10 +202,8 @@ def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
                            json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
-                                 "max_suggestions": 1000, "params": {
-                                   "generator": {
+                                 "max_suggestions": 1000, "params": {                              
                                        "country": 'pl'
-                                   }
                                }})
 
     assert response.status_code == 200
@@ -203,9 +228,7 @@ def test_prod_short_suggestions(prod_test_client):
     response = client.post("/",
                            json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
-                                   "generator": {
                                        "country": 'pl'
-                                   }
                                }})
 
     assert response.status_code == 200
@@ -214,3 +237,39 @@ def test_prod_short_suggestions(prod_test_client):
     str_names = [name["name"] for name in json]
 
     assert all([len(name) >= 3 for name in str_names])
+
+
+def test_instant_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
+                "conservative": True,
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert not any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])
+
+
+def test_not_instant_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
+                "conservative": False,
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])

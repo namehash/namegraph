@@ -2,7 +2,7 @@ from typing import Tuple, List, Optional
 
 
 class GeneratedName:
-    __slots__ = ['tokens', 'pipeline_name', 'category', 'applied_strategies']
+    __slots__ = ['tokens', 'pipeline_name', 'category', 'applied_strategies', 'interpretation']
 
     def __init__(self,
                  tokens: Tuple[str, ...],
@@ -20,6 +20,8 @@ class GeneratedName:
             self.add_strategies(applied_strategies)
         else:
             self.applied_strategies.append([])
+
+        self.interpretation = None
 
     def __str__(self):
         return ''.join(self.tokens)
@@ -39,3 +41,12 @@ class GeneratedName:
         # we do not need any duplicates checking, as adding same value to unique values keeps them unique
         for strategy in self.applied_strategies:
             strategy.append(point)
+
+    def dict(self):
+        return {
+            'tokens': self.tokens,
+            'pipeline_name': self.pipeline_name,
+            'category': self.category,
+            'applied_strategies': self.applied_strategies,
+            'interpretation': self.interpretation,
+        }

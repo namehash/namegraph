@@ -25,17 +25,22 @@ class Singleton(type):
 
 
 class Domains(metaclass=Singleton):
+    TAKEN = 'taken'
+    ON_SALE = 'on_sale'
+    AVAILABLE = 'available'
+    RECENTLY_RELEASED = 'recently_released'
+
     def __init__(self, config):
         logger.debug('Initing Domains')
         self.config = config
         self.subname_filter = SubnameFilter(config)
         self.validname_filter = ValidNameFilter(config)
 
-        self.registered, self.secondary_market, self.available = self.read_csv_domains(
+        self.taken, self.on_sale, self.available = self.read_csv_domains(
             Path(config.filtering.root_path) / config.app.domains)
-        self.registered: Dict[
+        self.taken: Dict[
             str, float]  # = self.read_csv(Path(config.filtering.root_path) / config.filtering.domains)
-        self.secondary_market: Dict[str, float]  # = self.read_csv_with_prices(config.app.secondary_market_names)
+        self.on_sale: Dict[str, float]  # = self.read_csv_with_prices(config.app.secondary_market_names)
         # self.advertised: Dict[str, float] = self.read_csv_with_prices(config.app.advertised_names)
         self.internet: Set[str] = self.read_csv(config.app.internet_domains)
 
@@ -44,15 +49,15 @@ class Domains(metaclass=Singleton):
         # self.registered -= self.secondary_market.keys()
         # self.registered -= self.advertised.keys()
 
-        self.internet -= self.registered.keys()
-        self.internet -= self.secondary_market.keys()
+        self.internet -= self.taken.keys()
+        self.internet -= self.on_sale.keys()
         # self.internet -= self.advertised.keys()
 
         self.internet = set(
             n for n in self.internet
             if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
         )
-        self.only_primary = {
+        self.only_available = {
             n: v for n, v in self.available.items()
             if self.validname_filter.filter_name(n) and self.subname_filter.filter_name(n)
         }
@@ -92,14 +97,22 @@ class Domains(metaclass=Singleton):
                 name, interesting_score, status = row
                 name = strip_eth(name)
                 interesting_score = float(interesting_score)
-                if status == 'taken':
+                if status == self.TAKEN or status == self.RECENTLY_RELEASED:
                     taken[name] = interesting_score
-                elif status == 'on_sale':
+                elif status == self.ON_SALE:
                     on_sale[name] = interesting_score
-                elif status == 'available':
+                elif status == self.AVAILABLE:
                     available[name] = interesting_score
 
         return taken, on_sale, available
+
+    def get_name_status(self, name: str):
+        if name in self.on_sale:
+            return self.ON_SALE
+        elif name in self.taken:
+            return self.TAKEN
+        else:
+            return self.AVAILABLE
 
     def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
             -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:
@@ -114,11 +127,11 @@ class Domains(metaclass=Singleton):
                 remaining_suggestions.append(suggestion)
         return remaining_suggestions, matched
 
-    def get_secondary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        remaining_suggestions, secondary = self.split(suggestions, self.secondary_market)
-        return [name_price[0] for name_price in secondary.items()], remaining_suggestions
+    def get_on_sale(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
+        remaining_suggestions, on_sale = self.split(suggestions, self.on_sale)
+        return [name_price[0] for name_price in on_sale.items()], remaining_suggestions
 
-    def get_primary(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        primary = [s for s in suggestions if str(s) not in self.registered]
-        remaining = [s for s in suggestions if str(s) in self.registered]
-        return primary, remaining
+    def get_available(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
+        available = [s for s in suggestions if str(s) not in self.taken]
+        remaining = [s for s in suggestions if str(s) in self.taken]
+        return available, remaining

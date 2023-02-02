@@ -15,6 +15,8 @@
     - ValidNameFilter
 -
   name: w2v
+  controlflow:
+    - RunIfNotConservative
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -58,7 +60,7 @@
     - SubnameFilter
     - ValidNameFilter
 -
-  name: secondary
+  name: on-sale
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
@@ -68,7 +70,7 @@
   tokenizers:
     - WordNinjaTokenizer
   generators:
-    - SecondaryMatcher
+    - OnSaleMatchGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
@@ -96,7 +98,7 @@
     - ReplaceInvalidNormalizer
     - LongNameNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - PrefixGenerator
   filters:
@@ -111,27 +113,38 @@
     - ReplaceInvalidNormalizer
     - LongNameNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - SuffixGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
 -
-  name: substring
+  name: substring-normalized
   normalizers:
     - StripEthNormalizer
     - UnicodeNormalizer
     - NamehashNormalizer
-    - ReplaceInvalidNormalizer
     - LongNameNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - SubstringMatchGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
+-
+  name: substring-unnormalized
+  normalizers:
+    - StripEthNormalizer
+    - NamehashNormalizer
+    - LongNameNormalizer
+  tokenizers:
+    - NoneTokenizer
+  generators:
+    - SubstringMatchGenerator
+  filters:
+    - SubnameFilter
 -
   name: hyphens
   normalizers:
@@ -154,7 +167,7 @@
     - NamehashNormalizer
     - ReplaceInvalidNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - SpecialCharacterAffixGenerator
   filters:
@@ -182,7 +195,7 @@
     - NamehashNormalizer
     - ReplaceInvalidNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - FlagAffixGenerator
   filters:
@@ -210,7 +223,7 @@
     - NamehashNormalizer
     - ReplaceInvalidNormalizer
   tokenizers:
-    - WordNinjaTokenizer
+    - NoneTokenizer
   generators:
     - KeycapGenerator
   filters:
@@ -231,3 +244,31 @@
   filters:
     - SubnameFilter
     - ValidNameLengthFilter
+-
+  name: person-hyphens
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - PersonNameTokenizer
+  generators:
+    - HyphenGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+-
+  name: person-abbreviation
+  normalizers:
+    - StripEthNormalizer
+    - UnicodeNormalizer
+    - NamehashNormalizer
+    - ReplaceInvalidNormalizer
+  tokenizers:
+    - PersonNameTokenizer
+  generators:
+    - AbbreviationGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter

@@ -1,0 +1,218 @@
+-
+  name: wiki2v
+  generator: Wikipedia2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 15
+    person:
+      default: 15
+    other:
+      default: 15
+-
+  name: w2v
+  controlflow:
+    - RunIfNotConservative
+  generator: W2VGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 10
+    person:
+      default: 0.1
+    other:
+      default: 0
+-
+  name: categories-no-tokenizer
+  generator: CategoriesGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 10
+    person:
+      default: 10
+    other:
+      default: 10
+-
+  name: synonyms
+  generator: WordnetSynonymsGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 5
+    person:
+      default: 0.1
+    other:
+      default: 0
+-
+  name: on-sale
+  generator: OnSaleMatchGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 0
+-
+  name: permute
+  generator: PermuteGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 0
+-
+  name: prefix
+  generator: PrefixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.5
+      en: 1
+    person:
+      default: 0.5
+      en: 1
+    other:
+      default: 0.5
+-
+  name: suffix
+  generator: SuffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.5
+      en: 1
+    person:
+      default: 0.5
+      en: 1
+    other:
+      default: 0.5
+-
+  name: substring
+  generator: SubstringMatchGenerator
+  filters:
+    - SubnameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+-
+  name: hyphens
+  generator: HyphenGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 0
+-
+  name: special-char-affix
+  generator: SpecialCharacterAffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+-
+  name: abbreviation
+  generator: AbbreviationGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.1
+    person:
+      default: 1
+    other:
+      default: 0
+-
+  name: flag-affix
+  generator: FlagAffixGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+-
+  name: leet
+  generator: LeetGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+-
+  name: keycap
+  generator: KeycapGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+#    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+-
+  name: emoji
+  generator: EmojiGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 2
+    person:
+      default: 1
+      en: 2
+    other:
+      default: 0

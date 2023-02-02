@@ -1,0 +1,24 @@
+-
+  name: prefix
+  generator: PrefixGenerator
+  filters:
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 0
+-
+  name: suffix
+  generator: SuffixGenerator
+  filters:
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 0

@@ -25,7 +25,7 @@ app:
   clubs: data/suggestable_clubs.csv
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
-  min_primary_fraction: 0.1
+  min_available_fraction: 0.1
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
@@ -44,13 +44,14 @@ generation:
   prefixes_path: data/prefixes.txt
   name2emoji_path: data/name2emoji.json
   limit: 10000
+  empty_input_ability:
+    - RandomAvailableNameGenerator
   generator_limits:
     HyphenGenerator: 128
     AbbreviationGenerator: 128
     EmojiGenerator: 150
     Wikipedia2VGenerator: 100
-    OnlyPrimaryRandomGenerator: 20000
-    RandomGenerator: 20000
+    RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: data/wikipedia2vec.pkl
 sorting:
@@ -66,33 +67,37 @@ sorting:
       WordnetSynonymsGenerator: 5
       W2VGenerator: 10
       CategoriesGenerator: 10
-      OnlyPrimaryRandomGenerator: 1
-      RandomGenerator: 1
-      SecondaryMatcher: 1
+      RandomAvailableNameGenerator: 1
+      OnSaleMatchGenerator: 1
       Wikipedia2VGenerator: 15
       SpecialCharacterAffixGenerator: 1
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
-only_primary_random_pipeline:
+random_available_name_pipeline:
   name: random
   normalizers:
     - StripEthNormalizer
   tokenizers:
     - NoneTokenizer
   generators:
-    - OnlyPrimaryRandomGenerator
+    - RandomAvailableNameGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
-random_pipeline:
-  name: random
-  normalizers:
-    - StripEthNormalizer
-  tokenizers:
-    - NoneTokenizer
-  generators:
-    - RandomGenerator
-  filters:
-    - SubnameFilter
-    - ValidNameFilter
+person_names:
+  firstnames_url: person_names_firstnames.json
+  lastnames_url: person_names_lastnames.json
+  other_url: person_names_other.json
+  country_stats_url: person_names_country_stats.json
+  country_bonus: 100
+  firstnames_path: data/person_names_firstnames.json
+  lastnames_path: data/person_names_lastnames.json
+  other_path: data/person_names_other.json
+  country_stats_path: data/person_names_country_stats.json
+ngrams:
+  lazy_loading: true
+  unigrams: data/ngrams/unigram_freq.csv
+  bigrams: data/ngrams/bigram_freq.csv
+  custom_dictionary: data/ngrams/custom_dictionary.txt
+  custom_token_frequency: 500000

@@ -21,15 +21,16 @@ def run_around_tests():
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
-         ["fireability", "fireforce", "firemight"]),
+        (["app.query=powerfire", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
+         ["abilityfire", "forcefire", "mightfire"]),
     ],
 )
 def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
         result = [str(gn) for gn in result]
+        print(result)
         assert len(set(result).intersection(set(expected))) == len(expected)
         assert len(result) == 1000
 
@@ -38,14 +39,14 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
 @mark.parametrize(
     "overrides, expected",
     [
-        (["app.query=firepower", "pipelines=full",
+        (["app.query=firepower", "pipelines=prod_new",
           "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
          ["firepowercoin"]),
     ],
 )
 def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
@@ -56,13 +57,13 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     "overrides, expected",
     [
         (["app.input=stdin", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
-         ["fireability", "fireforce", "firemight"]),
+         ["abilityfire", "forcefire", "mightfire"]),
     ],
 )
 def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
-        monkeypatch.setattr('sys.stdin', io.StringIO('firepower'))
+        cfg = compose(config_name="test_config_new", overrides=overrides)
+        monkeypatch.setattr('sys.stdin', io.StringIO('powerfire'))
         result = generate(cfg, )[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
@@ -78,7 +79,7 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
 )
 def test_advertised(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
@@ -91,9 +92,9 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
          ["fire"]),
     ],
 )
-def test_secondary(overrides: List[str], expected: List[str]) -> None:
+def test_on_sale(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
@@ -105,20 +106,15 @@ def test_secondary(overrides: List[str], expected: List[str]) -> None:
         (
             ["app.query=dogcat", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"],
             [[
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "WordNinjaTokenizer", "PermuteGenerator", "SubnameFilter",
+                "PermuteGenerator", "SubnameFilter",
                 "ValidNameFilter"
-              ], [
-                "StripEthNormalizer", "UnicodeNormalizer", "NamehashNormalizer", "ReplaceInvalidNormalizer",
-                "LongNameNormalizer", "BigramWordnetTokenizer", "PermuteGenerator", "SubnameFilter",
-                "ValidNameFilter"
-            ]]
+              ]]
         )
     ]
 )
 def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
 
         catdog_result = [gn for gn in result if str(gn) == "catdog"]
@@ -134,7 +130,7 @@ def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
 )
 def test_no_duplicates(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        cfg = compose(config_name="test_config", overrides=overrides)
+        cfg = compose(config_name="test_config_new", overrides=overrides)
         result = generate(cfg, )[0]
 
         unique_results = set([str(gn) for gn in result])

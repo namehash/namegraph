@@ -1,0 +1,101 @@
+defaults:
+  - pipelines: test_new
+  - _self_
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
+app:
+  # read input from argument (query) or stdin
+  input: query
+  # the list of the domains, that are already registered
+  domains: tests/data/suggestable_domains.csv
+  # the query the names are generated for
+  query: mydomain
+  # the number of generated suggestions (TODO: implement)
+  suggestions: 10
+  # the pipelines used to generate the suggestions
+  # Make sure the required class is imported in generator/pipeline/pipeline.py
+  logging_level: INFO
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
+#  secondary_market_names: tests/data/secondary.csv
+#  advertised_names: tests/data/advertised.csv
+  internet_domains: tests/data/top_internet_names.csv
+  primary_url: suggestable_domains.csv
+#  secondary_url: secondary.csv
+#  advertised_url: advertised.csv
+  subnames_url: subnames.txt
+  clubs_url: suggestable_clubs.csv
+  clubs: tests/data/suggestable_clubs.csv
+  #for longer names only first 30 characters are taken into consideration
+  name_length_limit: 30
+  min_available_fraction: 0.1
+filtering:
+  # List of already registered domains
+#  domains: tests/data/primary.csv
+  subnames: tests/data/subnames.txt
+  root_path: ./
+tokenization:
+  dictionary: tests/data/words.txt
+  skip_one_letter_words: true
+  skip_non_words: false
+  add_letters_ias: true
+  with_gaps: true
+generation:
+  word2vec_url: embeddings.pkl
+  word2vec_path: data/embeddings.pkl
+  suffixes_path: tests/data/suffixes.txt
+  prefixes_path: tests/data/prefixes.txt
+  name2emoji_path: tests/data/name2emoji.json
+  limit: 10000
+  empty_input_ability:
+    - RandomAvailableNameGenerator
+  generator_limits:
+    HyphenGenerator: 128
+    AbbreviationGenerator: 128
+    EmojiGenerator: 150
+    Wikipedia2VGenerator: 10
+    RandomAvailableNameGenerator: 20000
+  wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
+  wikipedia2vec_path: tests/data/wikipedia2vec.pkl
+sorting:
+  weighted_sampling:
+    weights:
+      HyphenGenerator: 1
+      AbbreviationGenerator: 1
+      EmojiGenerator: 1
+      FlagAffixGenerator: 1
+      PermuteGenerator: 1
+      PrefixGenerator: 1
+      SuffixGenerator: 1
+      WordnetSynonymsGenerator: 1
+      W2VGenerator: 1
+      CategoriesGenerator: 1
+      RandomAvailableNameGenerator: 1
+      OnSaleMatchGenerator: 1
+      Wikipedia2VGenerator: 1
+      SpecialCharacterAffixGenerator: 1
+      SubstringMatchGenerator: 1
+      LeetGenerator: 1
+      KeycapGenerator: 1
+random_available_name_pipeline:
+  name: random
+  generator: RandomAvailableNameGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+person_names:
+  firstnames_url: person_names_firstnames.json
+  lastnames_url: person_names_lastnames.json
+  other_url: person_names_other.json
+  country_stats_url: person_names_country_stats.json
+  country_bonus: 100
+  firstnames_path: data/person_names_firstnames.json
+  lastnames_path: data/person_names_lastnames.json
+  other_path: data/person_names_other.json
+  country_stats_path: data/person_names_country_stats.json
+ngrams:
+  lazy_loading: true
+  unigrams: data/ngrams/unigram_freq.csv
+  bigrams: data/ngrams/bigram_freq.csv
+  custom_dictionary: tests/data/ngrams/custom_dictionary.txt
+  custom_token_frequency: 500000

@@ -4,28 +4,11 @@ from pydantic import BaseModel, Field
 from web_api import generator
 
 
-class NormalizerParams(BaseModel):
-    pass
-
-
-class TokenizerParams(BaseModel):
-    pass
-
-
-class GeneratorParams(BaseModel):
+class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
-
-
-class FilterParams(BaseModel):
-    pass
-
-
-class PipelineParams(BaseModel):
-    normalizer: Optional[NormalizerParams] = Field(dict())
-    tokenizer: Optional[TokenizerParams] = Field(dict())
-    generator: Optional[GeneratorParams] = Field(dict())
-    filter: Optional[FilterParams] = Field(dict())
+    conservative: bool = Field(False, title='instant search mode',
+                                 description='set to `true` to generate instant search suggestions')
 
 
 class Name(BaseModel):
@@ -41,8 +24,8 @@ class Name(BaseModel):
                                         ge=0.0, le=1.0,
                                         description='ensures at least `min_suggestions * min_primary_fraction` '
                                                     'primary names will be generated')
-    params: Optional[PipelineParams] = Field(None, title='pipeline parameters',
-                                             description='includes all the parameters for all nodes of the pipeline')
+    params: Optional[Params] = Field(None, title='pipeline parameters',
+                                     description='includes all the parameters for all nodes of the pipeline')
 
 
 class Metadata(BaseModel):
