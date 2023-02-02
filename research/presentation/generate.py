@@ -3,6 +3,8 @@ import sys
 import os
 import argparse
 
+from tqdm import tqdm
+
 from generator.domains import Domains
 from fastapi.testclient import TestClient
 
@@ -113,7 +115,7 @@ div {
     mrr = collections.defaultdict(list)
     first_position = collections.defaultdict(list)
     all_positions = collections.defaultdict(list)
-    for input_name in input_names:
+    for input_name in tqdm(input_names):
         f.write(f'<h1>{input_name}</h1>')
 
         f.write(f'<section>')

@@ -59,8 +59,6 @@ class WeightedSorterWithOrder(Sampler):
         if self.first_pass:
             return self.first_pass.pop(0)
         if self.weights:
-            print(self.weights)
-            print(list(self.weights.keys()), list(self.weights.values()))
             pipeline = random.choices(list(self.weights.keys()), weights=list(self.weights.values()))[
                 0]  # TODO: optimize?
             return pipeline

@@ -8,8 +8,6 @@ from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
 from generator.meta_sampler import MetaSampler
-from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
-from generator.sorting.sorter import Sorter
 from generator.input_name import InputName
 from generator.utils import aggregate_duplicates
 
@@ -94,17 +92,17 @@ class Generator:
         self.preprocessor.classify(name)
         logger.info('End preprocessing')
 
-        print(name.types_probabilities)
+        logger.info(str(name.types_probabilities))
 
         logger.info('Start sampling')
         all_suggestions = self.metasampler.sample(name, sorter)
 
-        print('Generated suggestions', len(all_suggestions), len(set([str(x) for x in all_suggestions])))
+        logger.info(f'Generated suggestions: {len(all_suggestions)}')
 
         if len(all_suggestions) < min_suggestions:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
             all_suggestions.extend(only_available_suggestions)  # TODO dodawaj do osiągnięcia limitu
-            print('Generated suggestions 2', len(all_suggestions), len(set([str(x) for x in all_suggestions])))
+            logger.info(f'Generated suggestions after random: {len(all_suggestions)}')
             all_suggestions = aggregate_duplicates(all_suggestions)
 
         # all_suggestions = []
