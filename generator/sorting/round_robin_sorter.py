@@ -1,12 +1,7 @@
-from copy import copy
 from typing import List, Dict, Iterator
-
-from omegaconf import DictConfig
-
 
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
-from generator.input_name import Interpretation, InputName
 
 
 class RoundRobinSorter(Sorter):
@@ -52,26 +47,3 @@ class RoundRobinSorter(Sorter):
                                                           min_available_fraction)
 
 
-class RoundRobinSorter2(Sorter):
-    def __init__(self, config: DictConfig, pipelines: list, weights: dict):
-        super().__init__(config)
-        self.used_pipelines = set()
-        self.pipelines = copy(pipelines)
-        self.index = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        # print('Robin', self.index , len(self.pipelines), self, [p.definition.name for p in self.pipelines])
-        if self.index < len(self.pipelines):
-            pipeline = self.pipelines[self.index]
-            self.index = (self.index + 1) % len(self.pipelines)
-            return pipeline
-        raise StopIteration
-
-    def pipeline_used(self, sampled_pipeline):
-        # self.used_pipelines.add(sampled_pipeline)
-        self.pipelines.remove(sampled_pipeline)
-        if len(self.pipelines):
-            self.index = self.index % len(self.pipelines)

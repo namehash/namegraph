@@ -5,8 +5,8 @@ from typing import Dict, Any, Type
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
-from generator.sorting import WeightedSorter
-from generator.sorting.round_robin_sorter import RoundRobinSorter2
+from generator.sampling import WeightedSorter, WeightedSorterWithOrder
+from generator.sampling.round_robin_sampler import RoundRobinSampler
 from generator.sorting.sorter import Sorter
 from generator.input_name import InputName
 
@@ -30,13 +30,13 @@ class MetaSampler:
     def get_sorter(self, sorter: str) -> Type[Sorter]:
         match sorter:
             case 'count':
-                return RoundRobinSorter2
+                return RoundRobinSampler
             case 'round-robin':
-                return RoundRobinSorter2
+                return RoundRobinSampler
             case 'length':
-                return RoundRobinSorter2
+                return RoundRobinSampler
             case 'weighted-sampling':
-                return WeightedSorter
+                return WeightedSorterWithOrder
             case _:
                 raise ValueError(f'{sorter} is unavailable')
 

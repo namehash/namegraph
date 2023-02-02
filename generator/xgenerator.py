@@ -7,7 +7,7 @@ from generator.preprocessor import Preprocessor
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
-from generator.sampler import MetaSampler
+from generator.meta_sampler import MetaSampler
 from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
 from generator.sorting.sorter import Sorter
 from generator.input_name import InputName
