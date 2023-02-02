@@ -16,7 +16,7 @@ logger = logging.getLogger('generator')
 
 class Settings(BaseSettings):
     # config_name: str = "test_config"
-    config_name: str = "prod_config"
+    config_name: str = "prod_config_new"
     config_overrides: Optional[str] = None
 
 

@@ -42,7 +42,7 @@ def download_embeddings(s3_downloader, url, path):
     s3_downloader.download_file(url + vectors, path + vectors, override=False)
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
+@hydra.main(version_base=None, config_path="../conf", config_name="prod_config_new")
 def init(config: DictConfig):
     s3_downloader = S3Downloader()
     download_embeddings(s3_downloader, config.generation.word2vec_url, config.generation.word2vec_path)
