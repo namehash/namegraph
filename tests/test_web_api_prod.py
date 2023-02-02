@@ -72,7 +72,7 @@ def test_prod(prod_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
-    assert "myfire.eth" in str_names
+    assert "thefire.eth" in str_names
 
 
 @pytest.mark.execution_timeout(20)
