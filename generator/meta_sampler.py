@@ -1,5 +1,6 @@
 import logging
 import random
+from functools import lru_cache
 from typing import Dict, Any, Type
 
 from generator.domains import Domains
@@ -16,11 +17,17 @@ logger = logging.getLogger('generator')
 
 class MetaSampler:
 
-    def get_weights(self, pipelines: list[Pipeline], type: str, lang: str = 'default') -> dict[
-        Pipeline, float]:  # TODO cache?
+    # @lru_cache(maxsize=None)
+    def get_weights(
+            self,
+            pipelines: tuple[Pipeline],
+            type: str,
+            lang: str = 'default'
+    ) -> dict[Pipeline, float]:  # TODO cache?
         """
         Return weights for pipelines for given type and language based on pipeline config.
         """
+
         weights = {}
         for pipeline in pipelines:
             pipeline_weights = pipeline.definition.weights
@@ -47,110 +54,100 @@ class MetaSampler:
             case _:
                 raise ValueError(f'{sampler} is unavailable')
 
-    def __init__(self, name: InputName, config, pipelines: list[Pipeline], sorter_name: str):
+    def __init__(self, config, pipelines: list[Pipeline]):
         self.config = config
         self.domains = Domains(config)
-        self.name = name
-        self.sorters = {}
-        for type_lang, interpretations in name.interpretations.items():
-            for interpretation in interpretations:
-                print(type_lang, interpretation.tokenization, interpretation.in_type_probability,
-                      interpretation.features)
-                type, lang = type_lang
-                self.sorters[interpretation] = self.get_sampler(sorter_name)(config, pipelines,
-                                                                             self.get_weights(pipelines, type, lang))
+        self.pipelines = pipelines
 
-        self.types_weights = {}
-        self.interpretation_weights = {}
-        for type_lang, weight in self.name.types_probabilities.items():
+    def sample(self, name: InputName, sorter_name: str) -> list[GeneratedName]:
+        min_suggestions = name.params['min_suggestions']
+        max_suggestions = name.params['max_suggestions']
+        min_available_fraction = name.params['min_available_fraction']
+        min_available_required = int(min_suggestions * min_available_fraction)
+
+        types_lang_weights = {}
+        interpretation_weights = {}
+        for type_lang, weight in name.types_probabilities.items():
             if weight > 0:
-                self.types_weights[type_lang] = weight
-                self.interpretation_weights[type_lang] = {}
-                for interpretation in self.name.interpretations[type_lang]:
-                    self.interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
+                types_lang_weights[type_lang] = weight
+                interpretation_weights[type_lang] = {}
+                for interpretation in name.interpretations[type_lang]:
+                    interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
-    def sample(self) -> list[GeneratedName]:
-        min_suggestions = self.name.params['min_suggestions']
-        max_suggestions = self.name.params['max_suggestions']
-        min_available_fraction = self.name.params['min_available_fraction']
-        min_available = int(min_suggestions * min_available_fraction)
+        sorters = {}
+        for (interpretation_type, lang), interpretations in name.interpretations.items():
+            for interpretation in interpretations:
+                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang)
+                sorters[interpretation] \
+                    = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
 
-        count_available = 0
+        available_added = 0
 
         all_suggestions = []
         all_suggestions_str = set()
         while True:
-            if len(all_suggestions) >= max_suggestions or not self.types_weights:
+            if len(all_suggestions) >= max_suggestions or not types_lang_weights:
                 break
 
-            # losuj interpretację
-            sampled_type = random.choices(list(self.types_weights.keys()),
-                                          weights=list(self.types_weights.values()))[0]
-            # print('Sampled type:', sampled_type, self.types_weights)
-            # print(list(self.interpretation_weights[sampled_type].items()))
-            # print(list([(x.tokenization) for x in self.interpretation_weights[sampled_type].keys()]))
-            sampled_interpretation = random.choices(list(self.interpretation_weights[sampled_type].keys()),
-                                                    weights=list(self.interpretation_weights[sampled_type].values()))[0]
-            # print('Sampled interpretation:', sampled_interpretation.tokenization,
-            #       self.interpretation_weights[sampled_type])
+            # sample interpretation
+            sampled_type_lang = random.choices(
+                list(types_lang_weights.keys()),
+                weights=list(types_lang_weights.values())
+            )[0]
 
-            # losuj pipeline
+            sampled_interpretation = random.choices(
+                list(interpretation_weights[sampled_type_lang].keys()),
+                weights=list(interpretation_weights[sampled_type_lang].values())
+            )[0]
+
             while True:
                 try:
                     if len(all_suggestions) >= max_suggestions:
                         break
 
-                    sampled_pipeline = next(self.sorters[sampled_interpretation])
-                    # for sampled_pipeline in self.sorters[sampled_interpretation]:
-                    # print('Sampled pipeline:', sampled_pipeline.definition.name)
+                    # sample and run pipeline
+                    sampled_pipeline = next(sorters[sampled_interpretation])
+                    suggestions = sampled_pipeline.apply(name, sampled_interpretation)
 
-                    # odpal pipeline
-                    suggestions = sampled_pipeline.apply(self.name, sampled_interpretation)
-                    # print('Length', len(suggestions))
                     added_suggestion = False
                     while True:
                         try:
-                            if len(all_suggestions) >= max_suggestions: break
+                            if len(all_suggestions) >= max_suggestions:
+                                break
 
                             suggestion = next(suggestions)
-                            # wez kolejny jeśli nie spełnia wymagań: duplikat lub nonavailable
-                            if str(suggestion) in all_suggestions_str:
-                                logger.info('Duplicated suggestion')
-                                continue
-                            else:
-                                # sprawdz status
-                                suggestion.category = self.domains.get_name_status(str(suggestion))
+                            # skip until it is not a duplicate
+                            while str(suggestion) in all_suggestions_str:
+                                suggestion = next(suggestions)
 
-                                # jesli ma byc dostpne a nie jest to continue
-                                if suggestion.category == Domains.AVAILABLE or count_available + max_suggestions - len(
-                                        all_suggestions) > min_available:
-                                    added_suggestion = True
-                                    if suggestion.category == Domains.AVAILABLE:
-                                        count_available += 1
-                                    all_suggestions.append(suggestion)
-                                    all_suggestions_str.add(str(suggestion))
-                                    break
-                                else:
-                                    logger.info('Skipping nonavailable suggestion')
-                                    # print('Skip non vailable', min_available, count_available, max_suggestions - len(
-                                    #     all_suggestions))
-                                    continue
+                            suggestion.category = self.domains.get_name_status(str(suggestion))
+
+                            # skip if suggestion is unavailable and there are just enough slots to fulfill
+                            # minimal available number of suggestions requirement
+                            slots_left = max_suggestions - len(all_suggestions)
+                            if suggestion.category == Domains.AVAILABLE \
+                                    or available_added + slots_left > min_available_required:
+
+                                added_suggestion = True
+                                if suggestion.category == Domains.AVAILABLE:
+                                    available_added += 1
+                                all_suggestions.append(suggestion)
+                                all_suggestions_str.add(str(suggestion))
+                                break
+                            else:
+                                continue
                         except StopIteration:
-                            # print('Empty pipeline', sampled_interpretation.tokenization, sampled_pipeline.definition.name)
-                            # jesli pusty to oznacz pipeline jako zużyty dla tej interpretacji
-                            self.sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
-                            # jesli wszystkie zuzyte to usun interpretacje z losowania
-                            # MEtaSampler
+                            # flags pipeline as emptied
+                            sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
                             break
                     if added_suggestion:
                         break
                 except StopIteration:
-                    # print('interpretacja skonczona')
-                    # usun interpretację z losowania
-                    del self.interpretation_weights[sampled_type][sampled_interpretation]
-                    if not self.interpretation_weights[sampled_type]:
-                        del self.interpretation_weights[sampled_type]
-                        del self.types_weights[sampled_type]
+                    # removes entries from the sampling population because they are emptied
+                    del interpretation_weights[sampled_type_lang][sampled_interpretation]
+                    if not interpretation_weights[sampled_type_lang]:
+                        del interpretation_weights[sampled_type_lang]
+                        del types_lang_weights[sampled_type_lang]
                     break
 
         return all_suggestions

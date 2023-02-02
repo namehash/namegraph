@@ -59,6 +59,7 @@ class Generator:
 
         self.init_objects()
         self.preprocessor = Preprocessor(config)
+        self.metasampler = MetaSampler(config, self.pipelines)
 
         self.weights = {}
         for definition in self.config.pipelines:
@@ -66,8 +67,6 @@ class Generator:
 
     def init_objects(self):
         self.domains = Domains(self.config)
-
-
 
     def generate_names(
             self,
@@ -97,10 +96,8 @@ class Generator:
 
         print(name.types_probabilities)
 
-        metasampler = MetaSampler(name, self.config, self.pipelines, sorter)
-
         logger.info('Start sampling')
-        all_suggestions = metasampler.sample()
+        all_suggestions = self.metasampler.sample(name, sorter)
 
         print('Generated suggestions', len(all_suggestions), len(set([str(x) for x in all_suggestions])))
 

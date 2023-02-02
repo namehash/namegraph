@@ -22,10 +22,10 @@ class WeightedSorter(Sampler):
 
     def __next__(self):
         if self.weights:
-            print(self.weights)
-            print(list(self.weights.keys()), list(self.weights.values()))
-            pipeline = random.choices(list(self.weights.keys()), weights=list(self.weights.values()))[
-                0]  # TODO: optimize?
+            pipeline = random.choices(
+                list(self.weights.keys()),
+                weights=list(self.weights.values())
+            )[0]  # TODO: optimize?
             return pipeline
         raise StopIteration
 

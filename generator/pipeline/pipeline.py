@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List
 import logging
 import re
@@ -41,6 +43,12 @@ class Pipeline:
         self.cache = {}
         logger.info(f'Pipeline {self.definition.name} inited.')
 
+    def __eq__(self, other: Pipeline) -> bool:
+        return isinstance(other, Pipeline) and self.pipeline_name == other.pipeline_name
+
+    def __hash__(self) -> int:
+        return hash(self.pipeline_name)
+
     def clear_cache(self):
         self.cache.clear()
 
@@ -57,8 +65,8 @@ class Pipeline:
         hash = self.generator.hash(name, interpretation)
         # print('HASH', interpretation.tokenization, hash, len(self.cache))
         if hash not in self.cache:
-            should_run = [controlflow.should_run(name, interpretation) for controlflow in self.controlflow]
-            if all(should_run):  # TODO ok?
+            should_run = all([controlflow.should_run(name, interpretation) for controlflow in self.controlflow])
+            if should_run:  # TODO ok?
 
                 if interpretation:
                     logger.info(
