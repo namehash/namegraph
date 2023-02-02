@@ -6,6 +6,7 @@ from namehash_common.ngrams import Ngrams
 
 class NGramClassifier(Classifier):
     TYPE = 'ngram'
+    LANG = 'en'
 
     def __init__(self, config):
         super().__init__(config)
@@ -22,22 +23,20 @@ class NGramClassifier(Classifier):
         for tokenization in tokenizations:
             if tokenization:
                 probability = self.ngrams.sequence_probability(tokenization)
-                probability =max(probability, 1e-20) #TODO
-                interpretation = Interpretation(self.TYPE, tokenization, probability)
+                probability = max(probability, 1e-20)  # TODO
+                interpretation = Interpretation(self.TYPE, self.LANG, tokenization, probability)
                 interpretations.append(interpretation)
 
         # calculate type prob
-        if interpretations:
-            highest_probability = interpretations[0].in_type_probability
-            if highest_probability > 1e-10:  # TODO
-                probability = 1.0
-            else:
-                probability = 0.5
-        else:
-            probability = 0.0
-        name.add_type(self.TYPE, probability)
 
         # add information about type and tokenizations
         # should normalize probability?
+        # TODO: there will be problem if more interpretations with different languages will be returned
         for interpretation in interpretations:
+            sequence_probability = interpretation.in_type_probability
+            if sequence_probability > 1e-10:  # TODO
+                probability = 1.0
+            else:
+                probability = 0.5
+            name.add_type(self.TYPE, self.LANG, probability, override=False)
             name.add_interpretation(interpretation)

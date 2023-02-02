@@ -65,7 +65,7 @@ def request_generator_http(host, name, override=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Presents suggestions for set of names for each generator.')
     parser.add_argument('--host', default='http://127.0.0.1:8000', help='host with name generator web apo')
-    parser.add_argument('-c', '--config', default=None, choices=['prod_config', 'test_config'],
+    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config'],
                         help=f'config name, if None then host is used')
     parser.add_argument('-o', '--output', default='test_generators.html', help='path to output HTML file')
     args = parser.parse_args()

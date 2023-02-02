@@ -48,10 +48,11 @@ class Preprocessor:
     def add_other_type(self, name: InputName) -> None:
         OTHER_PROBABILITY = 0.1
         OTHER_TYPE = 'other'
-        name.add_type(OTHER_TYPE, OTHER_PROBABILITY)
+        OTHER_LANG='default'
+        name.add_type(OTHER_TYPE, OTHER_LANG, OTHER_PROBABILITY)
 
         interpretation = Interpretation(
-            OTHER_TYPE, (name.strip_eth_namehash_unicode_replace_invalid_long_name,), 1.0
+            OTHER_TYPE, OTHER_LANG, (name.strip_eth_namehash_unicode_replace_invalid_long_name,), 1.0
         )  # TODO none?
         name.add_interpretation(interpretation)
 

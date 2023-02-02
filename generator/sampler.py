@@ -15,7 +15,8 @@ logger = logging.getLogger('generator')
 
 class MetaSampler:
 
-    def get_weights(self, pipelines: list[Pipeline], type: str, lang: str = 'default') -> dict[Pipeline, float]: #TODO cache?
+    def get_weights(self, pipelines: list[Pipeline], type: str, lang: str = 'default') -> dict[
+        Pipeline, float]:  # TODO cache?
         weights = {}
         for pipeline in pipelines:
             pipeline_weights = pipeline.definition.weights
@@ -44,19 +45,22 @@ class MetaSampler:
         self.domains = Domains(config)
         self.name = name
         self.sorters = {}
-        for type, interpretations in name.interpretations.items():
+        for type_lang, interpretations in name.interpretations.items():
             for interpretation in interpretations:
-                print(type, interpretation.tokenization, interpretation.in_type_probability, interpretation.features)
-                self.sorters[interpretation] = self.get_sorter(sorter_name)(config, pipelines, self.get_weights(pipelines,type))
+                print(type_lang, interpretation.tokenization, interpretation.in_type_probability,
+                      interpretation.features)
+                type, lang = type_lang
+                self.sorters[interpretation] = self.get_sorter(sorter_name)(config, pipelines,
+                                                                            self.get_weights(pipelines, type, lang))
 
         self.types_weights = {}
         self.interpretation_weights = {}
-        for type, weight in self.name.types_probabilities.items():
+        for type_lang, weight in self.name.types_probabilities.items():
             if weight > 0:
-                self.types_weights[type] = weight
-                self.interpretation_weights[type] = {}
-                for interpretation in self.name.interpretations[type]:
-                    self.interpretation_weights[type][interpretation] = interpretation.in_type_probability
+                self.types_weights[type_lang] = weight
+                self.interpretation_weights[type_lang] = {}
+                for interpretation in self.name.interpretations[type_lang]:
+                    self.interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
     def sample(self) -> list[GeneratedName]:
         min_suggestions = self.name.params['min_suggestions']

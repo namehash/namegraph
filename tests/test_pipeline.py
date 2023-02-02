@@ -22,7 +22,7 @@ def get_name_and_interpretation(preprocessor_test_config, name):
     input_name = InputName(name, {})
     preprocessor_test_config.normalize(input_name)
     preprocessor_test_config.classify(input_name)
-    interpretation = input_name.interpretations['ngram'][0]
+    interpretation = input_name.interpretations[('ngram','en')][0]
     return input_name, interpretation
 
 
