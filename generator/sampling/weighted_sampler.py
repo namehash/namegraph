@@ -47,11 +47,13 @@ class WeightedSorterWithOrder(Sampler):
             if self.weights[pipeline] <= 0:
                 del self.weights[pipeline]
 
-        normalized_weights = numpy.array(list(self.weights.values()))
-        normalized_weights = normalized_weights / numpy.sum(normalized_weights)
-
-        self.first_pass = numpy.random.choice(list(self.weights.keys()), len(self.weights),
-                                              p=normalized_weights, replace=False).tolist()
+        if self.weights:
+            normalized_weights = numpy.array(list(self.weights.values()))
+            normalized_weights = normalized_weights / numpy.sum(normalized_weights)
+            self.first_pass = numpy.random.choice(list(self.weights.keys()), len(self.weights),
+                                                  p=normalized_weights, replace=False).tolist()
+        else:
+            self.first_pass = []
 
     def __next__(self):
         if self.first_pass:
