@@ -73,7 +73,10 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
     if include_metadata:
         for name, name_json in zip(names, response):
             name_json['metadata'] = {
-                'applied_strategies': name.applied_strategies
+                'applied_strategies': name.applied_strategies,
+                'interpretation': name.interpretation,
+                'category': name.category,
+                'pipeline_name': name.pipeline_name,
             }
 
     return response
@@ -85,6 +88,8 @@ async def root(name: Name):
     log_entry = LogEntry(generator.domains)
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
+
+    generator.clear_cache()
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,

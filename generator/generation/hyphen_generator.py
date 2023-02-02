@@ -2,6 +2,7 @@ from typing import List, Tuple, Any
 from itertools import product, islice, chain
 
 from .name_generator import NameGenerator
+from ..input_name import InputName, Interpretation
 
 
 class HyphenGenerator(NameGenerator):
@@ -24,7 +25,7 @@ class HyphenGenerator(NameGenerator):
 
         return tuple(generated_tokens)
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         if len(tokens) <= 1:
             return []
 
@@ -34,3 +35,9 @@ class HyphenGenerator(NameGenerator):
             for flags in
             islice(product((True, False), repeat=len(tokens) - 1), min(2 ** (len(tokens) - 1) - 1, self.limit))
         ]
+
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
+        return {'tokens': interpretation.tokenization}

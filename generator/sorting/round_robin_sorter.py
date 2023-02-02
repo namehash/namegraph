@@ -45,3 +45,5 @@ class RoundRobinSorter(Sorter):
                                                           min_suggestions,
                                                           max_suggestions,
                                                           min_available_fraction)
+
+

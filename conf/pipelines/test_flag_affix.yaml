@@ -1,14 +1,13 @@
 -
   name: flag-affix
-  normalizers:
-    - StripEthNormalizer
-    - UnicodeNormalizer
-    - NamehashNormalizer
-    - ReplaceInvalidNormalizer
-  tokenizers:
-    - WordNinjaTokenizer
-  generators:
-    - FlagAffixGenerator
+  generator: FlagAffixGenerator
   filters:
     - SubnameFilter
     - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 0

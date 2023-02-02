@@ -15,7 +15,7 @@ from helpers import check_generator_response, generate_example_names
 def prod_test_client():
     Domains.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
-    os.environ['CONFIG_NAME'] = 'prod_config'
+    os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
         import web_api
     else:
@@ -72,7 +72,7 @@ def test_prod(prod_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
-    assert "myfire.eth" in str_names
+    assert "thefire.eth" in str_names
 
 
 @pytest.mark.execution_timeout(20)
@@ -104,7 +104,7 @@ def test_metadata(prod_test_client):
 
     json = response.json()
     assert len(json) > 0
-
+    print(json)
     catdog_result = [name for name in json if name["name"] == "catdog.eth"]
     assert len(catdog_result) == 1
 

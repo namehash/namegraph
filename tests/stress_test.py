@@ -13,7 +13,7 @@ from helpers import check_generator_response, SPECIAL_CHAR_REGEX
 def prod_test_client():
     Domains.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
-    os.environ['CONFIG_NAME'] = 'prod_config'
+    os.environ['CONFIG_NAME'] = 'prod_config_new'
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:
         import web_api
