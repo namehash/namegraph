@@ -1,8 +1,8 @@
 from . import ControlFlow
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 
 class RunIfNotConservative(ControlFlow):
 
-    def should_run(self, name: TheName, interpretation: Interpretation) -> bool:
+    def should_run(self, name: InputName, interpretation: Interpretation) -> bool:
         return not name.params.get('conservative', False)

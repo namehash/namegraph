@@ -4,7 +4,7 @@ import itertools
 import math
 
 from .name_generator import NameGenerator
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 LEETSPEAK_PATH = 'data/leetspeak.json'
 
@@ -129,8 +129,8 @@ class LeetGenerator(NameGenerator):
 
         return generated
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> list[tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> list[tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': interpretation.tokenization}

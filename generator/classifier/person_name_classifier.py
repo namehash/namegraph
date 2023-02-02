@@ -1,5 +1,5 @@
 from generator.classifier.classifier import Classifier
-from generator.the_name import TheName, Interpretation
+from generator.input_name import InputName, Interpretation
 from generator.utils.person_names import PersonNames
 
 
@@ -10,7 +10,7 @@ class PersonNameClassifier(Classifier):
         super().__init__(config)
         self.pn = PersonNames(config)
 
-    def classify(self, name: TheName):
+    def classify(self, name: InputName):
         normalized_name = name.strip_eth_namehash_unicode_replace_invalid
         # take normalized name and process
         raw_interpretations = self.pn.tokenize(normalized_name, topn=1) #TODO: parameter

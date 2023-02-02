@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Any
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -103,8 +103,8 @@ class CategoriesGenerator(NameGenerator):
                 stats[token] += 1
         return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}

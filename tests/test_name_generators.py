@@ -29,7 +29,7 @@ from generator.generated_name import GeneratedName
 import pytest
 
 from generator.domains import Domains
-from generator.the_name import TheName
+from generator.input_name import InputName
 
 from generator.utils.suffixtree import HAS_SUFFIX_TREE
 

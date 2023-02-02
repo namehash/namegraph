@@ -9,7 +9,7 @@ class Interpretation:
         self.features = features or {}
 
 
-class TheName:
+class InputName:
     """
     Stores everything related to one request.
     """

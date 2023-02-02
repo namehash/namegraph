@@ -10,7 +10,7 @@ from generator.pipeline import Pipeline
 from generator.sampler import MetaSampler
 from generator.sorting import CountSorter, RoundRobinSorter, LengthSorter, WeightedSamplingSorter
 from generator.sorting.sorter import Sorter
-from generator.the_name import TheName
+from generator.input_name import InputName
 from generator.utils import aggregate_duplicates
 
 logger = logging.getLogger('generator')
@@ -88,21 +88,18 @@ class Generator:
         params['max_suggestions'] = max_suggestions
         params['min_available_fraction'] = min_available_fraction
 
-        name = TheName(name, params)
+        name = InputName(name, params)
         logger.info('Start normalize')
         self.preprocessor.normalize(name)
         logger.info('Start classify')
         self.preprocessor.classify(name)
         logger.info('End preprocessing')
 
-        for pipeline in self.pipelines:
-            pipeline.clear_cache()
-        self.random_available_name_pipeline.clear_cache()
-
         print(name.types_probabilities)
 
         metasampler = MetaSampler(name, self.config, self.pipelines, sorter)
 
+        logger.info('Start sampling')
         all_suggestions = metasampler.sample()
 
         print('Generated suggestions', len(all_suggestions), len(set([str(x) for x in all_suggestions])))
@@ -161,3 +158,8 @@ class Generator:
         # suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_available_fraction)
         # 
         return all_suggestions[:max_suggestions]
+
+    def clear_cache(self) -> None:
+        for pipeline in self.pipelines:
+            pipeline.clear_cache()
+        self.random_available_name_pipeline.clear_cache()

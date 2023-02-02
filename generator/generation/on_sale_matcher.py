@@ -5,7 +5,7 @@ import wordninja
 
 from .name_generator import NameGenerator
 from ..domains import Domains
-from ..the_name import Interpretation, TheName
+from ..input_name import Interpretation, InputName
 from ..utils import sort_by_value
 
 
@@ -30,8 +30,8 @@ class OnSaleMatchGenerator(NameGenerator):
             result.extend(self.index[token])
         return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True)]
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': interpretation.tokenization}

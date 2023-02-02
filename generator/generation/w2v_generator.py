@@ -7,7 +7,7 @@ import itertools
 from .combination_limiter import CombinationLimiter, prod
 
 from .name_generator import NameGenerator
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -53,8 +53,8 @@ class W2VGenerator(NameGenerator):
 
         return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': interpretation.tokenization}

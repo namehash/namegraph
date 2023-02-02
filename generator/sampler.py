@@ -8,7 +8,7 @@ from generator.pipeline import Pipeline
 from generator.sorting import WeightedSorter
 from generator.sorting.round_robin_sorter import RoundRobinSorter2
 from generator.sorting.sorter import Sorter
-from generator.the_name import TheName
+from generator.input_name import InputName
 
 logger = logging.getLogger('generator')
 
@@ -25,7 +25,7 @@ class MetaSampler:
                 pipeline_weight = pipeline_weights[type]['default']
             weights[pipeline] = pipeline_weight
         return weights
-    
+
     def get_sorter(self, sorter: str) -> Type[Sorter]:
         match sorter:
             case 'count':
@@ -38,9 +38,9 @@ class MetaSampler:
                 return WeightedSorter
             case _:
                 raise ValueError(f'{sorter} is unavailable')
-    
-    def __init__(self, name: TheName, config, pipelines: list[Pipeline], sorter_name: str):
-        self.config=config
+
+    def __init__(self, name: InputName, config, pipelines: list[Pipeline], sorter_name: str):
+        self.config = config
         self.domains = Domains(config)
         self.name = name
         self.sorters = {}
@@ -59,7 +59,6 @@ class MetaSampler:
                     self.interpretation_weights[type][interpretation] = interpretation.in_type_probability
 
     def sample(self) -> list[GeneratedName]:
-        logger.info('Start sampling')
         min_suggestions = self.name.params['min_suggestions']
         max_suggestions = self.name.params['max_suggestions']
         min_available_fraction = self.name.params['min_available_fraction']
@@ -70,11 +69,10 @@ class MetaSampler:
         all_suggestions = []
         all_suggestions_str = set()
         while True:
-            if len(all_suggestions) >= max_suggestions: break
-            # losuj interpretację
-            if not self.types_weights:
+            if len(all_suggestions) >= max_suggestions or not self.types_weights:
                 break
 
+            # losuj interpretację
             sampled_type = random.choices(list(self.types_weights.keys()),
                                           weights=list(self.types_weights.values()))[0]
             # print('Sampled type:', sampled_type, self.types_weights)
@@ -84,10 +82,12 @@ class MetaSampler:
                                                     weights=list(self.interpretation_weights[sampled_type].values()))[0]
             # print('Sampled interpretation:', sampled_interpretation.tokenization,
             #       self.interpretation_weights[sampled_type])
+
             # losuj pipeline
             while True:
                 try:
-                    if len(all_suggestions) >= max_suggestions: break
+                    if len(all_suggestions) >= max_suggestions:
+                        break
 
                     sampled_pipeline = next(self.sorters[sampled_interpretation])
                     # for sampled_pipeline in self.sorters[sampled_interpretation]:

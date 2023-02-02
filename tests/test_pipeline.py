@@ -5,7 +5,7 @@ from typing import List
 
 from generator.preprocessor import Preprocessor
 from generator.pipeline import Pipeline
-from generator.the_name import TheName, Interpretation
+from generator.input_name import InputName, Interpretation
 
 from utils import assert_applied_strategies_are_equal
 
@@ -19,7 +19,7 @@ def preprocessor_test_config():
 
 
 def get_name_and_interpretation(preprocessor_test_config, name):
-    input_name = TheName(name, {})
+    input_name = InputName(name, {})
     preprocessor_test_config.normalize(input_name)
     preprocessor_test_config.classify(input_name)
     interpretation = input_name.interpretations['ngram'][0]

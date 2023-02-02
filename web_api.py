@@ -85,6 +85,8 @@ async def root(name: Name):
     log_entry = LogEntry(generator.domains)
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
+
+    generator.clear_cache()
     result = generator.generate_names(name.name,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,

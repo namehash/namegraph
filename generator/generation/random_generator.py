@@ -3,7 +3,7 @@ from typing import List, Tuple, Any
 
 from .name_generator import NameGenerator
 from ..domains import Domains
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -29,8 +29,8 @@ class RandomGenerator(NameGenerator):
             result = self.domains.internet
         return [(x,) for x in result]
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {}

@@ -1,4 +1,4 @@
-from generator.the_name import TheName
+from generator.input_name import InputName
 
 
 class Classifier:
@@ -10,5 +10,5 @@ class Classifier:
     def __init__(self, config):
         pass
     
-    def classify(self, name: TheName):
+    def classify(self, name: InputName):
         pass

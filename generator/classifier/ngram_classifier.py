@@ -1,5 +1,5 @@
 from generator.classifier.classifier import Classifier
-from generator.the_name import TheName, Interpretation
+from generator.input_name import InputName, Interpretation
 from generator.tokenization import WordNinjaTokenizer
 from namehash_common.ngrams import Ngrams
 
@@ -12,7 +12,7 @@ class NGramClassifier(Classifier):
         self.tokenizer = WordNinjaTokenizer(config)
         self.ngrams = Ngrams(config)
 
-    def classify(self, name: TheName):
+    def classify(self, name: InputName):
         normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name
         # take normalized name and tokenize
         tokenizations = self.tokenizer.tokenize(normalized_name)

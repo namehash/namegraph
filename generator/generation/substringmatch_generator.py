@@ -8,7 +8,7 @@ from generator.utils.unisuffixtree import UniSuffixTree, HAS_SUFFIX_TREE
 
 from .name_generator import NameGenerator
 from ..domains import Domains
-from ..the_name import Interpretation, TheName
+from ..input_name import Interpretation, InputName
 from ..utils import sort_by_value
 
 CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
@@ -91,10 +91,10 @@ class SubstringMatchGenerator(NameGenerator):
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),
                           self.generate(name.strip_eth_namehash_long_name))
         # TODO: optimize
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': (name.strip_eth_namehash_unicode_long_name, name.strip_eth_namehash_long_name)}

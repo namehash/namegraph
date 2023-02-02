@@ -2,7 +2,7 @@ from typing import List, Tuple, Any
 import itertools
 
 from .name_generator import NameGenerator
-from ..the_name import Interpretation, TheName
+from ..input_name import Interpretation, InputName
 
 
 class PermuteGenerator(NameGenerator):
@@ -16,8 +16,8 @@ class PermuteGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         return itertools.islice(itertools.permutations(tokens), self.limit)
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': interpretation.tokenization}

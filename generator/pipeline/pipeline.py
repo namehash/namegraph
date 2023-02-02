@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 
 from generator.controlflow import *
 from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
-from generator.the_name import Interpretation, TheName
+from generator.input_name import Interpretation, InputName
 
 from generator.controlflow import *
 from generator.normalization import *
@@ -49,7 +49,7 @@ class Pipeline:
     def clear_cache(self):
         self.cache.clear()
 
-    def apply(self, name: TheName, interpretation: Interpretation) -> PipelineResultsIterator:
+    def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
         if interpretation:
             logger.info(
                 f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')

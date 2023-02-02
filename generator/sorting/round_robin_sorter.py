@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 
 from generator.sorting.sorter import Sorter
 from generator.generated_name import GeneratedName
-from generator.the_name import Interpretation, TheName
+from generator.input_name import Interpretation, InputName
 
 
 class RoundRobinSorter(Sorter):

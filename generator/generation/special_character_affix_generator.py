@@ -1,7 +1,7 @@
 from typing import List, Tuple, Any
 
 from .name_generator import NameGenerator
-from ..the_name import TheName, Interpretation
+from ..input_name import InputName, Interpretation
 
 
 class SpecialCharacterAffixGenerator(NameGenerator):
@@ -20,8 +20,8 @@ class SpecialCharacterAffixGenerator(NameGenerator):
             tokens + ('Ξ',),
         ]
 
-    def generate2(self, name: TheName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
-    def prepare_arguments(self, name: TheName, interpretation: Interpretation):
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}
