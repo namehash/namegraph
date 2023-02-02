@@ -4,7 +4,6 @@ import re
 
 from omegaconf import DictConfig
 
-
 from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
 from generator.input_name import Interpretation, InputName
 
@@ -33,8 +32,6 @@ class Pipeline:
         self.pipeline_name = definition.name
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
-        self.normalizers: List[Normalizer] = []
-        self.tokenizers: List[Tokenizer] = []
         self.generators: List[NameGenerator] = []
         self.filters: List[Filter] = []
 
@@ -48,6 +45,9 @@ class Pipeline:
         self.cache.clear()
 
     def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
+        """
+        Generate suggestions, results are cached.
+        """
         if interpretation:
             logger.info(
                 f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
@@ -69,9 +69,6 @@ class Pipeline:
                 suggestions = self.generator.apply(name, interpretation)
                 logger.info('Pipeline suggestions generated.')
 
-                for s in suggestions:
-                    s.pipeline_name = self.pipeline_name
-
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
                 # remove input name from suggestions
@@ -79,6 +76,16 @@ class Pipeline:
                 suggestions = [s for s in suggestions if str(s) != input_word]
 
                 suggestions = aggregate_duplicates(suggestions)
+
+                # TODO: add metadata about types and interpretation
+                for s in suggestions:
+                    s.pipeline_name = self.pipeline_name
+                    s.interpretation = (
+                        interpretation.type if interpretation else None,
+                        interpretation.lang if interpretation else None,
+                        hash)  # TODO because of chaching interpretation's type and lang might be wrong
+
+
             else:
                 suggestions = []
             self.cache[hash] = PipelineResultsIterator(suggestions)

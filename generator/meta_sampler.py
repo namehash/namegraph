@@ -7,6 +7,7 @@ from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
 from generator.sampling import WeightedSorter, WeightedSorterWithOrder
 from generator.sampling.round_robin_sampler import RoundRobinSampler
+from generator.sampling.sampler import Sampler
 from generator.sorting.sorter import Sorter
 from generator.input_name import InputName
 
@@ -17,6 +18,9 @@ class MetaSampler:
 
     def get_weights(self, pipelines: list[Pipeline], type: str, lang: str = 'default') -> dict[
         Pipeline, float]:  # TODO cache?
+        """
+        Return weights for pipelines for given type and language based on pipeline config.
+        """
         weights = {}
         for pipeline in pipelines:
             pipeline_weights = pipeline.definition.weights
@@ -27,8 +31,11 @@ class MetaSampler:
             weights[pipeline] = pipeline_weight
         return weights
 
-    def get_sorter(self, sorter: str) -> Type[Sorter]:
-        match sorter:
+    def get_sampler(self, sampler: str) -> Type[Sampler]:
+        """
+        Return sampler by a name.
+        """
+        match sampler:
             case 'count':
                 return RoundRobinSampler
             case 'round-robin':
@@ -38,7 +45,7 @@ class MetaSampler:
             case 'weighted-sampling':
                 return WeightedSorterWithOrder
             case _:
-                raise ValueError(f'{sorter} is unavailable')
+                raise ValueError(f'{sampler} is unavailable')
 
     def __init__(self, name: InputName, config, pipelines: list[Pipeline], sorter_name: str):
         self.config = config
@@ -50,8 +57,8 @@ class MetaSampler:
                 print(type_lang, interpretation.tokenization, interpretation.in_type_probability,
                       interpretation.features)
                 type, lang = type_lang
-                self.sorters[interpretation] = self.get_sorter(sorter_name)(config, pipelines,
-                                                                            self.get_weights(pipelines, type, lang))
+                self.sorters[interpretation] = self.get_sampler(sorter_name)(config, pipelines,
+                                                                             self.get_weights(pipelines, type, lang))
 
         self.types_weights = {}
         self.interpretation_weights = {}

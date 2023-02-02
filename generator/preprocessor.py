@@ -13,6 +13,9 @@ from omegaconf import DictConfig
 
 
 class Preprocessor:
+    """
+    Perform few normalizations of input name, classify and tokenize input name. Return interpretations.
+    """
     def __init__(self, config: DictConfig) -> None:
         self.strip_eth_normalizer = StripEthNormalizer(config)
         self.namehash_normalizer = NamehashNormalizer(config)
