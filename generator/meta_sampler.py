@@ -102,38 +102,46 @@ class MetaSampler:
 
             while True:
                 try:
-                    slots_left = max_suggestions - len(all_suggestions)
-                    if slots_left <= 0:
+                    if len(all_suggestions) >= max_suggestions:
                         break
 
                     # sample and run pipeline
                     sampled_pipeline = next(sorters[sampled_interpretation])
                     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
 
-                    try:
-                        suggestion = next(suggestions)
-                        suggestion.category = self.domains.get_name_status(str(suggestion))
-                        # skip until it is not a duplicate and until it is "available" in case there are
-                        # just enough free slots left to fulfill minimal available number of suggestions requirement
-                        while str(suggestion) in all_suggestions_str \
-                                or (suggestion.category != Domains.AVAILABLE
-                                    and available_added + slots_left <= min_available_required):
+                    added_suggestion = False
+                    while True:
+                        try:
+                            if len(all_suggestions) >= max_suggestions:
+                                break
+
                             suggestion = next(suggestions)
+                            # skip until it is not a duplicate
+                            while str(suggestion) in all_suggestions_str:
+                                suggestion = next(suggestions)
+
                             suggestion.category = self.domains.get_name_status(str(suggestion))
-                    except StopIteration:
-                        # in case the suggestions have run out we simply mark the pipeline as empty
-                        # and proceed to sample another non-empty pipeline
-                        sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
-                        continue
 
-                    # on the other hand, if the suggestion is alright, then we add it to the list
-                    # and update corresponding counters and variables
-                    if suggestion.category == Domains.AVAILABLE:
-                        available_added += 1
+                            # skip if suggestion is unavailable and there are just enough slots to fulfill
+                            # minimal available number of suggestions requirement
+                            slots_left = max_suggestions - len(all_suggestions)
+                            if suggestion.category == Domains.AVAILABLE \
+                                    or available_added + slots_left > min_available_required:
 
-                    all_suggestions.append(suggestion)
-                    all_suggestions_str.add(str(suggestion))
-
+                                added_suggestion = True
+                                if suggestion.category == Domains.AVAILABLE:
+                                    available_added += 1
+                                all_suggestions.append(suggestion)
+                                all_suggestions_str.add(str(suggestion))
+                                break
+                            else:
+                                continue
+                        except StopIteration:
+                            # flags pipeline as emptied
+                            sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                            break
+                    if added_suggestion:
+                        break
                 except StopIteration:
                     # removes entries from the sampling population because they are emptied
                     del interpretation_weights[sampled_type_lang][sampled_interpretation]
