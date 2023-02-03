@@ -16,8 +16,6 @@ class SpecialCharacterAffixGenerator(NameGenerator):
         return [
             ('_',) + tokens,
             ('$',) + tokens,
-            ('Ξ',) + tokens,
-            tokens + ('Ξ',),
         ]
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
