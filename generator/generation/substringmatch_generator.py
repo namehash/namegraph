@@ -29,7 +29,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = list(self.domains.taken.keys())
+        self.lines = list([x[0] for x in sorted(self.domains.taken.items(), key=lambda x: x[1], reverse=True)])
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         cached_hash = None
@@ -86,7 +86,6 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
-            names = sort_by_value(islice(names, self.limit), self.domains.taken, reverse=True)
 
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]
