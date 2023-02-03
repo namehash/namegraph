@@ -133,6 +133,7 @@ class MetaSampler:
 
                     all_suggestions.append(suggestion)
                     all_suggestions_str.add(str(suggestion))
+                    break
 
                 except StopIteration:
                     # removes entries from the sampling population because they are emptied
