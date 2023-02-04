@@ -67,14 +67,18 @@ def request_generator_http(host, name, override=None):
 
 
 def interpretation_str(interpretation):
-    type, lang, feat=interpretation
-    return f'{type} {lang} {feat}'
-    
+    try:
+        interpretation = interpretation["interpretation"]
+        type, lang, feat = interpretation
+        return f'{type} {lang} {feat}'
+    except KeyError:
+        return ''
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Presents suggestions for set of names for each generator.')
     parser.add_argument('--host', default='http://127.0.0.1:8000', help='host with name generator web apo')
-    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config_new'],
+    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config_new', 'prod_config'],
                         help=f'config name, if None then host is used')
     parser.add_argument('-o', '--output', default='test_generators.html', help='path to output HTML file')
     args = parser.parse_args()
@@ -86,15 +90,15 @@ if __name__ == "__main__":
     else:
         request_fn = lambda name, override: request_generator_http(args.host, name, override)
 
-    for name in ['cat','ice']:
+    for name in ['cat', 'ice']:
         request_fn(name, {
-                'min_suggestions': 100,
-                'max_suggestions': 100,
-                "min_primary_fraction": 1.0,
-                "params": {
-                    'conservative': False,
-                    'country': 'pl'
-                }})
+            'min_suggestions': 100,
+            'max_suggestions': 100,
+            "min_primary_fraction": 1.0,
+            "params": {
+                'conservative': False,
+                'country': 'pl'
+            }})
 
     input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
                    'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
@@ -165,7 +169,8 @@ span.i {
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"]["interpretation"])})</span></li>')
+            f.write(
+                f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"])})</span></li>')
         f.write(f'</ol>')
         f.write(f'</div>')
         # END INSTANT
@@ -192,7 +197,8 @@ span.i {
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"]["interpretation"])})</span></li>')
+            f.write(
+                f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"])})</span></li>')
         f.write(f'</ol>')
         f.write(f'</div>')
         # END NAME
@@ -250,7 +256,8 @@ span.i {
 
     f.write(f'<h1>Times</h1>')
     for mode, values in request_times.items():
-        f.write(f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000*np.median(values):.2f} ms</p>')
+        f.write(
+            f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000 * np.median(values):.2f} ms</p>')
 
     f.write(f'<h1>Mean share</h1>')
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
