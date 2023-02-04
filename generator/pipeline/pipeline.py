@@ -32,6 +32,16 @@ class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.pipeline_name = definition.name
+        try: # copy to internal dict
+            self.weights = {}
+            for key, value in definition.weights.items():
+                if key not in self.weights:
+                    self.weights[key] = {}
+                for key2, value2 in value.items():
+                    self.weights[key][key2] = value2
+        except:
+            pass
+        
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []

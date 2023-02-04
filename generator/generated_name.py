@@ -33,9 +33,7 @@ class GeneratedName:
         return ''.join(self.tokens)
 
     def add_strategies(self, strategies: List[List[str]]) -> None:
-        for strategy in strategies:
-            if strategy not in self.applied_strategies:
-                self.applied_strategies.append(strategy)
+        self.applied_strategies.extend(strategies)
 
     def append_strategy_point(self, point: str) -> None:
         # we do not need any duplicates checking, as adding same value to unique values keeps them unique
