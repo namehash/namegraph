@@ -2,7 +2,9 @@ import collections
 import sys
 import os
 import argparse
+import time
 
+import numpy as np
 from tqdm import tqdm
 
 from generator.domains import Domains
@@ -64,10 +66,15 @@ def request_generator_http(host, name, override=None):
     return requests.post(host, json=data)
 
 
+def interpretation_str(interpretation):
+    type, lang, feat=interpretation
+    return f'{type} {lang} {feat}'
+    
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Presents suggestions for set of names for each generator.')
     parser.add_argument('--host', default='http://127.0.0.1:8000', help='host with name generator web apo')
-    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config'],
+    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config_new'],
                         help=f'config name, if None then host is used')
     parser.add_argument('-o', '--output', default='test_generators.html', help='path to output HTML file')
     args = parser.parse_args()
@@ -78,6 +85,16 @@ if __name__ == "__main__":
         request_fn = request_generator_client
     else:
         request_fn = lambda name, override: request_generator_http(args.host, name, override)
+
+    for name in ['cat','ice']:
+        request_fn(name, {
+                'min_suggestions': 100,
+                'max_suggestions': 100,
+                "min_primary_fraction": 1.0,
+                "params": {
+                    'conservative': False,
+                    'country': 'pl'
+                }})
 
     input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
                    'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
@@ -91,6 +108,7 @@ if __name__ == "__main__":
                    'sony', 'kevin', 'discord', 'monaco', 'market', 'sportsbet', 'volodymyrzelensky', 'coffee', 'gold',
                    'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
                    'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb']
+    # happypeople, muscle
 
     f = open(args.output, 'w')
 
@@ -109,18 +127,24 @@ div {
 .all100 {
     flex-basis: 600px;
 }
+span.i {
+    color: grey;
+}
 </style>''')
 
     stats = collections.defaultdict(list)
     mrr = collections.defaultdict(list)
     first_position = collections.defaultdict(list)
     all_positions = collections.defaultdict(list)
+
+    request_times = collections.defaultdict(list)
     for input_name in tqdm(input_names):
         f.write(f'<h1>{input_name}</h1>')
 
         f.write(f'<section>')
 
         # START INSTANT
+        start_time = time.time()
         instant_r = request_fn(input_name, {
             'min_suggestions': 3,
             'max_suggestions': 3,
@@ -129,9 +153,11 @@ div {
                 'conservative': True,
                 'country': 'pl'
             }}).json()
+        request_time = time.time() - start_time
+        request_times['instant'].append(request_time)
         print(instant_r)
         f.write(f'<div>')
-        f.write(f'<h2>instant</h2>')
+        f.write(f'<h2>instant ({request_time * 1000:.2f} ms)</h2>')
         f.write(f'<ol>')
         for s in instant_r:
             generators = []
@@ -139,12 +165,13 @@ div {
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(f'<li>{s["name"].replace(".eth", "")} ({", ".join(generators)})</li>')
+            f.write(f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"]["interpretation"])})</span></li>')
         f.write(f'</ol>')
         f.write(f'</div>')
         # END INSTANT
 
         # START NAME other ideas
+        start_time = time.time()
         name_r = request_fn(input_name, {
             'min_suggestions': 5,
             'max_suggestions': 5,
@@ -153,9 +180,11 @@ div {
                 'conservative': True,
                 'country': 'pl'
             }}).json()
+        request_time = time.time() - start_time
+        request_times['top5'].append(request_time)
 
         f.write(f'<div>')
-        f.write(f'<h2>/name</h2>')
+        f.write(f'<h2>/name ({request_time * 1000:.2f} ms)</h2>')
         f.write(f'<ol>')
         for s in name_r:
             generators = []
@@ -163,12 +192,13 @@ div {
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(f'<li>{s["name"].replace(".eth", "")} ({", ".join(generators)})</li>')
+            f.write(f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"]["interpretation"])})</span></li>')
         f.write(f'</ol>')
         f.write(f'</div>')
         # END NAME
 
         # START 100
+        start_time = time.time()
         name_r = request_fn(input_name, {
             'min_suggestions': 100,
             'max_suggestions': 100,
@@ -177,11 +207,13 @@ div {
                 'conservative': False,
                 'country': 'pl'
             }}).json()
+        request_time = time.time() - start_time
+        request_times['100'].append(request_time)
 
         generated = len(name_r)
 
         f.write(f'<div class="all100">')
-        f.write(f'<h2>100 ideas generated</h2>')
+        f.write(f'<h2>100 ideas generated ({request_time * 1000:.2f} ms)</h2>')
         f.write(f'<p>')
         for data in name_r:
             f.write(f'{data["name"].replace(".eth", "")} ')
@@ -215,6 +247,10 @@ div {
         # END 100
 
         f.write(f'</section>')
+
+    f.write(f'<h1>Times</h1>')
+    for mode, values in request_times.items():
+        f.write(f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000*np.median(values):.2f} ms</p>')
 
     f.write(f'<h1>Mean share</h1>')
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
