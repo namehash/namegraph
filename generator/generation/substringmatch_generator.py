@@ -11,8 +11,8 @@ from ..domains import Domains
 from ..input_name import Interpretation, InputName
 from ..utils import sort_by_value
 
-CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin'
-CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt'
+CACHE_TREE_PATH = 'data/cache/substringmatchgenerator_tree.bin_'
+CACHE_TREE_HASH_PATH = 'data/cache/substringmatchgenerator_tree_hash.txt_'
 
 
 class ReImpl:
@@ -32,24 +32,27 @@ class SuffixTreeImpl:
         self.lines = list([x[0] for x in sorted(self.domains.taken.items(), key=lambda x: x[1], reverse=True)])
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
+        domains_hash = hashlib.sha256(config.app.domains.encode('utf-8')).hexdigest()
+        cache_tree_hash_path = CACHE_TREE_HASH_PATH + domains_hash
+        cache_tree_path = CACHE_TREE_PATH + domains_hash
         cached_hash = None
         try:
-            with open(CACHE_TREE_HASH_PATH, 'r') as f:
+            with open(cache_tree_hash_path, 'r') as f:
                 cached_hash = f.read().strip()
         except FileNotFoundError:
             pass
 
         if cached_hash != latest_hash:
             self.tree = UniSuffixTree(self.lines)
-            os.makedirs(os.path.dirname(CACHE_TREE_PATH), exist_ok=True)
-            os.makedirs(os.path.dirname(CACHE_TREE_HASH_PATH), exist_ok=True)
-            self.tree.serialize(CACHE_TREE_PATH)
-            with open(CACHE_TREE_HASH_PATH, 'w') as f:
+            os.makedirs(os.path.dirname(cache_tree_path), exist_ok=True)
+            os.makedirs(os.path.dirname(cache_tree_hash_path), exist_ok=True)
+            self.tree.serialize(cache_tree_path)
+            with open(cache_tree_hash_path, 'w') as f:
                 f.write(latest_hash + '\n')
         else:
             self.tree = UniSuffixTree()
             # this is quite slow (over 2s)
-            self.tree.deserialize(CACHE_TREE_PATH)
+            self.tree.deserialize(cache_tree_path)
 
     def find(self, pattern: str) -> Iterable[str]:
         inds = self.tree.findStringIdx(pattern)
@@ -86,7 +89,7 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
-
+        # self.limit=100 #TODO set to request's max_suggestions
         # return single tokens
         return [(name,) for name in islice(names, self.limit)]
 
