@@ -47,7 +47,7 @@ import requests
 
 
 def request_generator_http(host, name, override=None):
-    time.sleep(0.1)
+    # time.sleep(0.1)
     data = {
         'name': name,
         'metadata': True,
