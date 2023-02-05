@@ -112,7 +112,7 @@ if __name__ == "__main__":
                    'sony', 'kevin', 'discord', 'monaco', 'market', 'sportsbet', 'volodymyrzelensky', 'coffee', 'gold',
                    'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
                    'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb']
-    # happypeople, muscle
+    # happypeople, muscle, billybob (2 leet in instant), quo (instant 2 flag suggestions)
 
     f = open(args.output, 'w')
 
@@ -140,6 +140,7 @@ span.i {
     mrr = collections.defaultdict(list)
     first_position = collections.defaultdict(list)
     all_positions = collections.defaultdict(list)
+    times = []
 
     request_times = collections.defaultdict(list)
     for input_name in tqdm(input_names):
@@ -159,6 +160,7 @@ span.i {
             }}).json()
         request_time = time.time() - start_time
         request_times['instant'].append(request_time)
+        times.append((request_time, input_name, 'instant'))
         print(instant_r)
         f.write(f'<div>')
         f.write(f'<h2>instant ({request_time * 1000:.2f} ms)</h2>')
@@ -187,6 +189,7 @@ span.i {
             }}).json()
         request_time = time.time() - start_time
         request_times['top5'].append(request_time)
+        times.append((request_time, input_name, 'top5'))
 
         f.write(f'<div>')
         f.write(f'<h2>/name ({request_time * 1000:.2f} ms)</h2>')
@@ -215,6 +218,7 @@ span.i {
             }}).json()
         request_time = time.time() - start_time
         request_times['100'].append(request_time)
+        times.append((request_time, input_name, '100'))
 
         generated = len(name_r)
 
@@ -254,10 +258,14 @@ span.i {
 
         f.write(f'</section>')
 
-    f.write(f'<h1>Times</h1>')
+    f.write(f'<h1>Average times</h1>')
     for mode, values in request_times.items():
         f.write(
             f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000 * np.median(values):.2f} ms</p>')
+
+    f.write(f'<h1>Times</h1>')
+    for request_time, name, mode in sorted(times, reverse=True):
+        f.write(f'<p>{1000 * request_time:.2f} ms {name} {mode}</p>')
 
     f.write(f'<h1>Mean share</h1>')
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
