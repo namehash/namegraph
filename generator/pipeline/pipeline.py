@@ -32,7 +32,7 @@ class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.pipeline_name = definition.name
-        try: # copy to internal dict
+        try:  # copy to internal dict
             self.weights = {}
             for key, value in definition.weights.items():
                 if key not in self.weights:
@@ -41,7 +41,7 @@ class Pipeline:
                     self.weights[key][key2] = value2
         except:
             pass
-        
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
@@ -60,6 +60,7 @@ class Pipeline:
         return hash(self.pipeline_name)
 
     def clear_cache(self):
+        """Cache must be cleared before every request because index in pipeline results is saved."""
         self.cache.clear()
 
     def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
