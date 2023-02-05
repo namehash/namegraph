@@ -24,7 +24,7 @@ class KeycapGenerator(NameGenerator):
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         name = ''.join(tokens)
         try:
-            return [(''.join([self.mapping[char] for char in name]),)]
+            return ((''.join([self.mapping[char] for char in name]),))
         except KeyError:
             return []
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:

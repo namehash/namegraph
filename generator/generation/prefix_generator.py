@@ -15,7 +15,7 @@ class PrefixGenerator(NameGenerator):
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         name = ''.join(tokens)
-        return [tuple([prefix] + list(tokens)) for prefix in self.prefixes if not name.startswith(prefix)]
+        return (tuple([prefix] + list(tokens)) for prefix in self.prefixes if not name.startswith(prefix))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

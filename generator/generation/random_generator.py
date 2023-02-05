@@ -27,7 +27,7 @@ class RandomGenerator(NameGenerator):
             result = random.sample(self.names, self.limit)
         else:
             result = self.domains.internet
-        return [(x,) for x in result]
+        return ((x,) for x in result)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

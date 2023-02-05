@@ -42,7 +42,7 @@ class RandomAvailableNameGenerator(NameGenerator):
             result = random.choices(self.names, cum_weights=self.accumulated_probabilities, k=self.limit)
         else:
             result = self.names
-        return [(x,) for x in result]
+        return ((x,) for x in result)
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 

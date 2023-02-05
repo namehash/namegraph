@@ -40,7 +40,7 @@ class Wikipedia2VGenerator(NameGenerator):
             phrase = re.split(r'_', phrase)
             result.append(phrase)
 
-        return [tuple(x) for x in result]
+        return (tuple(x) for x in result)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

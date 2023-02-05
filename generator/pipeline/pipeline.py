@@ -92,18 +92,20 @@ class Pipeline:
                     suggestions = filter_.apply(suggestions)
                 # remove input name from suggestions
                 input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
-                suggestions = [s for s in suggestions if str(s) != input_word]
+                suggestions = (s for s in suggestions if str(s) != input_word)
 
-                suggestions = aggregate_duplicates(suggestions)
+                # suggestions = aggregate_duplicates(suggestions)
 
                 # TODO: add metadata about types and interpretation
-                for s in suggestions:
-                    s.pipeline_name = self.pipeline_name
-                    s.interpretation = (
-                        interpretation.type if interpretation else None,
-                        interpretation.lang if interpretation else None,
-                        hash)  # TODO because of chaching interpretation's type and lang might be wrong
-
+                def gen(suggestions):
+                    for s in suggestions:
+                        s.pipeline_name = self.pipeline_name
+                        s.interpretation = (
+                            interpretation.type if interpretation else None,
+                            interpretation.lang if interpretation else None,
+                            hash)  # TODO because of caching interpretation's type and lang might be wrong
+                        yield s
+                suggestions=gen(suggestions)
 
             else:
                 suggestions = []

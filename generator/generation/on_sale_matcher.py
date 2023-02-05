@@ -28,7 +28,7 @@ class OnSaleMatchGenerator(NameGenerator):
         result = []
         for token in tokens:
             result.extend(self.index[token])
-        return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True)]
+        return ((item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

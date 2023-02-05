@@ -274,7 +274,7 @@ class FlagAffixGenerator(NameGenerator):
             return []
 
         flag = self.country2emoji[country.upper()]
-        return [tokens + (flag,), (flag,) + tokens]
+        return (tokens + (flag,), (flag,) + tokens)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
