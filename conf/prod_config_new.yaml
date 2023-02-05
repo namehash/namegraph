@@ -13,7 +13,7 @@ app:
   # the number of generated suggestions (TODO: implement)
   suggestions: 100
   # by default no pipelines are defined
-  logging_level: INFO
+  logging_level: ERROR
 #  secondary_market_names: data/secondary.csv
 #  advertised_names: data/empty.csv
   internet_domains: data/top_internet_names.csv
