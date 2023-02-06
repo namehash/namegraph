@@ -94,7 +94,7 @@ class Pipeline:
                 input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
                 suggestions = [s for s in suggestions if str(s) != input_word]
 
-                suggestions = aggregate_duplicates(suggestions)
+                # suggestions = aggregate_duplicates(suggestions)
 
                 # TODO: add metadata about types and interpretation
                 for s in suggestions:
