@@ -1,11 +1,19 @@
-from generator.generated_name import GeneratedName
+from typing import Optional
 import time
+
+from omegaconf import DictConfig
+
+from generator.generated_name import GeneratedName
+from generator.generation.categories_generator import Categories
+from generator.domains import Domains
 
 
 class LogEntry:
-    def __init__(self, domains):
+    def __init__(self, config: DictConfig):
         self.start_time = time.time()
-        self.domains = domains
+        self.config = config
+        self.domains: Domains = Domains(config)
+        self.categories: Categories = Categories(config)
 
     def create_log_entry(self, request: dict, result: list[GeneratedName]) -> dict:
         request.update({
@@ -34,13 +42,13 @@ class LogEntry:
             'tokens': suggestion.tokens,
             'pipeline_name': suggestion.pipeline_name,
             'interpretation': suggestion.interpretation,
-            'cached_status': suggestion.category,
+            'cached_status': suggestion.status,
             'applied_strategies': suggestion.applied_strategies,
             'price': 1.2345,  # dummy
             'real_status': 'available',  # dummy
             'name_guard': 'green',  # dummy
             'normalized_price': '2.34',  # dummy
             'price_in_user_currency': '3.45',  # dummy
-            'categories': [],  # TODO
-            'cached_interesting_score': '0.9',  # TODO
+            'categories': self.categories.get_categories(str(suggestion)),
+            'cached_interesting_score': self.domains.get_interesting_score(suggestion)
         }

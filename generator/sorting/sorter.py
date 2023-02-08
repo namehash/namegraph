@@ -23,7 +23,7 @@ class Sorter:
                                     all_available_count: int = None) -> List[GeneratedName]:
 
         if all_available_count is None:
-            all_available_count = len([str(s) for s in suggestions if s.category == Domains.AVAILABLE])
+            all_available_count = len([str(s) for s in suggestions if s.status == Domains.AVAILABLE])
 
         needed_available_count = min(needed_available_count, all_available_count)
         
@@ -31,12 +31,12 @@ class Sorter:
         for i, s in enumerate(suggestions):
             # if there is just enough space left for all the left available suggestions we simply append them at the end
             if max_suggestions - i <= needed_available_count - available_used:
-                rest_available = [s for s in suggestions[i:] if s.category == 'available']
+                rest_available = [s for s in suggestions[i:] if s.status == 'available']
                 assert len(rest_available) >= needed_available_count - available_used
 
                 return suggestions[:i] + rest_available
 
-            if s.category == 'available':
+            if s.status == 'available':
                 available_used += 1
 
         logger.warning('weird parameters used, should not get here')
@@ -62,8 +62,8 @@ class Sorter:
         assert len(suggestions) == len({str(s) for s in suggestions})  # asserting there are only unique names
 
         needed_available_count = int(math.ceil(min_available_fraction * min_suggestions))
-        available_count = len([str(s) for s in suggestions[:max_suggestions] if s.category == 'available'])
-        rest_available_count = len([str(s) for s in suggestions[max_suggestions:] if s.category == 'available'])
+        available_count = len([str(s) for s in suggestions[:max_suggestions] if s.status == 'available'])
+        rest_available_count = len([str(s) for s in suggestions[max_suggestions:] if s.status == 'available'])
 
         if available_count >= needed_available_count:
             return suggestions[:max_suggestions]

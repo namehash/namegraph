@@ -309,6 +309,16 @@ def test_categories():
         assert ('my', 'usa', '123') in generated_names
 
 
+def test_categories_eth():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = ('king', 'lion')
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('king', 'cheetah') in generated_names
+        assert ('king', 'wolf') in generated_names
+
+
 def test_categories_csv():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")

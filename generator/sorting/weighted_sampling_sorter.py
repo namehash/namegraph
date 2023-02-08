@@ -58,7 +58,7 @@ class WeightedSamplingSorter(Sorter):
         for pipeline_suggestions in pipelines_suggestions:
 
             for suggestion in pipeline_suggestions:
-                if suggestion.category == Domains.AVAILABLE:
+                if suggestion.status == Domains.AVAILABLE:
                     available_unique_suggestions.add(str(suggestion))
                     if len(available_unique_suggestions) >= needed_available_count:
                         enough = True
@@ -133,9 +133,9 @@ class WeightedSamplingSorter(Sorter):
                 existing_suggestion = name2suggestion.get(name, None)
                 if existing_suggestion is None:
                     # if the flag is not set, then enter normally, else the suggestion must be available
-                    if not sampling_only_available or suggestion.category == Domains.AVAILABLE:
+                    if not sampling_only_available or suggestion.status == Domains.AVAILABLE:
                         name2suggestion[name] = suggestion
-                        if suggestion.category == Domains.AVAILABLE:
+                        if suggestion.status == Domains.AVAILABLE:
                             available_used += 1
                         break
                 else:
@@ -163,7 +163,7 @@ class WeightedSamplingSorter(Sorter):
                 if max_suggestions - len(name2suggestion) == possible_available_count - available_used:
                     name2suggestion = extend_and_aggregate(
                         name2suggestion,
-                        [s for s in last_pipeline_suggestions[i:] if s.category == Domains.AVAILABLE],
+                        [s for s in last_pipeline_suggestions[i:] if s.status == Domains.AVAILABLE],
                         max_suggestions
                     )
                     break
@@ -173,7 +173,7 @@ class WeightedSamplingSorter(Sorter):
                 existing_suggestion = name2suggestion.get(name, None)
                 if existing_suggestion is None:
                     name2suggestion[name] = suggestion
-                    if suggestion.category == Domains.AVAILABLE:
+                    if suggestion.status == Domains.AVAILABLE:
                         available_used += 1
                 else:
                     existing_suggestion.add_strategies(suggestion.applied_strategies)

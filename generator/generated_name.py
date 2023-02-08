@@ -2,7 +2,7 @@ from typing import Tuple, List, Optional
 
 
 class GeneratedName:
-    __slots__ = ['tokens', 'pipeline_name', 'category', 'applied_strategies', 'interpretation']
+    __slots__ = ['tokens', 'pipeline_name', 'status', 'applied_strategies', 'interpretation']
 
     def __init__(self,
                  tokens: Tuple[str, ...],
@@ -13,7 +13,7 @@ class GeneratedName:
         self.tokens = tokens
 
         self.pipeline_name = pipeline_name
-        self.category = category
+        self.status = category
         self.applied_strategies = []  # history of applied strategies
 
         if applied_strategies is not None:
@@ -44,7 +44,7 @@ class GeneratedName:
         return {
             'tokens': self.tokens,
             'pipeline_name': self.pipeline_name,
-            'category': self.category,
+            'category': self.status,
             'applied_strategies': self.applied_strategies,
             'interpretation': self.interpretation,
         }

@@ -29,6 +29,12 @@ class Name(BaseModel):
 
 
 class Metadata(BaseModel):
+    # pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
+    # interpretation: list[str] = Field(title='interpretation tags',
+    #                                   description='list of interpretation tags based on which the '
+    #                                               'suggestion has been generated')
+    # category: str = Field(title='domain category',
+    #                       description='can be either available, taken, recently released or on sale')
     applied_strategies: List[List[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion")
 

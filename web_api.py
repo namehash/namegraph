@@ -79,7 +79,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
             name_json['metadata'] = {
                 'applied_strategies': name.applied_strategies,
                 'interpretation': name.interpretation,
-                'category': name.category,
+                'category': name.status,
                 'pipeline_name': name.pipeline_name,
             }
 
@@ -89,7 +89,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 @app.post("/", response_model=list[Suggestion])
 async def root(name: Name):
     seed_all(name.name)
-    log_entry = LogEntry(generator.domains)
+    log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
 

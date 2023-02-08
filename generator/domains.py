@@ -1,7 +1,7 @@
 import csv
 import logging
 from pathlib import Path
-from typing import Set, Dict, List, Tuple
+from typing import Set, Dict, List, Tuple, Optional
 
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
@@ -106,13 +106,26 @@ class Domains(metaclass=Singleton):
 
         return taken, on_sale, available
 
-    def get_name_status(self, name: str):
+    def get_name_status(self, name: str) -> str:
         if name in self.on_sale:
             return self.ON_SALE
         elif name in self.taken:
             return self.TAKEN
         else:
             return self.AVAILABLE
+
+    def get_interesting_score(self, name: GeneratedName) -> Optional[float]:
+        if name.status is None:
+            name.status = self.get_name_status(str(name))
+
+        if name.status in [self.TAKEN, self.RECENTLY_RELEASED]:
+            return self.taken.get(name.status, None)
+        if name.status == self.AVAILABLE:
+            return self.available.get(name.status, None)
+        if name.status == self.ON_SALE:
+            return self.on_sale.get(name.status, None)
+
+        return None
 
     def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
             -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:

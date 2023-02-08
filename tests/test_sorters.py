@@ -571,7 +571,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
             str(name)
             for sublist in input_names
             for name in sublist
-            if name.category == 'available'
+            if name.status == 'available'
         }
 
         sorted_strings = [str(gn) for gn in sorter.sort(input_names, min_suggestions, max_suggestions)]
