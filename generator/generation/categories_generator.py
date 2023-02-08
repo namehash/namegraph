@@ -3,7 +3,11 @@ import glob
 import itertools, collections
 import logging
 from pathlib import Path
+from operator import itemgetter
 from typing import List, Dict, Tuple, Any
+
+from omegaconf import DictConfig
+
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
 from ..input_name import InputName, Interpretation
@@ -11,52 +15,80 @@ from ..input_name import InputName, Interpretation
 logger = logging.getLogger('generator')
 
 
-def load_categories_from_csv(config):
-    path = config.app.clubs
-    categories = collections.defaultdict(list)
-    with open(path, newline='') as csvfile:
-        reader = csv.reader(csvfile)
-        next(reader)
-        for row in reader:
-            assert len(row) == 2
-            name, category = row
-            categories[category].append(name)
-    return categories
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+    def remove_self(cls):
+        if cls in cls._instances:
+            del cls._instances[cls]
 
 
-def load_categories(config):
-    categories = collections.defaultdict(list)
+class Categories(metaclass=Singleton):
+    def __init__(self, config: DictConfig) -> None:
+        self.categories = self.load_categories_from_csv(config)
+        self.inverted_categories = collections.defaultdict(list)
+        for category, tokens in self.categories.items():
+            for token in tokens:
+                self.inverted_categories[token].append(category)
 
-    ignored = [line.strip() for line in open(config.app.categories_ignored)]
-    pattern = str(Path(config.app.categories) / '**/*.*')
-    for path in glob.iglob(pattern, recursive=True):
-        if any([i in path for i in ignored]):
-            logger.debug(f'Ignore category {path}')
-            continue
-        if path.endswith('.txt'):
-            with open(path) as category_file:
-                for line in category_file:
-                    name = line.strip()
-                    if name: categories[path].append(name)
-        elif path.endswith('.csv'):
-            with open(path, newline='') as csvfile:
-                reader = csv.reader(csvfile)
-                for row in reader:
-                    name = row[0].strip()
-                    if name: categories[path].append(name)
-        else:
-            logger.warning(f"Categories cannot be read from file: {path}")
-    return categories
+    def get_names(self, category: str) -> list[str]:
+        return self.categories.get(category, [])
 
+    def get_categories(self, name: str) -> list[str]:
+        return self.inverted_categories.get(name, [])
 
-def remove_duplicated_categories(categories):
-    s = collections.defaultdict(list)
-    for path, tokens in categories.items():
-        s[tuple(sorted(tokens))].append(path)
+    @staticmethod
+    def load_categories_from_csv(config):
+        path = config.app.clubs
+        categories = collections.defaultdict(list)
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            for row in reader:
+                assert len(row) == 2
+                name, category = row
+                categories[category].append(name.removesuffix('.eth'))
+        return categories
 
-    for paths in s.values():
-        for path in paths[1:]:
-            del categories[path]
+    @staticmethod
+    def load_categories(config):
+        categories = collections.defaultdict(list)
+
+        ignored = [line.strip() for line in open(config.app.categories_ignored)]
+        pattern = str(Path(config.app.categories) / '**/*.*')
+        for path in glob.iglob(pattern, recursive=True):
+            if any([i in path for i in ignored]):
+                logger.debug(f'Ignore category {path}')
+                continue
+            if path.endswith('.txt'):
+                with open(path) as category_file:
+                    for line in category_file:
+                        name = line.strip()
+                        if name: categories[path].append(name)
+            elif path.endswith('.csv'):
+                with open(path, newline='') as csvfile:
+                    reader = csv.reader(csvfile)
+                    for row in reader:
+                        name = row[0].strip()
+                        if name: categories[path].append(name)
+            else:
+                logger.warning(f"Categories cannot be read from file: {path}")
+        return categories
+
+    @staticmethod
+    def remove_duplicated_categories(categories):
+        s = collections.defaultdict(list)
+        for path, tokens in categories.items():
+            s[tuple(sorted(tokens))].append(path)
+
+        for paths in s.values():
+            for path in paths[1:]:
+                del categories[path]
 
 
 class CategoriesGenerator(NameGenerator):
@@ -66,13 +98,7 @@ class CategoriesGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__(config)
-        self.categories: Dict[str, List[str]] = load_categories_from_csv(config)
-        # remove_duplicated_categories(self.categories)
-
-        self.inverted_categories = collections.defaultdict(list)
-        for category, tokens in self.categories.items():
-            for token in tokens:
-                self.inverted_categories[token].append(category)
+        self.categories = Categories(config)
         self.combination_limiter = CombinationLimiter(config.generation.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
@@ -93,15 +119,15 @@ class CategoriesGenerator(NameGenerator):
             counts = [t[1] for t in synset_tuple]
             result.append((tokens, sum(counts)))
 
-        return (tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True))
+        return (tuple(x[0]) for x in sorted(result, key=itemgetter(1), reverse=True))
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)
         stats[token] += 1
-        for category in self.inverted_categories[token]:
-            for token in self.categories[category]:
+        for category in self.categories.get_categories(token):
+            for token in self.categories.get_names(category):
                 stats[token] += 1
-        return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+        return dict(sorted(stats.items(), key=itemgetter(1), reverse=True))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

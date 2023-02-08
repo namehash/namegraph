@@ -23,10 +23,10 @@ class Result:
     def add_pipeline_suggestions(self, pipeline_suggestions: List[GeneratedName]):
         self.suggestions.append(pipeline_suggestions)
 
-    def assign_categories(self) -> None:
+    def assign_statuses(self) -> None:
         for pipeline_suggestions in self.suggestions:
             for suggestion in pipeline_suggestions:
-                suggestion.category = self.domains.get_name_status(str(suggestion))
+                suggestion.status = self.domains.get_name_status(str(suggestion))
 
     def unique_suggestions(self) -> int:
         return len(set([
@@ -40,7 +40,7 @@ class Result:
             suggestion
             for pipeline_suggestions in self.suggestions
             for suggestion in pipeline_suggestions
-            if suggestion.category == Domains.AVAILABLE
+            if suggestion.status == Domains.AVAILABLE
         ])
 
 
