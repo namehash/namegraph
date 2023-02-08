@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import List
 import logging
 import re
@@ -73,9 +74,10 @@ class Pipeline:
                         f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
                 else:
                     logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
-
+                start_time = time.time()
                 suggestions = self.generator.apply(name, interpretation)
-                logger.info('Pipeline suggestions generated.')
+                generator_time = 1000 * (time.time() - start_time)
+                logger.info(f'Pipeline suggestions generated. Time: {generator_time:.2f}')
 
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
