@@ -11,21 +11,9 @@ from omegaconf import DictConfig
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
 from ..input_name import InputName, Interpretation
+from ..utils import Singleton
 
 logger = logging.getLogger('generator')
-
-
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-    def remove_self(cls):
-        if cls in cls._instances:
-            del cls._instances[cls]
 
 
 class Categories(metaclass=Singleton):

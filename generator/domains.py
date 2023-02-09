@@ -7,21 +7,9 @@ from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.generated_name import GeneratedName
 from generator.normalization.strip_eth_normalizer import strip_eth
+from generator.utils import Singleton
 
 logger = logging.getLogger('generator')
-
-
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-    def remove_self(cls):
-        if cls in cls._instances:
-            del cls._instances[cls]
 
 
 class Domains(metaclass=Singleton):
