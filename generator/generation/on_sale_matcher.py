@@ -17,10 +17,11 @@ class OnSaleMatchGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__(config)
         self.domains = Domains(config)
+        self.tokenizer = wordninja.LanguageModel(config.tokenization.wordninja_dictionary)
         # index names
         self.index = collections.defaultdict(set)
         for name in self.domains.on_sale:
-            tokenized = tuple(wordninja.split(name))
+            tokenized = tuple(self.tokenizer.split(name))
             for token in tokenized:
                 self.index[token].add((name,))
 

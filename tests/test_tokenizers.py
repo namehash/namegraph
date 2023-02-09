@@ -54,7 +54,7 @@ def test_word_ninja_tokenizer2():
         config = compose(config_name="test_config")
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewyork123')
-        assert ('york', 'new', 'york', '123') in tokenized_names
+        assert ('york', 'newyork', '123') in tokenized_names
 
 
 def test_none_tokenizer():
