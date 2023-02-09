@@ -234,7 +234,7 @@ def test_flag_generator():
         generated_names = strategy.generate(tokenized_name, country=None)
         assert len(generated_names) == 0
 
-        #TODO
+        # TODO
         # tokenized_name = ('taras', 'shevchenko')
         # generated_names = strategy.generate(tokenized_name, params={})
         # assert len(generated_names) == 0
@@ -333,8 +333,8 @@ def test_random(overrides: List[str]):
         generated_names = list(strategy.generate())
         assert len(
             set([x[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
-                                                           'wikipedia', 'qq',
-                                                           'twitter', 'live', 'global', '00002'}) == 8
+                                                    'wikipedia', 'qq',
+                                                    'twitter', 'live', 'global', '00002'}) == 8
 
 
 @mark.parametrize(
