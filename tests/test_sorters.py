@@ -21,6 +21,7 @@ from utils import assert_applied_strategies_are_equal
         ['a', 'b', 'c', 'aa', 'cc', 'ccc', 'cccc']
     )]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -44,6 +45,7 @@ def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: 
         ['a', 'aa', 'cc', 'cccc', 'c', 'b']
     )]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -66,6 +68,7 @@ def test_count_sorter(input: List[List[GeneratedName]], expected_strings: List[s
         ['v'*2, 'd'*4, 'j'*5, 'y'*7, 'f'*10, 'a'*15]
     )]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -86,6 +89,7 @@ def test_length_sorter(input: List[List[GeneratedName]], expected_strings: List[
         ),
     ]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path='../conf/'):
         config = compose(config_name='test_config_new')
@@ -205,6 +209,7 @@ def test_length_sorter_aggregation(input: List[List[GeneratedName]], expected: L
         ),
     ]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -219,6 +224,7 @@ def test_weighted_sampling_sorter_aggregation(input: List[List[GeneratedName]], 
 
 
 @mark.slow
+@mark.skip(reason="sorters not used anymore")
 def test_weighted_sampling_sorter_stress():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -242,6 +248,7 @@ def test_weighted_sampling_sorter_stress():
 
 
 @mark.slow
+@mark.skip(reason="sorters not used anymore")
 def test_weighted_sampling_sorter_stress2():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -253,6 +260,7 @@ def test_weighted_sampling_sorter_stress2():
 
 
 @mark.slow
+@mark.skip(reason="sorters not used anymore")
 def test_weighted_sampling_sorter_weights():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config_new")
@@ -354,6 +362,7 @@ def test_weighted_sampling_sorter_weights():
         ),
     ],
 )
+@mark.skip(reason="sorters not used anymore")
 def test_available_fraction_obligation_length_sorter(overrides: List[str],
                                                      input_names: List[List[GeneratedName]],
                                                      expected_strings: List[str],
@@ -401,6 +410,7 @@ def test_available_fraction_obligation_length_sorter(overrides: List[str],
         ),
     ],
 )
+@mark.skip(reason="sorters not used anymore")
 def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
                                                                 input_names: List[List[GeneratedName]],
                                                                 expected_strings: List[str],
@@ -456,6 +466,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
         ),
     ]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
                                                                          input_names: List[List[GeneratedName]],
                                                                          expected_strings: List[str],
@@ -542,6 +553,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
         ),
     ]
 )
+@mark.skip(reason="sorters not used anymore")
 def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
         overrides: List[str],
         input_names: List[List[GeneratedName]],
