@@ -92,7 +92,7 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.suffix_tree_impl.find(pattern)
         # self.limit=100 #TODO set to request's max_suggestions
         # return single tokens
-        return [(name,) for name in islice(names, self.limit)]
+        return ((name,) for name in islice(names, self.limit))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),

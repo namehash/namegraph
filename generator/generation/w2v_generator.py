@@ -51,7 +51,7 @@ class W2VGenerator(NameGenerator):
             distances = [t[1] for t in synset_tuple]
             result.append((tokens, prod(distances)))
 
-        return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
+        return (tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

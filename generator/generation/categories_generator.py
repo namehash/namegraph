@@ -93,7 +93,7 @@ class CategoriesGenerator(NameGenerator):
             counts = [t[1] for t in synset_tuple]
             result.append((tokens, sum(counts)))
 
-        return [tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True)]
+        return (tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True))
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)

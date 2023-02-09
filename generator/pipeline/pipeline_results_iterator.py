@@ -8,10 +8,10 @@ class PipelineResultsIterator:
 
     def __init__(self, suggestions: list[GeneratedName]):
         self.index = 0
-        self.suggestions = suggestions
+        self.suggestions = iter(suggestions)
 
-    def __len__(self):
-        return len(self.suggestions)
+    # def __len__(self):
+    #     return len(self.suggestions)
 
     def next_suggestion(self):
         suggestion = self.suggestions[self.index]
@@ -22,9 +22,10 @@ class PipelineResultsIterator:
         return self
 
     def __next__(self) -> GeneratedName:
+        return next(self.suggestions)
         # print('ResultsIterator', self.index,len(self.suggestions))
-        if self.index < len(self.suggestions):
-            suggestion = self.suggestions[self.index]
-            self.index += 1
-            return suggestion
-        raise StopIteration
+        # if self.index < len(self.suggestions):
+        #     suggestion = self.suggestions[self.index]
+        #     self.index += 1
+        #     return suggestion
+        # raise StopIteration
