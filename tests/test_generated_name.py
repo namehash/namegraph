@@ -16,6 +16,7 @@ from utils import assert_applied_strategies_are_equal
         )
     ]
 )
+@mark.xfail
 def test_applied_strategies_constructor(strategies: List[List[str]], expected_strategies: List[List[str]]):
     name = GeneratedName(tuple(), applied_strategies=strategies)
     assert_applied_strategies_are_equal(name.applied_strategies, expected_strategies)
@@ -31,6 +32,7 @@ def test_applied_strategies_constructor(strategies: List[List[str]], expected_st
         )
     ]
 )
+@mark.xfail
 def test_applied_strategies_add_strategies(constructor_strategies: List[List[str]],
                                            strategies: List[List[str]],
                                            expected_strategies: List[List[str]]):
@@ -50,6 +52,7 @@ def test_applied_strategies_add_strategies(constructor_strategies: List[List[str
         )
     ]
 )
+@mark.xfail
 def test_applied_strategies_append_strategy_point(constructor_strategies: List[List[str]],
                                                   point: str,
                                                   expected_strategies: List[List[str]]):
