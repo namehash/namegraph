@@ -1,3 +1,4 @@
+from operator import itemgetter
 from typing import List, Tuple, Iterable, Dict, Any
 from itertools import islice, cycle
 import hashlib
@@ -29,7 +30,7 @@ class ReImpl:
 class SuffixTreeImpl:
     def __init__(self, config):
         self.domains = Domains(config)
-        self.lines = list([x[0] for x in sorted(self.domains.taken.items(), key=lambda x: x[1], reverse=True)])
+        self.lines = list([x[0] for x in sorted(self.domains.taken.items(), key=itemgetter(1), reverse=True)])
         latest_hash = hashlib.sha256('\n'.join(self.lines).encode('utf-8')).hexdigest()
 
         domains_hash = hashlib.sha256(config.app.domains.encode('utf-8')).hexdigest()

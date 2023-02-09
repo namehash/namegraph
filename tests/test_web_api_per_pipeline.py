@@ -175,7 +175,7 @@ class TestOnlyPrimary:
 
         assert len(names) == 1
         assert names[0] in {'glintpay.eth', 'drbaher.eth', '9852222.eth', 'wanadoo.eth',
-                            'conio.eth', 'indulgente.eth', 'theclown.eth'}
+                            'conio.eth', 'indulgente.eth', 'theclown.eth', 'taco.eth'}
 
 
 @pytest.fixture(scope='class')

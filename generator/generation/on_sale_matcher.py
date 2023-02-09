@@ -18,17 +18,17 @@ class OnSaleMatchGenerator(NameGenerator):
         super().__init__(config)
         self.domains = Domains(config)
         # index names
-        self.index = collections.defaultdict(set)
+        self.index = collections.defaultdict(dict)
         for name in self.domains.on_sale:
             tokenized = tuple(wordninja.split(name))
             for token in tokenized:
-                self.index[token].add((name,))
+                self.index[token][(name,)] = None
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
         for token in tokens:
-            result.extend(self.index[token])
-        return ((item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True))
+            result.extend(self.index[token].keys())
+        return [(item,) for item in sort_by_value([r[0] for r in result], self.domains.on_sale, reverse=True)]
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
