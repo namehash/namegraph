@@ -340,7 +340,8 @@ def test_random(overrides: List[str]):
 @mark.parametrize(
     "overrides",
     [
-        ["app.domains=tests/data/suggestable_domains_for_only_primary.csv"]
+        ["app.domains=tests/data/suggestable_domains_for_only_primary.csv",
+         "generation.generator_limits.RandomAvailableNameGenerator=7"]
     ]
 )
 def test_only_primary_random(overrides: List[str]):
@@ -350,8 +351,9 @@ def test_only_primary_random(overrides: List[str]):
         tokenized_name = ('my', 'domain', '123')
         generated_names = list(strategy.generate())
 
-        expected_names = {'glintpay', 'drbaher', '9852222', 'wanadoo', 'conio', 'indulgente', 'theclown'}
-        assert set([x[0] for x in generated_names]) & expected_names == expected_names
+        available_names = {'taco', 'glintpay', 'drbaher', '9852222', 'wanadoo', 'conio', 'indulgente', 'theclown'}
+        assert len(generated_names) == len(set(generated_names))
+        assert len(set([x[0] for x in generated_names]) & available_names) == 7
 
 
 def test_on_sale_matcher():
