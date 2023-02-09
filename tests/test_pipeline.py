@@ -22,7 +22,7 @@ def get_name_and_interpretation(preprocessor_test_config, name):
     input_name = InputName(name, {})
     preprocessor_test_config.normalize(input_name)
     preprocessor_test_config.classify(input_name)
-    interpretation = input_name.interpretations[('ngram','en')][0]
+    interpretation = input_name.interpretations[('ngram', 'en')][0]
     return input_name, interpretation
 
 
@@ -49,6 +49,7 @@ def test_basic_pipeline(preprocessor_test_config, overrides: List[str], expected
         (["app.query=dogcatdog", "app.suggestions=1000"]),
     ],
 )
+@mark.skip(reason='no deduplication in pipelines now')
 def test_duplicates_in_suggestions(preprocessor_test_config, overrides: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)

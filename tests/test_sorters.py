@@ -142,6 +142,7 @@ def test_round_robin_sorter_aggregation(input: List[List[GeneratedName]], expect
         ]
     )]
 )
+
 @mark.skip(reason="sorters not used anymore")
 def test_count_sorter_aggregation(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
