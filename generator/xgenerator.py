@@ -1,6 +1,7 @@
 import logging
 from typing import List, Any
 
+import wordninja
 from omegaconf import DictConfig
 
 from generator.preprocessor import Preprocessor
@@ -65,6 +66,7 @@ class Generator:
 
     def init_objects(self):
         self.domains = Domains(self.config)
+        wordninja.DEFAULT_LANGUAGE_MODEL = wordninja.LanguageModel(self.config.tokenization.wordninja_dictionary)
 
     def generate_names(
             self,

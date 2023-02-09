@@ -398,16 +398,16 @@ def test_on_sale_matcher_sorting():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         strategy = OnSaleMatchGenerator(config)
-        tokenized_name = ('fire', 'baba', 'orange')
+        tokenized_name = ('fire', 'marshal', 'orange')
         generated_names = list(strategy.generate(tokenized_name))
         generated_tokens = generated_names
 
         assert ('orange',) in generated_tokens  # intersting_score = 69.98
-        assert ('alibaba',) in generated_tokens  # intersting_score = 300.0
+        assert ('fieldmarshal',) in generated_tokens  # intersting_score = 300.0
         assert ('fire',) in generated_tokens  # intersting_score = 190.5115
 
         orange_pos = generated_tokens.index(('orange',))
-        alibaba_pos = generated_tokens.index(('alibaba',))
+        alibaba_pos = generated_tokens.index(('fieldmarshal',))
         fire_pos = generated_tokens.index(('fire',))
 
         assert alibaba_pos < fire_pos < orange_pos
