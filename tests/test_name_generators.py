@@ -370,6 +370,30 @@ def test_on_sale_matcher():
         assert ('fire',) in generated_names
 
 
+# this test does not detect non-deterministic behavior if run in different processes
+@mark.parametrize(
+    "overrides",
+    [
+        ["app.domains=tests/data/suggestable_domains_for_only_primary.csv"]
+    ]
+)
+def test_on_sale_matcher_deterministic(overrides: list[str]):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new", overrides=overrides)
+        tokenized_name = ('fire',)
+
+        strategy = OnSaleMatchGenerator(config)
+        generated_names = list(strategy.generate(tokenized_name))
+        print(generated_names)
+
+        for _ in range(10):
+            Domains.remove_self()
+            strategy = OnSaleMatchGenerator(config)
+            generated_names2 = list(strategy.generate(tokenized_name))
+
+            assert generated_names == generated_names2
+
+
 def test_on_sale_matcher_sorting():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
