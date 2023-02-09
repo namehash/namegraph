@@ -1,7 +1,10 @@
 defaults:
-  - pipelines: test
+  - pipelines: test_new
   - _self_
+# Configuration for the individual modules. So far all modules share the same config.
+# This might be moved to the pipeline definition.
 app:
+  # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered
   domains: tests/data/suggestable_domains.csv
@@ -53,7 +56,7 @@ generation:
     EmojiGenerator: 150
     Wikipedia2VGenerator: 10
     RandomAvailableNameGenerator: 20000
-  wikipedia2vec_url:
+  wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
 sorting:
   weighted_sampling:
@@ -87,6 +90,10 @@ random_available_name_pipeline:
     - SubnameFilter
     - ValidNameFilter
 person_names:
+  firstnames_url: person_names_firstnames.json
+  lastnames_url: person_names_lastnames.json
+  other_url: person_names_other.json
+  country_stats_url: person_names_country_stats.json
   country_bonus: 100
   firstnames_path: data/person_names_firstnames.json
   lastnames_path: data/person_names_lastnames.json

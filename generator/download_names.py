@@ -17,7 +17,7 @@ def download_names(config):
     print('Downloaded names', file=sys.stderr)
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="prod_config")
+@hydra.main(version_base=None, config_path="../conf", config_name="prod_config_new")
 def init(config: DictConfig):
     download_names(config)
 

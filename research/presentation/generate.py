@@ -3,6 +3,8 @@ import sys
 import os
 import argparse
 
+from tqdm import tqdm
+
 from generator.domains import Domains
 from fastapi.testclient import TestClient
 
@@ -65,7 +67,7 @@ def request_generator_http(host, name, override=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Presents suggestions for set of names for each generator.')
     parser.add_argument('--host', default='http://127.0.0.1:8000', help='host with name generator web apo')
-    parser.add_argument('-c', '--config', default=None, choices=['prod_config', 'test_config'],
+    parser.add_argument('-c', '--config', default=None, choices=['prod_config_new', 'test_config'],
                         help=f'config name, if None then host is used')
     parser.add_argument('-o', '--output', default='test_generators.html', help='path to output HTML file')
     args = parser.parse_args()
@@ -113,7 +115,7 @@ div {
     mrr = collections.defaultdict(list)
     first_position = collections.defaultdict(list)
     all_positions = collections.defaultdict(list)
-    for input_name in input_names:
+    for input_name in tqdm(input_names):
         f.write(f'<h1>{input_name}</h1>')
 
         f.write(f'<section>')

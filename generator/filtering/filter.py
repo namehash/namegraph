@@ -10,8 +10,7 @@ class Filter:
 
     def apply(
             self,
-            tokenized_names: List[GeneratedName],
-            params: Optional[dict[str, Any]] = None
+            tokenized_names: List[GeneratedName]
     ) -> List[GeneratedName]:
 
         result = [tokenized_name for tokenized_name in tokenized_names if self.filter_name(str(tokenized_name))]

@@ -308,8 +308,7 @@ def sort_name2emojis_by_similarity(
     for name, emojis in tqdm(name2emojis.items(), desc='sorting emojis per token'):
         # otherwise we do as planned
         emojis = [
-            (emoji, (not has_modifier(emoji),
-                     (1 if name in original_emojis2names.get(emoji, []) else 0),
+            (emoji, ((1 if name in original_emojis2names.get(emoji, []) else 0),
                      similarity,
                      frequences.get(emoji, 0.0)))
             for emoji, similarity in emojis
@@ -318,6 +317,40 @@ def sort_name2emojis_by_similarity(
         name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
 
     return name2sorted_emojis
+
+
+def load_emoji2canonical(filepath: str | Path) -> dict[str, str]:
+    with open(filepath, 'r', encoding='utf-8') as f:
+        confusables = json.load(f)
+
+    emoji2canonical = {
+        emoji: canonical or emoji
+        for emoji, (canonical, _) in confusables.items()
+    }
+
+    return emoji2canonical
+
+
+def cluster_emojis(name2emojis: dict[str, list[str]], emoji2canonical: dict[str, str]) -> dict[str, list[str]]:
+    new_name2emojis = dict()
+    for name, emojis in tqdm(name2emojis.items(), 'clustering emojis'):
+        present_clusters = set()
+        first_time_order = []
+        rest_order = []
+
+        for emoji in emojis:
+            # if emoji is not in the confusables, then it is canonical
+            canonical = emoji2canonical.get(emoji, emoji)
+            if canonical not in present_clusters:
+                first_time_order.append(emoji)
+            else:
+                rest_order.append(emoji)
+
+            present_clusters.add(canonical)
+
+        new_name2emojis[name] = first_time_order + rest_order
+
+    return new_name2emojis
 
 
 def extract_gold_mapping(name2emojis: dict[str, list[str]] | dict[str, dict[str, list[str]]]) -> dict[str, list[str]]:
@@ -458,6 +491,9 @@ if __name__ == '__main__':
         frequencies,
         all_emojis2names
     )
+
+    emoji2canonical = load_emoji2canonical(PROJECT_ROOT_DIR / 'data' / 'grapheme_confusables.json')
+    name2sorted_emojis = cluster_emojis(name2sorted_emojis, emoji2canonical)
 
     if args.overrides is not None:
         for overrides_path in args.overrides:

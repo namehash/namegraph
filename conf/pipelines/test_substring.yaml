@@ -1,26 +1,12 @@
 -
   name: substring-normalized
-  normalizers:
-    - StripEthNormalizer
-    - UnicodeNormalizer
-    - NamehashNormalizer
-    - LongNameNormalizer
-  tokenizers:
-    - NoneTokenizer
-  generators:
-    - SubstringMatchGenerator
+  generator: SubstringMatchGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
--
-  name: substring-unnormalized
-  normalizers:
-    - StripEthNormalizer
-    - NamehashNormalizer
-    - LongNameNormalizer
-  tokenizers:
-    - NoneTokenizer
-  generators:
-    - SubstringMatchGenerator
-  filters:
-    - SubnameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 1

@@ -9,6 +9,7 @@ from omegaconf import DictConfig
 
 from .combination_limiter import CombinationLimiter
 from .name_generator import NameGenerator
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -44,7 +45,7 @@ class EmojiGenerator(NameGenerator):
 
         self.combination_limiter = CombinationLimiter(self.limit)
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         all_possibilities = [self.name2emoji.get(token, []) + [token] for token in tokens]
 
         if len(tokens) == 1:
@@ -67,3 +68,9 @@ class EmojiGenerator(NameGenerator):
         all_results = list(islice(order_product(*all_possibilities), min(self.limit, all_possibilities_count - 1)))
 
         return (diverse_results + [result for result in all_results if result not in diverse_results_set])[:self.limit]
+
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
+        return {'tokens': interpretation.tokenization}

@@ -7,6 +7,7 @@ import numpy.typing as npt
 
 from .name_generator import NameGenerator
 from ..domains import Domains
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -36,9 +37,14 @@ class RandomAvailableNameGenerator(NameGenerator):
         self.probabilities: list[float] = _softmax(probabilities).tolist()
         self.accumulated_probabilities = list(accumulate(self.probabilities))
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self) -> List[Tuple[str, ...]]:
         if len(self.domains.only_available) >= self.limit:
             result = random.choices(self.names, cum_weights=self.accumulated_probabilities, k=self.limit)
         else:
             result = self.names
         return [(x,) for x in result]
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
+        return {}

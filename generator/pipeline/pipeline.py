@@ -1,16 +1,19 @@
-from typing import List, Dict, Any
+from __future__ import annotations
+
+import time
+from typing import List
 import logging
 import re
 
 from omegaconf import DictConfig
 
-from generator.generated_name import GeneratedName
+from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
+from generator.input_name import Interpretation, InputName
+
 from generator.controlflow import *
-from generator.normalization import *
-from generator.tokenization import *
 from generator.generation import *
 from generator.filtering import *
-from generator.sorting import *
+
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter
 from generator.filtering.domain_filter import DomainFilter
@@ -29,73 +32,82 @@ logger = logging.getLogger('generator')
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
+        self.pipeline_name = definition.name
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
-        self.normalizers: List[Normalizer] = []
-        self.tokenizers: List[Tokenizer] = []
         self.generators: List[NameGenerator] = []
         self.filters: List[Filter] = []
+
+        logger.info(f'Pipeline {self.definition.name} initing.')
         self._build()
 
-    def apply(self, word: str, params: dict[str, Any] = None) -> List[GeneratedName]:
-        params = params or dict()
+        self.cache = {}
+        logger.info(f'Pipeline {self.definition.name} inited.')
 
-        input_word = word
-        words: List[GeneratedName] = [GeneratedName((word,), pipeline_name=self.definition.name)]
+    def __eq__(self, other: Pipeline) -> bool:
+        return isinstance(other, Pipeline) and self.pipeline_name == other.pipeline_name
 
-        # control flow is applied sequentially
-        for controlflow in self.controlflow:
-            words = controlflow.apply(words, params=params)
+    def __hash__(self) -> int:
+        return hash(self.pipeline_name)
 
-        # the normalizers are applied sequentially
-        for normalizer in self.normalizers:
-            words = normalizer.apply(words, params=params)
+    def clear_cache(self):
+        self.cache.clear()
 
-        # the tokenizers are applied in parallel
-        suggestions: List[GeneratedName] = []
-        for tokenizer in self.tokenizers:
-            suggestions.extend(tokenizer.apply(words, params=params))
+    def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
+        """
+        Generate suggestions, results are cached.
+        """
+        if interpretation:
+            logger.info(
+                f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
+        else:
+            logger.info(f'Pipeline {self.definition.name} suggestions apply on N {name.input_name}.')
 
-        suggestions = aggregate_duplicates(suggestions, by_tokens=True)
-        logger.debug(f'Tokenization: {suggestions}')
+        hash = self.generator.hash(name, interpretation)
+        # print('HASH', interpretation.tokenization, hash, len(self.cache))
+        if hash not in self.cache:
+            should_run = all([controlflow.should_run(name, interpretation) for controlflow in self.controlflow])
+            if should_run:  # TODO ok?
 
-        logger.info(
-            f'Start generation')
-        # the generators are applied sequentially
-        for generator in self.generators:
-            suggestions = generator.apply(suggestions, params=params)
+                if interpretation:
+                    logger.info(
+                        f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
+                else:
+                    logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
+                start_time = time.time()
+                suggestions = self.generator.apply(name, interpretation)
+                generator_time = 1000 * (time.time() - start_time)
+                logger.info(f'Pipeline suggestions generated. Time: {generator_time:.2f}')
 
-        logger.info(
-            f'Generated suggestions: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
+                for filter_ in self.filters:
+                    suggestions = filter_.apply(suggestions)
+                # remove input name from suggestions
+                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
+                suggestions = [s for s in suggestions if str(s) != input_word]
 
-        # the filters are applied sequentially
-        for filter_ in self.filters:
-            logger.debug(f'{filter} filtering')
-            suggestions = filter_.apply(suggestions, params=params)
-            logger.debug(f'{filter} done')
+                suggestions = aggregate_duplicates(suggestions)
 
-        # remove input name from suggestions
-        input_word = re.sub(r'\.\w+$', '', input_word)
-        suggestions = [s for s in suggestions if str(s) != input_word]
+                # TODO: add metadata about types and interpretation
+                for s in suggestions:
+                    s.pipeline_name = self.pipeline_name
+                    s.interpretation = (
+                        interpretation.type if interpretation else None,
+                        interpretation.lang if interpretation else None,
+                        hash)  # TODO because of chaching interpretation's type and lang might be wrong
 
-        logger.info(
-            f'After filters: {len(suggestions)} - {[str(name)[:30] + "..." if len(str(name)) > 30 else str(name) for name in suggestions[:3]]}')
 
-        return aggregate_duplicates(suggestions)
+            else:
+                suggestions = []
+            self.cache[hash] = PipelineResultsIterator(suggestions)
+            logger.info('Pipeline suggestions cached.')
+        return self.cache[hash]
 
     def _build(self):
         # make control flow optional
         for controlflow_class in getattr(self.definition, 'controlflow', []):
             self.controlflow.append(globals()[controlflow_class](self.config))
 
-        for normalizer_class in self.definition.normalizers:
-            self.normalizers.append(globals()[normalizer_class](self.config))
-
-        for tokenizer_class in self.definition.tokenizers:
-            self.tokenizers.append(globals()[tokenizer_class](self.config))
-
-        for generator_class in self.definition.generators:
-            self.generators.append(globals()[generator_class](self.config))
+        self.generator: NameGenerator = globals()[self.definition.generator](self.config)
 
         for filter_class in self.definition.filters:
             self.filters.append(globals()[filter_class](self.config))

@@ -1,14 +1,13 @@
 -
   name: hyphens
-  normalizers:
-    - StripEthNormalizer
-    - UnicodeNormalizer
-    - NamehashNormalizer
-    - ReplaceInvalidNormalizer
-  tokenizers:
-    - WordNinjaTokenizer
-  generators:
-    - HyphenGenerator
+  generator: HyphenGenerator
   filters:
     - SubnameFilter
     - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 0
+    other:
+      default: 0

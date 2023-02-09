@@ -7,6 +7,7 @@ import collections
 
 from .combination_limiter import CombinationLimiter, prod
 from .name_generator import NameGenerator
+from ..input_name import InputName, Interpretation
 
 logger = logging.getLogger('generator')
 
@@ -21,7 +22,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         wn.synsets('dog')  # init wordnet
         self.combination_limiter = CombinationLimiter(self.limit)
 
-    def generate(self, tokens: Tuple[str, ...], params: dict[str, Any]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         result = []
         synsets = [list(self._get_lemmas_for_word(t).items()) for t in tokens]
 
@@ -55,3 +56,9 @@ class WordnetSynonymsGenerator(NameGenerator):
         stats[word] += 1
 
         return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
+        return {'tokens': interpretation.tokenization}
