@@ -107,11 +107,11 @@ class Domains(metaclass=Singleton):
             name.status = self.get_name_status(str(name))
 
         if name.status in [self.TAKEN, self.RECENTLY_RELEASED]:
-            return self.taken.get(name.status, None)
+            return self.taken.get(str(name), None)
         if name.status == self.AVAILABLE:
-            return self.available.get(name.status, None)
+            return self.available.get(str(name), None)
         if name.status == self.ON_SALE:
-            return self.on_sale.get(name.status, None)
+            return self.on_sale.get(str(name), None)
 
         return None
 
