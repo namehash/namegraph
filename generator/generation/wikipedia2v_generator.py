@@ -18,7 +18,8 @@ class Wikipedia2VGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__(config)
         try:
-            self.model = gensim.models.keyedvectors.KeyedVectors.load(config.generation.wikipedia2vec_path)
+            self.model: gensim.models.keyedvectors.KeyedVectors = gensim.models.keyedvectors.KeyedVectors.load(
+                config.generation.wikipedia2vec_path, mmap='r')
         except FileNotFoundError as e:
             print('No embeddings in binary format. Run generator/download.py.', file=sys.stderr)
             raise FileNotFoundError('No embeddings in binary format. Run generator/download_from_s3.py.')
@@ -45,4 +46,4 @@ class Wikipedia2VGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': interpretation.tokenization}
+        return {'tokens': ('_'.join(interpretation.tokenization),)}

@@ -52,7 +52,6 @@ class EmojiGenerator(NameGenerator):
             return [(tokens[0], possibility) for possibility in all_possibilities[0][:-1]]
 
         if len(tokens) == 2:
-            print(tokens, all_possibilities)
             first_token_substitutions = [(possibility, tokens[1]) for possibility in all_possibilities[0][:-1]]
             second_token_substitutions = [(tokens[0], possibility) for possibility in all_possibilities[1][:-1]]
             min_length = min(len(first_token_substitutions), len(second_token_substitutions))

@@ -33,6 +33,16 @@ class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.pipeline_name = definition.name
+        try:  # copy to internal dict
+            self.weights = {}
+            for key, value in definition.weights.items():
+                if key not in self.weights:
+                    self.weights[key] = {}
+                for key2, value2 in value.items():
+                    self.weights[key][key2] = value2
+        except:
+            pass
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
@@ -51,6 +61,7 @@ class Pipeline:
         return hash(self.pipeline_name)
 
     def clear_cache(self):
+        """Cache must be cleared before every request because index in pipeline results is saved."""
         self.cache.clear()
 
     def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
@@ -85,7 +96,7 @@ class Pipeline:
                 input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
                 suggestions = [s for s in suggestions if str(s) != input_word]
 
-                suggestions = aggregate_duplicates(suggestions)
+                # suggestions = aggregate_duplicates(suggestions)
 
                 # TODO: add metadata about types and interpretation
                 for s in suggestions:

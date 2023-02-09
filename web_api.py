@@ -1,3 +1,4 @@
+import gc
 import logging, random, hashlib, json
 from typing import List, Optional
 
@@ -13,6 +14,7 @@ from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
 
+# gc.set_debug(gc.DEBUG_STATS)
 
 class Settings(BaseSettings):
     # config_name: str = "test_config"
@@ -32,7 +34,9 @@ def init():
         for handler in logger.handlers:
             handler.setLevel(config.app.logging_level)
 
-        return Generator(config)
+        generator = Generator(config)
+        generator.generate_names('cat', min_suggestions=100, max_suggestions=100, min_available_fraction=0.9) # init
+        return generator
 
 
 def init_inspector():

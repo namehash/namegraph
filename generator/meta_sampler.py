@@ -30,7 +30,7 @@ class MetaSampler:
 
         weights = {}
         for pipeline in pipelines:
-            pipeline_weights = pipeline.definition.weights
+            pipeline_weights = pipeline.weights
             try:
                 pipeline_weight = pipeline_weights[type][lang]
             except KeyError:
