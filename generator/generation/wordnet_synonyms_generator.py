@@ -1,4 +1,5 @@
 import logging
+from operator import itemgetter
 
 from nltk.corpus import wordnet as wn
 from typing import List, Dict, Tuple, Any
@@ -55,7 +56,7 @@ class WordnetSynonymsGenerator(NameGenerator):
         # keep the original token in the output
         stats[word] += 1
 
-        return dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+        return dict(sorted(stats.items(), key=itemgetter(1), reverse=True))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
