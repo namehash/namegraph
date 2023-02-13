@@ -81,6 +81,36 @@ class Categories(metaclass=Singleton):
 
 class CategoriesGenerator(NameGenerator):
     """
+    Replace tokens using categories. Faster, single token version.
+    """
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.categories = Categories(config)
+
+    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        token = ''.join(tokens)
+        tokens_synsets = self.get_similar(token).items()
+
+        return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
+
+    def get_similar(self, token: str) -> Dict[str, int]:
+        stats = collections.defaultdict(int)
+        stats[token] += 1
+        for category in self.categories.get_categories(token):
+            for token in self.categories.get_names(category):
+                stats[token] += 1
+        return stats
+
+    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return self.generate(**self.prepare_arguments(name, interpretation))
+
+    def prepare_arguments(self, name: InputName, interpretation: Interpretation):
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}
+
+
+class MultiTokenCategoriesGenerator(NameGenerator):
+    """
     Replace tokens using categories.
     """
 

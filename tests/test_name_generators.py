@@ -3,6 +3,7 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
+from generator.generation.categories_generator import MultiTokenCategoriesGenerator
 from generator.preprocessor import Preprocessor
 from generator.generation import (
     HyphenGenerator,
@@ -302,7 +303,7 @@ def test_emoji_generator_long():
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = CategoriesGenerator(config)
+        strategy = MultiTokenCategoriesGenerator(config)
         tokenized_name = ('my', 'pol', '123')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('my', 'ukr', '123') in generated_names
@@ -312,7 +313,7 @@ def test_categories():
 def test_categories_eth():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = CategoriesGenerator(config)
+        strategy = MultiTokenCategoriesGenerator(config)
         tokenized_name = ('king', 'lion')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('king', 'cheetah') in generated_names
@@ -322,11 +323,21 @@ def test_categories_eth():
 def test_categories_csv():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = CategoriesGenerator(config)
+        strategy = MultiTokenCategoriesGenerator(config)
         tokenized_name = ('my', '0x8', '123')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('my', '0x1', '123') in generated_names
         assert ('my', '0x2', '123') in generated_names
+
+
+def test_single_token_categories():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = ('0x8',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('0x1',) in generated_names
+        assert ('0x2',) in generated_names
 
 
 @mark.parametrize(
