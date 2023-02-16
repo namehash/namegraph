@@ -53,6 +53,11 @@ class Pipeline:
         except ConfigAttributeError:
             self.mode_weights_multiplier = {}
 
+        try:  # copy to internal dict
+            self.global_limits = dictconfig_to_dict(definition.global_limits)
+        except ConfigAttributeError:
+            self.global_limits = {}
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
