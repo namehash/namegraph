@@ -36,7 +36,7 @@ class MetaSampler:
                 pipeline_weight = pipeline_weights[type][lang]
             except KeyError:
                 pipeline_weight = pipeline_weights[type]['default']
-            
+
             weights_multiplier = pipeline.mode_weights_multiplier.get(mode, 1.0)
 
             weights[pipeline] = pipeline_weight * weights_multiplier
@@ -63,6 +63,15 @@ class MetaSampler:
         self.domains = Domains(config)
         self.pipelines = pipelines
 
+    def get_global_limits(self, mode: str, min_suggestions: int):
+        global_limits = {}
+        for pipeline in self.pipelines:
+            limit = pipeline.global_limits.get(mode, None)
+            if isinstance(limit, float):
+                limit = int(min_suggestions * limit)
+            global_limits[pipeline.pipeline_name] = limit
+        return global_limits
+
     def sample(self, name: InputName, sorter_name: str) -> list[GeneratedName]:
         min_suggestions = name.params['min_suggestions']
         max_suggestions = name.params['max_suggestions']
@@ -79,6 +88,8 @@ class MetaSampler:
                 interpretation_weights[type_lang] = {}
                 for interpretation in name.interpretations[type_lang]:
                     interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
+
+        global_limits = self.get_global_limits(mode, min_suggestions)
 
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
@@ -124,6 +135,10 @@ class MetaSampler:
                         while str(suggestion) in all_suggestions_str \
                                 or (suggestion.status != Domains.AVAILABLE
                                     and available_added + slots_left <= min_available_required):
+                            if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
+                                sampled_pipeline.pipeline_name] == 0:
+                                sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                                break
                             suggestion = next(suggestions)
                             suggestion.status = self.domains.get_name_status(str(suggestion))
                     except StopIteration:
@@ -139,6 +154,8 @@ class MetaSampler:
 
                     all_suggestions.append(suggestion)
                     all_suggestions_str.add(str(suggestion))
+                    if global_limits[sampled_pipeline.pipeline_name] is not None:
+                        global_limits[sampled_pipeline.pipeline_name] -= 1
                     break
 
                 except StopIteration:
