@@ -34,20 +34,22 @@ class RandomAvailableNameGenerator(NameGenerator):
         self.names, probabilities = list(zip(*self.domains.only_available.items()))
         # greatest value is 4.0, so that probability of sampling custom name is 20 times higher: exp(4) ~= 20 * exp(1)
         probabilities = np.clip(probabilities, 0.0, 4.0)
-        self.probabilities: npt.NDArray[np.float64] = _softmax(probabilities)
 
-    def generate(self) -> List[Tuple[str, ...]]:
-        if len(self.domains.only_available) >= self.limit:
-            result = [
-                str(name)
-                for name in np.random.choice(self.names, size=self.limit, replace=False, p=self.probabilities)
-            ]
+        self.probabilities: list[float] = _softmax(probabilities).tolist()
+        self.accumulated_probabilities = list(accumulate(self.probabilities))
+
+    def generate(self, limit=None) -> List[Tuple[str, ...]]:
+        if limit is None:
+            limit = self.limit
+        limit = min(limit * 2, self.limit)
+        if len(self.domains.only_available) >= limit:
+            result = random.choices(self.names, cum_weights=self.accumulated_probabilities, k=limit)
         else:
             result = self.names
         return ((x,) for x in result)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
-        return self.generate(**self.prepare_arguments(name, interpretation))
+        return self.generate(limit=name.params['max_suggestions'])
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {}
