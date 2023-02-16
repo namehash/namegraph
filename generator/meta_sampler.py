@@ -144,10 +144,6 @@ class MetaSampler:
                         while str(suggestion) in all_suggestions_str \
                                 or (suggestion.status != Domains.AVAILABLE
                                     and available_added + slots_left <= min_available_required):
-                            if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
-                                sampled_pipeline.pipeline_name] == 0:
-                                sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
-                                break
                             suggestion = next(suggestions)
                             suggestion.status = self.domains.get_name_status(str(suggestion))
                     except StopIteration:
