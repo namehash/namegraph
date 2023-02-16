@@ -19,5 +19,6 @@ research/emoji/emoji_w2v/corpus.txt
 research/emoji/emoji_w2v/*.bin
 research/emoji/emoji_w2v/*.zip
 !research/emoji/emoji_w2v/*.ipynb
+research/symbol/*.xlsx
 !research/symbol/*.ipynb
 data/person_*.json

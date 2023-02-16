@@ -19,3 +19,4 @@ from .substringmatch_generator import SubstringMatchGenerator
 from .leet_generator import LeetGenerator
 from .keycap_generator import KeycapGenerator
 from .person_name_generator import PersonNameGenerator
+from .symbol_generator import SymbolGenerator
