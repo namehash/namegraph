@@ -22,7 +22,8 @@ class MetaSampler:
             self,
             pipelines: tuple[Pipeline],
             type: str,
-            lang: str = 'default'
+            lang: str = 'default',
+            mode: str = 'full'
     ) -> dict[Pipeline, float]:  # TODO cache?
         """
         Return weights for pipelines for given type and language based on pipeline config.
@@ -35,7 +36,10 @@ class MetaSampler:
                 pipeline_weight = pipeline_weights[type][lang]
             except KeyError:
                 pipeline_weight = pipeline_weights[type]['default']
-            weights[pipeline] = pipeline_weight
+            
+            weights_multiplier = pipeline.mode_weights_multiplier.get(mode, 1.0)
+
+            weights[pipeline] = pipeline_weight * weights_multiplier
         return weights
 
     def get_sampler(self, sampler: str) -> Type[Sampler]:
@@ -65,6 +69,8 @@ class MetaSampler:
         min_available_fraction = name.params['min_available_fraction']
         min_available_required = int(min_suggestions * min_available_fraction)
 
+        mode = name.params.get('mode', 'full')
+
         types_lang_weights = {}
         interpretation_weights = {}
         for type_lang, weight in name.types_probabilities.items():
@@ -77,7 +83,7 @@ class MetaSampler:
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
             for interpretation in interpretations:
-                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang)
+                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang, mode)
                 sorters[interpretation] \
                     = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
 
