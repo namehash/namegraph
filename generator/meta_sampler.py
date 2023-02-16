@@ -95,6 +95,7 @@ class MetaSampler:
         for (interpretation_type, lang), interpretations in name.interpretations.items():
             for interpretation in interpretations:
                 weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang, mode)
+                # logger.info(f'weights {weights}')
                 sorters[interpretation] \
                     = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
 
@@ -125,6 +126,13 @@ class MetaSampler:
 
                     # sample and run pipeline
                     sampled_pipeline = next(sorters[sampled_interpretation])
+
+                    # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
+                    if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
+                        sampled_pipeline.pipeline_name] == 0:
+                        sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                        continue
+
                     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
 
                     try:
@@ -132,13 +140,10 @@ class MetaSampler:
                         suggestion.status = self.domains.get_name_status(str(suggestion))
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
+
                         while str(suggestion) in all_suggestions_str \
                                 or (suggestion.status != Domains.AVAILABLE
                                     and available_added + slots_left <= min_available_required):
-                            if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
-                                sampled_pipeline.pipeline_name] == 0:
-                                sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
-                                break
                             suggestion = next(suggestions)
                             suggestion.status = self.domains.get_name_status(str(suggestion))
                     except StopIteration:
