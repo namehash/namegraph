@@ -90,6 +90,8 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  mode_weights_multiplier:
+    instant: 0
 -
   name: permute
   generator: PermuteGenerator
@@ -161,6 +163,8 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  mode_weights_multiplier:
+    instant: 0
 -
   name: hyphens
   generator: HyphenGenerator
