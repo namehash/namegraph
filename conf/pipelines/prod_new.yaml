@@ -14,7 +14,7 @@
   global_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.33
 -
   name: w2v
   controlflow:
@@ -37,7 +37,7 @@
   global_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.33
 -
   name: categories-no-tokenizer
   generator: CategoriesGenerator
