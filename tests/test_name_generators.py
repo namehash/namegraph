@@ -463,6 +463,20 @@ def test_special_character_affix_generator():
         generated_names = list(strategy.generate(tokenized_name))
         assert ('$', 'billy', 'corgan',) in generated_names
         assert ('_', 'billy', 'corgan',) in generated_names
+        assert ('ξ', 'billy', 'corgan',) in generated_names
+        assert ('billy', 'corgan', 'ξ',) in generated_names
+
+
+def test_special_character_affix_generator_non_ascii():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = SpecialCharacterAffixGenerator(config)
+        tokenized_name = ('авада', 'кедавра')
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('$', 'авада', 'кедавра',) in generated_names
+        assert ('_', 'авада', 'кедавра',) in generated_names
+        assert ('ξ', 'авада', 'кедавра',) not in generated_names
+        assert ('авада', 'кедавра', 'ξ',) not in generated_names
 
 
 def test_substringmatchgenerator():

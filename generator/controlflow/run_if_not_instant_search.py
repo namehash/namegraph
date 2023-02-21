@@ -2,7 +2,7 @@ from . import ControlFlow
 from ..input_name import InputName, Interpretation
 
 
-class RunIfNotConservative(ControlFlow):
+class RunIfNotInstant(ControlFlow):
 
     def should_run(self, name: InputName, interpretation: Interpretation) -> bool:
-        return not name.params.get('conservative', False)
+        return not name.params.get('instant', False)

@@ -244,7 +244,7 @@ def test_instant_search(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-                "mode": 'instant',
+            "mode": 'instant',
         },
     })
     assert response.status_code == 200
@@ -261,7 +261,7 @@ def test_instant_search_temp(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-                "conservative": True,
+            "mode": "instant",
         },
     })
     assert response.status_code == 200
@@ -278,7 +278,7 @@ def test_not_instant_search(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-                "mode": 'full',
+            "mode": 'full',
         },
     })
     assert response.status_code == 200
@@ -295,7 +295,7 @@ def test_not_instant_search_temp(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
-                "conservative": False,
+            "mode": "full",
         },
     })
     assert response.status_code == 200

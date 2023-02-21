@@ -18,7 +18,7 @@
 -
   name: w2v
   controlflow:
-    - RunIfNotConservative
+    - RunIfNotInstant
   generator: W2VGenerator
   filters:
     - SubnameFilter
