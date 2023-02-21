@@ -475,6 +475,8 @@ def test_special_character_affix_generator_non_ascii():
         generated_names = list(strategy.generate(tokenized_name))
         assert ('$', 'авада', 'кедавра',) in generated_names
         assert ('_', 'авада', 'кедавра',) in generated_names
+        assert ('ξ', 'авада', 'кедавра',) not in generated_names
+        assert ('авада', 'кедавра', 'ξ',) not in generated_names
 
 
 def test_substringmatchgenerator():
