@@ -303,6 +303,16 @@ def test_emoji_generator_long():
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = ('wolf',)
+        generated_names = list(strategy.generate(tokenized_name))
+
+        assert generated_names.index(('lion',)) < generated_names.index(('cheetah',))
+
+
+def test_multi_categories():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
         strategy = MultiTokenCategoriesGenerator(config)
         tokenized_name = ('my', 'pol', '123')
         generated_names = list(strategy.generate(tokenized_name))
@@ -310,7 +320,7 @@ def test_categories():
         assert ('my', 'usa', '123') in generated_names
 
 
-def test_categories_eth():
+def test_multi_categories_eth():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         strategy = MultiTokenCategoriesGenerator(config)
@@ -320,7 +330,7 @@ def test_categories_eth():
         assert ('king', 'wolf') in generated_names
 
 
-def test_categories_csv():
+def test_multi_categories_csv():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         strategy = MultiTokenCategoriesGenerator(config)
