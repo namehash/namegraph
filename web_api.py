@@ -11,6 +11,8 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
+from generator.domains import Domains
+from generator.generation.categories_generator import Categories
 
 logger = logging.getLogger('generator')
 
@@ -62,6 +64,9 @@ def seed_all(seed: int | str):
 generator = init()
 inspector = init_inspector()
 
+domains = Domains(generator.config)
+categories = Categories(generator.config)
+
 from models import (
     Name,
     Suggestion,
@@ -78,8 +83,10 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
         for name, name_json in zip(names, response):
             name_json['metadata'] = {
                 'applied_strategies': name.applied_strategies,
+                'cached_interesting_score': domains.get_interesting_score(name),
+                'cached_status': name.status,
+                'categories': categories.get_categories(str(name)),
                 'interpretation': name.interpretation,
-                'category': name.status,
                 'pipeline_name': name.pipeline_name,
             }
 
