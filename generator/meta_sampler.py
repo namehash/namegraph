@@ -22,7 +22,8 @@ class MetaSampler:
             self,
             pipelines: tuple[Pipeline],
             type: str,
-            lang: str = 'default'
+            lang: str = 'default',
+            mode: str = 'full'
     ) -> dict[Pipeline, float]:  # TODO cache?
         """
         Return weights for pipelines for given type and language based on pipeline config.
@@ -35,7 +36,10 @@ class MetaSampler:
                 pipeline_weight = pipeline_weights[type][lang]
             except KeyError:
                 pipeline_weight = pipeline_weights[type]['default']
-            weights[pipeline] = pipeline_weight
+
+            weights_multiplier = pipeline.mode_weights_multiplier.get(mode, 1.0)
+
+            weights[pipeline] = pipeline_weight * weights_multiplier
         return weights
 
     def get_sampler(self, sampler: str) -> Type[Sampler]:
@@ -59,11 +63,22 @@ class MetaSampler:
         self.domains = Domains(config)
         self.pipelines = pipelines
 
+    def get_global_limits(self, mode: str, min_suggestions: int):
+        global_limits = {}
+        for pipeline in self.pipelines:
+            limit = pipeline.global_limits.get(mode, None)
+            if isinstance(limit, float):
+                limit = int(min_suggestions * limit)
+            global_limits[pipeline.pipeline_name] = limit
+        return global_limits
+
     def sample(self, name: InputName, sorter_name: str) -> list[GeneratedName]:
         min_suggestions = name.params['min_suggestions']
         max_suggestions = name.params['max_suggestions']
         min_available_fraction = name.params['min_available_fraction']
         min_available_required = int(min_suggestions * min_available_fraction)
+
+        mode = name.params.get('mode', 'full')
 
         types_lang_weights = {}
         interpretation_weights = {}
@@ -74,10 +89,13 @@ class MetaSampler:
                 for interpretation in name.interpretations[type_lang]:
                     interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
+        global_limits = self.get_global_limits(mode, min_suggestions)
+
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
             for interpretation in interpretations:
-                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang)
+                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang, mode)
+                # logger.info(f'weights {weights}')
                 sorters[interpretation] \
                     = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
 
@@ -108,6 +126,13 @@ class MetaSampler:
 
                     # sample and run pipeline
                     sampled_pipeline = next(sorters[sampled_interpretation])
+
+                    # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
+                    if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
+                        sampled_pipeline.pipeline_name] == 0:
+                        sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                        continue
+
                     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
 
                     try:
@@ -115,6 +140,7 @@ class MetaSampler:
                         suggestion.status = self.domains.get_name_status(str(suggestion))
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
+
                         while str(suggestion) in all_suggestions_str \
                                 or (suggestion.status != Domains.AVAILABLE
                                     and available_added + slots_left <= min_available_required):
@@ -133,6 +159,8 @@ class MetaSampler:
 
                     all_suggestions.append(suggestion)
                     all_suggestions_str.add(str(suggestion))
+                    if global_limits[sampled_pipeline.pipeline_name] is not None:
+                        global_limits[sampled_pipeline.pipeline_name] -= 1
                     break
 
                 except StopIteration:

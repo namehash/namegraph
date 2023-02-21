@@ -1,5 +1,6 @@
 import logging
 import sys
+from operator import itemgetter
 from typing import List, Tuple, Any
 import gensim.downloader
 import itertools
@@ -48,10 +49,10 @@ class W2VGenerator(NameGenerator):
         result = []
         for synset_tuple in itertools.product(*tokens_synsets):
             tokens = [t[0] for t in synset_tuple]
-            distances = [t[1] for t in synset_tuple]
+            distances = [t[1] for t in synset_tuple] #TODO speed up?
             result.append((tokens, prod(distances)))
 
-        return (tuple(x[0]) for x in sorted(result, key=lambda x: x[1], reverse=True))
+        return (tuple(x[0]) for x in sorted(result, key=itemgetter(1), reverse=True))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

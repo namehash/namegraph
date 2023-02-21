@@ -105,6 +105,7 @@ def test_metadata_applied_strategies(test_test_client,
         "anarchy"
     ]
 )
+@mark.skip(reason='no count sorter')
 def test_count_sorter(test_test_client, name: str):
     client = test_test_client
     response = client.post("/", json={"name": name, "sorter": "count"})

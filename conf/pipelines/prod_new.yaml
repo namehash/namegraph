@@ -11,6 +11,10 @@
       default: 15
     other:
       default: 15
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.33
 -
   name: w2v
   controlflow:
@@ -27,6 +31,13 @@
       default: 0.1
     other:
       default: 0
+  mode_weights_multiplier:
+    instant: 0
+    domain_detail: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.33
 -
   name: categories-no-tokenizer
   generator: CategoriesGenerator
@@ -40,6 +51,10 @@
       default: 10
     other:
       default: 10
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: synonyms
   generator: WordnetSynonymsGenerator
@@ -54,6 +69,10 @@
       default: 0.1
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: on-sale
   generator: OnSaleMatchGenerator
@@ -67,6 +86,12 @@
       default: 1
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
+  mode_weights_multiplier:
+    instant: 0
 -
   name: permute
   generator: PermuteGenerator
@@ -80,6 +105,10 @@
       default: 1
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: prefix
   generator: PrefixGenerator
@@ -95,6 +124,10 @@
       en: 1
     other:
       default: 0.5
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: suffix
   generator: SuffixGenerator
@@ -110,6 +143,10 @@
       en: 1
     other:
       default: 0.5
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: substring
   generator: SubstringMatchGenerator
@@ -122,6 +159,12 @@
       default: 1
     other:
       default: 1
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
+  mode_weights_multiplier:
+    instant: 0
 -
   name: hyphens
   generator: HyphenGenerator
@@ -135,6 +178,10 @@
       default: 1
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: special-char-affix
   generator: SpecialCharacterAffixGenerator
@@ -148,6 +195,10 @@
       default: 1
     other:
       default: 1
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: abbreviation
   generator: AbbreviationGenerator
@@ -161,6 +212,10 @@
       default: 1
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: flag-affix
   generator: FlagAffixGenerator
@@ -174,6 +229,12 @@
       default: 1
     other:
       default: 1
+  mode_weights_multiplier:
+    instant: 0.2
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: leet
   generator: LeetGenerator
@@ -187,6 +248,13 @@
       default: 1
     other:
       default: 1
+  mode_weights_multiplier:
+    instant: 0
+    domain_detail: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 2
 -
   name: keycap
   generator: KeycapGenerator
@@ -201,6 +269,10 @@
       default: 1
     other:
       default: 1
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: emoji
   generator: EmojiGenerator
@@ -216,6 +288,10 @@
       en: 2
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: person-name
   generator: PersonNameGenerator
@@ -229,6 +305,10 @@
       default: 5
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
 -
   name: symbol
   generator: SymbolGenerator
@@ -244,3 +324,7 @@
       en: 2
     other:
       default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2

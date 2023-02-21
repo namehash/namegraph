@@ -111,8 +111,10 @@ if __name__ == "__main__":
                    'slutwife', 'god', 'imexpensive', 'htaccess', 'nike', '€80000', 'starbucks', 'ukraine', '٠٠٩',
                    'sony', 'kevin', 'discord', 'monaco', 'market', 'sportsbet', 'volodymyrzelensky', 'coffee', 'gold',
                    'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
-                   'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb']
-    # happypeople, muscle, billybob (2 leet in instant), quo (instant 2 flag suggestions)
+                   'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
+                   'happypeople', 'muscle', 'billybob', 'quo']
+
+    # 'happypeople', 'muscle', 'billybob' (2 leet in instant), 'quo' (instant 2 flag suggestions)
 
     f = open(args.output, 'w')
 
@@ -156,7 +158,8 @@ span.i {
             "min_primary_fraction": 1.0,
             "params": {
                 'conservative': True,
-                'country': 'pl'
+                'country': 'pl',
+                'mode': 'instant'
             }}).json()
         request_time = time.time() - start_time
         request_times['instant'].append(request_time)
@@ -185,7 +188,8 @@ span.i {
             "min_primary_fraction": 0.1,
             "params": {
                 'conservative': True,
-                'country': 'pl'
+                'country': 'pl',
+                'mode': 'domain_detail'
             }}).json()
         request_time = time.time() - start_time
         request_times['top5'].append(request_time)
@@ -214,7 +218,8 @@ span.i {
             "min_primary_fraction": 0.1,
             "params": {
                 'conservative': False,
-                'country': 'pl'
+                'country': 'pl',
+                'mode': 'full'
             }}).json()
         request_time = time.time() - start_time
         request_times['100'].append(request_time)

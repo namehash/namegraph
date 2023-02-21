@@ -1,10 +1,11 @@
 from functools import reduce
+from operator import mul
 from typing import List
 
 
 def prod(l: List[int]):
     if not l: return 1
-    return reduce((lambda x, y: x * y), l)
+    return reduce(mul, l)
 
 
 def prod_with_indexes(counts_with_indexes: List[List[int]]):

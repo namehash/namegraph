@@ -6,6 +6,7 @@ import logging
 import re
 
 from omegaconf import DictConfig
+from omegaconf.errors import ConfigAttributeError
 
 from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
 from generator.input_name import Interpretation, InputName
@@ -29,19 +30,33 @@ from generator.utils import aggregate_duplicates
 logger = logging.getLogger('generator')
 
 
+def dictconfig_to_dict(config: DictConfig):
+    if isinstance(config, DictConfig):
+        weights = {}
+        for key, value in config.items():
+            weights[key] = dictconfig_to_dict(value)
+        return weights
+    else:
+        return config
+
+
 class Pipeline:
     def __init__(self, definition, config: DictConfig):
         self.definition = definition
         self.pipeline_name = definition.name
         try:  # copy to internal dict
-            self.weights = {}
-            for key, value in definition.weights.items():
-                if key not in self.weights:
-                    self.weights[key] = {}
-                for key2, value2 in value.items():
-                    self.weights[key][key2] = value2
-        except:
+            self.weights = dictconfig_to_dict(definition.weights)
+        except ConfigAttributeError:
             pass
+        try:  # copy to internal dict
+            self.mode_weights_multiplier = dictconfig_to_dict(definition.mode_weights_multiplier)
+        except ConfigAttributeError:
+            self.mode_weights_multiplier = {}
+
+        try:  # copy to internal dict
+            self.global_limits = dictconfig_to_dict(definition.global_limits)
+        except ConfigAttributeError:
+            self.global_limits = {}
 
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
@@ -107,7 +122,8 @@ class Pipeline:
                             interpretation.lang if interpretation else None,
                             hash)  # TODO because of caching interpretation's type and lang might be wrong
                         yield s
-                suggestions=gen(suggestions)
+
+                suggestions = gen(suggestions)
 
             else:
                 suggestions = []

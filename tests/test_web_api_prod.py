@@ -244,6 +244,23 @@ def test_instant_search(prod_test_client):
     response = client.post("/", json={
         "name": "firepower",
         "params": {
+                "mode": 'instant',
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert not any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])
+
+def test_instant_search_temp(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
                 "conservative": True,
         },
     })
@@ -256,8 +273,24 @@ def test_instant_search(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
-
 def test_not_instant_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/", json={
+        "name": "firepower",
+        "params": {
+                "mode": 'full',
+        },
+    })
+    assert response.status_code == 200
+    json = response.json()
+    assert len(json) > 0
+    assert any([
+        'W2VGenerator' in strategy
+        for name in json
+        for strategy in name['metadata']['applied_strategies']
+    ])
+
+def test_not_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
         "name": "firepower",

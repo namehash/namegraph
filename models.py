@@ -8,7 +8,9 @@ class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
     conservative: bool = Field(False, title='instant search mode',
-                                 description='set to `true` to generate instant search suggestions')
+                               description='set to `true` to generate instant search suggestions')
+    mode: str = Field('full', title='request mode: instant, domain_detail, full',
+                      regex=r'^(instant|domain_detail|full)$')
 
 
 class Name(BaseModel):
