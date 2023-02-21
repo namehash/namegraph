@@ -9,27 +9,29 @@ from openpyxl.utils import get_column_letter
 
 def parser_xlsx(filepath: str):
     wb = load_workbook(filepath)
-    ws = wb['other']
 
     symbol2names = dict()
-    for row in count(1):
-        symbol = ws[get_column_letter(2) + str(row)].value
+    for worksheet_name in ['other', 'math', 'currency']:
+        ws = wb[worksheet_name]
 
-        if not symbol:
-            break
+        for row in count(1):
+            symbol = ws[get_column_letter(2) + str(row)].value
 
-        names = []
-        for column in count(4):
-            coords = get_column_letter(column) + str(row)
-
-            if not ws[coords].value:
+            if not symbol:
                 break
 
-            if ws[coords].font.bold:
-                names.append(ws[coords].value)
+            names = []
+            for column in count(4):
+                coords = get_column_letter(column) + str(row)
 
-        if names:
-            symbol2names[symbol] = names
+                if not ws[coords].value:
+                    break
+
+                if ws[coords].font.bold:
+                    names.append(ws[coords].value)
+
+            if names:
+                symbol2names[symbol] = names
 
     return symbol2names
 
