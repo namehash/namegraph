@@ -34,7 +34,6 @@ def request_generator_client(name, override=None):
         'max_suggestions': 100,
         "min_primary_fraction": 0.1,
         "params": {
-            'conservative': False,
             'country': 'pl'
         }
     }
@@ -55,7 +54,6 @@ def request_generator_http(host, name, override=None):
         'max_suggestions': 100,
         "min_primary_fraction": 0.1,
         "params": {
-            'conservative': False,
             'country': 'pl'
         }
     }
@@ -94,7 +92,6 @@ if __name__ == "__main__":
             'max_suggestions': 100,
             "min_primary_fraction": 1.0,
             "params": {
-                'conservative': False,
                 'country': 'pl'
             }})
 
@@ -152,8 +149,8 @@ span.i {
                 'max_suggestions': 3,
                 "min_primary_fraction": 1.0,
                 "params": {
-                    'conservative': True,
-                    'country': 'pl'
+                    'country': 'pl',
+                    'mode': 'instant'
                 }}).json()
             request_time = time.time() - start_time
             request_times['instant'].append(request_time)
@@ -166,8 +163,8 @@ span.i {
                 'max_suggestions': 5,
                 "min_primary_fraction": 0.1,
                 "params": {
-                    'conservative': True,
-                    'country': 'pl'
+                    'country': 'pl',
+                    'mode': 'instant'
                 }}).json()
             request_time = time.time() - start_time
             request_times['top5'].append(request_time)
@@ -180,7 +177,6 @@ span.i {
                 'max_suggestions': 100,
                 "min_primary_fraction": 0.1,
                 "params": {
-                    'conservative': False,
                     'country': 'pl'
                 }}).json()
             request_time = time.time() - start_time
