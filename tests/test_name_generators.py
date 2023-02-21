@@ -257,6 +257,20 @@ def test_symbol_generator():
         assert ('⬤', 'ci') in all_tokenized
 
 
+def test_symbol_generator2():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = SymbolGenerator(config)
+        tokenized_name = ('produce', 'electric', 'power')
+        generated_names = list(strategy.generate(tokenized_name))
+
+        all_tokenized = generated_names
+
+        assert ('produce', '⌁', '⏻') in all_tokenized
+        assert ('produce', '⌁', 'power') in all_tokenized
+        assert ('produce', 'electric', '⏻') in all_tokenized
+
+
 def test_emoji_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")

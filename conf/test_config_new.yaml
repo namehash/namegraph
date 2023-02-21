@@ -47,7 +47,7 @@ generation:
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
   name2emoji_path: tests/data/name2emoji.json
-  name2symbol_path: data/name2symbol.json
+  name2symbol_path: tests/data/name2symbol.json
   limit: 10000
   empty_input_ability:
     - RandomAvailableNameGenerator

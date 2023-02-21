@@ -162,3 +162,18 @@
       en: 2
     other:
       default: 0
+-
+  name: symbol
+  generator: SymbolGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 2
+    person:
+      default: 1
+      en: 2
+    other:
+      default: 0
