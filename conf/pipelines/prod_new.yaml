@@ -308,4 +308,4 @@
   global_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.1
