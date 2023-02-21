@@ -164,7 +164,7 @@ span.i {
                 "min_primary_fraction": 0.1,
                 "params": {
                     'country': 'pl',
-                    'mode': 'instant'
+                    'mode': 'domain_detail'
                 }}).json()
             request_time = time.time() - start_time
             request_times['top5'].append(request_time)
