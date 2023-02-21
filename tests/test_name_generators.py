@@ -22,7 +22,7 @@ from generator.generation import (
     SubstringMatchGenerator,
     OnSaleMatchGenerator,
     LeetGenerator,
-    KeycapGenerator,
+    KeycapGenerator, PersonNameGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -533,3 +533,11 @@ def test_keycap_generator():
         tokenized_name = ('fire', '-', 'cell')
         generated_names = list(strategy.generate(tokenized_name))
         assert not generated_names
+
+def test_person_name():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = PersonNameGenerator(config)
+        tokenized_name = ('chris',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('iam', 'chris') in generated_names

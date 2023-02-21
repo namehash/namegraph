@@ -58,6 +58,7 @@ generation:
     RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
+  person_name_affixes_path: data/person_name_affixes.json
 sorting:
   weighted_sampling:
     weights:

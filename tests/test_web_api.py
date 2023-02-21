@@ -203,3 +203,19 @@ def test_empty_input(test_test_client):
             for strategy in applied_strategies
             for generator in ['RandomAvailableNameGenerator']
         ])
+
+
+@pytest.mark.slow
+def test_person_name_generator(test_test_client):
+    client = test_test_client
+    response = client.post("/",
+                           json={"name": "chris", "params": {
+                               "country": 'pl'
+                           }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    str_names = [name["name"] for name in json]
+
+    assert "iamchris.eth" in str_names
