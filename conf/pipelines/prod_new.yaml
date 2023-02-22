@@ -185,7 +185,7 @@
   generator: SpecialCharacterAffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 1
