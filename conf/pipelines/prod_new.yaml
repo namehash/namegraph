@@ -307,3 +307,22 @@
     instant: 1
     domain_detail: 1
     full: 0.1
+-
+  name: symbol
+  generator: SymbolGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 2
+    person:
+      default: 1
+      en: 2
+    other:
+      default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2

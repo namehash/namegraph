@@ -22,7 +22,9 @@ from generator.generation import (
     SubstringMatchGenerator,
     OnSaleMatchGenerator,
     LeetGenerator,
-    KeycapGenerator, PersonNameGenerator,
+    KeycapGenerator,
+    PersonNameGenerator,
+    SymbolGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -242,6 +244,32 @@ def test_flag_generator():
         # tokenized_name = ('taras', 'shevchenko')
         # generated_names = strategy.generate(tokenized_name, params=None)
         # assert len(generated_names) == 0
+
+
+def test_symbol_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = SymbolGenerator(config)
+        tokenized_name = ('circle', 'ci')
+        generated_names = list(strategy.generate(tokenized_name))
+
+        all_tokenized = generated_names
+
+        assert ('⬤', 'ci') in all_tokenized
+
+
+def test_symbol_generator2():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = SymbolGenerator(config)
+        tokenized_name = ('produce', 'electric', 'power')
+        generated_names = list(strategy.generate(tokenized_name))
+
+        all_tokenized = generated_names
+
+        assert ('produce', '⌁', '⏻') in all_tokenized
+        assert ('produce', '⌁', 'power') in all_tokenized
+        assert ('produce', 'electric', '⏻') in all_tokenized
 
 
 def test_emoji_generator():

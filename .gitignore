@@ -20,3 +20,5 @@ research/emoji/emoji_w2v/*.bin
 research/emoji/emoji_w2v/*.zip
 !research/emoji/emoji_w2v/*.ipynb
 data/person_names_*.json
+research/symbol/*.xlsx
+!research/symbol/*.ipynb
