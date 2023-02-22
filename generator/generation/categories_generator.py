@@ -43,41 +43,6 @@ class Categories(metaclass=Singleton):
                 categories[category].append(name.removesuffix('.eth'))
         return categories
 
-    @staticmethod
-    def load_categories(config):
-        categories = collections.defaultdict(list)
-
-        ignored = [line.strip() for line in open(config.app.categories_ignored)]
-        pattern = str(Path(config.app.categories) / '**/*.*')
-        for path in glob.iglob(pattern, recursive=True):
-            if any([i in path for i in ignored]):
-                logger.debug(f'Ignore category {path}')
-                continue
-            if path.endswith('.txt'):
-                with open(path) as category_file:
-                    for line in category_file:
-                        name = line.strip()
-                        if name: categories[path].append(name)
-            elif path.endswith('.csv'):
-                with open(path, newline='') as csvfile:
-                    reader = csv.reader(csvfile)
-                    for row in reader:
-                        name = row[0].strip()
-                        if name: categories[path].append(name)
-            else:
-                logger.warning(f"Categories cannot be read from file: {path}")
-        return categories
-
-    @staticmethod
-    def remove_duplicated_categories(categories):
-        s = collections.defaultdict(list)
-        for path, tokens in categories.items():
-            s[tuple(sorted(tokens))].append(path)
-
-        for paths in s.values():
-            for path in paths[1:]:
-                del categories[path]
-
 
 class CategoriesGenerator(NameGenerator):
     """

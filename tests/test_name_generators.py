@@ -16,7 +16,6 @@ from generator.generation import (
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
-    RandomGenerator,
     RandomAvailableNameGenerator,
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
@@ -350,22 +349,6 @@ def test_single_token_categories():
         assert ('0x2',) in generated_names
 
 
-@mark.parametrize(
-    "overrides",
-    [
-        ["app.internet_domains=tests/data/top_internet_names_short.csv"]
-    ]
-)
-def test_random(overrides: List[str]):
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config_new", overrides=overrides)
-        strategy = RandomGenerator(config)
-        tokenized_name = ('my', 'domain', '123')
-        generated_names = list(strategy.generate())
-        assert len(
-            set([x[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
-                                                    'wikipedia', 'qq',
-                                                    'twitter', 'live', 'global', '00002'}) == 8
 
 
 @mark.parametrize(

@@ -7,8 +7,9 @@ class Classifier:
     Adds information about type of input.
     Adds tokenizations.
     """
+
     def __init__(self, config):
         pass
     
     def classify(self, name: InputName):
-        pass
+        raise NotImplementedError

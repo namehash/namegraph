@@ -47,11 +47,7 @@ class MetaSampler:
         Return sampler by a name.
         """
         match sampler:
-            case 'count':
-                return RoundRobinSampler
             case 'round-robin':
-                return RoundRobinSampler
-            case 'length':
                 return RoundRobinSampler
             case 'weighted-sampling':
                 return WeightedSorterWithOrder
