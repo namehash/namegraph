@@ -45,14 +45,27 @@ def invert_mapping(symbol2names: dict[str, list[str]]) -> dict[str, list[str]]:
     return dict(name2symbols)
 
 
+def sort_mapping(name2symbols: dict[str, list[str]], freqs: dict[str, int]) -> dict[str, list[str]]:
+    name2sorted_symbols = dict()
+    for name, symbols in name2symbols.items():
+        name2sorted_symbols[name] = sorted(symbols, key=lambda x: freqs.get(x, 0), reverse=True)
+    return name2sorted_symbols
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('sheet', help='path to the xlsx file')
+    parser.add_argument('freqs', help='path to the json file with symbol frequencies')
     parser.add_argument('output', help='path to the json output file')
     args = parser.parse_args()
 
     symbol2names = parser_xlsx(args.sheet)
     name2symbols = invert_mapping(symbol2names)
 
+    with open(args.freqs, 'r', encoding='utf-8') as f:
+        freqs = json.load(f)
+
+    name2sorted_symbols = sort_mapping(name2symbols, freqs)
+
     with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(name2symbols, f, indent=2, ensure_ascii=False)
+        json.dump(name2sorted_symbols, f, indent=2, ensure_ascii=False)
