@@ -16,7 +16,6 @@ from generator.generation import (
     WordnetSynonymsGenerator,
     W2VGenerator,
     CategoriesGenerator,
-    RandomGenerator,
     RandomAvailableNameGenerator,
     Wikipedia2VGenerator,
     SpecialCharacterAffixGenerator,
@@ -24,6 +23,7 @@ from generator.generation import (
     OnSaleMatchGenerator,
     LeetGenerator,
     KeycapGenerator,
+    PersonNameGenerator,
     SymbolGenerator,
 )
 from generator.generated_name import GeneratedName
@@ -377,22 +377,6 @@ def test_single_token_categories():
         assert ('0x2',) in generated_names
 
 
-@mark.parametrize(
-    "overrides",
-    [
-        ["app.internet_domains=tests/data/top_internet_names_short.csv"]
-    ]
-)
-def test_random(overrides: List[str]):
-    with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config_new", overrides=overrides)
-        strategy = RandomGenerator(config)
-        tokenized_name = ('my', 'domain', '123')
-        generated_names = list(strategy.generate())
-        assert len(
-            set([x[0] for x in generated_names]) & {'google', 'youtube', 'facebook', 'baidu', 'yahoo', 'amazon',
-                                                    'wikipedia', 'qq',
-                                                    'twitter', 'live', 'global', '00002'}) == 8
 
 
 @mark.parametrize(
@@ -490,6 +474,20 @@ def test_special_character_affix_generator():
         generated_names = list(strategy.generate(tokenized_name))
         assert ('$', 'billy', 'corgan',) in generated_names
         assert ('_', 'billy', 'corgan',) in generated_names
+        assert ('ξ', 'billy', 'corgan',) in generated_names
+        assert ('billy', 'corgan', 'ξ',) in generated_names
+
+
+def test_special_character_affix_generator_non_ascii():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = SpecialCharacterAffixGenerator(config)
+        tokenized_name = ('авада', 'кедавра')
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('$', 'авада', 'кедавра',) in generated_names
+        assert ('_', 'авада', 'кедавра',) in generated_names
+        assert ('ξ', 'авада', 'кедавра',) not in generated_names
+        assert ('авада', 'кедавра', 'ξ',) not in generated_names
 
 
 def test_substringmatchgenerator():
@@ -563,3 +561,11 @@ def test_keycap_generator():
         tokenized_name = ('fire', '-', 'cell')
         generated_names = list(strategy.generate(tokenized_name))
         assert not generated_names
+
+def test_person_name():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = PersonNameGenerator(config)
+        tokenized_name = ('chris',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('iam', 'chris') in generated_names

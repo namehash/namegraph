@@ -7,8 +7,6 @@ from web_api import generator
 class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
-    conservative: bool = Field(False, title='instant search mode',
-                               description='set to `true` to generate instant search suggestions')
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       regex=r'^(instant|domain_detail|full)$')
 
@@ -31,14 +29,20 @@ class Name(BaseModel):
 
 
 class Metadata(BaseModel):
-    # pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
-    # interpretation: list[str] = Field(title='interpretation tags',
-    #                                   description='list of interpretation tags based on which the '
-    #                                               'suggestion has been generated')
-    # category: str = Field(title='domain category',
-    #                       description='can be either available, taken, recently released or on sale')
-    applied_strategies: List[List[str]] = Field(
-        title="sequence of steps performed in every pipeline that generated the suggestion")
+    pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
+    interpretation: list[str] = Field(title='interpretation tags',
+                                      description='list of interpretation tags based on which the '
+                                                  'suggestion has been generated')
+    cached_status: str = Field(title='cached status',
+                               description='name\'s status cached at the time of application startup')
+    categories: str = Field(title='domain category',
+                            description='can be either available, taken, recently released or on sale')
+    cached_interesting_score: float = Field(title='cached interesting score',
+                                            description='name\'s interesting score cached at the time of '
+                                                        'application startup')
+    applied_strategies: list[list[str]] = Field(
+        title="sequence of steps performed in every pipeline that generated the suggestion"
+    )
 
 
 class Suggestion(BaseModel):

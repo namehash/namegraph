@@ -114,25 +114,3 @@ class Domains(metaclass=Singleton):
             return self.on_sale.get(str(name), None)
 
         return None
-
-    def split(self, suggestions: List[GeneratedName], to_match: Dict[str, float]) \
-            -> Tuple[List[GeneratedName], Dict[GeneratedName, float]]:
-
-        matched: Dict[GeneratedName, float] = {}
-        remaining_suggestions: List[GeneratedName] = []
-        for suggestion in suggestions:
-            suggestion_str = str(suggestion)
-            if suggestion_str in to_match:
-                matched[suggestion] = to_match[suggestion_str]
-            else:
-                remaining_suggestions.append(suggestion)
-        return remaining_suggestions, matched
-
-    def get_on_sale(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        remaining_suggestions, on_sale = self.split(suggestions, self.on_sale)
-        return [name_price[0] for name_price in on_sale.items()], remaining_suggestions
-
-    def get_available(self, suggestions: List[GeneratedName]) -> Tuple[List[GeneratedName], List[GeneratedName]]:
-        available = [s for s in suggestions if str(s) not in self.taken]
-        remaining = [s for s in suggestions if str(s) in self.taken]
-        return available, remaining

@@ -163,6 +163,19 @@
     other:
       default: 0
 -
+  name: person-name
+  generator: PersonNameGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 5
+    other:
+      default: 0
+-
   name: symbol
   generator: SymbolGenerator
   filters:

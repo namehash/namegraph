@@ -57,7 +57,8 @@ def test_metadata_scheme(test_test_client, name: str):
     for generated_name in json:
         assert sorted(generated_name.keys()) == sorted(["name", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted(
-            ["applied_strategies", 'category', 'interpretation', 'pipeline_name'])
+            ['applied_strategies', 'cached_interesting_score', 'cached_status',
+             'categories', 'interpretation', 'pipeline_name'])
 
 
 @mark.parametrize(
@@ -170,7 +171,7 @@ def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggest
 def test_min_primary_fraction(test_test_client):
     client = test_test_client
     response = client.post("/",
-                           json={"name": 'fire', "sorter": "length", "min_primary_fraction": 1.0, "min_suggestions": 10,
+                           json={"name": 'fire', "sorter": "round-robin", "min_primary_fraction": 1.0, "min_suggestions": 10,
                                  "max_suggestions": 10})
 
     assert response.status_code == 200
@@ -202,3 +203,19 @@ def test_empty_input(test_test_client):
             for strategy in applied_strategies
             for generator in ['RandomAvailableNameGenerator']
         ])
+
+
+@pytest.mark.slow
+def test_person_name_generator(test_test_client):
+    client = test_test_client
+    response = client.post("/",
+                           json={"name": "chris", "params": {
+                               "country": 'pl'
+                           }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+    str_names = [name["name"] for name in json]
+
+    assert "iamchris.eth" in str_names

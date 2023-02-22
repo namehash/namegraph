@@ -1,23 +1,19 @@
 import logging
 import random
-from functools import lru_cache
-from typing import Dict, Any, Type
+from typing import Type
 
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
 from generator.pipeline import Pipeline
-from generator.sampling import WeightedSorter, WeightedSorterWithOrder
+from generator.sampling import WeightedSorterWithOrder
 from generator.sampling.round_robin_sampler import RoundRobinSampler
 from generator.sampling.sampler import Sampler
-from generator.sorting.sorter import Sorter
 from generator.input_name import InputName
 
 logger = logging.getLogger('generator')
 
 
 class MetaSampler:
-
-    # @lru_cache(maxsize=None)
     def get_weights(
             self,
             pipelines: tuple[Pipeline],
@@ -47,11 +43,7 @@ class MetaSampler:
         Return sampler by a name.
         """
         match sampler:
-            case 'count':
-                return RoundRobinSampler
             case 'round-robin':
-                return RoundRobinSampler
-            case 'length':
                 return RoundRobinSampler
             case 'weighted-sampling':
                 return WeightedSorterWithOrder

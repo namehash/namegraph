@@ -37,7 +37,6 @@ def request_generator_client(name, override=None):
         'max_suggestions': 100,
         "min_primary_fraction": 0.1,
         "params": {
-            'conservative': False,
             'country': 'pl'
         }
     }
@@ -57,7 +56,6 @@ def request_generator_http(host, name, override=None):
         'max_suggestions': 100,
         "min_primary_fraction": 0.1,
         "params": {
-            'conservative': False,
             'country': 'pl'
         }
     }
@@ -96,7 +94,6 @@ if __name__ == "__main__":
             'max_suggestions': 100,
             "min_primary_fraction": 1.0,
             "params": {
-                'conservative': False,
                 'country': 'pl'
             }})
 
@@ -158,7 +155,6 @@ span.i {
             'max_suggestions': 3,
             "min_primary_fraction": 1.0,
             "params": {
-                'conservative': True,
                 'country': 'pl',
                 'mode': 'instant'
             }}).json()
@@ -188,7 +184,6 @@ span.i {
             'max_suggestions': 5,
             "min_primary_fraction": 0.1,
             "params": {
-                'conservative': True,
                 'country': 'pl',
                 'mode': 'domain_detail'
             }}).json()
@@ -218,7 +213,6 @@ span.i {
             'max_suggestions': 100,
             "min_primary_fraction": 0.1,
             "params": {
-                'conservative': False,
                 'country': 'pl',
                 'mode': 'full'
             }}).json()

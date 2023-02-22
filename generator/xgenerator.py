@@ -107,53 +107,6 @@ class Generator:
             logger.info(f'Generated suggestions after random: {len(all_suggestions)}')
             all_suggestions = aggregate_duplicates(all_suggestions)
 
-        # all_suggestions = []
-        # for i in range(100):
-        #     # losuj interpretację
-        #     sampled_type = random.choices(list(name.types_probabilities.keys()),
-        #                                   weights=list(name.types_probabilities.values()))[0]
-        #     print('Sampled type:', sampled_type)
-        #     sampled_interpretation = random.choices(name.interpretations[sampled_type],
-        #                                             weights=[i.in_type_probability for i in
-        #                                                      name.interpretations[sampled_type]])[0]
-        #     print('Sampled interpretation:', sampled_interpretation.tokenization)
-        #     # losuj pipeline
-        #     for sampled_pipeline in sampled_interpretation.sorter.next_pipeline():
-        #         print('Sampled pipeline:', sampled_pipeline.definition.name)
-        #         break
-        # 
-        #     # odpal pipeline
-        #     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
-        #     try:
-        #         suggestion = next(suggestions)
-        #     except:
-        #         print('Empty pipeline')
-        #         # jesli pusty to oznacz pipeline jako zużyty dla tej interpretacji
-        #         # jesli wszystkie zuzyte to usun interpretacje z losowania
-        #         # MEtaSampler
-        #         continue
-        #     all_suggestions.append(suggestion)
-
-        # sorter = self.get_sorter(sorter)
-        # result = Result(self.config)
-        # 
-        # for pipeline in self.pipelines:
-        #     pipeline_suggestions = pipeline.apply(name, params)
-        #     logger.debug(f'Pipeline suggestions: {pipeline_suggestions[:10]}')
-        #     result.add_pipeline_suggestions(pipeline_suggestions)
-
-        # result.assign_categories()
-
-        # required_available_suggestions = min_available_fraction * min_suggestions
-        # if result.unique_suggestions() < min_suggestions \
-        #         or result.available_suggestions() < required_available_suggestions:
-        #     logger.debug('Generate only available random')
-        #     only_available_suggestions = self.random_available_name_pipeline.apply(name)
-        #     result.add_pipeline_suggestions(only_available_suggestions)
-        # 
-        # result.assign_categories()
-        # suggestions = sorter.sort(result.suggestions, min_suggestions, max_suggestions, min_available_fraction)
-        # 
         return all_suggestions[:max_suggestions]
 
     def clear_cache(self) -> None:

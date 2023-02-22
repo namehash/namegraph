@@ -1,7 +1,17 @@
+import collections
+import json
+from operator import itemgetter
 from typing import List, Tuple, Any
+
+import numpy as np
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
+
+
+def standardize(a):
+    a = a + 1
+    return a / np.sum(a)
 
 
 class PersonNameGenerator(NameGenerator):
@@ -11,15 +21,48 @@ class PersonNameGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__(config)
+        self.affixes = json.load(open(config.generation.person_name_affixes_path))
+        self.male = collections.defaultdict(int)
+        self.female = collections.defaultdict(int)
+        self.both = collections.defaultdict(int)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        return (
-            tokens + ('👑',),  # crown
-            tokens + ('💎',),  # gem stone
-        )
+        for key, d in self.affixes.items():
+            for affix, count in d.items():
+                if key == 'm_prefixes':
+                    self.both[(affix, 'prefix')] += count
+                    self.male[(affix, 'prefix')] += count
+                elif key == 'f_prefixes':
+                    self.both[(affix, 'prefix')] += count
+                    self.female[(affix, 'prefix')] += count
+                elif key == 'm_suffixes':
+                    self.both[(affix, 'suffix')] += count
+                    self.male[(affix, 'suffix')] += count
+                elif key == 'f_suffixes':
+                    self.both[(affix, 'suffix')] += count
+                    self.female[(affix, 'suffix')] += count
+
+        self.male = (list(self.male.keys()), standardize(np.array(list(self.male.values()))))
+        self.female = (list(self.female.keys()), standardize(np.array(list(self.female.values()))))
+        self.both = (list(self.both.keys()), standardize(np.array(list(self.both.values()))))
+
+    def generate(self, tokens: Tuple[str, ...], gender: str = None) -> List[Tuple[str, ...]]:
+        if gender == 'M':
+            data = self.male
+        elif gender == 'F':
+            data = self.female
+        else:
+            data = self.both
+
+        order = np.random.choice(len(data[0]), size=len(data[0]), replace=False, p=data[1])
+        return (tokens + (data[0][index][0],) if data[0][index][1] == 'suffix' else (data[0][index][0],) + tokens for
+                index in order)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}
+        try:
+            gender = max(interpretation.features['gender'].items(), key=itemgetter(1))[0]
+        except:
+            gender = None
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'gender': gender}
