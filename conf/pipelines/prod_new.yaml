@@ -280,10 +280,10 @@
   weights:
     ngram:
       default: 0.1
-      en: 2
+      en: 5
     person:
-      default: 1
-      en: 2
+      default: 4
+      en: 5
     other:
       default: 0
   global_limits:

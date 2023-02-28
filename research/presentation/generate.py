@@ -74,11 +74,15 @@ def interpretation_str(interpretation):
         return ''
 
 
-def write(s: str, keep_time=False, print_wo_time=True):
+def write(s: str, keep_time=False, print_wo_time=True, stats=False):
     f.write(s)
     f.write('\n')
     f_current.write(s)
     f_current.write('\n')
+
+    if stats:
+        f_current_stats.write(s)
+        f_current_stats.write('\n')
 
     if not keep_time:
         s = regex.sub(r' ?(\d+\.\d+ ms|\(\d+\.\d+ ms\))', '', s)
@@ -130,6 +134,7 @@ if __name__ == "__main__":
 
     f_current = open('research/presentation/reports/current.html', 'w')
     f_current_wo_times = open('research/presentation/reports/current_wo_times.html', 'w')
+    f_current_stats = open('research/presentation/reports/current_stats.html', 'w')
     f = open(args.output, 'w')
 
     write('''<style>
@@ -274,29 +279,29 @@ span.i {
 
         write(f'</section>')
 
-    write(f'<h1>Average times</h1>')
+    write(f'<h1>Average times</h1>', stats=True)
     for mode, values in request_times.items():
         write(
             f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000 * np.median(values):.2f} ms</p>',
-            keep_time=True)
+            keep_time=True, stats=True)
 
     write(f'<h1>Times</h1>')
     for request_time, name, mode in sorted(times, reverse=True):
         write(f'<p>{1000 * request_time:.2f} ms {name} {mode}</p>', print_wo_time=False)
 
-    write(f'<h1>Mean share</h1>')
+    write(f'<h1>Mean share</h1>', stats=True)
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
-        write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>')
+        write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>', stats=True)
 
-    write(f'<h1>MRR</h1>')
+    write(f'<h1>MRR</h1>', stats=True)
     for generator_name, values in sorted(mrr.items(), key=lambda x: sum(x[1]), reverse=True):
-        write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>')
+        write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>', stats=True)
 
-    write(f'<h1>First position</h1>')
+    write(f'<h1>First position</h1>', stats=True)
     for generator_name, values in sorted(first_position.items(), key=lambda x: sum(x[1]) / len(x[1]), reverse=False):
-        write(f'<p>{(sum(values) / len(values)):.2f} {generator_name}</p>')
+        write(f'<p>{(sum(values) / len(values)):.2f} {generator_name}</p>', stats=True)
 
-    write(f'<h1>MAP</h1>')
+    write(f'<h1>MAP</h1>', stats=True)
     maps = []
     for generator_name, positions_lists in all_positions.items():
         map = []
@@ -308,9 +313,9 @@ span.i {
         maps.append((sum(map) / len(input_names), generator_name))
 
     for map, generator_name in sorted(maps, reverse=True):
-        write(f'<p>{map:.2f} {generator_name}</p>')
+        write(f'<p>{map:.2f} {generator_name}</p>', stats=True)
 
-    write(f'<h1>MAP /map</h1>')
+    write(f'<h1>MAP /map</h1>', stats=True)
     maps = []
     for generator_name, positions_lists in all_positions.items():
         map = []
@@ -322,4 +327,4 @@ span.i {
         maps.append((sum(map) / len(map), generator_name))
 
     for map, generator_name in sorted(maps, reverse=True):
-        write(f'<p>{map:.2f} {generator_name}</p>')
+        write(f'<p>{map:.2f} {generator_name}</p>', stats=True)
