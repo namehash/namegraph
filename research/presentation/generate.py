@@ -5,6 +5,7 @@ import argparse
 import time
 
 import numpy as np
+import regex
 from tqdm import tqdm
 
 from generator.domains import Domains
@@ -73,6 +74,19 @@ def interpretation_str(interpretation):
         return ''
 
 
+def write(s: str, keep_time=False, print_wo_time=True):
+    f.write(s)
+    f.write('\n')
+    f_current.write(s)
+    f_current.write('\n')
+
+    if not keep_time:
+        s = regex.sub(r' ?(\d+\.\d+ ms|\(\d+\.\d+ ms\))', '', s)
+    if print_wo_time:
+        f_current_wo_times.write(s)
+        f_current_wo_times.write('\n')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Presents suggestions for set of names for each generator.')
     parser.add_argument('--host', default='http://127.0.0.1:8000', help='host with name generator web apo')
@@ -114,9 +128,11 @@ if __name__ == "__main__":
 
     # 'happypeople', 'muscle', 'billybob' (2 leet in instant), 'quo' (instant 2 flag suggestions)
 
+    f_current = open('research/presentation/reports/current.html', 'w')
+    f_current_wo_times = open('research/presentation/reports/current_wo_times.html', 'w')
     f = open(args.output, 'w')
 
-    f.write('''<style>
+    write('''<style>
 section {
     display: flex;
 }
@@ -144,9 +160,9 @@ span.i {
 
     request_times = collections.defaultdict(list)
     for input_name in tqdm(input_names):
-        f.write(f'<h1>{input_name}</h1>')
+        write(f'<h1>{input_name}</h1>')
 
-        f.write(f'<section>')
+        write(f'<section>')
 
         # START INSTANT
         start_time = time.time()
@@ -162,19 +178,19 @@ span.i {
         request_times['instant'].append(request_time)
         times.append((request_time, input_name, 'instant'))
         print(instant_r)
-        f.write(f'<div>')
-        f.write(f'<h2>instant ({request_time * 1000:.2f} ms)</h2>')
-        f.write(f'<ol>')
+        write(f'<div>')
+        write(f'<h2>instant ({request_time * 1000:.2f} ms)</h2>')
+        write(f'<ol>')
         for s in instant_r:
             generators = []
             for strategy in s['metadata']['applied_strategies']:
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(
+            write(
                 f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"])})</span></li>')
-        f.write(f'</ol>')
-        f.write(f'</div>')
+        write(f'</ol>')
+        write(f'</div>')
         # END INSTANT
 
         # START NAME other ideas
@@ -191,19 +207,19 @@ span.i {
         request_times['top5'].append(request_time)
         times.append((request_time, input_name, 'top5'))
 
-        f.write(f'<div>')
-        f.write(f'<h2>/name ({request_time * 1000:.2f} ms)</h2>')
-        f.write(f'<ol>')
+        write(f'<div>')
+        write(f'<h2>/name ({request_time * 1000:.2f} ms)</h2>')
+        write(f'<ol>')
         for s in name_r:
             generators = []
             for strategy in s['metadata']['applied_strategies']:
                 for processor in strategy:
                     if 'Generator' in processor:
                         generators.append(processor.replace('Generator', ''))
-            f.write(
+            write(
                 f'<li>{s["name"].replace(".eth", "")} <span class="i">({", ".join(generators)}, {interpretation_str(s["metadata"])})</span></li>')
-        f.write(f'</ol>')
-        f.write(f'</div>')
+        write(f'</ol>')
+        write(f'</div>')
         # END NAME
 
         # START 100
@@ -222,13 +238,13 @@ span.i {
 
         generated = len(name_r)
 
-        f.write(f'<div class="all100">')
-        f.write(f'<h2>100 ideas generated ({request_time * 1000:.2f} ms)</h2>')
-        f.write(f'<p>')
+        write(f'<div class="all100">')
+        write(f'<h2>100 ideas generated ({request_time * 1000:.2f} ms)</h2>')
+        write(f'<p>')
         for data in name_r:
-            f.write(f'{data["name"].replace(".eth", "")} ')
-        f.write(f'</p>')
-        f.write(f'</div>')
+            write(f'{data["name"].replace(".eth", "")} ')
+        write(f'</p>')
+        write(f'</div>')
 
         generators = collections.defaultdict(list)
         for i, s in enumerate(name_r):
@@ -240,46 +256,47 @@ span.i {
 
         for generator_name, names in sorted(generators.items()):
             stats[generator_name].append(len(names) / generated)
-            f.write(f'<div class="g100">')
-            f.write(f'<h3>{generator_name} {(100 * len(names) / generated):.2f}%</h3>')
-            f.write(f'<ol>')
+            write(f'<div class="g100">')
+            write(f'<h3>{generator_name} {(100 * len(names) / generated):.2f}%</h3>')
+            write(f'<ol>')
 
             mrr[generator_name].append(1 / (names[0][1] + 1))
             first_position[generator_name].append(names[0][1] + 1)
             positions = []
             for name, i in names:
-                f.write(f'<li>{i + 1}. {name.replace(".eth", "")}</li>')
+                write(f'<li>{i + 1}. {name.replace(".eth", "")}</li>')
                 positions.append(i + 1)
-            f.write(f'</ol>')
+            write(f'</ol>')
             all_positions[generator_name].append(positions)
 
-            f.write(f'</div>')
+            write(f'</div>')
         # END 100
 
-        f.write(f'</section>')
+        write(f'</section>')
 
-    f.write(f'<h1>Average times</h1>')
+    write(f'<h1>Average times</h1>')
     for mode, values in request_times.items():
-        f.write(
-            f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000 * np.median(values):.2f} ms</p>')
+        write(
+            f'<p>{mode}: avg {(1000 * sum(values) / len(values)):.2f} ms, median {1000 * np.median(values):.2f} ms</p>',
+            keep_time=True)
 
-    f.write(f'<h1>Times</h1>')
+    write(f'<h1>Times</h1>')
     for request_time, name, mode in sorted(times, reverse=True):
-        f.write(f'<p>{1000 * request_time:.2f} ms {name} {mode}</p>')
+        write(f'<p>{1000 * request_time:.2f} ms {name} {mode}</p>', print_wo_time=False)
 
-    f.write(f'<h1>Mean share</h1>')
+    write(f'<h1>Mean share</h1>')
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
-        f.write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>')
+        write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>')
 
-    f.write(f'<h1>MRR</h1>')
+    write(f'<h1>MRR</h1>')
     for generator_name, values in sorted(mrr.items(), key=lambda x: sum(x[1]), reverse=True):
-        f.write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>')
+        write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>')
 
-    f.write(f'<h1>First position</h1>')
+    write(f'<h1>First position</h1>')
     for generator_name, values in sorted(first_position.items(), key=lambda x: sum(x[1]) / len(x[1]), reverse=False):
-        f.write(f'<p>{(sum(values) / len(values)):.2f} {generator_name}</p>')
+        write(f'<p>{(sum(values) / len(values)):.2f} {generator_name}</p>')
 
-    f.write(f'<h1>MAP</h1>')
+    write(f'<h1>MAP</h1>')
     maps = []
     for generator_name, positions_lists in all_positions.items():
         map = []
@@ -291,9 +308,9 @@ span.i {
         maps.append((sum(map) / len(input_names), generator_name))
 
     for map, generator_name in sorted(maps, reverse=True):
-        f.write(f'<p>{map:.2f} {generator_name}</p>')
+        write(f'<p>{map:.2f} {generator_name}</p>')
 
-    f.write(f'<h1>MAP /map</h1>')
+    write(f'<h1>MAP /map</h1>')
     maps = []
     for generator_name, positions_lists in all_positions.items():
         map = []
@@ -305,4 +322,4 @@ span.i {
         maps.append((sum(map) / len(map), generator_name))
 
     for map, generator_name in sorted(maps, reverse=True):
-        f.write(f'<p>{map:.2f} {generator_name}</p>')
+        write(f'<p>{map:.2f} {generator_name}</p>')
