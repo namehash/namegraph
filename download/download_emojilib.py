@@ -55,7 +55,7 @@ def _ens_normalize(text: str) -> Optional[str]:
 
 def _emoji_name(emoji: str) -> Optional[str]:
     try:
-        return myunicode.emoji_name(emoji)
+        return myunicode.emoji_name(emoji).lower()
     except ValueError:
         return None
 
