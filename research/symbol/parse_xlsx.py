@@ -81,4 +81,4 @@ if __name__ == '__main__':
     name2sorted_symbols = sort_mapping(name2symbols, freqs)
 
     with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(name2sorted_symbols, f, indent=2, ensure_ascii=False)
+        json.dump(name2sorted_symbols, f, indent=2, ensure_ascii=False, sort_keys=True)
