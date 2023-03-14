@@ -311,11 +311,15 @@ def sort_name2emojis_by_similarity(
         emojis = [
             (emoji, ((1 if name in original_emojis2names.get(emoji, []) else 0),
                      similarity,
-                     frequences.get(emoji, 0.0),
-                     emoji))  # emoji string to make order deterministic, even if all the previous are the same
+                     frequences.get(emoji, 0.0)))
             for emoji, similarity in emojis
         ]
-        sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
+        # firstly, we sort by emojis themselves to make sure that in even in cases when all the previous values
+        # are equal, we have a deterministic order among them
+        sorted_emoji = sorted(emojis, key=itemgetter(0), reverse=False)
+        # after that we sort by the different metrics defined above, for the same values order will stay deterministic,
+        # because sorting algorithm in Python is stable, and thus will save the underlying order by emojis themselves
+        sorted_emoji = sorted(sorted_emoji, key=itemgetter(1), reverse=True)
         name2sorted_emojis[name] = [emoji for emoji, similarity in sorted_emoji]
 
     return name2sorted_emojis
