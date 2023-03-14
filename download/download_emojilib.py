@@ -311,7 +311,8 @@ def sort_name2emojis_by_similarity(
         emojis = [
             (emoji, ((1 if name in original_emojis2names.get(emoji, []) else 0),
                      similarity,
-                     frequences.get(emoji, 0.0)))
+                     frequences.get(emoji, 0.0),
+                     emoji))  # emoji string to make order deterministic, even if all the previous are the same
             for emoji, similarity in emojis
         ]
         sorted_emoji = sorted(emojis, key=itemgetter(1), reverse=True)
