@@ -71,11 +71,17 @@ Similarity is calculated between a token and emoji's names form 1st and 2nd poin
     "💓",
     "😻",
 
-### similarity*log(frequency)
+## Strategies of taking frequency into consideration 
+
+**Before**: tuple of similarity and frequency (sorting by frequency only in case similarity is the same) **[current approach]**
+
+**After**: `similarity*log(frequency)` as a value by which we sort (more detailed formula below)
 
 `best_similarity(name, emoji2names[emoji]) * (math.log(frequences.get(emoji, 1.0)) + 0.01)`
 
-Before:
+### Observed changes
+
+**Before**:
 
   "boar": [
     "🐗",
@@ -88,7 +94,7 @@ Before:
     "🐰",
     "🐃"
 
-After:
+**After**:
 
   "boar": [
     "🐗",
@@ -102,7 +108,7 @@ After:
     "🐽"
   
 
-Before:
+**Before**:
 
 "hamburger": [
     "🍔",
@@ -125,7 +131,7 @@ Before:
     "🐄",
     "🇸🇿"
   
-After:
+**After**:
 
 "hamburger": [
     "🍔",
@@ -148,7 +154,7 @@ After:
     "🍲",
     "🇸🇿"
 
-Before:
+**Before**:
 
 "spicy": [
     "🌶",
@@ -166,7 +172,7 @@ Before:
     "🧅",
     "🧄"
 
-After:
+**After**:
 
 "spicy": [
     "🌶",
@@ -184,7 +190,7 @@ After:
     "🧄",
     "🍠"
 
-Before:
+**Before**:
 
 "splendid": [
     "💖",
@@ -195,7 +201,7 @@ Before:
     "💯",
     "👌"
 
-After:
+**After**:
 
 "splendid": [
     "🇬🇧",
