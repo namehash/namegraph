@@ -1,0 +1,2 @@
+Wikidata==0.7.0
+Wikipedia-API==0.5.8
