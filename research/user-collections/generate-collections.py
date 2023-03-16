@@ -40,8 +40,10 @@ if __name__ == '__main__':
             category_id = wikilist['category'].split('/')[-1]
             en_label = wikilist["category_wiki"].split('/')[-1]
 
-            members = category_members(en_label)
-
-            wikilist['members'] = members
-
-            writer.write(wikilist)
+            try:
+                members = category_members(en_label)
+                wikilist['members'] = members
+                writer.write(wikilist)
+            except KeyError as e:
+                print(e)
+                print(en_label, category_id)
