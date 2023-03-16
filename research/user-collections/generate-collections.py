@@ -16,7 +16,7 @@ wiki_wiki = wikipediaapi.Wikipedia(
 def category_members(category_name: str) -> list:
     members = set()
 
-    category = wiki_wiki.page(category_name)
+    category = wiki_wiki.page(category_name, unquote=True)
     for member in category.categorymembers.values():
         if member.ns == wikipediaapi.Namespace.CATEGORY:
             continue  # TODO currently not checking subcategories
