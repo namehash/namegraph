@@ -1,16 +1,15 @@
 from argparse import ArgumentParser
-import requests
 import json
+import jsonlines
 
 import tqdm
 import wikipediaapi
 from wikidata.client import Client
 
-
 wikidata = Client()
 wiki_wiki = wikipediaapi.Wikipedia(
-        language='en',
-        extract_format=wikipediaapi.ExtractFormat.WIKI
+    language='en',
+    extract_format=wikipediaapi.ExtractFormat.WIKI
 )
 
 
@@ -30,25 +29,19 @@ def category_members(category_name: str) -> list:
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('input', help='JSON file to lists')
-    parser.add_argument('output', help='JSON file for the output collections')
+    parser.add_argument('output', help='JSONL file for the output collections')
     args = parser.parse_args()
 
     with open(args.input, 'r', encoding='utf-8') as f:
         lists = json.load(f)
 
-    collections: dict[str, list[str]] = dict()
-    for wikilist in tqdm.tqdm(lists):
-        category_id = wikilist['category'].split('/')[-1]
-        wikidata_category = wikidata.get(category_id, load=True)
+    with jsonlines.open(args.output, mode='w') as writer:
+        for wikilist in tqdm.tqdm(lists):
+            category_id = wikilist['category'].split('/')[-1]
+            en_label = wikilist["category_wiki"].split('/')[-1]
 
-        try:
-            en_label = wikidata_category.label['en']
-        except KeyError as ex:
-            print(f'skipped {wikidata_category.label} {wikidata_category.id}')
-            continue
+            members = category_members(en_label)
 
-        members = category_members(en_label)
-        collections[en_label] = members
+            wikilist['members'] = members
 
-    with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(collections, f, indent=2, ensure_ascii=False)
+            writer.write(wikilist)
