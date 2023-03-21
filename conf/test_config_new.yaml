@@ -29,6 +29,13 @@ app:
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
+# if present, env variables will override values below
+elasticsearch:
+  host: localhost
+  port: 9200
+  username: elastic
+  password: password
+  index: collections
 filtering:
   # List of already registered domains
 #  domains: tests/data/primary.csv

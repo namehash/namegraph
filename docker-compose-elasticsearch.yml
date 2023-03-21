@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.4.2
+    container_name: elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      - "cluster.routing.allocation.disk.watermark.low=30mb"
+      - "cluster.routing.allocation.disk.watermark.high=20mb"
+      - "cluster.routing.allocation.disk.watermark.flood_stage=10mb"
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=true"
+      - ELASTIC_PASSWORD=password
+
+volumes:
+  elasticsearch_data:

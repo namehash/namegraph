@@ -22,3 +22,4 @@ research/emoji/emoji_w2v/*.zip
 data/person_names_*.json
 research/symbol/*.xlsx
 !research/symbol/*.ipynb
+research/elasticsearch/*.jsonl

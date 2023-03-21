@@ -19,3 +19,4 @@ web3
 boto3
 python-dotenv
 more-itertools==9.0.0
+elasticsearch==7.10.1

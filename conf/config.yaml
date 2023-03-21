@@ -4,6 +4,7 @@ defaults:
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
 app:
+  elasticsearch_password: ${env:ELASTICSEARCH_PASSWORD}
   # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered
@@ -26,6 +27,13 @@ app:
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
+# if present, env variables will override values below
+elasticsearch:
+  host: localhost
+  port: 9200
+  username: elastic
+  password: password
+  index: collections
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
