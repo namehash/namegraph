@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections'
+INDEX_NAME = 'collections8all'
 
 
 def connect_to_elasticsearch(
@@ -24,7 +24,8 @@ def connect_to_elasticsearch(
             'host': host,
             'port': port
         }],
-        http_auth=(username, password)
+        http_auth=(username, password),
+        timeout=60
     )
 
 
@@ -65,9 +66,12 @@ def initialize_index(es: Elasticsearch):
         },
         "mappings": {
             "properties": {
-                "collection_name": {"type": "text", "similarity": "BM25"},
-                "collection_members": {"type": "text", "similarity": "BM25"},
-                "metadata.collection_articles": {"type": "text", "similarity": "BM25"},
+                "data.collection_name": {"type": "text", "similarity": "BM25"},
+                "data.names.normalized_name": {"type": "text", "similarity": "BM25"},
+                "data.names.tokenized_name": {"type": "text", "similarity": "BM25"},
+                "data.collection_description": {"type": "text", "similarity": "BM25"},
+                "data.collection_keywords": {"type": "text", "similarity": "BM25"},
+                "template.collection_articles": {"type": "text", "similarity": "BM25"},
             }
         },
     }
@@ -90,7 +94,11 @@ def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
     successes = 0
 
     # create the ES index
-    for ok, action in streaming_bulk(client=es, index=INDEX_NAME, actions=collections):
+    for ok, action in streaming_bulk(client=es,
+                                     index=INDEX_NAME,
+                                     actions=collections,
+                                     max_chunk_bytes=1000000,  # 1MB
+                                     max_retries=1):
         progress.update(1)
         successes += ok
     print("Indexed %d documents" % (successes,))

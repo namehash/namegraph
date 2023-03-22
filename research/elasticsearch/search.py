@@ -38,7 +38,9 @@ if __name__ == '__main__':
             "query": {
                 "multi_match": {
                     "query": args.query,
-                    "fields": ["collection_name", "collection_members", "metadata.collection_articles"],
+                    "fields": ["data.collection_name", "data.names.normalized_name", "data.names.tokenized_name",
+                               "data.collection_description", "data.collection_keywords",
+                               "template.collection_articles"],
                     "type": "cross_fields",
                 }
             },
