@@ -66,16 +66,33 @@ class AllTokenizer(Tokenizer):
         self.with_gaps = config.tokenization.with_gaps
 
         self.automaton = ahocorasick.Automaton()
-        skip_one_letter_words = config.tokenization.skip_one_letter_words
-        with open(path) as f:
+        
+        with open(config.tokenization.domain_specific_dictionary) as f:
             for line in f:
                 word = line.strip().lower()
-                if skip_one_letter_words and len(word) == 1: continue
                 self.automaton.add_word(word, word)
 
-        if config.tokenization.add_letters_ias:
-            for char in 'ias':
-                self.automaton.add_word(char, char)
+        with open(config.tokenization.custom_dictionary) as f:
+            for line in f:
+                word = line.strip().lower()
+                self.automaton.add_word(word, word)
+
+        with open(config.tokenization.dictionary) as f:
+            for line in f:
+                word = line.strip().lower()
+                if len(word) <= 3: continue
+                self.automaton.add_word(word, word)
+                
+        # skip_one_letter_words = config.tokenization.skip_one_letter_words
+        # with open(path) as f:
+        #     for line in f:
+        #         word = line.strip().lower()
+        #         if skip_one_letter_words and len(word) == 1: continue
+        #         self.automaton.add_word(word, word)
+
+        # if config.tokenization.add_letters_ias:
+        #     for char in 'ias':
+        #         self.automaton.add_word(char, char)
 
         self.automaton.make_automaton()
 

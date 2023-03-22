@@ -101,4 +101,5 @@ ngrams:
   unigrams: data/ngrams/unigram_freq.csv
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: tests/data/ngrams/custom_dictionary.txt
+  domain_specific_dictionary: data/ngrams/domain_specific_dictionary.txt
   custom_token_frequency: 500000

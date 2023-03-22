@@ -33,6 +33,8 @@ filtering:
   root_path: ./
 tokenization:
   dictionary: data/words.txt
+  custom_dictionary: data/ngrams/custom_dictionary.txt
+  domain_specific_dictionary: data/ngrams/domain_specific_dictionary.txt
   wordninja_dictionary: data/ngrams/wordninja_dictionary.txt.gz
   skip_one_letter_words: true
   skip_non_words: false
@@ -98,4 +100,5 @@ ngrams:
   unigrams: data/ngrams/unigram_freq.csv
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: data/ngrams/custom_dictionary.txt
+  domain_specific_dictionary: data/ngrams/domain_specific_dictionary.txt
   custom_token_frequency: 500000
