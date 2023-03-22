@@ -25,11 +25,29 @@ def search_by_name(query, limit):
         index=INDEX_NAME,
         body={
             "query": {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["data.collection_name", "data.collection_description", "data.collection_keywords", ],
-                    "type": "cross_fields",
+                "bool": {
+                    "must": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": ["data.collection_name", "data.collection_description",
+                                           "data.collection_keywords", ],
+                                "type": "cross_fields",
+                            }
+                        }
+                    ],
+                    "should": [
+                        {
+                            "rank_feature": {
+                                "field": "template.collection_rank",
+                                # "log": {
+                                #     "scaling_factor": 4
+                                # }
+                            }
+                        }
+                    ]
                 }
+
             },
             "size": limit,
         },
@@ -44,13 +62,31 @@ def search_by_all(query, limit):
         index=INDEX_NAME,
         body={
             "query": {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["data.collection_name", "data.names.normalized_name", "data.names.tokenized_name",
-                               "data.collection_description", "data.collection_keywords",
-                               "template.collection_articles"],
-                    "type": "cross_fields",
+                "bool": {
+                    "must": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": ["data.collection_name", "data.names.normalized_name",
+                                           "data.names.tokenized_name",
+                                           "data.collection_description", "data.collection_keywords",
+                                           "template.collection_articles"],
+                                "type": "cross_fields",
+                            }
+                        }
+                    ],
+                    "should": [
+                        {
+                            "rank_feature": {
+                                "field": "template.collection_rank",
+                                # "log": {
+                                #     "scaling_factor": 4
+                                # }
+                            }
+                        }
+                    ]
                 }
+
             },
             "size": limit,
         },
