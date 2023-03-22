@@ -5,7 +5,6 @@ from pprint import pprint
 import jsonlines
 from elasticsearch import Elasticsearch
 
-
 INDEX_NAME = 'collections'
 
 
@@ -56,6 +55,18 @@ def initialize_index(es: Elasticsearch):
     #     }
     # }
     mapping = None
+    mapping = {
+        "settings": {
+            "number_of_shards": 1,
+        },
+        "mappings": {
+            "properties": {
+                "collection_name": {"type": "text", "similarity": "BM25"},
+                "collection_members": {"type": "text", "similarity": "BM25"},
+                "metadata.collection_articles": {"type": "text", "similarity": "BM25"},
+            }
+        },
+    }
 
     # TODO handle errors
     if not es.indices.exists(INDEX_NAME):
