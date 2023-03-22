@@ -1,3 +1,5 @@
+import time
+import urllib
 from argparse import ArgumentParser
 import json
 import jsonlines
@@ -67,6 +69,7 @@ if __name__ == '__main__':
             type = wikilist["type"].split('/')[-1]
 
             try:
+                time.sleep(1)
                 members = category_members(en_label, type)
                 wikilist['members'] = members
                 if members:
@@ -76,3 +79,13 @@ if __name__ == '__main__':
             except KeyError as e:
                 print(e)
                 print(en_label, category_id)
+            except json.decoder.JSONDecodeError as e:
+                print(e)
+                print(en_label, category_id)
+            except urllib.error.HTTPError as e:
+                print(e)
+                print(en_label, category_id)
+                time.sleep(5)
+            except:
+                print(en_label, category_id)
+                
