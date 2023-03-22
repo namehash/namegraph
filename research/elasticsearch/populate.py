@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections8all'
+INDEX_NAME = 'collections12all'
 
 
 def connect_to_elasticsearch(
@@ -71,7 +71,8 @@ def initialize_index(es: Elasticsearch):
                 "data.names.tokenized_name": {"type": "text", "similarity": "BM25"},
                 "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
-                "template.collection_articles": {"type": "text", "similarity": "BM25"},
+                "template.collection_articles": {"type": "text", "similarity": "BM25"},  # TODO remove?
+                "template.collection_rank": {"type": "rank_feature"},
             }
         },
     }
@@ -98,10 +99,23 @@ def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
                                      index=INDEX_NAME,
                                      actions=collections,
                                      max_chunk_bytes=1000000,  # 1MB
+                                     # chunk_size=10,
                                      max_retries=1):
         progress.update(1)
         successes += ok
     print("Indexed %d documents" % (successes,))
+
+
+def gen(path, limit):
+    with jsonlines.open(path, 'r') as reader:
+        for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), limit):
+            # rank_feature must be positive
+            doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])
+            yield {
+                "_index": INDEX_NAME,
+                "_type": '_doc',
+                "_source": doc
+            }
 
 
 if __name__ == '__main__':
@@ -118,13 +132,7 @@ if __name__ == '__main__':
 
     initialize_index(es)
 
-    with jsonlines.open(args.input, 'r') as reader:
-        gen = ({
-            "_index": INDEX_NAME,
-            "_type": '_doc',
-            "_source": doc
-        } for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), args.limit))
-        insert_collections(es, gen)
+    insert_collections(es, gen(args.input, args.limit))
 
     search = es.search(index=INDEX_NAME, body={'query': {'bool': {}}})
     print(f'Documents overall in {INDEX_NAME} - {len(search["hits"]["hits"])}')

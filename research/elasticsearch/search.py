@@ -52,6 +52,6 @@ if __name__ == '__main__':
     print(f'Results in {INDEX_NAME} - {len(hits)}\n')
 
     for hit in hits:
-        print(hit['_source']['collection_name'])
-        print(', '.join(hit['_source']['collection_members']))
+        print(hit['_source']['data']['collection_name'], 'RANK:', hit['_source']['template']['collection_rank'])
+        print(', '.join([x['normalized_name'] for x in hit['_source']['data']['names']]))
         print()
