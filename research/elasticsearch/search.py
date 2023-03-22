@@ -20,6 +20,46 @@ def connect_to_elasticsearch(
     )
 
 
+def search_by_name(query, limit):
+    response = es.search(
+        index=INDEX_NAME,
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["data.collection_name", "data.collection_description", "data.collection_keywords", ],
+                    "type": "cross_fields",
+                }
+            },
+            "size": limit,
+        },
+    )
+
+    hits = response["hits"]["hits"]
+    return hits
+
+
+def search_by_all(query, limit):
+    response = es.search(
+        index=INDEX_NAME,
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["data.collection_name", "data.names.normalized_name", "data.names.tokenized_name",
+                               "data.collection_description", "data.collection_keywords",
+                               "template.collection_articles"],
+                    "type": "cross_fields",
+                }
+            },
+            "size": limit,
+        },
+    )
+
+    hits = response["hits"]["hits"]
+    return hits
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('query', help='query')
@@ -32,26 +72,18 @@ if __name__ == '__main__':
 
     es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
 
-    response = es.search(
-        index=INDEX_NAME,
-        body={
-            "query": {
-                "multi_match": {
-                    "query": args.query,
-                    "fields": ["data.collection_name", "data.names.normalized_name", "data.names.tokenized_name",
-                               "data.collection_description", "data.collection_keywords",
-                               "template.collection_articles"],
-                    "type": "cross_fields",
-                }
-            },
-            "size": args.limit,
-        },
-    )
-
-    hits = response["hits"]["hits"]
-    print(f'Results in {INDEX_NAME} - {len(hits)}\n')
+    hits = search_by_name(args.query, args.limit)
+    print(f'Results in {INDEX_NAME} - {len(hits)}')
 
     for hit in hits:
-        print(hit['_source']['data']['collection_name'], 'RANK:', hit['_source']['template']['collection_rank'])
+        print(hit['_score'], hit['_source']['data']['collection_name'], 'RANK:',
+              hit['_source']['template']['collection_rank'], hit['_source']['template']['collection_wikipedia_link'])
+
+    hits = search_by_all(args.query, args.limit)
+    print(f'\nResults in {INDEX_NAME} - {len(hits)}\n')
+
+    for hit in hits:
+        print(hit['_score'], hit['_source']['data']['collection_name'], 'RANK:',
+              hit['_source']['template']['collection_rank'], hit['_source']['template']['collection_wikipedia_link'])
         print(', '.join([x['normalized_name'] for x in hit['_source']['data']['names']]))
         print()
