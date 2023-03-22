@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections12all'
+INDEX_NAME = 'collections13all'
 
 
 def connect_to_elasticsearch(
@@ -63,15 +63,38 @@ def initialize_index(es: Elasticsearch):
     mapping = {
         "settings": {
             "number_of_shards": 1,
+            "analysis": {
+                "analyzer": {
+                    "english_stemmer": {
+                        "tokenizer": "standard",
+                        "filter": [
+                            "lowercase",
+                            "porter_stem"
+                        ]
+                    },
+                    "english_exact": {
+                        "tokenizer": "standard",
+                        "filter": [
+                            "lowercase"
+                        ]
+                    }
+                }
+            }
         },
         "mappings": {
             "properties": {
-                "data.collection_name": {"type": "text", "similarity": "BM25"},
+                "data.collection_name": {"type": "text", "similarity": "BM25", "analyzer": "english_stemmer",
+                                         "fields": {
+                                             "exact": {
+                                                 "type": "text",
+                                                 "analyzer": "english_exact"
+                                             }
+                                         }},
                 "data.names.normalized_name": {"type": "text", "similarity": "BM25"},
                 "data.names.tokenized_name": {"type": "text", "similarity": "BM25"},
                 "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
-                "template.collection_articles": {"type": "text", "similarity": "BM25"},  # TODO remove?
+                # "template.collection_articles": {"type": "text", "similarity": "BM25"},  # TODO remove?
                 "template.collection_rank": {"type": "rank_feature"},
             }
         },
@@ -110,7 +133,11 @@ def gen(path, limit):
     with jsonlines.open(path, 'r') as reader:
         for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), limit):
             # rank_feature must be positive
-            doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])
+
+            if doc['data']['collection_name'].startswith('Lists of'):
+                continue
+            doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
+
             yield {
                 "_index": INDEX_NAME,
                 "_type": '_doc',
