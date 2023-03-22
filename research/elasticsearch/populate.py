@@ -2,8 +2,12 @@ from argparse import ArgumentParser
 from itertools import islice
 
 from pprint import pprint
+from typing import Iterable
+
 import jsonlines
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import streaming_bulk
+from tqdm import tqdm
 
 INDEX_NAME = 'collections'
 
@@ -80,6 +84,18 @@ def insert_collection(es: Elasticsearch, collection: dict):
     es.index(INDEX_NAME, body=collection)
 
 
+def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
+    number_of_docs = 500000
+    progress = tqdm(unit="docs", total=number_of_docs)
+    successes = 0
+
+    # create the ES index
+    for ok, action in streaming_bulk(client=es, index=INDEX_NAME, actions=collections):
+        progress.update(1)
+        successes += ok
+    print("Indexed %d documents" % (successes,))
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('input', help='input JSONL file with the collections to insert into ES')
@@ -95,8 +111,12 @@ if __name__ == '__main__':
     initialize_index(es)
 
     with jsonlines.open(args.input, 'r') as reader:
-        for collection in islice(reader.iter(skip_empty=True, skip_invalid=True), args.limit):
-            insert_collection(es, collection)
+        gen = ({
+            "_index": INDEX_NAME,
+            "_type": '_doc',
+            "_source": doc
+        } for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), args.limit))
+        insert_collections(es, gen)
 
     search = es.search(index=INDEX_NAME, body={'query': {'bool': {}}})
     print(f'Documents overall in {INDEX_NAME} - {len(search["hits"]["hits"])}')
