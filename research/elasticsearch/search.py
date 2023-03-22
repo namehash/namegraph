@@ -22,6 +22,7 @@ def connect_to_elasticsearch(
 
 if __name__ == '__main__':
     parser = ArgumentParser()
+    parser.add_argument('query', help='query')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
     parser.add_argument('--port', default=9200, type=int, help='elasticsearch port')
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         body={
             "query": {
                 "multi_match": {
-                    "query": 'mexico',
+                    "query": args.query,
                     "fields": ["collection_name", "collection_members", "metadata.collection_articles"],
                     "type": "cross_fields",
                 }
