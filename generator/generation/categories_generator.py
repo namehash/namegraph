@@ -60,6 +60,8 @@ class CategoriesGenerator(NameGenerator):
         token = ''.join(tokens)
         tokens_synsets = self.get_similar(token).items()
 
+        # todo: choose best approach and implement (weighted shuffle / 2 buckets shuffle)
+
         return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
 
     def get_similar(self, token: str) -> Dict[str, int]:
