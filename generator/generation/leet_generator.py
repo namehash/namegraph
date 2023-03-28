@@ -116,6 +116,9 @@ class LeetGenerator(NameGenerator):
         return tuple(self._leetify_token(token, letter_map, sequence_map) for token in tokens)
 
     def generate(self, tokens: tuple[str, ...]) -> list[tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         # find all replaceable tokens/letters
         sequence_replaceables, letter_replaceables = self._get_tokens_replaceables(tokens)
 

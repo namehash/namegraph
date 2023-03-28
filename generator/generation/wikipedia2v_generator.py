@@ -25,6 +25,9 @@ class Wikipedia2VGenerator(NameGenerator):
             raise FileNotFoundError('No embeddings in binary format. Run generator/download_from_s3.py.')
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         name = '_'.join(tokens)
         query = f'ENTITY/{name}'
 

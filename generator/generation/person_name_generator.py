@@ -46,6 +46,9 @@ class PersonNameGenerator(NameGenerator):
         self.both = (list(self.both.keys()), standardize(np.array(list(self.both.values()))))
 
     def generate(self, tokens: Tuple[str, ...], gender: str = None) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         if gender == 'M':
             data = self.male
         elif gender == 'F':

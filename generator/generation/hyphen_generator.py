@@ -26,6 +26,9 @@ class HyphenGenerator(NameGenerator):
         return tuple(generated_tokens)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         if len(tokens) <= 1:
             return []
 

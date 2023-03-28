@@ -14,6 +14,9 @@ class SuffixGenerator(NameGenerator):
         self.suffixes = [line.strip() for line in open(config.generation.suffixes_path)]
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         name = ''.join(tokens)
         return (tuple(list(tokens) + [suffix]) for suffix in self.suffixes if not name.endswith(suffix))
 

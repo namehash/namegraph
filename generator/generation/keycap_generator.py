@@ -22,6 +22,9 @@ class KeycapGenerator(NameGenerator):
         }
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         name = ''.join(tokens)
         try:
             return ((''.join([self.mapping[char] for char in name]),),)

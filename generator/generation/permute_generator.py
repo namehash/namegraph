@@ -14,6 +14,9 @@ class PermuteGenerator(NameGenerator):
         super().__init__(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         return itertools.islice(itertools.permutations(tokens), self.limit)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:

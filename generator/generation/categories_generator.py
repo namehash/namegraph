@@ -54,6 +54,9 @@ class CategoriesGenerator(NameGenerator):
         self.categories = Categories(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         token = ''.join(tokens)
         tokens_synsets = self.get_similar(token).items()
 
