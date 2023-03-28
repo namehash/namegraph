@@ -202,8 +202,8 @@ def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
                            json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
-                                 "max_suggestions": 1000, "params": {                              
-                                       "country": 'pl'
+                                 "max_suggestions": 1000, "params": {
+                                   "country": 'pl'
                                }})
 
     assert response.status_code == 200
@@ -228,7 +228,7 @@ def test_prod_short_suggestions(prod_test_client):
     response = client.post("/",
                            json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
-                                       "country": 'pl'
+                                   "country": 'pl'
                                }})
 
     assert response.status_code == 200
@@ -306,3 +306,19 @@ def test_not_instant_search_temp(prod_test_client):
         for name in json
         for strategy in name['metadata']['applied_strategies']
     ])
+
+
+def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
+    client = prod_test_client
+    response = client.post("/",
+                           json={"name": "😊😊😊", "metadata": True,
+                                 "params": {
+                                     "mode": "full",
+                                     "country": 'pl'
+                                 }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+
+    assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])
