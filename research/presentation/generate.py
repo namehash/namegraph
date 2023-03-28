@@ -137,7 +137,9 @@ if __name__ == "__main__":
     f_current_stats = open('research/presentation/reports/current_stats.html', 'w')
     f = open(args.output, 'w')
 
-    write('''<style>
+    write('''<meta charset="UTF-8">
+
+<style>
 section {
     display: flex;
 }

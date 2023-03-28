@@ -24,6 +24,9 @@ class WordnetSynonymsGenerator(NameGenerator):
         self.combination_limiter = CombinationLimiter(self.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         result = []
         synsets = [list(self._get_lemmas_for_word(t).items()) for t in tokens]
 

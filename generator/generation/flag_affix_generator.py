@@ -270,6 +270,9 @@ class FlagAffixGenerator(NameGenerator):
         }
 
     def generate(self, tokens: Tuple[str, ...], country: str = None) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         if country is None or country.upper() not in self.country2emoji:
             return []
 
