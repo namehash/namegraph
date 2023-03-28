@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 import logging
 
+import elasticsearch
 from omegaconf import DictConfig
 
 from generator.tokenization import WordNinjaTokenizer
@@ -39,19 +40,24 @@ class Collection:
 class CollectionMatcher:
     def __init__(self, config: DictConfig):
         self.config = config
-        self.elastic = connect_to_elasticsearch(
-            config.elasticsearch.host,
-            config.elasticsearch.port,
-            config.elasticsearch.username,
-            config.elasticsearch.password
-        )
-
-        self.index_name = config.elasticsearch.index
-        self.active = index_exists(self.elastic, self.index_name)
-        if not self.active:  # TODO should we raise Exception instead?
-            logger.warning(f'elasticsearch index {self.index_name} does not exist')
-
         self.tokenizer = WordNinjaTokenizer(config)
+        self.index_name = config.elasticsearch.index
+
+        try:
+            self.elastic = connect_to_elasticsearch(
+                config.elasticsearch.host,
+                config.elasticsearch.port,
+                config.elasticsearch.username,
+                config.elasticsearch.password
+            )
+
+            self.active = index_exists(self.elastic, self.index_name)
+            if not self.active:  # TODO should we raise Exception instead?
+                logger.warning(f'Elasticsearch index {self.index_name} does not exist')
+
+        except elasticsearch.ConnectionError as ex:
+            logger.warning('Elasticsearch service is unavailable: ' + str(ex))
+            self.active = False
 
     def _search(self, query: str, limit: int) -> list[Collection]:
         response = self.elastic.search(
@@ -97,5 +103,8 @@ class CollectionMatcher:
         return [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
     def search(self, query: str, mode: str = 'featured', limit: int = 3) -> list[Collection]:
+        if not self.active:
+            return []
+
         query = query if mode == 'template' else ' '.join(self.tokenizer.tokenize(query)[0])
         return self._search(query, limit)
