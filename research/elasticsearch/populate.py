@@ -140,7 +140,7 @@ def gen(path, limit):
 
             yield {
                 "_index": INDEX_NAME,
-                "_type": '_doc',
+                # "_type": '_doc',
                 "_source": doc
             }
 

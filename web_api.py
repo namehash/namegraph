@@ -11,6 +11,7 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
+from generator.collection import CollectionMatcher
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
 
@@ -82,12 +83,17 @@ def seed_all(seed: int | str):
 generator = init()
 inspector = init_inspector()
 
+# TODO move this elsewhere, temporary for now
+collections_matcher = CollectionMatcher(generator.config)
+
 domains = Domains(generator.config)
 categories = Categories(generator.config)
 
 from models import (
     Name,
     Suggestion,
+    CollectionSearch,
+    Collection
 )
 
 
@@ -133,5 +139,35 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-# @app.post("/collection", response_model=str)
-# async def collection()
+@app.post("/collections/template", response_model=list[Collection])
+async def template_collections(query: CollectionSearch):
+    collections = collections_matcher.search(query.query, mode='template', limit=query.limit)
+
+    response = [
+        {
+            'title': collection.name,
+            'names': collection.names,
+            'rank': collection.rank,
+            'score': collection.score
+        }
+        for collection in collections
+    ]
+
+    return JSONResponse(response)
+
+
+@app.post("/collections/featured", response_model=list[Collection])
+async def featured_collections(query: CollectionSearch):
+    collections = collections_matcher.search(query.query, mode='featured', limit=query.limit)
+
+    response = [
+        {
+            'title': collection.name,
+            'names': collection.names,
+            'rank': collection.rank,
+            'score': collection.score
+        }
+        for collection in collections
+    ]
+
+    return JSONResponse(response)
