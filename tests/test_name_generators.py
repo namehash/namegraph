@@ -327,6 +327,7 @@ def test_emoji_generator_long():
         generated_names = list(strategy.generate(tokenized_name))
 
 
+@pytest.mark.skip(reason='CategoriesGenerator no longer returns deterministic results')
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -335,6 +336,23 @@ def test_categories():
         generated_names = list(strategy.generate(tokenized_name))
 
         assert generated_names.index(('lion',)) < generated_names.index(('cheetah',))
+
+
+def test_single_token_categories_randomization():
+    with initialize(version_base=None, config_path="../conf/"):
+        from collections import Counter
+        config = compose(config_name="prod_config_new")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = ('wolf',)  # todo: this generates [lion, wolf, cheetah], how to get more suggestions?
+        counter = Counter()         # todo: with name='peppers' I get only ['peppers'] :(
+        n_times = 10
+        for _ in range(n_times):
+            generated_list = list(strategy.generate(tokenized_name))
+            generated_names = list(map(lambda x: x[0], generated_list))
+            n_top = len(generated_names)//2
+            counter.update(Counter(generated_names[:n_top]))
+        counter_items = sorted(counter.items(), key=lambda x: x[1], reverse=True)
+        assert counter_items[0][1] < n_times
 
 
 def test_multi_categories():
