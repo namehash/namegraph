@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections15all'
+INDEX_NAME = 'collections16all'
 
 
 def connect_to_elasticsearch(
@@ -147,7 +147,9 @@ def gen(path, limit):
                 continue
             doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
             doc['metadata']['members_count'] = len(doc['data']['names'])
-
+            if doc['metadata']['members_count'] > 10000:
+                continue
+                
             yield {
                 "_index": INDEX_NAME,
                 # "_type": '_doc',
