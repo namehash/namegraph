@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections13all'
+INDEX_NAME = 'collections15all'
 
 
 def connect_to_elasticsearch(
@@ -79,6 +79,13 @@ def initialize_index(es: Elasticsearch):
                         ]
                     }
                 }
+            },
+            "similarity": {
+                "BM25_b0": {
+                    "type": "BM25",
+                    "k1": 1.2,
+                    "b": 0
+                },
             }
         },
         "mappings": {
@@ -90,12 +97,14 @@ def initialize_index(es: Elasticsearch):
                                                  "analyzer": "english_exact"
                                              }
                                          }},
-                "data.names.normalized_name": {"type": "text", "similarity": "BM25"},
-                "data.names.tokenized_name": {"type": "text", "similarity": "BM25"},
+                # b=0 so document length doesn't matter
+                "data.names.normalized_name": {"type": "text", "similarity": "BM25_b0"},
+                "data.names.tokenized_name": {"type": "text", "similarity": "BM25_b0"},
                 "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
                 # "template.collection_articles": {"type": "text", "similarity": "BM25"},  # TODO remove?
                 "template.collection_rank": {"type": "rank_feature"},
+                "metadata.members_count": {"type": "rank_feature"},
             }
         },
     }
@@ -137,6 +146,7 @@ def gen(path, limit):
             if doc['data']['collection_name'].startswith('Lists of'):
                 continue
             doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
+            doc['metadata']['members_count'] = len(doc['data']['names'])
 
             yield {
                 "_index": INDEX_NAME,

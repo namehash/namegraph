@@ -1,7 +1,11 @@
+import json
 from argparse import ArgumentParser
 
 from elasticsearch import Elasticsearch
 from populate import INDEX_NAME
+
+
+# INDEX_NAME = 'collections14all'
 
 
 def connect_to_elasticsearch(
@@ -29,10 +33,12 @@ def search_by_name(query, limit, with_rank=True):
                         "multi_match": {
                             "query": query,
                             "fields": [
-                                "data.collection_name^2",
+                                "data.collection_name^3",
                                 "data.collection_name.exact^3",
-                                "data.collection_description",
+                                "data.collection_description^2",
                                 "data.collection_keywords^2",
+                                "data.names.normalized_name",
+                                "data.names.tokenized_name",
                             ],
                             "type": "cross_fields",
                         }
@@ -42,9 +48,15 @@ def search_by_name(query, limit, with_rank=True):
                     {
                         "rank_feature": {
                             "field": "template.collection_rank",
+                            "boost": 100,
                             # "log": {
                             #     "scaling_factor": 4
                             # }
+                        }
+                    },
+                    {
+                        "rank_feature": {
+                            "field": "metadata.members_count",
                         }
                     }
                 ]
@@ -58,7 +70,8 @@ def search_by_name(query, limit, with_rank=True):
 
     response = es.search(
         index=INDEX_NAME,
-        body=body
+        body=body,
+        explain=args.explain
     )
 
     hits = response["hits"]["hits"]
@@ -68,6 +81,7 @@ def search_by_name(query, limit, with_rank=True):
 def search_by_all(query, limit):
     response = es.search(
         index=INDEX_NAME,
+        explain=args.explain,
         body={
             "query": {
                 "bool": {
@@ -76,11 +90,11 @@ def search_by_all(query, limit):
                             "multi_match": {
                                 "query": query,
                                 "fields": [
-                                    "data.collection_name^2",
+                                    "data.collection_name^3",
                                     "data.collection_name.exact^3",
                                     "data.names.normalized_name",
                                     "data.names.tokenized_name",
-                                    "data.collection_description",
+                                    "data.collection_description^2",
                                     "data.collection_keywords^2",
                                     # "template.collection_articles"
                                 ],
@@ -92,9 +106,15 @@ def search_by_all(query, limit):
                         {
                             "rank_feature": {
                                 "field": "template.collection_rank",
+                                "boost": 100,
                                 # "log": {
                                 #     "scaling_factor": 4
                                 # }
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "metadata.members_count",
                             }
                         }
                     ]
@@ -109,6 +129,17 @@ def search_by_all(query, limit):
     return hits
 
 
+def print_exlanation(hits):
+    print('<details><summary>Explanation</summary><table border=1>')
+    print(f'<tr><th>name</th><th>explanation</th></tr>')
+    for hit in hits:
+        name = hit['_source']['data']['collection_name']
+        explanation = hit['_explanation']
+        print(
+            f'<tr><td>{name}</td><td><pre>{json.dumps(explanation, indent=2, ensure_ascii=False)}</pre></td></tr>')
+    print('</table></details>')
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('queries', nargs='+', help='queries')
@@ -117,6 +148,8 @@ if __name__ == '__main__':
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
     parser.add_argument('--password', default='password', help='elasticsearch password')
     parser.add_argument('--limit', default=10, type=int, help='limit the number of collections to retrieve')
+    parser.add_argument('--limit_names', default=100, type=int, help='limit the number of collections to retrieve')
+    parser.add_argument('--explain', action='store_true', help='run search with explain')
     args = parser.parse_args()
 
     es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
@@ -139,6 +172,8 @@ if __name__ == '__main__':
                 f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td></tr>')
         print('</table>')
 
+        if args.explain: print_exlanation(hits)
+
         print(f'<h2>only collection without rank</h2>')
         hits = search_by_name(query, args.limit, with_rank=False)
         print('<table>')
@@ -154,6 +189,8 @@ if __name__ == '__main__':
                 f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td></tr>')
         print('</table>')
 
+        if args.explain: print_exlanation(hits)
+
         print(f'<h2>collection + names</h2>')
         hits = search_by_all(query, args.limit)
         print('<table>')
@@ -165,7 +202,8 @@ if __name__ == '__main__':
             link = hit['_source']['template']['collection_wikipedia_link']
             type_wikidata_id = hit['_source']['template']['collection_type_wikidata_id']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
-            names = ', '.join([x['normalized_name'] for x in hit['_source']['data']['names']])
+            names = f"<b>{len(hit['_source']['data']['names'])}:</b> " + ', '.join(
+                [x['normalized_name'] for x in hit['_source']['data']['names'][:args.limit_names]])
             print(
                 f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td><td>{names}</td></tr>')
 
@@ -175,3 +213,5 @@ if __name__ == '__main__':
             # print(', '.join([x['normalized_name'] for x in hit['_source']['data']['names']]))
             print()
         print('</table>')
+
+        if args.explain: print_exlanation(hits)
