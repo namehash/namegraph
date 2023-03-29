@@ -1,6 +1,10 @@
 import csv
 import glob
-import itertools, collections
+import numpy as np
+from numpy import typing as npt
+import random
+import itertools
+import collections
 import logging
 from pathlib import Path
 from operator import itemgetter
@@ -14,6 +18,12 @@ from ..input_name import InputName, Interpretation
 from ..utils import Singleton
 
 logger = logging.getLogger('generator')
+
+
+def _softmax(x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    exps = np.exp(x - np.amax(x))
+    exps_totals = np.sum(exps)
+    return exps / exps_totals
 
 
 class Categories(metaclass=Singleton):
@@ -60,9 +70,17 @@ class CategoriesGenerator(NameGenerator):
         token = ''.join(tokens)
         tokens_synsets = self.get_similar(token).items()
 
-        # todo: choose best approach and implement (weighted shuffle / 2 buckets shuffle)
+        suggestions, probabilities = zip(*tokens_synsets)
+        # todo: should we clip counts to 3/sth else or should we not clip at all?
+        probabilities = _softmax(np.clip(probabilities, 0., 3.)).tolist()
+        yield_order = sorted(
+            range(len(suggestions)),
+            key=lambda i: random.random() ** (1.0 / probabilities[i]),
+            reverse=True
+        )
 
-        return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
+        # return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
+        return ((suggestions[i],) for i in yield_order)
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)
