@@ -19,4 +19,4 @@ web3
 boto3
 python-dotenv
 more-itertools==9.0.0
-elasticsearch==7.10.1
+elasticsearch==7.10.1  # FIXME update version to the one used in AWS

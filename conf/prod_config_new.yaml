@@ -32,7 +32,7 @@ elasticsearch:
   port: 9200
   username: elastic
   password: password
-  index: collections13all
+  index: collections
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv

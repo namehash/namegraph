@@ -4,7 +4,6 @@ defaults:
 # Configuration for the individual modules. So far all modules share the same config.
 # This might be moved to the pipeline definition.
 app:
-  elasticsearch_password: ${env:ELASTICSEARCH_PASSWORD}
   # read input from argument (query) or stdin
   input: query
   # the list of the domains, that are already registered

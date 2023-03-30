@@ -102,9 +102,9 @@ class CollectionMatcher:
         hits = response["hits"]["hits"]
         return [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-    def search(self, query: str, mode: str = 'featured', limit: int = 3) -> list[Collection]:
+    def search(self, query: str, tokenized: bool = False, limit: int = 3) -> list[Collection]:
         if not self.active:
             return []
 
-        query = query if mode == 'template' else ' '.join(self.tokenizer.tokenize(query)[0])
+        query = query if tokenized else ' '.join(self.tokenizer.tokenize(query)[0])
         return self._search(query, limit)

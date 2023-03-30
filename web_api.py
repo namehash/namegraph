@@ -1,5 +1,5 @@
 import gc
-import logging, random, hashlib, json, os
+import logging, random, hashlib, json
 from typing import List, Optional
 
 import numpy as np
@@ -141,7 +141,7 @@ async def root(name: Name):
 
 @app.post("/collections/template", response_model=list[Collection])
 async def template_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, mode='template', limit=query.limit)
+    collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
 
     response = [
         {
@@ -158,7 +158,7 @@ async def template_collections(query: CollectionSearch):
 
 @app.post("/collections/featured", response_model=list[Collection])
 async def featured_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, mode='featured', limit=query.limit)
+    collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
 
     response = [
         {
