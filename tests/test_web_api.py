@@ -1,6 +1,5 @@
 import os
 import sys
-import itertools
 from typing import List
 
 import pytest
@@ -8,10 +7,12 @@ from pytest import mark
 from fastapi.testclient import TestClient
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
 
 
 @pytest.fixture(scope="module")
 def test_test_client():
+    Categories.remove_self()
     Domains.remove_self()
     os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api

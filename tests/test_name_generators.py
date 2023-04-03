@@ -3,7 +3,7 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.generation.categories_generator import MultiTokenCategoriesGenerator
+from generator.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
 from generator.preprocessor import Preprocessor
 from generator.generation import (
     HyphenGenerator,
@@ -41,6 +41,7 @@ needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree 
 @pytest.fixture(autouse=True)
 def run_around_tests():
     Domains.remove_self()
+    Categories.remove_self()
     yield
 
 
@@ -338,14 +339,12 @@ def test_categories():
         assert generated_names.index(('lion',)) < generated_names.index(('cheetah',))
 
 
-@pytest.mark.skip(reason='Need to fix getting more suggestions first')
 def test_single_token_categories_randomization():
     with initialize(version_base=None, config_path="../conf/"):
-        from collections import Counter
         config = compose(config_name="prod_config_new")
         strategy = CategoriesGenerator(config)
-        tokenized_name = ('wolf',)  # fixme: this generates [lion, wolf, cheetah], how to get more suggestions?
-                                    # fixme: with name='peppers' I get only ['peppers'] :(
+        tokenized_name = ('wolf',)
+
         generated_names_a = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
         generated_names_b = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
         assert generated_names_a != generated_names_b
@@ -389,8 +388,6 @@ def test_single_token_categories():
         generated_names = list(strategy.generate(tokenized_name))
         assert ('0x1',) in generated_names
         assert ('0x2',) in generated_names
-
-
 
 
 @mark.parametrize(
@@ -575,6 +572,7 @@ def test_keycap_generator():
         tokenized_name = ('fire', '-', 'cell')
         generated_names = list(strategy.generate(tokenized_name))
         assert not generated_names
+
 
 def test_person_name():
     with initialize(version_base=None, config_path="../conf/"):
