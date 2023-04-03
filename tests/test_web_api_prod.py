@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from hydra import initialize, compose
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
 
 from helpers import check_generator_response, generate_example_names
 
@@ -14,6 +15,7 @@ from helpers import check_generator_response, generate_example_names
 @pytest.fixture(scope="module")
 def prod_test_client():
     Domains.remove_self()
+    Categories.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
