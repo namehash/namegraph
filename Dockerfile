@@ -29,7 +29,7 @@ RUN pip3 install --no-cache-dir -e .
 COPY . .
 RUN python3 generator/download.py
 
-RUN python3 namehash_common/generate_cache.py
+RUN python3 generator/namehash_common/generate_cache.py
 
 HEALTHCHECK --interval=60s --start-period=60s --retries=3 CMD python3 healthcheck.py
 

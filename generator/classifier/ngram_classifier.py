@@ -1,7 +1,7 @@
 from generator.classifier.classifier import Classifier
 from generator.input_name import InputName, Interpretation
 from generator.tokenization import WordNinjaTokenizer
-from namehash_common.ngrams import Ngrams
+from generator.namehash_common.ngrams import Ngrams
 
 
 class NGramClassifier(Classifier):
