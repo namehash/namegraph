@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from tqdm import tqdm
 
-INDEX_NAME = 'collections16all'
+INDEX_NAME = 'collection-templates-1'
 
 
 def connect_to_elasticsearch(
@@ -25,6 +25,18 @@ def connect_to_elasticsearch(
             'port': port
         }],
         http_auth=(username, password),
+        timeout=60
+    )
+
+
+def connect_to_elasticsearch_using_cloud_id(
+        cloud_id: str,
+        username: str,
+        password: str,
+):
+    return Elasticsearch(
+        cloud_id=cloud_id,
+        basic_auth=(username, password),
         timeout=60
     )
 
@@ -110,8 +122,8 @@ def initialize_index(es: Elasticsearch):
     }
 
     # TODO handle errors
-    if not es.indices.exists(INDEX_NAME):
-        es.indices.create(INDEX_NAME, body=mapping)
+    if not es.indices.exists(index=INDEX_NAME):
+        es.indices.create(index=INDEX_NAME, body=mapping)
     else:
         print('Warning: index already exists, no changes applied')
 
@@ -149,7 +161,7 @@ def gen(path, limit):
             doc['metadata']['members_count'] = len(doc['data']['names'])
             if doc['metadata']['members_count'] > 10000:
                 continue
-                
+
             yield {
                 "_index": INDEX_NAME,
                 # "_type": '_doc',
@@ -165,9 +177,13 @@ if __name__ == '__main__':
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
     parser.add_argument('--password', default='password', help='elasticsearch password')
     parser.add_argument('--limit', default=None, type=int, help='limit the number of collections to insert')
+    parser.add_argument('--cloud_id', default=None, help='cloud id')
     args = parser.parse_args()
 
-    es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
+    if args.cloud_id:
+        es = connect_to_elasticsearch_using_cloud_id(args.cloud_id, args.username, args.password)
+    else:
+        es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
 
     initialize_index(es)
 
