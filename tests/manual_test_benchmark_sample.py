@@ -137,6 +137,8 @@ def check(r):
 def test_shuffle(benchmark):
     r = benchmark(shuffle)
     check(r)
+
+
 def test_numpy_wo_replace(benchmark):
     r = benchmark(numpy_wo_replace)
     check(r)

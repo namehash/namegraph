@@ -1,8 +1,5 @@
 import csv
-import glob
 import numpy as np
-from numpy import typing as npt
-import random
 import itertools
 import collections
 import logging
@@ -19,11 +16,6 @@ from ..utils import Singleton
 
 logger = logging.getLogger('generator')
 
-
-def _softmax(x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-    exps = np.exp(x - np.amax(x))
-    exps_totals = np.sum(exps)
-    return exps / exps_totals
 
 
 class Categories(metaclass=Singleton):
@@ -70,17 +62,35 @@ class CategoriesGenerator(NameGenerator):
         token = ''.join(tokens)
         tokens_synsets = self.get_similar(token).items()
 
-        suggestions, probabilities = zip(*tokens_synsets)
-        # todo: should we clip counts to 3/sth else or should we not clip at all?
-        probabilities = _softmax(np.clip(probabilities, 0., 3.)).tolist()
-        yield_order = sorted(
-            range(len(suggestions)),
-            key=lambda i: random.random() ** (1.0 / probabilities[i]),
-            reverse=True
-        )
+        suggestions, interesting_scores = zip(*tokens_synsets)
 
-        # return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
-        return ((suggestions[i],) for i in yield_order)
+        bucket_top = [s for i, s in enumerate(suggestions) if interesting_scores[i] > 1.]
+        bucket_mid = [s for i, s in enumerate(suggestions) if 0.9 <= interesting_scores[i] <= 1.]
+        bucket_low = [s for i, s in enumerate(suggestions) if interesting_scores[i] < 0.9]
+
+        # mix buckets
+        SWAP_COUNT_DENOM = 8
+        n_mixed_top_mid = min(len(bucket_top) // SWAP_COUNT_DENOM, len(bucket_mid) // SWAP_COUNT_DENOM)
+        n_mixed_mid_low = min(len(bucket_mid) // SWAP_COUNT_DENOM, len(bucket_low) // SWAP_COUNT_DENOM)
+        for i in range(max(n_mixed_top_mid, n_mixed_mid_low)):
+            if i < n_mixed_top_mid:
+                top_i = np.random.randint(len(bucket_top))
+                mid_i = np.random.randint(len(bucket_mid))
+                bucket_top[top_i], bucket_mid[mid_i] = bucket_mid[mid_i], bucket_top[top_i]
+            if i < n_mixed_mid_low:
+                mid_i = np.random.randint(len(bucket_mid))
+                low_i = np.random.randint(len(bucket_low))
+                bucket_mid[mid_i], bucket_low[low_i] = bucket_low[low_i], bucket_mid[mid_i]
+
+        # shuffle buckets
+        for bucket in (bucket_top, bucket_mid, bucket_low):
+            if bucket:
+                np.random.shuffle(bucket)
+
+        suggestions = bucket_top + bucket_mid + bucket_low
+
+        return ((s,) for s in suggestions)
+
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)

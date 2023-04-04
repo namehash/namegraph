@@ -343,7 +343,7 @@ def test_single_token_categories_randomization():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="prod_config_new")
         strategy = CategoriesGenerator(config)
-        tokenized_name = ('wolf',)
+        tokenized_name = ('pikachu',)
 
         generated_names_a = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
         generated_names_b = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
