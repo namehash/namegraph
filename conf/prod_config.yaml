@@ -83,6 +83,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   normalizers:
@@ -110,3 +111,6 @@ ngrams:
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000
+collections:
+  collections_limit: 3
+  suggestions_limit: 20  # per one collections

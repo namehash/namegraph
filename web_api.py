@@ -145,7 +145,7 @@ async def template_collections(query: CollectionSearch):
 
     response = [
         {
-            'title': collection.name,
+            'title': collection.title,
             'names': collection.names,
             'rank': collection.rank,
             'score': collection.score
@@ -162,7 +162,7 @@ async def featured_collections(query: CollectionSearch):
 
     response = [
         {
-            'title': collection.name,
+            'title': collection.title,
             'names': collection.names,
             'rank': collection.rank,
             'score': collection.score

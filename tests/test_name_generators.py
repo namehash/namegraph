@@ -25,6 +25,7 @@ from generator.generation import (
     KeycapGenerator,
     PersonNameGenerator,
     SymbolGenerator,
+    CollectionGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -569,3 +570,13 @@ def test_person_name():
         tokenized_name = ('chris',)
         generated_names = list(strategy.generate(tokenized_name))
         assert ('iam', 'chris') in generated_names
+
+
+@pytest.mark.integration_test
+def test_collection_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = CollectionGenerator(config)
+        tokenized_name = ('pink', 'floyd')
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('the', 'dark', 'side', 'of', 'the', 'moon') in generated_names

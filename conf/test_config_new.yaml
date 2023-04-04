@@ -35,7 +35,7 @@ elasticsearch:
   port: 9200
   username: elastic
   password: password
-  index: collections
+  index: collections16all  # TODO create a specific test index with a few test collections
 filtering:
   # List of already registered domains
 #  domains: tests/data/primary.csv
@@ -87,6 +87,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   generator: RandomAvailableNameGenerator
@@ -109,3 +110,6 @@ ngrams:
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: tests/data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000
+collections:
+  collections_limit: 3
+  suggestions_limit: 20  # per one collections

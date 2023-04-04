@@ -83,6 +83,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   normalizers:
@@ -100,3 +101,6 @@ person_names:
   lastnames_path: data/person_names_lastnames.json
   other_path: data/person_names_other.json
   country_stats_path: data/person_names_country_stats.json
+collections:
+  collections_limit: 3
+  suggestions_limit: 20  # per one collections
