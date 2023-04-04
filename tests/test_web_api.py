@@ -56,9 +56,10 @@ def test_metadata_scheme(test_test_client, name: str):
 
     for generated_name in json:
         assert sorted(generated_name.keys()) == sorted(["name", "metadata"])
-        assert sorted(generated_name["metadata"].keys()) == sorted(
-            ['applied_strategies', 'cached_interesting_score', 'cached_status',
-             'categories', 'interpretation', 'pipeline_name'])
+        assert sorted(generated_name["metadata"].keys()) == sorted([
+            'applied_strategies', 'cached_interesting_score', 'cached_status',
+            'categories', 'interpretation', 'pipeline_name', 'collection'
+        ])
 
 
 @mark.parametrize(

@@ -32,7 +32,7 @@ class Collection:
 
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
-        return Collection(
+        return cls(
             title=hit['_source']['data']['collection_name'],
             names=[x['normalized_name'] for x in hit['_source']['data']['names']],
             tokenized_names=[tuple(x['tokenized_name']) for x in hit['_source']['data']['names']],

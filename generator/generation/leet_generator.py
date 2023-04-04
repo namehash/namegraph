@@ -6,7 +6,7 @@ import math
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
 
-LEETSPEAK_PATH = 'data/leetspeak.json'
+LEETSPEAK_PATH = 'data/leetspeak.json'  # FIXME should it be here like that?
 
 
 def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> Iterable[

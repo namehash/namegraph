@@ -8,7 +8,7 @@ from generator.input_name import Interpretation, InputName
 
 class NameGenerator:
     """
-    Base class for generating names. The class is reposnsible for generating new
+    Base class for generating names. The class is responsible for generating new
     names based on the already tokenized input. It provides the apply method,
     responsible for registering the applied generators.
     """

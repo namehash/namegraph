@@ -112,6 +112,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'categories': categories.get_categories(str(name)),
                 'interpretation': name.interpretation,
                 'pipeline_name': name.pipeline_name,
+                'collection': name.collection
             }
 
     return response

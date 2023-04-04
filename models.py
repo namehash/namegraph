@@ -43,6 +43,11 @@ class Metadata(BaseModel):
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
+    collection: Optional[str] = Field(
+        name='name of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its name, else it is null'
+    )
 
 
 class Suggestion(BaseModel):

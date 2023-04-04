@@ -209,3 +209,21 @@ class TestSubstringMatch:
         json = response.json()
         names = [name["name"] for name in json]
         assert "i💛you.eth" in names
+
+
+@pytest.fixture(scope='class')
+def collection_test_pipelines():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_collections'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
+
+
+@mark.usefixtures("collection_test_pipelines")
+@mark.integration_test
+class TestCollections:
+    def test_metadata_collection_field(self, test_client):
+        response = test_client.post("/", json={"name": "pinkfloyd"})
+        assert response.status_code == 200
+        json = response.json()
+        collection_names = [name["metadata"]["collection"] for name in json]
+        assert "Pink Floyd albums" in collection_names
