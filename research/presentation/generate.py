@@ -9,14 +9,16 @@ import regex
 from tqdm import tqdm
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
 from fastapi.testclient import TestClient
 
 
 # TODO position of first appearance
-# TODO 
+# TODO
 
 def prod_test_client(config):
     Domains.remove_self()
+    Categories.remove_self()
     os.environ['CONFIG_NAME'] = config
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:
