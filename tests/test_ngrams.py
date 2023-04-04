@@ -1,6 +1,6 @@
 from hydra import initialize, compose
 
-from namehash_common.ngrams import Ngrams
+from generator.namehash_common.ngrams import Ngrams
 
 
 def test_ngrams():
