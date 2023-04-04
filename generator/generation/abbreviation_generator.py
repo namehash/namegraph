@@ -29,6 +29,9 @@ class AbbreviationGenerator(NameGenerator):
         return tuple(abbrev_tokens)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         word_tokens = tuple([True if self.word_regex.fullmatch(token) else False for token in tokens])
         all_flags_generator = islice(product((False, True), repeat=sum(word_tokens)), 1, self.limit)
         all_flags = sorted(all_flags_generator, key=sum)

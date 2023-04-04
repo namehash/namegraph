@@ -13,6 +13,9 @@ class SpecialCharacterAffixGenerator(NameGenerator):
         super().__init__(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         results = [('_',) + tokens, ('$',) + tokens]
         if all([token.isascii() for token in tokens]):
             results.extend([('ξ',) + tokens, tokens + ('ξ',)])

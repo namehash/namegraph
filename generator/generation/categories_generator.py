@@ -1,6 +1,7 @@
 import csv
-import glob
-import itertools, collections
+import numpy as np
+import itertools
+import collections
 import logging
 from pathlib import Path
 from operator import itemgetter
@@ -14,6 +15,7 @@ from ..input_name import InputName, Interpretation
 from ..utils import Singleton
 
 logger = logging.getLogger('generator')
+
 
 
 class Categories(metaclass=Singleton):
@@ -54,10 +56,41 @@ class CategoriesGenerator(NameGenerator):
         self.categories = Categories(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         token = ''.join(tokens)
         tokens_synsets = self.get_similar(token).items()
 
-        return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
+        suggestions, interesting_scores = zip(*tokens_synsets)
+
+        bucket_top = [s for i, s in enumerate(suggestions) if interesting_scores[i] > 1.]
+        bucket_mid = [s for i, s in enumerate(suggestions) if 0.9 <= interesting_scores[i] <= 1.]
+        bucket_low = [s for i, s in enumerate(suggestions) if interesting_scores[i] < 0.9]
+
+        # mix buckets
+        SWAP_COUNT_DENOM = 8
+        n_mixed_top_mid = min(len(bucket_top) // SWAP_COUNT_DENOM, len(bucket_mid) // SWAP_COUNT_DENOM)
+        n_mixed_mid_low = min(len(bucket_mid) // SWAP_COUNT_DENOM, len(bucket_low) // SWAP_COUNT_DENOM)
+        for i in range(max(n_mixed_top_mid, n_mixed_mid_low)):
+            if i < n_mixed_top_mid:
+                top_i = np.random.randint(len(bucket_top))
+                mid_i = np.random.randint(len(bucket_mid))
+                bucket_top[top_i], bucket_mid[mid_i] = bucket_mid[mid_i], bucket_top[top_i]
+            if i < n_mixed_mid_low:
+                mid_i = np.random.randint(len(bucket_mid))
+                low_i = np.random.randint(len(bucket_low))
+                bucket_mid[mid_i], bucket_low[low_i] = bucket_low[low_i], bucket_mid[mid_i]
+
+        # shuffle buckets
+        for bucket in (bucket_top, bucket_mid, bucket_low):
+            if bucket:
+                np.random.shuffle(bucket)
+
+        suggestions = bucket_top + bucket_mid + bucket_low
+
+        return ((s,) for s in suggestions)
+
 
     def get_similar(self, token: str) -> Dict[str, int]:
         stats = collections.defaultdict(int)

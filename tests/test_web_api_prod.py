@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 from hydra import initialize, compose
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
+from generator.collection import CollectionMatcher
 
 from helpers import check_generator_response, generate_example_names
 
@@ -14,6 +16,8 @@ from helpers import check_generator_response, generate_example_names
 @pytest.fixture(scope="module")
 def prod_test_client():
     Domains.remove_self()
+    Categories.remove_self()
+    CollectionMatcher.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
@@ -202,8 +206,8 @@ def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
                            json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
-                                 "max_suggestions": 1000, "params": {                              
-                                       "country": 'pl'
+                                 "max_suggestions": 1000, "params": {
+                                   "country": 'pl'
                                }})
 
     assert response.status_code == 200
@@ -228,7 +232,7 @@ def test_prod_short_suggestions(prod_test_client):
     response = client.post("/",
                            json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
-                                       "country": 'pl'
+                                   "country": 'pl'
                                }})
 
     assert response.status_code == 200
@@ -330,3 +334,19 @@ def test_elasticsearch_featured_collections_search(prod_test_client):
     assert response.status_code == 200
     titles = [collection['title'] for collection in response.json()]
     assert 'Highest mountains on Earth' in titles
+
+
+def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
+    client = prod_test_client
+    response = client.post("/",
+                           json={"name": "😊😊😊", "metadata": True,
+                                 "params": {
+                                     "mode": "full",
+                                     "country": 'pl'
+                                 }})
+
+    assert response.status_code == 200
+
+    json = response.json()
+
+    assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])

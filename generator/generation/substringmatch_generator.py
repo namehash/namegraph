@@ -84,6 +84,9 @@ class SubstringMatchGenerator(NameGenerator):
         self.re_impl = ReImpl(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         pattern = ''.join(tokens)
 
         if len(pattern) <= self.short_heuristic or self.suffix_tree_impl is None:

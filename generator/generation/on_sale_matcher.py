@@ -26,6 +26,9 @@ class OnSaleMatchGenerator(NameGenerator):
                 self.index[token][(name,)] = None
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         result = []
         for token in tokens:
             result.extend(self.index[token].keys())

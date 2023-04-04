@@ -30,6 +30,9 @@ class W2VGenerator(NameGenerator):
         self.combination_limiter = CombinationLimiter(self.limit)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         topn = int(10000 ** (1 / max(len(tokens), 1)) + 1)
 
         tokens_synsets = []

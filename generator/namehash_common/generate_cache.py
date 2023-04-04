@@ -10,17 +10,17 @@ from hydra import compose, initialize
 
 import generator.xgenerator
 # if there are modules not imported by xgenerator, import them here
-import namehash_common.ngrams
+import generator.namehash_common.ngrams
 
-import namehash_common.pickle_cache as pickle_cache
-from namehash_common.paths import PROJECT_ROOT
+import generator.namehash_common.pickle_cache as pickle_cache
+from generator.namehash_common.paths import PROJECT_ROOT
 
 
 if __name__ == '__main__':
     # cd to the root of the project
     os.chdir(PROJECT_ROOT)
 
-    with initialize(version_base=None, config_path='../conf/'):
+    with initialize(version_base=None, config_path='../../conf/'):
         config = compose(config_name='prod_config_new')
 
         print('Removing old cache')

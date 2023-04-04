@@ -7,6 +7,7 @@ from pytest import mark
 from fastapi.testclient import TestClient
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
 
 
 @pytest.fixture(scope='class')
@@ -26,6 +27,7 @@ def emoji_pipeline():
 @pytest.fixture(scope="class")
 def test_client():
     Domains.remove_self()
+    Categories.remove_self()
     os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api
     if 'web_api' not in sys.modules:
