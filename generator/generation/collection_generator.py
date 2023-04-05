@@ -1,9 +1,25 @@
 from typing import List, Tuple, Iterable, Any
+from itertools import cycle, islice
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
 from ..collection import CollectionMatcher
 from ..generated_name import GeneratedName
+
+
+def roundrobin(*iterables):
+    "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
+    # Recipe credited to George Sakkis
+    num_active = len(iterables)
+    nexts = cycle(iter(it).__next__ for it in iterables)
+    while num_active:
+        try:
+            for next in nexts:
+                yield next()
+        except StopIteration:
+            # Remove the iterator we just exhausted from the cycle.
+            num_active -= 1
+            nexts = cycle(islice(nexts, num_active))
 
 
 class CollectionGenerator(NameGenerator):
@@ -21,11 +37,16 @@ class CollectionGenerator(NameGenerator):
         tokens = interpretation.tokenization
         collections = self.collection_matcher.search(tokens, tokenized=True, limit=self.collections_limit)
 
-        return (
-            GeneratedName(name_tokens, applied_strategies=[[self.__class__.__name__]], collection=collection.title)
+        # list of collections, where each collection is a list of tuples - (collection object, tokenized_name)
+        collections_with_tuples = [
+            [(collection, tokenized_name) for tokenized_name in collection.tokenized_names[:self.suggestions_limit]]
             for collection in collections
-            for name_tokens in collection.tokenized_names[:self.suggestions_limit]
-            if name_tokens != tokens
+        ]
+
+        return (
+            GeneratedName(tokenized_name, applied_strategies=[[self.__class__.__name__]], collection=collection.title)
+            for collection, tokenized_name in roundrobin(*collections_with_tuples)
+            if tokenized_name != tokens
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
