@@ -25,6 +25,7 @@ from generator.generation import (
     KeycapGenerator,
     PersonNameGenerator,
     SymbolGenerator,
+    EasterEggGenerator,
     CollectionGenerator,
 )
 from generator.generated_name import GeneratedName
@@ -582,6 +583,21 @@ def test_person_name():
         tokenized_name = ('chris',)
         generated_names = list(strategy.generate(tokenized_name))
         assert ('iam', 'chris') in generated_names
+
+
+def test_easteregg_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = EasterEggGenerator(config)
+
+        tokenized_name = ('byczong',)
+        generated_names = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
+        assert all(['byczong' in name or
+                    name in (
+                        'i-am-so-tired-of-making-suggestions',
+                        'please-stop-typing-so-fast',
+                        'you-hurting-me'
+                    ) for name in generated_names])
 
 
 @pytest.mark.integration_test

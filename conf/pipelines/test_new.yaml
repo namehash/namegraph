@@ -190,3 +190,16 @@
       en: 2
     other:
       default: 0
+-
+  name: easteregg
+  generator: EasterEggGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
