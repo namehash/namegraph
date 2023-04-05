@@ -5,6 +5,7 @@ from time import time as get_time
 import pytest
 from fastapi.testclient import TestClient
 from hydra import initialize, compose
+from ens_normalize import is_ens_normalized, ens_cure
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
@@ -350,3 +351,33 @@ def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     json = response.json()
 
     assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])
+
+
+def test_prod_normalization_with_ens_normalize(prod_test_client):
+    client = prod_test_client
+    input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+                   'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
+                   'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
+                   'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
+                   'prayforukraine', 'krakowdragon', 'fiftysix', 'あかまい', '💛', 'asd', 'bartek', 'hongkong',
+                   'hongkonger', 'tyler', 'asdfasdfasdf3453212345', 'nineinchnails', 'krakow', 'joebiden',
+                   'europeanunion', 'rogerfederer', 'suzuki', 'pirates', 'doge', 'ethcorner', 'google', 'apple', '001',
+                   'stop-doing-fake-bids-its-honestly-lame-my-guy', 'kfcsogood', 'wallet', 'الأبيض', 'porno', 'sex',
+                   'slutwife', 'god', 'imexpensive', 'htaccess', 'nike', '€80000', 'starbucks', 'ukraine', '٠٠٩',
+                   'sony', 'kevin', 'discord', 'monaco', 'market', 'sportsbet', 'volodymyrzelensky', 'coffee', 'gold',
+                   'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
+                   'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
+                   'happypeople', 'muscle', 'billybob', 'quo', 'circleci', 'bitcoinmine', 'poweroutage',
+                   'shootingarrowatthesky']
+    for input_name in input_names:
+        response = client.post("/",
+                               json={"name": input_name, "min_suggestions": 100, "max_suggestions": 100,
+                                     "params": {
+                                         "mode": "full"
+                                     }})
+
+        assert response.status_code == 200
+        str_names = [name["name"] for name in response.json()]
+        for name in str_names:
+            assert is_ens_normalized(name), (f'input: {input_name}; unnormalized sug.: {name}; '
+                                             f'should be: {ens_cure(name)}')
