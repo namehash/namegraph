@@ -48,4 +48,10 @@ jobs:
         run: |
             python3 generator/namehash_common/generate_cache.py
       - name: Run tests
+        env:
+          ES_HOST: ${{ secrets.ES_HOST }}
+          ES_PORT: ${{ secrets.ES_PORT }}
+          ES_USERNAME: ${{ secrets.ES_USERNAME }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          ES_INDEX: ${{ secrets.ES_INDEX }}
         run: pytest -vv --durations=0
