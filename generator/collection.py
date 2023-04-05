@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Union, Iterable
 import logging
 
+import elastic_transport
 import elasticsearch
 from omegaconf import DictConfig
 
@@ -61,6 +62,15 @@ class CollectionMatcher(metaclass=Singleton):
 
         except elasticsearch.ConnectionError as ex:
             logger.warning('Elasticsearch service is unavailable: ' + str(ex))
+            self.active = False
+        except elasticsearch.exceptions.AuthenticationException as ex:
+            logger.warning('Elasticsearch authentication failed: ' + str(ex))
+            self.active = False
+        except elastic_transport.ConnectionTimeout as ex:
+            logger.warning('Elasticsearch connection timed out: ' + str(ex))
+            self.active = False
+        except Exception as ex:
+            logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
 
     def _search(self, query: str, limit: int) -> list[Collection]:

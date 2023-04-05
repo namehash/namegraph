@@ -15,7 +15,7 @@ def connect_to_elasticsearch(
         }],
         http_auth=(username, password),
         http_compress=True,
-        #TODO add timeout
+        request_timeout=10,
     )
 
 
