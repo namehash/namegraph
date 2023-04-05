@@ -55,3 +55,11 @@ jobs:
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
           ES_INDEX: ${{ vars.ES_INDEX }}
         run: pytest -vv --durations=0
+      - name: Run ElasticSearch tests
+        env:
+          ES_HOST: ${{ vars.ES_HOST }}
+          ES_PORT: ${{ vars.ES_PORT }}
+          ES_USERNAME: ${{ secrets.ES_USERNAME }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          ES_INDEX: ${{ vars.ES_INDEX }}
+        run: pytest -m "integration_test" -vv --durations=0
