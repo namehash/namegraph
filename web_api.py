@@ -24,11 +24,11 @@ class Settings(BaseSettings):
     config_name: str = "prod_config_new"
     config_overrides: Optional[str] = None
 
-    elasticsearch_host: Optional[str] = None
-    elasticsearch_port: Optional[int] = None
-    elasticsearch_username: Optional[str] = None
-    elasticsearch_password: Optional[str] = None
-    elasticsearch_index: Optional[str] = None
+    # elasticsearch_host: Optional[str] = None
+    # elasticsearch_port: Optional[int] = None
+    # elasticsearch_username: Optional[str] = None
+    # elasticsearch_password: Optional[str] = None
+    # elasticsearch_index: Optional[str] = None
 
 
 settings = Settings()
@@ -44,16 +44,16 @@ def init():
             handler.setLevel(config.app.logging_level)
 
         # overriding elasticsearch data with environment variables
-        if settings.elasticsearch_host:
-            config.elasticsearch.host = settings.elasticsearch_host
-        if settings.elasticsearch_port:
-            config.elasticsearch.port = settings.elasticsearch_port
-        if settings.elasticsearch_username:
-            config.elasticsearch.username = settings.elasticsearch_username
-        if settings.elasticsearch_password:
-            config.elasticsearch.password = settings.elasticsearch_password
-        if settings.elasticsearch_index:
-            config.elasticsearch.index = settings.elasticsearch_index
+        # if settings.elasticsearch_host:
+        #     config.elasticsearch.host = settings.elasticsearch_host
+        # if settings.elasticsearch_port:
+        #     config.elasticsearch.port = settings.elasticsearch_port
+        # if settings.elasticsearch_username:
+        #     config.elasticsearch.username = settings.elasticsearch_username
+        # if settings.elasticsearch_password:
+        #     config.elasticsearch.password = settings.elasticsearch_password
+        # if settings.elasticsearch_index:
+        #     config.elasticsearch.index = settings.elasticsearch_index
 
         generator = Generator(config)
         generator.generate_names('cat', min_suggestions=100, max_suggestions=100, min_available_fraction=0.9)  # init

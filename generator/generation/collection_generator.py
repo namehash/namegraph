@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple, Iterable, Any
 from itertools import cycle, islice
 
@@ -6,7 +7,7 @@ from ..input_name import InputName, Interpretation
 from ..collection import CollectionMatcher
 from ..generated_name import GeneratedName
 
-
+logger = logging.getLogger('generator')
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
@@ -36,6 +37,9 @@ class CollectionGenerator(NameGenerator):
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
         collections = self.collection_matcher.search(tokens, tokenized=True, limit=self.collections_limit)
+
+        for collection in collections:
+            logger.info(f'Collection: {collection.title} score: {collection.score} names: {len(collection.names)}')
 
         # list of collections, where each collection is a list of tuples - (collection object, tokenized_name)
         collections_with_tuples = [
