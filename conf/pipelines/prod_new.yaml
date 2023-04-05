@@ -326,3 +326,24 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+-
+  name: easteregg
+  generator: EasterEggGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 1
+    person:
+      default: 1
+    other:
+      default: 1
+  mode_weights_multiplier:
+    instant: 0.05
+    domain_detail: 0.05
+    full: 0.05
+  global_limits:
+    instant: 0
+    domain_detail: 1
+    full: 1
