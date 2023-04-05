@@ -2,26 +2,13 @@ import json
 from argparse import ArgumentParser
 
 from elasticsearch import Elasticsearch
-from populate import INDEX_NAME
+from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
 
 
 # INDEX_NAME = 'collections14all'
 
 
-def connect_to_elasticsearch(
-        host: str,
-        port: int,
-        username: str,
-        password: str,
-):
-    return Elasticsearch(
-        hosts=[{
-            'scheme': 'http',
-            'host': host,
-            'port': port
-        }],
-        http_auth=(username, password)
-    )
+
 
 
 def search_by_name(query, limit, with_rank=True):
@@ -148,11 +135,15 @@ if __name__ == '__main__':
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
     parser.add_argument('--password', default='password', help='elasticsearch password')
     parser.add_argument('--limit', default=10, type=int, help='limit the number of collections to retrieve')
-    parser.add_argument('--limit_names', default=100, type=int, help='limit the number of collections to retrieve')
+    parser.add_argument('--limit_names', default=100, type=int, help='limit the number of printed names in collections')
     parser.add_argument('--explain', action='store_true', help='run search with explain')
+    parser.add_argument('--cloud_id', default=None, help='cloud id')
     args = parser.parse_args()
 
-    es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
+    if args.cloud_id:
+        es = connect_to_elasticsearch_using_cloud_id(args.cloud_id, args.username, args.password)
+    else:
+        es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
 
     for query in args.queries:
         print(f'<h1>{query}</h1>')

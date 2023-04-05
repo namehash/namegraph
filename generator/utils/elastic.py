@@ -9,13 +9,15 @@ def connect_to_elasticsearch(
 ) -> Elasticsearch:
     return Elasticsearch(
         hosts=[{
-            'scheme': 'http',
+            'scheme': 'https',
             'host': host,
             'port': port
         }],
-        http_auth=(username, password)
+        http_auth=(username, password),
+        http_compress=True,
+        #TODO add timeout
     )
 
 
 def index_exists(elastic: Elasticsearch, index_name: str) -> bool:
-    return elastic.indices.exists(index_name)
+    return elastic.indices.exists(index=index_name)

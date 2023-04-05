@@ -20,12 +20,13 @@ def connect_to_elasticsearch(
 ):
     return Elasticsearch(
         hosts=[{
-            'scheme': 'http',
+            'scheme': 'https',
             'host': host,
             'port': port
         }],
         http_auth=(username, password),
-        timeout=60
+        timeout=60,
+        http_compress=True,
     )
 
 
@@ -37,7 +38,7 @@ def connect_to_elasticsearch_using_cloud_id(
     return Elasticsearch(
         cloud_id=cloud_id,
         basic_auth=(username, password),
-        timeout=60
+        timeout=60,
     )
 
 

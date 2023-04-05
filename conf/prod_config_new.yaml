@@ -28,11 +28,11 @@ app:
   min_available_fraction: 0.1
 # if present, env variables will override values below
 elasticsearch:
-  host: localhost
-  port: 9200
-  username: elastic
-  password: password
-  index: collections16all
+  host: ${oc.env:ES_HOST,localhost}
+  port: ${oc.decode:${oc.env:ES_PORT,9243}}
+  username: ${oc.env:ES_USERNAME,elastic}
+  password: ${oc.env:ES_PASSWORD,password}
+  index: ${oc.env:ES_INDEX,collection-templates}
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
