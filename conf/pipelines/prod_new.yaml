@@ -357,9 +357,9 @@
     - ValidNameFilter
   weights:
     ngram:
-      default: 1
+      default: 0
     person:
-      default: 1
+      default: 0
     other:
       default: 1
   mode_weights_multiplier:
@@ -367,6 +367,6 @@
     domain_detail: 0.05
     full: 0.05
   global_limits:
-    instant: 0
+    instant: 1
     domain_detail: 1
     full: 1
