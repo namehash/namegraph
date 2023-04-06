@@ -9,6 +9,11 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      ES_HOST: ${{ vars.ES_HOST }}
+      ES_PORT: ${{ vars.ES_PORT }}
+      ES_USERNAME: ${{ secrets.ES_USERNAME }}
+      ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+      ES_INDEX: ${{ vars.ES_INDEX }}
       ECR_REPOSITORY: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator
       PROD_IMAGE_TAG: prod-name-generator
       CLUSTER_NAME: prod-name-generator
@@ -26,6 +31,11 @@ jobs:
           docker build \
           --build-arg AWS_SECRET_ACCESS_KEY \
           --build-arg AWS_ACCESS_KEY_ID \
+          --build-arg ES_HOST \
+          --build-arg ES_PORT \
+          --build-arg ES_USERNAME \
+          --build-arg ES_PASSWORD \
+          --build-arg ES_INDEX \
           -t ${ECR_REPOSITORY}:commit_$(git rev-parse --short "$GITHUB_SHA") \
           -t ${ECR_REPOSITORY}:${PROD_IMAGE_TAG} \
           .

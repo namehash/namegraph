@@ -8,6 +8,7 @@ from hydra import initialize, compose
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
+from generator.collection import CollectionMatcher
 
 from helpers import check_generator_response, generate_example_names
 
@@ -16,6 +17,7 @@ from helpers import check_generator_response, generate_example_names
 def prod_test_client():
     Domains.remove_self()
     Categories.remove_self()
+    CollectionMatcher.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
@@ -308,6 +310,30 @@ def test_not_instant_search_temp(prod_test_client):
         for name in json
         for strategy in name['metadata']['applied_strategies']
     ])
+
+@pytest.mark.integration_test
+def test_elasticsearch_template_collections_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/collections/template", json={
+        "query": "highest mountains",
+        "limit": 5
+    })
+
+    assert response.status_code == 200
+    titles = [collection['title'] for collection in response.json()]
+    assert 'Highest mountains on Earth' in titles
+
+@pytest.mark.integration_test
+def test_elasticsearch_featured_collections_search(prod_test_client):
+    client = prod_test_client
+    response = client.post("/collections/featured", json={
+        "query": "highestmountains",
+        "limit": 5
+    })
+
+    assert response.status_code == 200
+    titles = [collection['title'] for collection in response.json()]
+    assert 'Highest mountains on Earth' in titles
 
 
 def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):

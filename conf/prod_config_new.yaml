@@ -26,6 +26,14 @@ app:
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
+# if present, env variables will override values below
+elasticsearch:
+  scheme: ${oc.env:ES_SCHEME,https}
+  host: ${oc.env:ES_HOST,localhost}
+  port: ${oc.decode:${oc.env:ES_PORT,9243}}
+  username: ${oc.env:ES_USERNAME,elastic}
+  password: ${oc.env:ES_PASSWORD,password}
+  index: ${oc.env:ES_INDEX,collection-templates}
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
@@ -77,6 +85,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   generator: RandomAvailableNameGenerator
@@ -99,3 +108,6 @@ ngrams:
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000
+collections:
+  collections_limit: 3
+  suggestions_limit: 20  # per one collections

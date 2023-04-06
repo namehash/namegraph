@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional, Any
+from typing import List, Tuple, Optional, Any, Iterable
 
 from omegaconf import DictConfig
 
@@ -8,7 +8,7 @@ from generator.input_name import Interpretation, InputName
 
 class NameGenerator:
     """
-    Base class for generating names. The class is reposnsible for generating new
+    Base class for generating names. The class is responsible for generating new
     names based on the already tokenized input. It provides the apply method,
     responsible for registering the applied generators.
     """
@@ -18,7 +18,7 @@ class NameGenerator:
         self.limit = config.generation.generator_limits.get(self.__class__.__name__, config.generation.limit)
         self.can_work_with_empty_input = self.__class__.__name__ in config.generation.empty_input_ability
 
-    def apply(self, name: InputName, interpretation: Interpretation) -> list[GeneratedName]:
+    def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         return (
             GeneratedName(generated, applied_strategies=[[self.__class__.__name__]])
             for generated in self.generate2(name, interpretation)

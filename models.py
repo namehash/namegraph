@@ -43,9 +43,26 @@ class Metadata(BaseModel):
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
+    collection: Optional[str] = Field(
+        name='name of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its name, else it is null'
+    )
 
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
+
+
+class CollectionSearch(BaseModel):
+    query: str = Field(title='input query which is used to search for template collections')
+    limit: int = Field(10, title='the number of best matches to return')
+
+
+class Collection(BaseModel):
+    title: str = Field('title of the collections')
+    names: list[str] = Field('names stored in the collection')
+    rank: float = Field('rank of the collection')
+    score: float = Field('Elasticsearch score for the query result')

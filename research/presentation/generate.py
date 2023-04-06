@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
+from generator.collection import CollectionMatcher
 from fastapi.testclient import TestClient
 
 
@@ -19,6 +20,7 @@ from fastapi.testclient import TestClient
 def prod_test_client(config):
     Domains.remove_self()
     Categories.remove_self()
+    CollectionMatcher.remove_self()
     os.environ['CONFIG_NAME'] = config
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:
@@ -130,7 +132,7 @@ if __name__ == "__main__":
                    'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
                    'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
                    'happypeople', 'muscle', 'billybob', 'quo', 'circleci', 'bitcoinmine', 'poweroutage',
-                   'shootingarrowatthesky']
+                   'shootingarrowatthesky', 'pinkfloyd']
 
     # 'happypeople', 'muscle', 'billybob' (2 leet in instant), 'quo' (instant 2 flag suggestions)
 
