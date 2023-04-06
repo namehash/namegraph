@@ -1,5 +1,5 @@
 from typing import Tuple, Iterator
-from numpy.random import shuffle
+from random import shuffle
 
 from generator.generation import NameGenerator
 from ..input_name import InputName, Interpretation
@@ -16,7 +16,7 @@ class EasterEggGenerator(NameGenerator):
         self.messages = [
             'i-dont-like-{name}',
             'i-wish-i-was-{name}',
-            'you-think-being-creative-everyone-is-typing-{name}',  # todo: is this message ok? (mb 'you think you are'?)
+            'you-think-being-creative-everyone-is-typing-{name}',
             'i-am-so-tired-of-making-suggestions',
             'please-stop-typing-so-fast',
             'you-hurting-me'
@@ -34,4 +34,4 @@ class EasterEggGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': interpretation.tokenization}
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid_long_name,)}
