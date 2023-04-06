@@ -50,6 +50,7 @@ class CollectionMatcher(metaclass=Singleton):
 
         try:
             self.elastic = connect_to_elasticsearch(
+                config.elasticsearch.scheme,
                 config.elasticsearch.host,
                 config.elasticsearch.port,
                 config.elasticsearch.username,

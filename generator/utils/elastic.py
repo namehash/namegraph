@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 
 
 def connect_to_elasticsearch(
+        scheme: str,
         host: str,
         port: int,
         username: str,
@@ -9,7 +10,7 @@ def connect_to_elasticsearch(
 ) -> Elasticsearch:
     return Elasticsearch(
         hosts=[{
-            'scheme': 'https',
+            'scheme': scheme,
             'host': host,
             'port': port
         }],

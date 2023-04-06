@@ -130,6 +130,7 @@ def print_exlanation(hits):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('queries', nargs='+', help='queries')
+    parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
     parser.add_argument('--port', default=9200, type=int, help='elasticsearch port')
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
@@ -143,7 +144,7 @@ if __name__ == '__main__':
     if args.cloud_id:
         es = connect_to_elasticsearch_using_cloud_id(args.cloud_id, args.username, args.password)
     else:
-        es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
+        es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
 
     for query in args.queries:
         print(f'<h1>{query}</h1>')

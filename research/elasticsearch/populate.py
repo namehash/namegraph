@@ -13,6 +13,7 @@ INDEX_NAME = 'collection-templates-1'
 
 
 def connect_to_elasticsearch(
+        scheme: str,
         host: str,
         port: int,
         username: str,
@@ -20,7 +21,7 @@ def connect_to_elasticsearch(
 ):
     return Elasticsearch(
         hosts=[{
-            'scheme': 'https',
+            'scheme': scheme,
             'host': host,
             'port': port
         }],
@@ -173,6 +174,7 @@ def gen(path, limit):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('input', help='input JSONL file with the collections to insert into ES')
+    parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
     parser.add_argument('--port', default=9200, type=int, help='elasticsearch port')
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
@@ -184,7 +186,7 @@ if __name__ == '__main__':
     if args.cloud_id:
         es = connect_to_elasticsearch_using_cloud_id(args.cloud_id, args.username, args.password)
     else:
-        es = connect_to_elasticsearch(args.host, args.port, args.username, args.password)
+        es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
 
     initialize_index(es)
 

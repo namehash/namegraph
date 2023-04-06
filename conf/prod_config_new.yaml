@@ -28,6 +28,7 @@ app:
   min_available_fraction: 0.1
 # if present, env variables will override values below
 elasticsearch:
+  scheme: ${oc.env:ES_SCHEME,https}
   host: ${oc.env:ES_HOST,localhost}
   port: ${oc.decode:${oc.env:ES_PORT,9243}}
   username: ${oc.env:ES_USERNAME,elastic}
