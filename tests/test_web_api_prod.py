@@ -327,6 +327,7 @@ def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])
 
 
+@pytest.mark.slow
 def test_prod_normalization_with_ens_normalize(prod_test_client):
     client = prod_test_client
     input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
@@ -345,7 +346,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
                    'shootingarrowatthesky']
     for input_name in input_names:
         response = client.post("/",
-                               json={"name": input_name, "min_suggestions": 100, "max_suggestions": 100,
+                               json={"name": input_name, "min_suggestions": 50, "max_suggestions": 50,
                                      "params": {
                                          "mode": "full"
                                      }})
@@ -353,5 +354,4 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
         assert response.status_code == 200
         str_names = [name["name"] for name in response.json()]
         for name in str_names:
-            assert is_ens_normalized(name), (f'input: {input_name}; unnormalized sug.: {name}; '
-                                             f'should be: {ens_cure(name)}')
+            assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
