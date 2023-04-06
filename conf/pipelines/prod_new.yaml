@@ -365,7 +365,7 @@
   mode_weights_multiplier:
     instant: 0.166
     domain_detail: 0.1
-    full: 0.1
+    full: 0
   global_limits:
     instant: 1
     domain_detail: 1
