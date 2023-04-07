@@ -1,3 +1,5 @@
+import json
+
 from generator.classifier.classifier import Classifier
 from generator.input_name import InputName, Interpretation
 from generator.utils.person_names import PersonNames
@@ -9,6 +11,7 @@ class PersonNameClassifier(Classifier):
     def __init__(self, config):
         super().__init__(config)
         self.pn = PersonNames(config)
+        self.country2languages = json.load(open(config.person_names.country2langs_path))
 
     def classify(self, name: InputName):
         normalized_name = name.strip_eth_namehash_unicode_replace_invalid
@@ -19,7 +22,8 @@ class PersonNameClassifier(Classifier):
         interpretations = []
         for probability, country, tokenization, person_name_type, gender in raw_interpretations:
             features = {'country': country, 'person_name_type': person_name_type, 'gender': gender}
-            lang = country  # TODO: tranform country to lang
+            lang = self.country2languages.get(country, ('en',))[0]
+            # todo: write tests for classifier
             interpretation = Interpretation(self.TYPE, lang, tokenization, probability, features=features)
             interpretations.append(interpretation)
 
