@@ -130,4 +130,8 @@ class CollectionMatcher(metaclass=Singleton):
             query = ' '.join(query)
 
         query = query if tokenized else ' '.join(self.tokenizer.tokenize(query)[0])
-        return self._search(query, limit)
+        try:
+            return self._search(query, limit)
+        except Exception as ex:
+            logger.warning(f'Elasticsearch search failed: {ex}')
+            return []
