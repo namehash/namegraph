@@ -1,7 +1,6 @@
 import logging
 import random
 from typing import Type
-from ens_normalize import is_ens_normalized
 
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
@@ -133,8 +132,7 @@ class MetaSampler:
                         suggestion.status = self.domains.get_name_status(str(suggestion))
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
-                        while not is_ens_normalized(str(suggestion)) \
-                                or str(suggestion) in all_suggestions_str \
+                        while str(suggestion) in all_suggestions_str \
                                 or (suggestion.status != Domains.AVAILABLE
                                     and available_added + slots_left <= min_available_required):
                             suggestion = next(suggestions)
