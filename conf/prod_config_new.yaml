@@ -102,6 +102,7 @@ person_names:
   lastnames_path: data/person_names_lastnames.json
   other_path: data/person_names_other.json
   country_stats_path: data/person_names_country_stats.json
+  country2langs_path: data/country2langs.json
 ngrams:
   lazy_loading: true
   unigrams: data/ngrams/unigram_freq.csv
