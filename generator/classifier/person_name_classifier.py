@@ -23,7 +23,6 @@ class PersonNameClassifier(Classifier):
         for probability, country, tokenization, person_name_type, gender in raw_interpretations:
             features = {'country': country, 'person_name_type': person_name_type, 'gender': gender}
             lang = self.country2languages.get(country, ('en',))[0]
-            # todo: write tests for classifier
             interpretation = Interpretation(self.TYPE, lang, tokenization, probability, features=features)
             interpretations.append(interpretation)
 
