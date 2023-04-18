@@ -160,10 +160,10 @@ if __name__ == '__main__':
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
             link = hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_id = hit['_source']['template']['collection_type_wikidata_id']
+            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td></tr>')
+                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td></tr>')
         print('</table>')
 
         if args.explain: print_exlanation(hits)
@@ -177,10 +177,10 @@ if __name__ == '__main__':
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
             link = hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_id = hit['_source']['template']['collection_type_wikidata_id']
+            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td></tr>')
+                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td></tr>')
         print('</table>')
 
         if args.explain: print_exlanation(hits)
@@ -194,12 +194,12 @@ if __name__ == '__main__':
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
             link = hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_id = hit['_source']['template']['collection_type_wikidata_id']
+            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             names = f"<b>{len(hit['_source']['data']['names'])}:</b> " + ', '.join(
                 [x['normalized_name'] for x in hit['_source']['data']['names'][:args.limit_names]])
             print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_id}">{type_wikidata_id}</a></td><td>{names}</td></tr>')
+                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td><td>{names}</td></tr>')
 
             # print(hit['_score'], hit['_source']['data']['collection_name'], 'RANK:',
             #       hit['_source']['template']['collection_rank'],
