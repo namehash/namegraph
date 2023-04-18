@@ -10,9 +10,6 @@ from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connec
 # INDEX_NAME = 'collections14all'
 
 
-
-
-
 def search_by_name(query, limit, with_rank=True):
     body = {
         "query": {
@@ -154,16 +151,65 @@ if __name__ == '__main__':
         print(f'<h2>only collection</h2>')
         hits = search_by_name(query, args.limit)
         print('<table>')
-        print(f'<tr><th>score</th><th>name</th><th>rank</th><th>wikidata</th><th>type</th></tr>')
+        print(
+            f'<tr>'
+            f'<th>score</th>'
+            f'<th>name</th>'
+            f'<th>rank</th>'
+            f'<th>wikidata</th>'
+            f'<th>type</th>'
+            f'<th>members_rank_mean</th>'
+            f'<th>members_rank_median</th>'
+            f'<th>members_system_interesting_score_mean</th>'
+            f'<th>members_system_interesting_score_median</th>'
+            f'<th>valid_members_count</th>'
+            f'<th>invalid_members_count</th>'
+            f'<th>valid_members_ratio</th>'
+            f'<th>nonavailable_members_count</th>'
+            f'<th>nonavailable_members_ratio</th>'
+            f'<th>is_merged</th>'
+            f'</tr>'
+        )
         for hit in hits:
             score = hit['_score']
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
-            link = hit['_source']['template']['collection_wikipedia_link']
+            link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
             type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
+            collection_images = hit['_source']['template']['collection_images']
+            collection_page_banners = hit['_source']['template']['collection_page_banners']
+            members_rank_mean = hit['_source']['template']['members_rank_mean']
+            members_rank_median = hit['_source']['template']['members_rank_median']
+            members_system_interesting_score_mean = hit['_source']['template']['members_system_interesting_score_mean']
+            members_system_interesting_score_median = hit['_source']['template'][
+                'members_system_interesting_score_median']
+            valid_members_count = hit['_source']['template']['valid_members_count']
+            invalid_members_count = hit['_source']['template']['invalid_members_count']
+            valid_members_ratio = hit['_source']['template']['valid_members_ratio']
+            nonavailable_members_count = hit['_source']['template']['nonavailable_members_count']
+            nonavailable_members_ratio = hit['_source']['template']['nonavailable_members_ratio']
+            is_merged = hit['_source']['template']['is_merged']
+
             print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td></tr>')
+                f'<tr>'
+                f'<td>{score}</td>'
+                f'<td><a href="{link}">{name}</a></td>'
+                f'<td>{rank}</td>'
+                f'<td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td>'
+                f'<td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td>'
+                f'<td>{members_rank_mean:.0f}</td>'
+                f'<td>{members_rank_median:.0f}</td>'
+                f'<td>{members_system_interesting_score_mean:.4f}</td>'
+                f'<td>{members_system_interesting_score_median:.4f}</td>'
+                f'<td>{valid_members_count}</td>'
+                f'<td>{invalid_members_count}</td>'
+                f'<td>{valid_members_ratio:.2f}</td>'
+                f'<td>{nonavailable_members_count}</td>'
+                f'<td>{nonavailable_members_ratio:.2f}</td>'
+                f'<td>{is_merged}</td>'
+                f'</tr>'
+            )
         print('</table>')
 
         if args.explain: print_exlanation(hits)
@@ -176,7 +222,7 @@ if __name__ == '__main__':
             score = hit['_score']
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
-            link = hit['_source']['template']['collection_wikipedia_link']
+            link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
             type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             print(
@@ -193,7 +239,7 @@ if __name__ == '__main__':
             score = hit['_score']
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
-            link = hit['_source']['template']['collection_wikipedia_link']
+            link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
             type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             names = f"<b>{len(hit['_source']['data']['names'])}:</b> " + ', '.join(
