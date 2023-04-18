@@ -18,7 +18,7 @@ jobs:
           python-version: 3.10.5
           cache: 'pip'
       - name: Install dependencies
-        run: pip install -e .
+        run: pip install -e . --use-pep517
       - name: Show installed dependencies
         run: pip freeze
       - name: Install flake8
