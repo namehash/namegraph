@@ -8,7 +8,6 @@ import csv
 from io import BytesIO
 import logging
 from time import perf_counter
-from typing import Iterator
 
 str_logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logger = logging.getLogger(__name__)
@@ -53,8 +52,8 @@ def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
 
 
     def contains_punctuation_mark(bigram: str) -> bool:
-        return '.' in bigram or ',' in bigram or "'" in bigram or '"' in bigram or \
-               '-' in bigram or ':' in bigram or ';' in bigram
+        return '.' in bigram or ',' in bigram or "'" in bigram or '"' in bigram or '-' in bigram or \
+               ':' in bigram or ';' in bigram or '(' in bigram or ')' in bigram
 
 
     def process_file(url: str):
@@ -87,7 +86,7 @@ def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
 
     logger.info('Processing files ended.\n')
 
-    logger.info(f'Sorting {top_n} bigrams ...')
+    logger.info(f'Sorting {len(bigram_priority_queue)} bigrams ...')
     sorted_bigrams = sorted(bigram_priority_queue, key=lambda x: x[0], reverse=True)
     logger.info(f'Bigrams sorted.')
 
