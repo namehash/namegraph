@@ -191,7 +191,7 @@ if __name__ == '__main__':
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
             link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
+            collection_types = hit['_source']['template']['collection_types']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             collection_images = hit['_source']['template']['collection_images']
             collection_page_banners = hit['_source']['template']['collection_page_banners']
@@ -213,7 +213,7 @@ if __name__ == '__main__':
                 f'<td><a href="{link}">{name}</a></td>'
                 f'<td>{rank}</td>'
                 f'<td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td>'
-                f'<td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td>'
+                f'<td><a href="https://www.wikidata.org/wiki/{collection_types[0][0]}">{collection_types}</a></td>'
                 f'<td>{members_rank_mean:.0f}</td>'
                 f'<td>{members_rank_median:.0f}</td>'
                 f'<td>{members_system_interesting_score_mean:.4f}</td>'
@@ -256,12 +256,12 @@ if __name__ == '__main__':
             name = hit['_source']['data']['collection_name']
             rank = hit['_source']['template']['collection_rank']
             link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
+            collection_types = hit['_source']['template']['collection_types']
             wikidata_id = hit['_source']['template']['collection_wikidata_id']
             names = f"<b>{len(hit['_source']['data']['names'])}:</b> " + ', '.join(
                 [x['normalized_name'] for x in hit['_source']['data']['names'][:args.limit_names]])
             print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td><td>{names}</td></tr>')
+                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{collection_types[0][0]}">{collection_types}</a></td><td>{names}</td></tr>')
 
             # print(hit['_score'], hit['_source']['data']['collection_name'], 'RANK:',
             #       hit['_source']['template']['collection_rank'],
