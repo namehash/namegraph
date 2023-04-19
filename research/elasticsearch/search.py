@@ -10,58 +10,58 @@ from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connec
 # INDEX_NAME = 'collections14all'
 
 
-def search_by_name(query, limit, with_rank=True):
-    body = {
-        "query": {
-            "bool": {
-                "must": [
-                    {
-                        "multi_match": {
-                            "query": query,
-                            "fields": [
-                                "data.collection_name^3",
-                                "data.collection_name.exact^3",
-                                "data.collection_description^2",
-                                "data.collection_keywords^2",
-                                "data.names.normalized_name",
-                                "data.names.tokenized_name",
-                            ],
-                            "type": "cross_fields",
-                        }
-                    }
-                ],
-                "should": [
-                    {
-                        "rank_feature": {
-                            "field": "template.collection_rank",
-                            "boost": 100,
-                            # "log": {
-                            #     "scaling_factor": 4
-                            # }
-                        }
-                    },
-                    {
-                        "rank_feature": {
-                            "field": "metadata.members_count",
-                        }
-                    }
-                ]
-            }
-
-        },
-        "size": limit,
-    }
-    if not with_rank:
-        del body['query']['bool']['should']
-
-    response = es.search(
-        index=INDEX_NAME,
-        body=body,
-        explain=args.explain
-    )
-
-    hits = response["hits"]["hits"]
-    return hits
+# def search_by_name(query, limit, with_rank=True):
+#     body = {
+#         "query": {
+#             "bool": {
+#                 "must": [
+#                     {
+#                         "multi_match": {
+#                             "query": query,
+#                             "fields": [
+#                                 "data.collection_name^3",
+#                                 "data.collection_name.exact^3",
+#                                 "data.collection_description^2",
+#                                 "data.collection_keywords^2",
+#                                 "data.names.normalized_name",
+#                                 "data.names.tokenized_name",
+#                             ],
+#                             "type": "cross_fields",
+#                         }
+#                     }
+#                 ],
+#                 "should": [
+#                     {
+#                         "rank_feature": {
+#                             "field": "template.collection_rank",
+#                             "boost": 100,
+#                             # "log": {
+#                             #     "scaling_factor": 4
+#                             # }
+#                         }
+#                     },
+#                     {
+#                         "rank_feature": {
+#                             "field": "metadata.members_count",
+#                         }
+#                     }
+#                 ]
+#             }
+# 
+#         },
+#         "size": limit,
+#     }
+#     if not with_rank:
+#         del body['query']['bool']['should']
+# 
+#     response = es.search(
+#         index=INDEX_NAME,
+#         body=body,
+#         explain=args.explain
+#     )
+# 
+#     hits = response["hits"]["hits"]
+#     return hits
 
 
 def search_by_all(query, limit):
@@ -82,7 +82,6 @@ def search_by_all(query, limit):
                                     "data.names.tokenized_name",
                                     "data.collection_description^2",
                                     "data.collection_keywords^2",
-                                    # "template.collection_articles"
                                 ],
                                 "type": "cross_fields",
                             }
@@ -93,14 +92,31 @@ def search_by_all(query, limit):
                             "rank_feature": {
                                 "field": "template.collection_rank",
                                 "boost": 100,
-                                # "log": {
-                                #     "scaling_factor": 4
-                                # }
                             }
                         },
                         {
                             "rank_feature": {
                                 "field": "metadata.members_count",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.members_rank_mean",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.members_system_interesting_score_median",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.valid_members_ratio",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.nonavailable_members_ratio",
                             }
                         }
                     ]
@@ -149,7 +165,7 @@ if __name__ == '__main__':
         print(f'<h1>{query}</h1>')
 
         print(f'<h2>only collection</h2>')
-        hits = search_by_name(query, args.limit)
+        hits = search_by_all(query, args.limit)
         print('<table>')
         print(
             f'<tr>'
@@ -214,22 +230,22 @@ if __name__ == '__main__':
 
         if args.explain: print_exlanation(hits)
 
-        print(f'<h2>only collection without rank</h2>')
-        hits = search_by_name(query, args.limit, with_rank=False)
-        print('<table>')
-        print(f'<tr><th>score</th><th>name</th><th>rank</th><th>wikidata</th><th>type</th></tr>')
-        for hit in hits:
-            score = hit['_score']
-            name = hit['_source']['data']['collection_name']
-            rank = hit['_source']['template']['collection_rank']
-            link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
-            type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
-            wikidata_id = hit['_source']['template']['collection_wikidata_id']
-            print(
-                f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td></tr>')
-        print('</table>')
-
-        if args.explain: print_exlanation(hits)
+        # print(f'<h2>only collection without rank</h2>')
+        # hits = search_by_name(query, args.limit, with_rank=False)
+        # print('<table>')
+        # print(f'<tr><th>score</th><th>name</th><th>rank</th><th>wikidata</th><th>type</th></tr>')
+        # for hit in hits:
+        #     score = hit['_score']
+        #     name = hit['_source']['data']['collection_name']
+        #     rank = hit['_source']['template']['collection_rank']
+        #     link = 'https://en.wikipedia.org/wiki/' + hit['_source']['template']['collection_wikipedia_link']
+        #     type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
+        #     wikidata_id = hit['_source']['template']['collection_wikidata_id']
+        #     print(
+        #         f'<tr><td>{score}</td><td><a href="{link}">{name}</a></td><td>{rank}</td><td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td><td><a href="https://www.wikidata.org/wiki/{type_wikidata_ids[0]}">{type_wikidata_ids}</a></td></tr>')
+        # print('</table>')
+        # 
+        # if args.explain: print_exlanation(hits)
 
         print(f'<h2>collection + names</h2>')
         hits = search_by_all(query, args.limit)
