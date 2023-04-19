@@ -61,15 +61,16 @@ def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
         nonlocal bigram_priority_queue
         with requests.get(url, stream=True) as response:
             response.raise_for_status()
-            with gzip.open(BytesIO(response.content), 'rt', encoding='utf-8') as file:
-                for line in file:
-                    bigram, match_count = parse_line(line)
-                    if contains_punctuation_mark(bigram) or ('_' in bigram and '_START_' not in bigram):
-                        continue
-                    if len(bigram_priority_queue) < top_n:
-                        heapq.heappush(bigram_priority_queue, (match_count, bigram))
-                    elif match_count > bigram_priority_queue[0][0]:
-                        heapq.heappushpop(bigram_priority_queue, (match_count, bigram))
+            for line in gzip.open(response.raw):
+                text_line = line.decode('utf-8')
+                bigram, match_count = parse_line(text_line)
+                if contains_punctuation_mark(bigram) or ('_' in bigram and '_START_' not in bigram):
+                    continue
+                if len(bigram_priority_queue) < top_n:
+                    heapq.heappush(bigram_priority_queue, (match_count, bigram))
+                elif match_count > bigram_priority_queue[0][0]:
+                    heapq.heappushpop(bigram_priority_queue, (match_count, bigram))
+
 
 
     for file_url in tqdm(file_urls, desc='files progress', colour='cyan'):
