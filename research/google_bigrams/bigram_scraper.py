@@ -36,18 +36,6 @@ def get_file_urls() -> list[str]:
     ))
 
 
-def download_and_extract(file_urls: list[str]) -> Iterator[tuple[str, str]]:
-    for url in file_urls[223:227]:  # fixme
-        filename = url.rsplit('/')[-1]
-        logger.info(f'Downloading file {filename} ...')
-        t0 = perf_counter()
-        decompressed_content = gzip.GzipFile(fileobj=BytesIO(requests.get(url, stream=True).content))
-        str_content = decompressed_content.read().decode('utf-8')
-        t1 = perf_counter()
-        logger.info(f'File {filename} downloaded. Time elapsed: {t1 - t0:.5} seconds.\n')
-        yield str_content, filename
-
-
 def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
     """Consecutively download files from Google bigram api and save top N bigrams with counts to file."""
 
@@ -85,7 +73,7 @@ def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
                         heapq.heappushpop(bigram_priority_queue, (match_count, bigram))
 
 
-    for file_url in tqdm(file_urls[230:240], desc='files progress', colour='cyan'):  # fixme
+    for file_url in tqdm(file_urls, desc='files progress', colour='cyan'):
         filename = file_url.rsplit('/')[-1]
         logger.info(f'Downloading and processing file {filename} ...')
         t0 = perf_counter()
