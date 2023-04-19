@@ -10,7 +10,6 @@ import logging
 from time import perf_counter
 from typing import Iterator
 
-
 str_logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -38,11 +37,14 @@ def get_file_urls() -> list[str]:
 
 
 def download_and_extract(file_urls: list[str]) -> Iterator[tuple[str, str]]:
-    for url in file_urls:
+    for url in file_urls[223:227]:  # fixme
         filename = url.rsplit('/')[-1]
-        response = requests.get(url, stream=True)
-        decompressed_content = gzip.GzipFile(fileobj=BytesIO(response.content))
+        logger.info(f'Downloading file {filename} ...')
+        t0 = perf_counter()
+        decompressed_content = gzip.GzipFile(fileobj=BytesIO(requests.get(url, stream=True).content))
         str_content = decompressed_content.read().decode('utf-8')
+        t1 = perf_counter()
+        logger.info(f'File {filename} downloaded. Time elapsed: {t1 - t0:.5} seconds.\n')
         yield str_content, filename
 
 
@@ -56,43 +58,44 @@ def get_bigrams(top_n: int, output_filename='bigrams.csv') -> str:
 
     bigram_priority_queue = []
 
-
     def parse_line(line: str) -> tuple[str, int]:
         """Returns (bigram, match_count) tuple from line."""
         split_line = line.split(sep='\t')
         return split_line[0], sum(map(lambda tup: int(tup.split(',')[1]), split_line[1:]))
 
 
-    def is_pos_tagged(bigram: str) -> bool:
-        return '_NOUN' in bigram or '_VERB' in bigram or '_ADJ' in bigram or '_ADV' in bigram or '_PRON' in bigram or \
-                '_DET' in bigram or '_ADP' in bigram or '_NUM' in bigram or '_CONJ' in bigram or '_PRT' in bigram or \
-                '_X' in bigram
-
     def contains_punctuation_mark(bigram: str) -> bool:
-        return '.' in bigram or ',' in bigram or "'" in bigram or '"' in bigram or ':' in bigram
+        return '.' in bigram or ',' in bigram or "'" in bigram or '"' in bigram or \
+               '-' in bigram or ':' in bigram or ';' in bigram
 
 
-    def process_file(content: str):
-        """Go through the whole file content and add bigrams to priority queue."""
+    def process_file(url: str):
+        """Go through the whole file url and add bigrams to priority queue."""
         nonlocal bigram_priority_queue
-        lines = content.splitlines()
-        for line in tqdm(lines, position=1, desc='lines progress', colour='cyan'):
-            bigram, match_count = parse_line(line)
-            if is_pos_tagged(bigram) or contains_punctuation_mark(bigram):
-                continue
-            if len(bigram_priority_queue) < top_n:
-                heapq.heappush(bigram_priority_queue, (match_count, bigram))
-            elif match_count > bigram_priority_queue[0][0]:
-                heapq.heappushpop(bigram_priority_queue, (match_count, bigram))
+        with requests.get(url, stream=True) as response:
+            response.raise_for_status()
+            with gzip.open(BytesIO(response.content), 'rt', encoding='utf-8') as file:
+                for line in file:
+                    bigram, match_count = parse_line(line)
+                    if contains_punctuation_mark(bigram) or ('_' in bigram and '_START_' not in bigram):
+                        continue
+                    if len(bigram_priority_queue) < top_n:
+                        heapq.heappush(bigram_priority_queue, (match_count, bigram))
+                    elif match_count > bigram_priority_queue[0][0]:
+                        heapq.heappushpop(bigram_priority_queue, (match_count, bigram))
 
 
-    for file_content, filename in tqdm(download_and_extract(file_urls), total=n_files,
-                                       position=0, desc='files progress', colour='green'):
-        logger.info(f'Processing file {filename} ...')
+    for file_url in tqdm(file_urls[230:240], desc='files progress', colour='cyan'):  # fixme
+        filename = file_url.rsplit('/')[-1]
+        logger.info(f'Downloading and processing file {filename} ...')
         t0 = perf_counter()
-        process_file(file_content)
-        t1 = perf_counter()
-        logger.info(f'File {filename} processed. Time elapsed: {t1-t0:.5} seconds.\n')
+        try:
+            process_file(file_url)
+        except Exception:
+            logger.exception(f'Error occurred while processing file {filename}. Skipping ...\n')
+        else:
+            t1 = perf_counter()
+            logger.info(f'File {filename} processed. Time elapsed: {t1 - t0:.5} seconds.\n')
 
     logger.info('Processing files ended.\n')
 
