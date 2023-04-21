@@ -1,13 +1,11 @@
 import json
 from argparse import ArgumentParser
+from math import log10
 
 from copy import deepcopy
 
 from elasticsearch import Elasticsearch
 from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
-
-
-# INDEX_NAME = 'collections14all'
 
 
 COMMON_QUERY = {
@@ -62,14 +60,13 @@ def search_by_name(query, limit, with_rank=True, with_keyword_description=False)
 
     print(f'{body["query"]["bool"]}')
 
-    body['size'] = limit
-
     if not with_rank:
         del body['query']['bool']['should']
 
     response = es.search(
         index=INDEX_NAME,
-        body=body,
+        query = body['query'],
+        size=limit,
         explain=args.explain
     )
 
@@ -88,9 +85,12 @@ def search_by_all(query, limit):
         "data.names.tokenized_name",
     ]
 
+    print(f'{body["query"]["bool"]}')
+
     response = es.search(
         index=INDEX_NAME,
-        body=body,
+        query=body['query'],
+        size=limit,
         explain=args.explain,
     )
 
@@ -113,25 +113,58 @@ class Search:
         return '<h2 class="px-5 py-2 font-sans text-lg font-bold">%s</h2>' % self.header()
 
     def values(self, hit, args):
-        score = hit['_score']
+        score = "%.1f" % hit['_score']
         name = hit['_source']['data']['collection_name']
         keywords = '; '.join(hit['_source']['data']['collection_keywords'][:10])
         if len(hit['_source']['data']['collection_keywords']) > 10:
             keywords += "..."
         description = hit['_source']['data']['collection_description']
-        rank = hit['_source']['template']['collection_rank']
+        rank = "%.3f" % log10(hit['_source']['template']['collection_rank'])
         link = hit['_source']['template']['collection_wikipedia_link']
-        type_wikidata_ids = hit['_source']['template']['collection_type_wikidata_ids']
+        type_wikidata_ids = ', '.join(['<a href="https://wikidata.org/wiki/' + id + '">' + name + '</a>' for id, name in hit['_source']['template']['collection_types']])
         #print(hit['_source']['data'])
         names = ', '.join([x['normalized_name'] for x in hit['_source']['data']['names'][:args.limit_names]])
 
         if len(hit['_source']['data']['names']) > args.limit_names:
             names += "..."
+
         wikidata_id = hit['_source']['template']['collection_wikidata_id']
+        wikidata_id = '<a href="https://wikidata.org/wiki/' + wikidata_id + '">' + wikidata_id + '</a>'
 
         members_count = len(hit['_source']['data']['names'])
+        members_value = f"{members_count} : {'%.3f' % log10(members_count)}"
 
-        return [score, name, rank, members_count, wikidata_id, type_wikidata_ids, description, keywords, names, ]
+        rank_mean = "%.1f" % log10(hit['_source']['template']['members_rank_mean'])
+        rank_median = "%.1f" % log10(hit['_source']['template']['members_rank_median'])
+        score_mean = "%.3f" % hit['_source']['template']['members_system_interesting_score_mean']
+        score_median = "%.3f" % hit['_source']['template']['members_system_interesting_score_median']
+        valid_count = hit['_source']['template']['valid_members_count'] 
+        valid_ratio = "%.3f" % hit['_source']['template']['valid_members_ratio']
+        noavb_count =  hit['_source']['template']['nonavailable_members_count'] 
+        noavb_ratio = "%.3f" % hit['_source']['template']['nonavailable_members_ratio']
+        is_merged = hit['_source']['template']['is_merged']
+
+        return [score, name, rank, members_value, rank_mean, rank_median, score_mean, score_median, valid_count, valid_ratio, noavb_count, noavb_ratio, is_merged, wikidata_id, type_wikidata_ids, description, keywords, names, ]
+
+    def columns(self):
+        return ['score', 'name', 'rank', 'members', 'm. rank mean', 'm. rank median', 'm. int. score mean', 'm. int. score median', 'valid m. count', 'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 'desciption', 'keywords', 'names']
+
+    def __call__(self, query, args):
+
+        body = self.body(query)
+
+        print(f'{body["query"]["bool"]}')
+
+        response = es.search(
+            index=INDEX_NAME,
+            query=body['query'],
+            size=args.limit,
+            explain=args.explain
+        )
+
+        hits = response["hits"]["hits"]
+        return hits
+
 
 class NameRankSearch(Search):
     def __call__(self, query, args):
@@ -140,19 +173,12 @@ class NameRankSearch(Search):
     def header(self):
         return 'name with rank'
 
-    def columns(self):
-        return ['score', 'name (2+3)', 'rank (log^10)', 'members (log^10)', 'wikidata', 'types', 'description (0)', 'keywords (0)', 'members (0)',]
-
-
 class NameSearch(Search):
     def __call__(self, query, args):
         return search_by_name(query, args.limit, with_rank=False)
 
     def header(self):
         return 'only name without rank'
-
-    def columns(self):
-        return ['score', 'name (2+3)', 'rank (0)', 'members (0)', 'wikidata', 'types', 'description (0)', 'keywords (0)', 'members (0)',]
 
 class NameKeywordsDescriptionSearch(Search):
     def __call__(self, query, args):
@@ -161,9 +187,6 @@ class NameKeywordsDescriptionSearch(Search):
     def header(self):
         return 'name, description, keywords without rank'
 
-    def columns(self):
-        return ['score', 'name (2+3)', 'rank (0)', 'members (0)', 'wikidata', 'types', 'description (2)', 'keywords (2)', 'members (0)',]
-
 class NameMembersSearch(Search):
     def __call__(self, query, args):
         return search_by_all(query, args.limit)
@@ -171,9 +194,173 @@ class NameMembersSearch(Search):
     def header(self):
         return 'name, description, keywords, members'
 
-    def columns(self):
-        return ['score', 'name (2+3)', 'rank (log^0)', 'members (log^10)', 'wikidata', 'types', 'description (2)', 'keywords (2)', 'members (1)',]
 
+class NameTypeSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        return body
+
+
+    def header(self):
+        return 'name, type, rank'
+
+class MemberMeanSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.members_rank_mean",
+                        "boost": 10,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, mean member rank'
+
+
+class MemberMedianSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.members_rank_median",
+                        "boost": 10,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, median member rank'
+
+class ScoreMeanSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.members_system_interesting_score_mean",
+                        "boost": 40,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, score mean rank'
+
+class ScoreMedianSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.members_system_interesting_score_median",
+                        "boost": 40,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, score median rank'
+
+class ValidRatioSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.valid_members_ratio",
+                        "boost": 40,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, valid ratio'
+
+class NonavbRatioSearch(Search):
+    def body(self, query):
+        body = deepcopy(COMMON_QUERY)
+        body['query']['bool']['must'][0]['multi_match']['query'] = query
+        body['query']['bool']['must'][0]['multi_match']['fields'] += [
+            "data.collection_types^3",
+        ]
+
+        body['query']['bool']['should'] = [
+                {
+                    "rank_feature": {
+                        "field": "template.nonavailable_members_ratio",
+                        "boost": 40,
+                            "log": {
+                                "scaling_factor": 1
+                            }
+                    }
+                }
+        ]
+
+        return body
+
+    def header(self):
+        return 'name, type, nonavailable members ratio'
+
+MemberMedianSearch(),ScoreMeanSearch(),ScoreMedianSearch(),ValidRatioSearch(),NonavbRatioSearch()
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -196,22 +383,23 @@ if __name__ == '__main__':
 
     print(f'<head><script src="https://cdn.tailwindcss.com"></script></head>')
 
-    for query in args.queries:
-        print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{query}</h1>')
+    for search in [NameTypeSearch(),MemberMeanSearch(),MemberMedianSearch(),ScoreMeanSearch(),ScoreMedianSearch(),ValidRatioSearch(),NonavbRatioSearch()]:
+        print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{search.description()}</h1>')
 
-        for search in [NameRankSearch(), NameSearch(), NameKeywordsDescriptionSearch(), NameMembersSearch()]:
-            print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{search.description()}</h2>')
+        for query in args.queries:
+        #for search in [NameRankSearch(), NameSearch(), NameKeywordsDescriptionSearch(), NameMembersSearch()]:
+            print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query}</h2>')
             hits = search(query, args)
             print('<table class="m-5">')
             print(f'<tr>')
             for column in search.columns():
-                print(f'<th class="border border-slate-300 px-2 py-2">{column}</th>')
+                print(f'<th class="sticky bg-blue-300 top-0 border border-slate-300 px-2 py-2">{column}</th>')
             print(f'</tr>')
 
             for hit in hits:
                 print('<tr>')
                 for value in search.values(hit, args):
-                    print(f'<td class="border border-slate-300 px-2 py-2">{value}</td>')
+                    print(f'<td class="border border-slate-300 px-2 py-2 text-right">{value}</td>')
                 print('</tr>')
             print('</table>')
 
