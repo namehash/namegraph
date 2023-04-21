@@ -12,31 +12,32 @@ jobs:
       NLTK_DATA: ./cache/nltk
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python 3.10.5
         uses: actions/setup-python@v4
         with:
           python-version: 3.10.5
-          cache: 'pip'
+          cache: 'poetry'
+
       - name: Install dependencies
-        run: |
-            pip install pip==23.0.1
-            pip install -e .
-      - name: Show installed dependencies
-        run: pip freeze
-      - name: Install flake8
-        run: |
-            pip install flake8
+        run: poetry install
+
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
       - name: Cache downloaded data
         uses: actions/cache@v3
         with:
           path: ./cache
           key: cache-v1.1
+
       - name: Download data
         env:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
@@ -44,12 +45,14 @@ jobs:
         run: |
             ln -s ../tests/data/wikipedia2vec.pkl data/wikipedia2vec.pkl
             touch data/wikipedia2vec.pkl.vectors.npy
-            python3 generator/download.py
-            python3 generator/download_from_s3.py
-            python3 generator/download_names.py
+            poetry run python3 generator/download.py
+            poetry run python3 generator/download_from_s3.py
+            poetry run python3 generator/download_names.py
+
       - name: Generate cache
         run: |
-            python3 generator/namehash_common/generate_cache.py
+            poetry run python3 generator/namehash_common/generate_cache.py
+
       - name: Run tests
         env:
           ES_HOST: ${{ vars.ES_HOST }}
@@ -57,7 +60,8 @@ jobs:
           ES_USERNAME: ${{ secrets.ES_USERNAME }}
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
           ES_INDEX: ${{ vars.ES_INDEX }}
-        run: pytest -vv --durations=0
+        run: poetry run pytest -vv --durations=0
+
       - name: Run ElasticSearch tests
         env:
           ES_HOST: ${{ vars.ES_HOST }}
@@ -65,4 +69,4 @@ jobs:
           ES_USERNAME: ${{ secrets.ES_USERNAME }}
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
           ES_INDEX: ${{ vars.ES_INDEX }}
-        run: pytest -m "integration_test" -vv --durations=0
+        run: poetry run pytest -m "integration_test" -vv --durations=0
