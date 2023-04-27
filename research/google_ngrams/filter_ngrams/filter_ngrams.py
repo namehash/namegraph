@@ -53,7 +53,7 @@ def filter_ngrams(
     logger.debug("Tokenizing lists...")
     # humans_tokens = get_token_set(humans_list, min_length=2)
     popular_humans_tokens = get_token_set(humans_list[:popular_humans_top_n], min_length=2)
-    nothumans_tokens = get_token_set(nothumans_list, min_length=3)
+    # nothumans_tokens = get_token_set(nothumans_list, min_length=3)
 
     logger.info("Counting popular names % in ngrams [before] ...")
     count_before = count_human_names_in_ngrams(ngrams_list, popular_humans_tokens)
@@ -103,7 +103,7 @@ def filter_qrank_weighted_counts(
         humans_list: list[tuple[str, int]],
         nothumans_list: list[tuple[str, int]],
         output_path: Path,
-        k=0.9
+        k=0.9  # todo: different k
 ):
     """
     Create token->weighted_count dicts for humans and nothumans weighted by get_name_weight(name_qrank).
@@ -113,7 +113,7 @@ def filter_qrank_weighted_counts(
     """
     logger.info("Chosen method: qrank-weighted-counts filtering")
 
-    def get_name_weight(name_qrank: int) -> int:
+    def get_name_weight(name_qrank: int) -> int:  # todo: zmienić / usunąć buckety?
         if name_qrank < 500:
             return 1
         elif name_qrank < 1000:
@@ -237,6 +237,10 @@ if __name__ == '__main__':
 
 """
 python filter_ngrams.py unigram \
+    --humans_min_qrank 1000 \
+    --nothumans_min_qrank 4000
+
+python filter_ngrams.py bigram \
     --humans_min_qrank 1000 \
     --nothumans_min_qrank 4000
 """
