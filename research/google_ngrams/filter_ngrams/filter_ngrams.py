@@ -6,6 +6,7 @@ import csv
 import argparse
 import logging
 from pathlib import Path
+from collections import defaultdict
 
 str_logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logger = logging.getLogger(__name__)
@@ -49,21 +50,17 @@ def filter_ngrams(
     humans_list = [(str(name), int(qrank)) for name, qrank in zip(humans_df['name'], humans_df['qrank'])]
     nothumans_list = [(str(name), int(qrank)) for name, qrank in zip(nothumans_df['name'], nothumans_df['qrank'])]
 
-    # logger.debug("Tokenizing humans...")
+    logger.debug("Tokenizing lists...")
     # humans_tokens = get_token_set(humans_list, min_length=2)
-    logger.debug("Tokenizing popular humans...")
     popular_humans_tokens = get_token_set(humans_list[:popular_humans_top_n], min_length=2)
-
-    logger.debug("Tokenizing nothumans...")
     nothumans_tokens = get_token_set(nothumans_list, min_length=3)
 
     logger.info("Counting popular names % in ngrams [before] ...")
     count_before = count_human_names_in_ngrams(ngrams_list, popular_humans_tokens)
     logger.info(f'Popular names in ngrams:\t{count_before} /\t{len(ngrams_list)} [before]')
 
-    filter_basic(ngrams_list, nothumans_tokens, output_path)
-
-    # todo add fiter_qrank option
+    # filter_basic(ngrams_list, nothumans_tokens, output_path)
+    filter_qrank_weighted_counts(ngrams_list, humans_list, nothumans_list, output_path, k=0.9)
 
     logger.debug("Reading filtered ngrams...")
     filtered_ngrams_df = pd.read_csv(output_path, header=None, names=['ngram', 'count'], dtype=ngrams_dtype)
@@ -72,8 +69,9 @@ def filter_ngrams(
     ]
     logger.info("Counting popular names % in filtered ngrams [after] ...")
     count_after = count_human_names_in_ngrams(filtered_ngrams_list, popular_humans_tokens)
-    logger.info(f'Popular names in ngrams:\t{count_after} /\t{len(ngrams_list)} [after]')
+    logger.info(f'Popular names in ngrams:\t{count_after} /\t{len(filtered_ngrams_list)} [after]')
     logger.info(f'--- Deleted {100 * (1. - count_after / count_before):.4}% of popular names ---')
+    logger.info(f'--- Deleted {100 * (1. - len(filtered_ngrams_list) / len(ngrams_list)):.4}% of rows ---')
 
     return output_path
 
@@ -82,53 +80,106 @@ def filter_basic(ngrams_list: list[tuple[str, int]], nothumans_tokens: set[str],
     logger.info("Chosen method: basic filtering")
 
     def is_name(ngram: str) -> bool:
+        nonlocal nothumans_tokens
         tokens = ngram.split()
         for token in tokens:
             if token.istitle() and token not in nothumans_tokens:
                 return True
         return False
 
-    logger.debug("Filtering nothumans...")
+    logger.debug("Filtering ngrams...")
     with open(output_path, 'w', encoding='utf-8', newline='') as output_file:
         writer = csv.writer(output_file)
         for ngram_str, count in tqdm(ngrams_list, desc='filtering n-grams', colour='magenta'):
-            if all([not is_name(ngram_token) for ngram_token in ngram_str.split()]):
+            if '_START_' in ngram_str:
+                continue
+            if not is_name(ngram_str):
                 writer.writerow([ngram_str, count])
     logger.debug(f'N-grams saved.')
 
 
-def filter_qrank(
+def filter_qrank_weighted_counts(
         ngrams_list: list[tuple[str, int]],
         humans_list: list[tuple[str, int]],
         nothumans_list: list[tuple[str, int]],
-        humans_tokens: set[str],
-        nothumans_tokens: set[str],
-        output_path: Path
+        output_path: Path,
+        k=0.9
 ):
-    ...
+    """
+    Create token->weighted_count dicts for humans and nothumans weighted by get_name_weight(name_qrank).
+    Then, if for at least one of ngram's tokens
+        human_dict[token] > k * nothuman_dict[token] holds
+    do not inlude this ngram.
+    """
+    logger.info("Chosen method: qrank-weighted-counts filtering")
+
+    def get_name_weight(name_qrank: int) -> int:
+        if name_qrank < 500:
+            return 1
+        elif name_qrank < 1000:
+            return 2
+        elif name_qrank < 5000:
+            return 4
+        elif name_qrank < 10_000:
+            return 6
+        elif name_qrank < 20_000:
+            return 10
+        elif name_qrank < 100_000:
+            return 20
+        else:
+            return 40
+
+    humans_tokens_2_rank = defaultdict(lambda: 0)
+    for name, qrank in tqdm(humans_list, desc='creating humans dict', colour='cyan'):
+        for token in tokenize_name(name, min_length=2):
+            humans_tokens_2_rank[token] += get_name_weight(qrank)
+
+    nothumans_tokens_2_rank = defaultdict(lambda: 0)
+    for name, qrank in tqdm(nothumans_list, desc='creating nothumans dict', colour='cyan'):
+        for token in tokenize_name(name, min_length=3):
+            nothumans_tokens_2_rank[token] += get_name_weight(qrank)
+
+    def is_name(ngram: str) -> bool:
+        nonlocal humans_tokens_2_rank, nothumans_tokens_2_rank, k
+        for ngram_token in ngram.split():
+            if humans_tokens_2_rank[ngram_token] > k * nothumans_tokens_2_rank[ngram_token]:
+                return True
+        return False
+
+    logger.debug("Filtering ngrams...")
+    with open(output_path, 'w', encoding='utf-8', newline='') as output_file:
+        writer = csv.writer(output_file)
+        for ngram_str, count in tqdm(ngrams_list, desc='filtering n-grams', colour='magenta'):
+            if '_START_' in ngram_str:
+                continue
+            if not is_name(ngram_str):
+                writer.writerow([ngram_str, count])
+    logger.debug(f'N-grams saved.')
 
 
 def count_human_names_in_ngrams(ngrams_list: list[tuple[str, int]], humans_tokens: set[str]) -> int:
     names_count = 0
     for ngram_str, count in tqdm(ngrams_list, desc='counting names in n-grams', colour='green'):
-        if all([ngram_token in humans_tokens for ngram_token in ngram_str.split()]):
+        if all([ngram_token in humans_tokens for ngram_token in ngram_str.split()]):  # todo: czy to jest dobrze liczone
             names_count += 1
     return names_count
 
 
 # todo: jak jest pauza, kropka itp. to usunąć z name?
+def tokenize_name(name: str, min_length):
+    if name[0] == '"' and name[-1] == '"':
+        name = name[1:-1]
+        name = name.replace(',', '')
+    if name.startswith('Category:'):
+        name = name[9:]
+    tokens = name.split()
+    return list(filter(lambda x: len(x) >= min_length, tokens))
+
+
 def get_token_set(names_list: list[tuple[str, any]], min_length=3) -> set[str]:
     token_set = set()
-    for name_tup in tqdm(names_list, desc='list of names -> token set', colour='cyan'):
-        name: str = name_tup[0]
-        if name[0] == '"' and name[-1] == '"':
-            name = name[1:-1]
-            name = name.replace(',', '')
-        if name.startswith('Category:'):
-            name = name[9:]
-        tokens = name.split()
-        tokens = list(filter(lambda x: len(x) >= min_length, tokens))
-        token_set.update(tokens)
+    for name_tup in names_list:
+        token_set.update(tokenize_name(name_tup[0], min_length))
     return token_set
 
 
@@ -186,7 +237,6 @@ if __name__ == '__main__':
 
 """
 python filter_ngrams.py unigram \
-  --humans_min_qrank 1000 \
-  --nothumans_min_qrank 5000 \
- --popular_humans_top_n 10000
+    --humans_min_qrank 1000 \
+    --nothumans_min_qrank 4000
 """
