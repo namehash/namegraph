@@ -133,12 +133,20 @@ class MetaSampler:
                         suggestion.status = self.domains.get_name_status(str(suggestion))
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
-                        while str(suggestion) in all_suggestions_str \
-                                or (suggestion.status != Domains.AVAILABLE
-                                    and available_added + slots_left <= min_available_required) \
-                                or not is_ens_normalized(str(suggestion)):
-                            suggestion = next(suggestions)
-                            suggestion.status = self.domains.get_name_status(str(suggestion))
+                        while True:
+                            while str(suggestion) in all_suggestions_str \
+                                    or (suggestion.status != Domains.AVAILABLE
+                                        and available_added + slots_left <= min_available_required):
+                                suggestion = next(suggestions)
+                                suggestion.status = self.domains.get_name_status(str(suggestion))
+                            if not is_ens_normalized(str(suggestion)):
+                                # log suggestions which are not ens normalized
+                                logger.warning(f"suggestion not ens-normalized: '{str(suggestion)}'; "
+                                               f"metadata: {suggestion.dict()}")
+                                suggestion = next(suggestions)
+                                suggestion.status = self.domains.get_name_status(str(suggestion))
+                            else:
+                                break
                     except StopIteration:
                         # in case the suggestions have run out we simply mark the pipeline as empty
                         # and proceed to sample another non-empty pipeline
