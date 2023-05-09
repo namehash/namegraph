@@ -21,3 +21,4 @@ from .person_name_generator import PersonNameGenerator
 from .symbol_generator import SymbolGenerator
 from .collection_generator import CollectionGenerator
 from .easteregg_generator import EasterEggGenerator
+from .rhymes_generator import RhymesGenerator
