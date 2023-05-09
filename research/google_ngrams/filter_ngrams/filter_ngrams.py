@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -7,6 +9,7 @@ import argparse
 import logging
 from pathlib import Path
 from collections import defaultdict
+
 
 str_logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logger = logging.getLogger(__name__)
@@ -23,27 +26,18 @@ logger.addHandler(stream_handler)
 
 
 def filter_ngrams(
-        input_ngrams_path: Path,
-        nothumans_path: Path,
-        humans_path: Path,
         output_path: Path,
         humans_min_qrank: int,
         nothumans_min_qrank: int,
-        popular_humans_top_n: int
-) -> Path:
-    ngrams_dtype = {'ngram': str, 'count': np.uint64}
-    wikidata_dtype = {'itemid': str, 'qrank': np.uint64, 'name': str}
+        popular_humans_top_n: int,
+        k=0.9
+) -> tuple[Path, float]:
 
-    logger.debug("Reading ngrams...")
-    ngrams_df = pd.read_csv(input_ngrams_path, header=None, names=['ngram', 'count'], dtype=ngrams_dtype)
+    global ngrams_global_df, humans_global_df, nothumans_global_df
 
-    logger.debug("Reading humans...")
-    humans_df = pd.read_csv(humans_path, header=None, names=['itemid', 'qrank', 'name'], dtype=wikidata_dtype)
-    humans_df = humans_df[humans_df['qrank'] >= humans_min_qrank]
-
-    logger.debug("Reading nothumans...")
-    nothumans_df = pd.read_csv(nothumans_path, header=None, names=['itemid', 'qrank', 'name'], dtype=wikidata_dtype)
-    nothumans_df = nothumans_df[nothumans_df['qrank'] >= nothumans_min_qrank]
+    ngrams_df = ngrams_global_df
+    humans_df = humans_global_df[humans_global_df['qrank'] >= humans_min_qrank]
+    nothumans_df = nothumans_global_df[nothumans_global_df['qrank'] >= nothumans_min_qrank]
 
     logger.debug("Converting dataframes to lists...")
     ngrams_list = [(str(ngram), int(count)) for ngram, count in zip(ngrams_df['ngram'], ngrams_df['count'])]
@@ -55,25 +49,34 @@ def filter_ngrams(
     popular_humans_tokens = get_token_set(humans_list[:popular_humans_top_n], min_length=2)
     # nothumans_tokens = get_token_set(nothumans_list, min_length=3)
 
-    logger.info("Counting popular names % in ngrams [before] ...")
+    logger.debug("Counting popular names % in ngrams [before] ...")
     count_before = count_human_names_in_ngrams(ngrams_list, popular_humans_tokens)
     logger.info(f'Popular names in ngrams:\t{count_before} /\t{len(ngrams_list)} [before]')
 
     # filter_basic(ngrams_list, nothumans_tokens, output_path)
-    filter_qrank_weighted_counts(ngrams_list, humans_list, nothumans_list, output_path, k=0.9)
+    filter_qrank_weighted_counts(ngrams_list, humans_list, nothumans_list, output_path, k=k)
 
     logger.debug("Reading filtered ngrams...")
     filtered_ngrams_df = pd.read_csv(output_path, header=None, names=['ngram', 'count'], dtype=ngrams_dtype)
     filtered_ngrams_list = [
         (str(ngram), int(count)) for ngram, count in zip(filtered_ngrams_df['ngram'], filtered_ngrams_df['count'])
     ]
-    logger.info("Counting popular names % in filtered ngrams [after] ...")
-    count_after = count_human_names_in_ngrams(filtered_ngrams_list, popular_humans_tokens)
+    logger.debug("Counting popular names % in filtered ngrams [after] ...")
+    count_after, incorrect_ngram_list = \
+        count_human_names_in_ngrams(filtered_ngrams_list,popular_humans_tokens, return_incorrect=True)
+
+    incorrect_ngrams_filename = 'classified_as_incorrect_ngrams.csv'
+    logger.debug(f"Saving unfiltered ngrams which are names to '{incorrect_ngrams_filename}'")
+    with open(incorrect_ngrams_filename, 'w', encoding='utf-8', newline='') as output_file:
+        writer = csv.writer(output_file)
+        for ngram_str, count in incorrect_ngram_list:
+            writer.writerow([ngram_str, count])
+
     logger.info(f'Popular names in ngrams:\t{count_after} /\t{len(filtered_ngrams_list)} [after]')
     logger.info(f'--- Deleted {100 * (1. - count_after / count_before):.4}% of popular names ---')
     logger.info(f'--- Deleted {100 * (1. - len(filtered_ngrams_list) / len(ngrams_list)):.4}% of rows ---')
 
-    return output_path
+    return output_path, (1. - count_after / count_before)
 
 
 def filter_basic(ngrams_list: list[tuple[str, int]], nothumans_tokens: set[str], output_path: Path):
@@ -103,7 +106,7 @@ def filter_qrank_weighted_counts(
         humans_list: list[tuple[str, int]],
         nothumans_list: list[tuple[str, int]],
         output_path: Path,
-        k=0.9  # todo: different k
+        k: float
 ):
     """
     Create token->weighted_count dicts for humans and nothumans weighted by get_name_weight(name_qrank).
@@ -157,15 +160,23 @@ def filter_qrank_weighted_counts(
     logger.debug(f'N-grams saved.')
 
 
-def count_human_names_in_ngrams(ngrams_list: list[tuple[str, int]], humans_tokens: set[str]) -> int:
+def count_human_names_in_ngrams(
+        ngrams_list: list[tuple[str, int]],
+        humans_tokens: set[str],
+        return_incorrect=False
+) -> int | tuple[int, list[tuple[str, int]]]:
+
     names_count = 0
+    incorrect_ngrams: list[tuple[str, int]] = []
     for ngram_str, count in tqdm(ngrams_list, desc='counting names in n-grams', colour='green'):
         if all([ngram_token in humans_tokens for ngram_token in ngram_str.split()]):  # todo: czy to jest dobrze liczone
             names_count += 1
+            incorrect_ngrams.append((ngram_str, count))
+    if return_incorrect:
+        return names_count, sorted(incorrect_ngrams, key=lambda t: t[1], reverse=True)
     return names_count
 
 
-# todo: jak jest pauza, kropka itp. to usunąć z name?
 def tokenize_name(name: str, min_length):
     if name[0] == '"' and name[-1] == '"':
         name = name[1:-1]
@@ -190,6 +201,44 @@ def get_path(path_str: str) -> Path:
         raise ValueError("Provide filepath with existing parent directory.")
 
 
+def search_params() -> tuple[float, int, int]:
+    best_k, best_humans_min_qrank, best_nothumans_min_qrank = 0.9, 200, 2000
+
+    ks = [0.8, 0.95]
+    humans_min_qranks = [200, 250, 300]
+    nothumans_min_qranks = [1500, 2000, 2500]
+
+    max_score_ = 0.
+
+    curr_run = 1
+    out_of = len(ks) *  len(humans_min_qranks) *  len(nothumans_min_qranks)
+
+    for k in ks:
+        for humans_min_qrank in humans_min_qranks:
+            for nothumans_min_qrank in nothumans_min_qranks:
+                try:
+                    _, score_ = filter_ngrams(
+                        output_path=output_filepath,
+                        humans_min_qrank=humans_min_qrank,
+                        nothumans_min_qrank=nothumans_min_qrank,
+                        popular_humans_top_n=args.popular_humans_top_n,
+                        k=k
+                    )
+                    logger.info(f'[{curr_run}/{out_of}] params: (k={k}, humans_min_qrank={humans_min_qrank}, '
+                                f'nothumans_min_qrank={nothumans_min_qrank}), score: {score_}')
+                    if score_ > max_score_:
+                        logger.warning(f'New best params! (above)')
+                        max_score_ = score_
+                        best_k, best_humans_min_qrank, best_nothumans_min_qrank = k, humans_min_qrank, nothumans_min_qrank
+                except KeyboardInterrupt:
+                    logger.warning(f'Interrupting... Best params so far: '
+                                   f'(k={best_k}, humans_min_qrank={best_humans_min_qrank}, '
+                                   f'nothumans_min_qrank={best_nothumans_min_qrank}), score: {max_score_}')
+                    sys.exit(1)
+
+    return best_k, best_humans_min_qrank, best_nothumans_min_qrank
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filter n-grams from a csv file.')
 
@@ -199,6 +248,9 @@ if __name__ == '__main__':
     parser.add_argument('--nothumans', type=str, default=None, help='nothumans (proper nouns) file name or path')
     parser.add_argument('--humans', type=str, default=None, help='human (names) file name or path')
     parser.add_argument('-o', '--output', type=str, default=None, help='output file name or path')
+
+    parser.add_argument('-s', '--search_params', action='store_true', default=False,
+                        help='if specified, run parameters grid search, after which run filtering with best params')
 
     parser.add_argument('--humans_min_qrank', type=int, default=500, help='trim humans below this qrank')
     parser.add_argument('--nothumans_min_qrank', type=int, default=1000, help='trim nothumans below this qrank')
@@ -213,32 +265,62 @@ if __name__ == '__main__':
 
     nothumans_filepath = get_path(
         args.nothumans) if args.nothumans is not None else Path().cwd() / 'data' / f'nothumans.csv'
-    assert nothumans_filepath.is_file(), f'Proper nouns file {nothumans_filepath} does not exist.'
+    assert nothumans_filepath.is_file(), f'Proper nouns (nothumans) file {nothumans_filepath} does not exist.'
 
     humans_filepath = get_path(args.humans) if args.humans is not None else Path().cwd() / 'data' / f'humans.csv'
     assert humans_filepath.is_file(), f'Humans file {humans_filepath} does not exist.'
 
     output_filepath = get_path(args.output) if args.output is not None else f'{args.ngram_type}s_filtered.csv'
 
+
+    ngrams_dtype = {'ngram': str, 'count': np.uint64}
+    wikidata_dtype = {'itemid': str, 'qrank': np.uint64, 'name': str}
+    logger.debug("Reading ngrams...")
+    ngrams_global_df = pd.read_csv(ngrams_filepath, header=None, names=['ngram', 'count'], dtype=ngrams_dtype)
+    logger.debug("Reading humans...")
+    humans_global_df = pd.read_csv(nothumans_filepath, header=None, names=['itemid', 'qrank', 'name'], dtype=wikidata_dtype)
+    logger.debug("Reading nothumans...")
+    nothumans_global_df = pd.read_csv(humans_filepath, header=None, names=['itemid', 'qrank', 'name'], dtype=wikidata_dtype)
+
+
+    run_search_params: bool = args.search_params
+    best_k, best_humans_min_qrank, best_nothumans_min_qrank = None, None, None
+
+    if run_search_params:
+        logger.info('@@@@@ PARAMS SEARCH START @@@@@')
+        best_k, best_humans_min_qrank, best_nothumans_min_qrank = search_params()
+        logger.info('@@@@@ PARAMS SEARCH END @@@@@')
+        logger.info(f'Best params: (k={best_k}, humans_min_qrank={best_humans_min_qrank}, '
+                    f'nothumans_min_qrank={best_nothumans_min_qrank})')
+
     logger.info('##### START #####')
 
-    res = filter_ngrams(
-        input_ngrams_path=ngrams_filepath,
-        nothumans_path=nothumans_filepath,
-        humans_path=humans_filepath,
+    res, score = filter_ngrams(
         output_path=output_filepath,
-        humans_min_qrank=args.humans_min_qrank,
-        nothumans_min_qrank=args.nothumans_min_qrank,
-        popular_humans_top_n=args.popular_humans_top_n
+        humans_min_qrank=best_humans_min_qrank if run_search_params else args.humans_min_qrank,
+        nothumans_min_qrank=best_nothumans_min_qrank if run_search_params else args.nothumans_min_qrank,
+        popular_humans_top_n=args.popular_humans_top_n,
+        k=best_k if run_search_params else 0.9
     )
 
+    logger.info(f'Final score: {score}')
     logger.info(f'Output saved to "{res}".')
     logger.info('#####  END  #####\n')
 
 """
+If subdirectory 'data' exists and has structure like:
+
+data/
+├─ bigrams.csv
+├─ humans.csv
+├─ nothumans.csv
+├─ unigrams.csv
+
+run script like this:
+
 python filter_ngrams.py unigram \
-    --humans_min_qrank 1000 \
-    --nothumans_min_qrank 4000
+    --humans_min_qrank 200 \
+    --nothumans_min_qrank 2000
 
 python filter_ngrams.py bigram \
     --humans_min_qrank 1000 \
