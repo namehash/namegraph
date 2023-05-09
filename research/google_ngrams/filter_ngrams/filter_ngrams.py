@@ -31,7 +31,7 @@ def filter_ngrams(
         nothumans_min_qrank: int,
         popular_humans_top_n: int,
         k=0.9
-) -> tuple[Path, float]:
+) -> tuple[Path, float, float]:
 
     global ngrams_global_df, humans_global_df, nothumans_global_df
 
@@ -65,7 +65,7 @@ def filter_ngrams(
     count_after, incorrect_ngram_list = \
         count_human_names_in_ngrams(filtered_ngrams_list,popular_humans_tokens, return_incorrect=True)
 
-    incorrect_ngrams_filename = 'classified_as_incorrect_ngrams.csv'
+    incorrect_ngrams_filename = f'classified_as_incorrect_{args.ngram_type}s.csv'
     logger.debug(f"Saving unfiltered ngrams which are names to '{incorrect_ngrams_filename}'")
     with open(incorrect_ngrams_filename, 'w', encoding='utf-8', newline='') as output_file:
         writer = csv.writer(output_file)
@@ -76,7 +76,7 @@ def filter_ngrams(
     logger.info(f'--- Deleted {100 * (1. - count_after / count_before):.4}% of popular names ---')
     logger.info(f'--- Deleted {100 * (1. - len(filtered_ngrams_list) / len(ngrams_list)):.4}% of rows ---')
 
-    return output_path, (1. - count_after / count_before)
+    return output_path, (1. - count_after / count_before), (1. - len(filtered_ngrams_list) / len(ngrams_list))
 
 
 def filter_basic(ngrams_list: list[tuple[str, int]], nothumans_tokens: set[str], output_path: Path):
@@ -133,12 +133,12 @@ def filter_qrank_weighted_counts(
             return 40
 
     humans_tokens_2_rank = defaultdict(lambda: 0)
-    for name, qrank in tqdm(humans_list, desc='creating humans dict', colour='cyan'):
+    for name, qrank in humans_list:
         for token in tokenize_name(name, min_length=2):
             humans_tokens_2_rank[token] += get_name_weight(qrank)
 
     nothumans_tokens_2_rank = defaultdict(lambda: 0)
-    for name, qrank in tqdm(nothumans_list, desc='creating nothumans dict', colour='cyan'):
+    for name, qrank in nothumans_list:
         for token in tokenize_name(name, min_length=3):
             nothumans_tokens_2_rank[token] += get_name_weight(qrank)
 
@@ -202,13 +202,14 @@ def get_path(path_str: str) -> Path:
 
 
 def search_params() -> tuple[float, int, int]:
-    best_k, best_humans_min_qrank, best_nothumans_min_qrank = 0.9, 200, 2000
+    best_k, best_humans_min_qrank, best_nothumans_min_qrank = 0.9, 1000, 4000
 
-    ks = [0.8, 0.95]
-    humans_min_qranks = [200, 250, 300]
-    nothumans_min_qranks = [1500, 2000, 2500]
+    ks = [0.9, 0.95]
+    humans_min_qranks = [1000, 1500]
+    nothumans_min_qranks = [3500, 4000]  # [1500, 2000, 2500]
 
     max_score_ = 0.
+    best_deleted_rows_ = 0.
 
     curr_run = 1
     out_of = len(ks) *  len(humans_min_qranks) *  len(nothumans_min_qranks)
@@ -217,7 +218,9 @@ def search_params() -> tuple[float, int, int]:
         for humans_min_qrank in humans_min_qranks:
             for nothumans_min_qrank in nothumans_min_qranks:
                 try:
-                    _, score_ = filter_ngrams(
+                    logger.info(f'[{curr_run}/{out_of}] params: (k={k}, humans_min_qrank={humans_min_qrank}, '
+                                f'nothumans_min_qrank={nothumans_min_qrank}')
+                    _, score_, deleted_rows_ = filter_ngrams(
                         output_path=output_filepath,
                         humans_min_qrank=humans_min_qrank,
                         nothumans_min_qrank=nothumans_min_qrank,
@@ -225,15 +228,17 @@ def search_params() -> tuple[float, int, int]:
                         k=k
                     )
                     logger.info(f'[{curr_run}/{out_of}] params: (k={k}, humans_min_qrank={humans_min_qrank}, '
-                                f'nothumans_min_qrank={nothumans_min_qrank}), score: {score_}')
+                                f'nothumans_min_qrank={nothumans_min_qrank}), score: {score_}, deleted rows: {deleted_rows_}')
                     if score_ > max_score_:
                         logger.warning(f'New best params! (above)')
                         max_score_ = score_
                         best_k, best_humans_min_qrank, best_nothumans_min_qrank = k, humans_min_qrank, nothumans_min_qrank
+                        best_deleted_rows_ = deleted_rows_
+                    curr_run += 1
                 except KeyboardInterrupt:
-                    logger.warning(f'Interrupting... Best params so far: '
-                                   f'(k={best_k}, humans_min_qrank={best_humans_min_qrank}, '
-                                   f'nothumans_min_qrank={best_nothumans_min_qrank}), score: {max_score_}')
+                    logger.exception(f'Interrupting... Best params so far: '
+                                     f'(k={best_k}, humans_min_qrank={best_humans_min_qrank}, nothumans_min_qrank='
+                                     f'{best_nothumans_min_qrank}), score: {max_score_}, deleted rows: {best_deleted_rows_}')
                     sys.exit(1)
 
     return best_k, best_humans_min_qrank, best_nothumans_min_qrank
@@ -295,7 +300,7 @@ if __name__ == '__main__':
 
     logger.info('##### START #####')
 
-    res, score = filter_ngrams(
+    res, score, deleted_rows = filter_ngrams(
         output_path=output_filepath,
         humans_min_qrank=best_humans_min_qrank if run_search_params else args.humans_min_qrank,
         nothumans_min_qrank=best_nothumans_min_qrank if run_search_params else args.nothumans_min_qrank,
@@ -303,7 +308,7 @@ if __name__ == '__main__':
         k=best_k if run_search_params else 0.9
     )
 
-    logger.info(f'Final score: {score}')
+    logger.info(f'Deleted names: {100*score}%, deleted rows: {100*deleted_rows}%')
     logger.info(f'Output saved to "{res}".')
     logger.info('#####  END  #####\n')
 
@@ -326,3 +331,5 @@ python filter_ngrams.py bigram \
     --humans_min_qrank 1000 \
     --nothumans_min_qrank 4000
 """
+
+# todo: for bigrams try to save more rows (adjust params)
