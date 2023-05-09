@@ -370,3 +370,23 @@
     instant: 1
     domain_detail: 1
     full: 0
+-
+  name: reverse
+  generator: ReverseGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 1
+    other:
+      default: 0
+  mode_weights_multiplier:
+    instant: 0.166
+    domain_detail: 0.1
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 1
