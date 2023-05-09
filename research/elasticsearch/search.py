@@ -2,6 +2,8 @@ import json
 from argparse import ArgumentParser
 
 from elasticsearch import Elasticsearch
+from tqdm import tqdm
+
 from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
 
 
@@ -146,7 +148,7 @@ if __name__ == '__main__':
     else:
         es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
 
-    for query in args.queries:
+    for query in tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
         print(f'<h2>only collection</h2>')
