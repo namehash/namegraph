@@ -7,6 +7,6 @@ docker exec -it elasticsearch bash
 
 2. Use docker/Dockerfile as build script for installing LTR plugin
 
-3.
+3. http PUT localhost:9200/_ltr -a elastic:espass
 
 
