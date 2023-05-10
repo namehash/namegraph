@@ -203,7 +203,8 @@ if __name__ == '__main__':
     else:
         es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
 
-    es.indices.delete(index=INDEX_NAME)
+    if es.indices.exists(index=INDEX_NAME):
+        es.indices.delete(index=INDEX_NAME)
 
     initialize_index(es)
 
