@@ -33,7 +33,7 @@ elasticsearch:
   port: ${oc.decode:${oc.env:ES_PORT,9243}}
   username: ${oc.env:ES_USERNAME,elastic}
   password: ${oc.env:ES_PASSWORD,password}
-  index: ${oc.env:ES_INDEX,collection-templates}
+  index: ${oc.env:ES_INDEX,collection-templates-1}
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
