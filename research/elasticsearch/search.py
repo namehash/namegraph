@@ -1,11 +1,14 @@
 import json
 from argparse import ArgumentParser
 from math import log10
+import pprint
 
 from copy import deepcopy
 
 from elasticsearch import Elasticsearch
 from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
+
+MODEL_NAME="ltr-model"
 
 
 COMMON_QUERY = {
@@ -15,8 +18,12 @@ COMMON_QUERY = {
                     {
                         "multi_match": {
                             "fields": [
-                                "data.collection_name^2",
-                                "data.collection_name.exact^3",
+                                "data.collection_name^0.24", #1
+                                "data.collection_name.exact^0", #2
+                                "data.collection_description^0", #3
+                                "data.collection_keywords^0.02", #4
+                                "data.names.normalized_name^0", #5
+                                "data.names.tokenized_name^0.01", #6
                             ],
                             "type": "cross_fields",
                         }
@@ -24,28 +31,64 @@ COMMON_QUERY = {
                 ],
                 "should": [
                     {
-                        "rank_feature": {
-                            "field": "template.collection_rank",
-                            "boost": 10,
-                             "log": {
-                                 "scaling_factor": 1
-                             }
-                        }
+                        "rank_feature": { "field": "template.collection_rank", #7 
+                                         "boost": 0, }
                     },
                     {
-                        "rank_feature": {
-                            "field": "metadata.members_count",
-                            "boost": 10,
-                             "log": {
-                                 "scaling_factor": 1
-                             }
-                        }
-                    }
+                        "rank_feature": { "field": "metadata.members_rank_mean", #8
+                            "boost": 0.14, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.members_rank_median", #9
+                            "boost": 1.26, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.members_system_interesting_score_mean", #10
+                            "boost": 0, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.members_system_interesting_score_median", #11
+                            "boost": 5.64, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.valid_members_count", #12
+                            "boost": 1.9, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.invalid_members_count", #13
+                            "boost": 1.7, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.valid_members_ratio", #14
+                            "boost": 0, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.nonavailable_memebers_count", #15
+                            "boost": 0, }
+                    },
+                    {
+                        "rank_feature": { "field": "template.nonavailable_memebers_ratio", #16
+                            "boost": 0, }
+                    },
                 ]
             }
 
         },
-}
+
+        "rescore": {
+            "window_size": 1000,
+            "query": {
+                "rescore_query": {
+                    "sltr": {
+                        "params": {
+                            #"keywords": "rambo"
+                        },
+                        "model": MODEL_NAME
+                    }
+                }
+            }
+        }
+    }
 
 
 def search_by_name(query, limit, with_rank=True, with_keyword_description=False):
@@ -69,6 +112,7 @@ def search_by_name(query, limit, with_rank=True, with_keyword_description=False)
         size=limit,
         explain=args.explain
     )
+
 
     hits = response["hits"]["hits"]
     return hits
@@ -148,7 +192,7 @@ class Search:
         return [score, name, rank, members_value, rank_mean, rank_median, score_mean, score_median, valid_count, invalid_count, valid_ratio, noavb_count, noavb_ratio, is_merged, wikidata_id, type_wikidata_ids, description, keywords, names, ]
 
     def columns(self):
-        return ['score', 'name', 'rank', 'members', 'm. rank mean', 'm. rank median', 'm. int. score mean', 'm. int. score median', 'valid m. count', 'invalid m. count', 'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 'desciption', 'keywords', 'names']
+        return ['score', 'name', 'is bad', 'rank', 'members', 'm. rank mean', 'm. rank median', 'm. int. score mean', 'm. int. score median', 'valid m. count', 'invalid m. count', 'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 'desciption', 'keywords', 'names']
 
     def __call__(self, query, args):
 
@@ -159,9 +203,14 @@ class Search:
         response = es.search(
             index=INDEX_NAME,
             query=body['query'],
+            rescore=body['rescore'],
             size=args.limit,
             explain=args.explain
         )
+
+        print(response['hits']['hits'][0].keys())
+        print(response['hits']['total'])
+        print(response['hits']['max_score'])
 
         hits = response["hits"]["hits"]
         return hits
@@ -200,15 +249,13 @@ class NameTypeSearch(Search):
     def body(self, query):
         body = deepcopy(COMMON_QUERY)
         body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
+        body['rescore']['query']['rescore_query']['sltr']['params'] = {"keywords": query}
 
         return body
 
 
     def header(self):
-        return 'name, type, rank'
+        return 'optimized linear model'
 
 class MemberMeanSearch(Search):
     def body(self, query):
@@ -365,7 +412,7 @@ MemberMedianSearch(),ScoreMeanSearch(),ScoreMedianSearch(),ValidRatioSearch(),No
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('queries', nargs='+', help='queries')
+    parser.add_argument('--queries', help='file with queries')
     parser.add_argument('--output', default='report.html', help="file with the output report")
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
@@ -400,7 +447,12 @@ if __name__ == '__main__':
         for search in [NameTypeSearch()]:
             print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{search.description()}</h1>', file=output)
 
-            for query in args.queries:
+            queries = []
+            with open(args.queries) as input:
+                for row in input:
+                    queries.append(row.strip())
+
+            for query in queries:
             #for search in [NameRankSearch(), NameSearch(), NameKeywordsDescriptionSearch(), NameMembersSearch()]:
                 print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query}</h2>', file=output)
                 hits = search(query, args)
@@ -411,10 +463,27 @@ if __name__ == '__main__':
                 print(f'</tr>', file=output)
 
                 if(rf_model and len(hits) > 0):
-                    df = pd.DataFrame(columns=["query",
-                        "user_score",
-                        "elastic_score",
+                    df = pd.DataFrame(columns=[
+                        "rank_log",
+                        "mrank_mean_log",
+                        "mrank_median_log",
                         "members system interesting score mean",
+                        "members system interesting score median",
+                        "valid members count",
+                        "invalid members count",
+                        "valid members ratio",
+                        "nonavailable members count",
+                        "nonavailable members ratio",
+                        "is merged",
+                        ])
+
+                    for hit in hits:
+                        values = search.values(hit, args) 
+                        values = [float(values[2]), *[float(e) for e in values[4:13]], int(values[13])]
+                        df.loc[len(df)] = values
+
+                    # change order to match model
+                    df = df[["members system interesting score mean",
                         "members system interesting score median",
                         "valid members count",
                         "invalid members count",
@@ -424,31 +493,25 @@ if __name__ == '__main__':
                         "is merged",
                         "rank_log",
                         "mrank_mean_log",
-                        "mrank_median_log",
-                        ])
+                        "mrank_median_log",]]
+                        
+                    #df = df.drop(['user_score', 'query', 'elastic_score'], axis=1)
 
-                    for hit in hits:
-                        values = search.values(hit, args) 
-                        values = [values[1], 0, float(values[0]), float(values[2]), *[float(e) for e in values[4:13]], int(values[13])]
-                        df.loc[len(df)] = values
-
-                    df = df.drop(['user_score', 'query', 'elastic_score'], axis=1)
-
-                    #df['rank_log'] = df['rank'].apply(lambda x : np.log10(x))
-                    #df['mrank_mean_log'] = df['members rank mean'].apply(lambda x : np.log10(x))
-                    #df['mrank_median_log'] = df['members rank median'].apply(lambda x : np.log10(x))
-
-                    decision = rf_model.predict(df)
-
+                    decision = rf_model.predict_proba(df)[:, 1]
                 else:
-                    decision = [False] * len(hits)
+                    decision = [0.0] * len(hits)
 
-                for hit, to_filter in zip(hits, decision):
-                    if(to_filter):
-                        continue
+                for hit, bad_score in zip(hits, decision):
+                    if(bad_score > 0.5):
+                        print('<tr class="bg-slate-500">', file=output)
+                    elif(bad_score > 0.2):
+                        print('<tr class="bg-slate-200">', file=output)
+                    else:
+                        print('<tr>', file=output)
 
-                    print('<tr>', file=output)
-                    for value in search.values(hit, args):
+                    values = search.values(hit, args)
+                    values.insert(2, "%.3f" % bad_score)
+                    for value in values:
                         print(f'<td class="border border-slate-300 px-2 py-2 text-right">{value}</td>', file=output)
                     print('</tr>', file=output)
                 print('</table>', file=output)
