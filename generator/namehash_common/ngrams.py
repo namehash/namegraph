@@ -8,6 +8,16 @@ from .utils import ln
 ALPHA = 0.4
 
 
+def explode_gaps(words: list[str]) -> list[str]:
+    result = []
+    for word in words:
+        if hasattr(word, 'gap_length'):
+            result.extend([''] * word.gap_length)
+        else:
+            result.append(word)
+    return result
+
+
 class Ngrams:
     """Word probability of unigrams and bigrams."""
 
@@ -80,6 +90,7 @@ class Ngrams:
         return ALPHA * self.word_probability(word2)
 
     def sequence_log_probability(self, words: list[str]) -> float:
+        words = explode_gaps(words)
         probs = [ln(self.word_probability(words[0]))] \
                 + [ln(self.bigram_probability(word1, word2)) for word1, word2 in zip(words, words[1:])]
         return sum(probs)
