@@ -8,9 +8,6 @@ from copy import deepcopy
 from elasticsearch import Elasticsearch
 from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
 
-MODEL_NAME="ltr-model"
-
-
 COMMON_QUERY = {
         "query": {
             "bool": {
@@ -18,12 +15,12 @@ COMMON_QUERY = {
                     {
                         "multi_match": {
                             "fields": [
-                                "data.collection_name^0.24", #1
-                                "data.collection_name.exact^0", #2
-                                "data.collection_description^0", #3
-                                "data.collection_keywords^0.02", #4
-                                "data.names.normalized_name^0", #5
-                                "data.names.tokenized_name^0.01", #6
+                                "data.collection_name", #1
+                                "data.collection_name.exact", #2
+                                "data.collection_description", #3
+                                "data.collection_keywords", #4
+                                "data.names.normalized_name", #5
+                                "data.names.tokenized_name", #6
                             ],
                             "type": "cross_fields",
                         }
@@ -32,43 +29,43 @@ COMMON_QUERY = {
                 "should": [
                     {
                         "rank_feature": { "field": "template.collection_rank", #7 
-                                         "boost": 0, }
+                                         "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "metadata.members_rank_mean", #8
-                            "boost": 0.14, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.members_rank_median", #9
-                            "boost": 1.26, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.members_system_interesting_score_mean", #10
-                            "boost": 0, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.members_system_interesting_score_median", #11
-                            "boost": 5.64, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.valid_members_count", #12
-                            "boost": 1.9, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.invalid_members_count", #13
-                            "boost": 1.7, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.valid_members_ratio", #14
-                            "boost": 0, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.nonavailable_memebers_count", #15
-                            "boost": 0, }
+                            "boost": 1, }
                     },
                     {
                         "rank_feature": { "field": "template.nonavailable_memebers_ratio", #16
-                            "boost": 0, }
+                            "boost": 1, }
                     },
                 ]
             }
@@ -83,64 +80,12 @@ COMMON_QUERY = {
                         "params": {
                             #"keywords": "rambo"
                         },
-                        "model": MODEL_NAME
                     }
-                }
+                },
+                "query_weight": 0
             }
         }
     }
-
-
-def search_by_name(query, limit, with_rank=True, with_keyword_description=False):
-    body = deepcopy(COMMON_QUERY)
-    body['query']['bool']['must'][0]['multi_match']['query'] = query
-    if with_keyword_description:
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_description^2",
-            "data.collection_keywords^2",
-        ]
-
-
-    print(f'{body["query"]["bool"]}')
-
-    if not with_rank:
-        del body['query']['bool']['should']
-
-    response = es.search(
-        index=INDEX_NAME,
-        query = body['query'],
-        size=limit,
-        explain=args.explain
-    )
-
-
-    hits = response["hits"]["hits"]
-    return hits
-
-
-def search_by_all(query, limit):
-    body = deepcopy(COMMON_QUERY)
-    body['query']['bool']['must'][0]['multi_match']['query'] = query
-    body['size'] = limit
-    body['query']['bool']['must'][0]['multi_match']['fields'] += [
-        "data.collection_description^2",
-        "data.collection_keywords^2",
-        "data.names.normalized_name",
-        "data.names.tokenized_name",
-    ]
-
-    print(f'{body["query"]["bool"]}')
-
-    response = es.search(
-        index=INDEX_NAME,
-        query=body['query'],
-        size=limit,
-        explain=args.explain,
-    )
-
-    hits = response["hits"]["hits"]
-    return hits
-
 
 def print_exlanation(hits):
     print('<details class="m-5"><summary>Explanation</summary><table border=1>')
@@ -158,47 +103,59 @@ class Search:
 
     def values(self, hit, args):
         score = "%.1f" % hit['_score']
-        name = hit['_source']['data']['collection_name']
-        keywords = '; '.join(hit['_source']['data']['collection_keywords'][:10])
-        if len(hit['_source']['data']['collection_keywords']) > 10:
-            keywords += "..."
-        description = hit['_source']['data']['collection_description']
-        rank = "%.3f" % log10(hit['_source']['template']['collection_rank'])
-        link = hit['_source']['template']['collection_wikipedia_link']
-        type_wikidata_ids = ', '.join(['<a href="https://wikidata.org/wiki/' + id + '">' + name + '</a>' for id, name in hit['_source']['template']['collection_types']])
-        #print(hit['_source']['data'])
-        names = ', '.join([x['normalized_name'] for x in hit['_source']['data']['names'][:args.limit_names]])
+        data = hit['_source']['data']
+        template = hit['_source']['template']
 
-        if len(hit['_source']['data']['names']) > args.limit_names:
+        name = data['collection_name']
+        keywords = '; '.join(data['collection_keywords'][:10])
+        if len(data['collection_keywords']) > 10:
+            keywords += "..."
+        description = data['collection_description']
+        rank = "%.3f" % log10(template['collection_rank'])
+        link = template['collection_wikipedia_link']
+        def wikidata_url(id, name):
+            return '<a href="https://wikidata.org/wiki/' + str(id) + '">' + str(name) + '</a>'
+
+        type_wikidata_ids = ', '.join([wikidata_url(id, name) for id, name in template['collection_types']])
+        names = ', '.join([x['normalized_name'] for x in data['names'][:args.limit_names]])
+
+        if len(data['names']) > args.limit_names:
             names += "..."
 
-        wikidata_id = hit['_source']['template']['collection_wikidata_id']
-        wikidata_id = '<a href="https://wikidata.org/wiki/' + wikidata_id + '">' + wikidata_id + '</a>'
+        wikidata_id = template['collection_wikidata_id']
+        wikidata_id = wikidata_url(wikidata_id, wikidata_id)
 
-        members_count = len(hit['_source']['data']['names'])
+        members_count = len(data['names'])
         members_value = f"{members_count} : {'%.3f' % log10(members_count)}"
 
-        rank_mean = "%.1f" % log10(hit['_source']['template']['members_rank_mean'])
-        rank_median = "%.1f" % log10(hit['_source']['template']['members_rank_median'])
-        score_mean = "%.3f" % hit['_source']['template']['members_system_interesting_score_mean']
-        score_median = "%.3f" % hit['_source']['template']['members_system_interesting_score_median']
-        valid_count = hit['_source']['template']['valid_members_count'] 
-        invalid_count = hit['_source']['template']['invalid_members_count'] 
-        valid_ratio = "%.3f" % hit['_source']['template']['valid_members_ratio']
-        noavb_count =  hit['_source']['template']['nonavailable_members_count'] 
-        noavb_ratio = "%.3f" % hit['_source']['template']['nonavailable_members_ratio']
-        is_merged = hit['_source']['template']['is_merged']
+        rank_mean = "%.1f" % log10(template['members_rank_mean'])
+        rank_median = "%.1f" % log10(template['members_rank_median'])
+        score_mean = "%.3f" % template['members_system_interesting_score_mean']
+        score_median = "%.3f" % template['members_system_interesting_score_median']
+        valid_count = template['valid_members_count'] 
+        invalid_count = template['invalid_members_count'] 
+        valid_ratio = "%.3f" % template['valid_members_ratio']
+        noavb_count =  template['nonavailable_members_count'] 
+        noavb_ratio = "%.3f" % template['nonavailable_members_ratio']
+        is_merged = template['is_merged']
 
-        return [score, name, rank, members_value, rank_mean, rank_median, score_mean, score_median, valid_count, invalid_count, valid_ratio, noavb_count, noavb_ratio, is_merged, wikidata_id, type_wikidata_ids, description, keywords, names, ]
+        return [score, name, rank, members_value, rank_mean, rank_median, 
+                score_mean, score_median, valid_count, invalid_count, 
+                valid_ratio, noavb_count, noavb_ratio, is_merged, wikidata_id, type_wikidata_ids, 
+                description, keywords, names, ]
 
     def columns(self):
-        return ['score', 'name', 'is bad', 'rank', 'members', 'm. rank mean', 'm. rank median', 'm. int. score mean', 'm. int. score median', 'valid m. count', 'invalid m. count', 'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 'desciption', 'keywords', 'names']
+        return ['score', 'name', 'u. score', 'is bad', 'rank', 'members', 'm. rank mean', 'm. rank median', 
+                'm. int. score mean', 'm. int. score median', 'valid m. count', 'invalid m. count', 
+                'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 
+                'desciption', 'keywords', 'names']
 
     def __call__(self, query, args):
 
         body = self.body(query)
 
         print(f'{body["query"]["bool"]}')
+        body['rescore']['query']['rescore_query']['sltr']['model'] = args.ranking_model
 
         response = es.search(
             index=INDEX_NAME,
@@ -208,44 +165,14 @@ class Search:
             explain=args.explain
         )
 
-        print(response['hits']['hits'][0].keys())
-        print(response['hits']['total'])
-        print(response['hits']['max_score'])
-
         hits = response["hits"]["hits"]
         return hits
 
-
-class NameRankSearch(Search):
-    def __call__(self, query, args):
-        return search_by_name(query, args.limit)
-
-    def header(self):
-        return 'name with rank'
-
-class NameSearch(Search):
-    def __call__(self, query, args):
-        return search_by_name(query, args.limit, with_rank=False)
-
-    def header(self):
-        return 'only name without rank'
-
-class NameKeywordsDescriptionSearch(Search):
-    def __call__(self, query, args):
-        return search_by_name(query, args.limit, with_rank=False, with_keyword_description=True)
-
-    def header(self):
-        return 'name, description, keywords without rank'
-
-class NameMembersSearch(Search):
-    def __call__(self, query, args):
-        return search_by_all(query, args.limit)
-    
-    def header(self):
-        return 'name, description, keywords, members'
+    def key(self):
+        return "default"
 
 
-class NameTypeSearch(Search):
+class AllFieldsSearch(Search):
     def body(self, query):
         body = deepcopy(COMMON_QUERY)
         body['query']['bool']['must'][0]['multi_match']['query'] = query
@@ -253,162 +180,11 @@ class NameTypeSearch(Search):
 
         return body
 
-
     def header(self):
-        return 'optimized linear model'
+        return 'feature optimization'
 
-class MemberMeanSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.members_rank_mean",
-                        "boost": 10,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, mean member rank'
-
-
-class MemberMedianSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.members_rank_median",
-                        "boost": 10,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, median member rank'
-
-class ScoreMeanSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.members_system_interesting_score_mean",
-                        "boost": 40,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, score mean rank'
-
-class ScoreMedianSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.members_system_interesting_score_median",
-                        "boost": 40,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, score median rank'
-
-class ValidRatioSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.valid_members_ratio",
-                        "boost": 40,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, valid ratio'
-
-class NonavbRatioSearch(Search):
-    def body(self, query):
-        body = deepcopy(COMMON_QUERY)
-        body['query']['bool']['must'][0]['multi_match']['query'] = query
-        body['query']['bool']['must'][0]['multi_match']['fields'] += [
-            "data.collection_types^3",
-        ]
-
-        body['query']['bool']['should'] = [
-                {
-                    "rank_feature": {
-                        "field": "template.nonavailable_members_ratio",
-                        "boost": 40,
-                            "log": {
-                                "scaling_factor": 1
-                            }
-                    }
-                }
-        ]
-
-        return body
-
-    def header(self):
-        return 'name, type, nonavailable members ratio'
-
-MemberMedianSearch(),ScoreMeanSearch(),ScoreMedianSearch(),ValidRatioSearch(),NonavbRatioSearch()
+    def key(self):
+        return "all-fields"
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -424,12 +200,20 @@ if __name__ == '__main__':
     parser.add_argument('--explain', action='store_true', help='run search with explain')
     parser.add_argument('--cloud_id', default=None, help='cloud id')
     parser.add_argument('--random_forest_model', default=None, help='random forest model used to filter the results')
+    parser.add_argument('--ranking_model', default=None, help='name of the model to re-rank the results')
+    parser.add_argument('--scores', default=None, help='file with scores assigned by users (JSONL)')
+    parser.add_argument('--imputed_scores', default=None, help='file with relevance scores computed automatically')
+
     args = parser.parse_args()
 
     if args.cloud_id:
         es = connect_to_elasticsearch_using_cloud_id(args.cloud_id, args.username, args.password)
     else:
         es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
+
+    search_types = {}
+    for search in [Search(), AllFieldsSearch()]:
+        search_types[search.key()] = search
 
 
     rf_model = None
@@ -440,11 +224,21 @@ if __name__ == '__main__':
 
         rf_model = load(args.random_forest_model)
 
+    scores = {}
+    if args.scores:
+        with open(args.scores) as input:
+            for row in input:
+                data = json.loads(row.strip())
+                query = list(data.keys())[0]
+                scores[query] = {}
+                for result, score in data[query].items():
+                    scores[query][result] = score['user_score']
+
+
     with open(args.output, "w") as output:
         print(f'<head><script src="https://cdn.tailwindcss.com"></script></head>', file=output)
 
-        #for search in [NameTypeSearch(),MemberMeanSearch(),MemberMedianSearch(),ScoreMeanSearch(),ScoreMedianSearch(),ValidRatioSearch(),NonavbRatioSearch()]:
-        for search in [NameTypeSearch()]:
+        for search in [AllFieldsSearch()]:
             print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{search.description()}</h1>', file=output)
 
             queries = []
@@ -453,7 +247,6 @@ if __name__ == '__main__':
                     queries.append(row.strip())
 
             for query in queries:
-            #for search in [NameRankSearch(), NameSearch(), NameKeywordsDescriptionSearch(), NameMembersSearch()]:
                 print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query}</h2>', file=output)
                 hits = search(query, args)
                 print('<table class="m-5">', file=output)
@@ -509,11 +302,59 @@ if __name__ == '__main__':
                     else:
                         print('<tr>', file=output)
 
+                    # is bad
                     values = search.values(hit, args)
                     values.insert(2, "%.3f" % bad_score)
-                    for value in values:
-                        print(f'<td class="border border-slate-300 px-2 py-2 text-right">{value}</td>', file=output)
+                    
+                    # user score
+                    score_value = ""
+                    if(query in scores):
+                        if(values[1] in scores[query]):
+                            score_value = scores[query][values[1]]
+                        else:
+                            if bad_score > 0.5:
+                                scores[query][values[1]] = 0
+                            elif bad_score > 0.2:
+                                scores[query][values[1]] = 1
+                            else:
+                                scores[query][values[1]] = 2
+
+
+                    values.insert(2, score_value)
+
+                    for v_idx, value in enumerate(values):
+                        color = ""
+                        if(v_idx == 2):
+                            if(value is None or len(str(value)) == 0):
+                                color = ""
+                            elif(value <= 0):
+                                color = "bg-red-600"
+                            elif(value <= 1):
+                                color = "bg-red-300"
+                            elif(value <= 2):
+                                color = "bg-orange-300"
+                            elif(value <= 3):
+                                color = "bg-amber-300"
+                            elif(value <= 4):
+                                color = "bg-lime-300"
+                            elif(value <= 5):
+                                color = "bg-green-400"
+
+                            if(value is not None and len(str(value)) > 0):
+                                value = "%.2f" % float(value)
+
+
+                        print(f'<td class="border border-slate-300 px-2 py-2 text-right {color}">{value}</td>', file=output)
                     print('</tr>', file=output)
                 print('</table>', file=output)
 
                 if args.explain: print_exlanation(hits)
+
+    if args.imputed_scores:
+        with open(args.imputed_scores, "w") as imputed_scores:
+            for key, values in scores.items():
+                converted_values = {}
+                for key,value in values.items():
+                    converted_values[key] = {'user_score': value}
+
+                imputed_scores.write(json.dumps({key: converted_values}) + "\n")

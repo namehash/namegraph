@@ -5,6 +5,7 @@ from elasticsearch_ltr import LTRClient
 import json
 import pprint
 import random
+import tqdm
 
 random.seed(0)
 
@@ -44,12 +45,12 @@ def feature_query(keyword):
                     "multi_match": {
                         "query": keyword,
                         "fields": [
-                            "data.collection_name^3",
-                            "data.collection_name.exact^3",
+                            "data.collection_name",
+                            "data.collection_name.exact",
                             "data.names.normalized_name",
                             "data.names.tokenized_name",
-                            "data.collection_description^2",
-                            "data.collection_keywords^2",
+                            "data.collection_description",
+                            "data.collection_keywords",
                         ],
                         "type": "cross_fields",
                     }
@@ -59,7 +60,6 @@ def feature_query(keyword):
                 {
                     "rank_feature": {
                         "field": "template.collection_rank",
-                        "boost": 100
                     }
                 },
                 {
@@ -85,7 +85,6 @@ def feature_query(keyword):
                 {
                     "rank_feature": {
                         "field": "template.nonavailable_members_ratio",
-                        "boost": 100
                     }
                 }
             ],
@@ -95,7 +94,7 @@ def feature_query(keyword):
                         "_name": "logged_featureset",
                         "featureset": f"{FEATURE_SET_NAME}",
                         "params": {
-                            "keywords": "apple"
+                            "keywords": keyword
                         }
                     }
                 }
@@ -113,6 +112,9 @@ if __name__ == '__main__':
     parser.add_argument('--password', default='password', help='elasticsearch password')
     parser.add_argument('--cloud_id', default=None, help='cloud id')
     parser.add_argument('--reset', default=False, help='if present resets all feature definitions', action='store_true')
+    parser.add_argument('--scores', default=None, help='file with relevance scores (JSONL)')
+    parser.add_argument('--train', default=None, help='file with output train features (ranklib)')
+    parser.add_argument('--test', default=None, help='file with output test features (ranklib)')
     args = parser.parse_args()
 
     if args.cloud_id:
@@ -167,14 +169,11 @@ if __name__ == '__main__':
         }
     } 
 
-    #pprint.pprint([(e['_source']['data']['collection_name'], 
-    #                e['_score']) for e in result['hits']['hits']])
-
     train_dataset = []
     test_dataset = []
 
-    with open("data/relevance-score-11.05.2023.jsonl") as input:
-        for idx, row in enumerate(input):
+    with open(args.scores) as input:
+        for idx, row in tqdm.tqdm(enumerate(input)):
             data = json.loads(row.strip())
             key = list(data)[0]
             data_package = []
@@ -185,7 +184,7 @@ if __name__ == '__main__':
             for collection, value in score_data.items():
                 scores[collection] = value['user_score']
 
-            result = es.search(query=feature_query(key), ext=ext_query, size=10)
+            result = es.search(query=feature_query(key), ext=ext_query, size=1000)
             for hit in result['hits']['hits']:
                 name = hit['_source']['data']['collection_name']
                 if(name not in scores):
@@ -213,7 +212,7 @@ if __name__ == '__main__':
     print(len(train_dataset))
     print(len(test_dataset))
 
-    for name, dataset in [("train", train_dataset), ("test", test_dataset)]:
-        with open(f"data/relevance-score-11.05.2023-{name}.ranklib", "w") as output:
+    for name, dataset in [(args.train, train_dataset), (args.test, test_dataset)]:
+        with open(name, "w") as output:
             for row in dataset:
                 output.write(" ".join(row)+"\n")

@@ -8,11 +8,12 @@ import random
 
 
 FEATURE_SET_NAME="ltr-feature-set"
-MODEL_NAME="ltr-model"
+#MODEL_NAME="ltr-model"
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--model', default=None, help='model to load')
+    parser.add_argument('--model_name', default=None, help='name of the model to load')
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
     parser.add_argument('--port', default=9200, type=int, help='elasticsearch port')
@@ -38,7 +39,7 @@ if __name__ == '__main__':
 
     body = {
         "model": {
-            "name": MODEL_NAME,
+            "name": args.model_name,
             "model": {
                 "type": "model/ranklib",
                 "definition": definition
@@ -46,4 +47,4 @@ if __name__ == '__main__':
         }
     }
 
-    ltr.create_model(name=MODEL_NAME, feature_set_name=FEATURE_SET_NAME, body=body)
+    ltr.create_model(name=args.model_name, feature_set_name=FEATURE_SET_NAME, body=body)
