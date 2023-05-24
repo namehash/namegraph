@@ -92,8 +92,7 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionSearch,
-    Collection
+    CollectionResult, CollectionSearchByCollection, CollectionSearchByString
 )
 
 
@@ -140,35 +139,89 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-@app.post("/collections/template", response_model=list[Collection])
-async def template_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
+# 
+# @app.post("/collections/template", response_model=list[Collection])
+# async def template_collections(query: CollectionSearch):
+#     collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
+# 
+#     response = [
+#         {
+#             'title': collection.title,
+#             'names': collection.names,
+#             'rank': collection.rank,
+#             'score': collection.score
+#         }
+#         for collection in collections
+#     ]
+# 
+#     return JSONResponse(response)
+# 
+# 
+# @app.post("/collections/featured", response_model=list[Collection])
+# async def featured_collections(query: CollectionSearch):
+#     collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
+# 
+#     response = [
+#         {
+#             'title': collection.title,
+#             'names': collection.names,
+#             'rank': collection.rank,
+#             'score': collection.score
+#         }
+#         for collection in collections
+#     ]
+# 
+#     return JSONResponse(response)
 
-    response = [
+
+@app.post("/find_collections_by_string", response_model=CollectionResult)
+async def find_collections_by_string(query: CollectionSearchByString):
+    collections = collections_matcher.search_by_string(
+        query.query,
+        mode=query.mode,
+        min_limit=query.min_limit,
+        max_limit=query.max_limit,
+        name_diversity_ratio=query.name_diversity_ratio,
+        max_per_type=query.max_per_type,
+        limit_names=query.limit_names,
+    )
+    collections = [
         {
             'title': collection.title,
             'names': collection.names,
             'rank': collection.rank,
-            'score': collection.score
+            'score': collection.score,
+            'owner': collection.owner,
+            'number_of_names': collection.number_of_names,
         }
         for collection in collections
     ]
+    response = {'related_collections': collections, 'other_collections': []}
 
     return JSONResponse(response)
 
 
-@app.post("/collections/featured", response_model=list[Collection])
-async def featured_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
-
-    response = [
+@app.post("/find_collections_by_collection", response_model=CollectionResult)
+async def find_collections_by_collection(query: CollectionSearchByCollection):
+    collections = collections_matcher.search_by_collection(
+        query.collection_id,
+        min_limit=query.min_limit,
+        max_limit=query.max_limit,
+        name_diversity_ratio=query.name_diversity_ratio,
+        max_per_type=query.max_per_type,
+        limit_names=query.limit_names,
+    )
+    collections = [
         {
             'title': collection.title,
             'names': collection.names,
             'rank': collection.rank,
-            'score': collection.score
+            'score': collection.score,
+            'owner': collection.owner,
+            'number_of_names': collection.number_of_names,
         }
         for collection in collections
     ]
+    response = {'related_collections': collections, 'other_collections': []}
 
     return JSONResponse(response)
