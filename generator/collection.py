@@ -138,6 +138,11 @@ class CollectionMatcher(metaclass=Singleton):
         if not self.active:
             return []
 
+        tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
+        if tokenized_query != query:
+            # query = f'"{query}" OR "{tokenized_query}"'
+            query = f'{query} {tokenized_query}'
+
         try:
             return self._search(query, max_limit)
         except Exception as ex:
