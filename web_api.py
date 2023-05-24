@@ -193,6 +193,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
             'score': collection.score,
             'owner': collection.owner,
             'number_of_names': collection.number_of_names,
+            'collection_id': collection.collection_id,
         }
         for collection in collections
     ]
@@ -219,6 +220,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
             'score': collection.score,
             'owner': collection.owner,
             'number_of_names': collection.number_of_names,
+            'collection_id': collection.collection_id,
         }
         for collection in collections
     ]

@@ -24,6 +24,7 @@ class Collection:
             score: float,
             owner: str,
             number_of_names: int,
+            collection_id: str,
             # TODO do we need those above? and do we need anything else?
     ):
         self.title = title
@@ -33,6 +34,7 @@ class Collection:
         self.score = score
         self.owner = owner
         self.number_of_names = number_of_names
+        self.collection_id = collection_id
 
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
@@ -45,6 +47,7 @@ class Collection:
             score=hit['_score'],
             owner=hit['_source']['metadata']['owner'],
             number_of_names=len(hit['_source']['data']['names']),
+            collection_id=hit['_source']['metadata']['id'],
         )
 
 

@@ -97,6 +97,7 @@ class Collection(BaseModel):
     number_of_names: int = Field('total number of names int he collection')
     rank: float = Field('rank of the collection')  # ?
     score: float = Field('Elasticsearch score for the query result')  # ?
+    collection_id: str = Field('id of the collection')
 
 
 class CollectionResult(BaseModel):
