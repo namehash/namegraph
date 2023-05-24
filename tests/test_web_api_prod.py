@@ -325,7 +325,7 @@ def test_elasticsearch_template_collections_search(prod_test_client):
     titles = [collection['title'] for collection in response.json()['related_collections']]
     assert 'Highest mountains on Earth' in titles
 
-@pytest.marl.xfail
+@pytest.mark.xfail
 @pytest.mark.integration_test
 def test_elasticsearch_featured_collections_search(prod_test_client):
     client = prod_test_client
