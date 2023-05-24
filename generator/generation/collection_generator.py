@@ -36,7 +36,7 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
-        collections = self.collection_matcher.search_by_string(tokens, mode='instant', max_limit=self.collections_limit)
+        collections = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant', max_limit=self.collections_limit)
 
         for collection in collections:
             logger.info(f'Collection: {collection.title} score: {collection.score} names: {len(collection.names)}')
