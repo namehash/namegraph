@@ -93,7 +93,7 @@ class CollectionMatcher(metaclass=Singleton):
                                     "fields": [
                                         "data.collection_name^3",
                                         "data.collection_name.exact^3",
-                                        "data.collection_description^2",
+                                        # "data.collection_description^2",
                                         "data.collection_keywords^2",
                                         "data.names.normalized_name",
                                         "data.names.tokenized_name",
@@ -128,9 +128,13 @@ class CollectionMatcher(metaclass=Singleton):
         hits = response["hits"]["hits"]
         return [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-    def search_by_string(self, query: str, mode: str, min_limit: int = 10, max_limit: int = 10,
+    def search_by_string(self, query: str,
+                         mode: str,
+                         min_limit: int = 10,
+                         max_limit: int = 10,
                          name_diversity_ratio: float = 0.5,
-                         max_per_type: int = 3, limit_names: int = 10) -> list[Collection]:
+                         max_per_type: int = 3,
+                         limit_names: int = 10) -> list[Collection]:
         if not self.active:
             return []
 
@@ -140,9 +144,12 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
 
-    def search_by_collection(self, collection_id: str, min_limit: int = 10, max_limit: int = 10,
+    def search_by_collection(self, collection_id: str,
+                             min_limit: int = 10,
+                             max_limit: int = 10,
                              name_diversity_ratio: float = 0.5,
-                             max_per_type: int = 3, limit_names: int = 10) -> list[
+                             max_per_type: int = 3,
+                             limit_names: int = 10) -> list[
         Collection]:
         if not self.active:
             return []
