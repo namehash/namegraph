@@ -213,8 +213,8 @@ if __name__ == '__main__':
 
             try:
                 print(f'<h2>search by collection name and members</h2>')
-                query2 = ' '.join([f'{token}^2' for token in query.split(' ')]) + ' ' + the_names
-                print(query2)
+                query2 = ' '.join([f'{token}' for token in query.split(' ')]) + ' ' + the_names
+                # print(query2)
                 hits = search_by_all(query2, args.limit)
                 print_resutls(hits)
 
