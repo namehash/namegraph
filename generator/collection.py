@@ -11,7 +11,6 @@ from generator.tokenization import WordNinjaTokenizer
 from generator.utils.elastic import connect_to_elasticsearch, index_exists
 from generator.utils import Singleton
 
-
 logger = logging.getLogger('generator')
 
 
@@ -19,10 +18,12 @@ class Collection:
     def __init__(
             self,
             title: str,
-            names: list[str],
+            names: list[dict],
             tokenized_names: list[tuple[str]],
             rank: float,
-            score: float
+            score: float,
+            owner: str,
+            number_of_names: int,
             # TODO do we need those above? and do we need anything else?
     ):
         self.title = title
@@ -30,15 +31,20 @@ class Collection:
         self.tokenized_names = tokenized_names
         self.rank = rank
         self.score = score
+        self.owner = owner
+        self.number_of_names = number_of_names
 
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
         return cls(
             title=hit['_source']['data']['collection_name'],
-            names=[x['normalized_name'] for x in hit['_source']['data']['names']],
+            names=[{'name': x['normalized_name'], 'namehash': x['namehash']} for x in
+                   hit['_source']['template']['names']],
             tokenized_names=[tuple(x['tokenized_name']) for x in hit['_source']['data']['names']],
             rank=hit['_source']['template']['collection_rank'],
-            score=hit['_score']
+            score=hit['_score'],
+            owner=hit['_source']['metadata']['owner'],
+            number_of_names=len(hit['_source']['data']['names']),
         )
 
 
@@ -122,16 +128,27 @@ class CollectionMatcher(metaclass=Singleton):
         hits = response["hits"]["hits"]
         return [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-    def search(self, query: Union[str, Iterable[str]], tokenized: bool = False, limit: int = 3) -> list[Collection]:
+    def search_by_string(self, query: str, mode: str, min_limit: int = 10, max_limit: int = 10,
+                         name_diversity_ratio: float = 0.5,
+                         max_per_type: int = 3, limit_names: int = 10) -> list[Collection]:
         if not self.active:
             return []
 
-        if tokenized and not isinstance(query, str):
-            query = ' '.join(query)
-
-        query = query if tokenized else ' '.join(self.tokenizer.tokenize(query)[0])
         try:
-            return self._search(query, limit)
+            return self._search(query, max_limit)
+        except Exception as ex:
+            logger.warning(f'Elasticsearch search failed: {ex}')
+            return []
+
+    def search_by_collection(self, collection_id: str, min_limit: int = 10, max_limit: int = 10,
+                             name_diversity_ratio: float = 0.5,
+                             max_per_type: int = 3, limit_names: int = 10) -> list[
+        Collection]:
+        if not self.active:
+            return []
+
+        try:
+            return self._search(collection_id, max_limit)  # TODO
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
