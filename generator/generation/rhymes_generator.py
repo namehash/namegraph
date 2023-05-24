@@ -16,7 +16,9 @@ class RhymesGenerator(NameGenerator):
         if len(''.join(tokens)) == 0:
             return []
 
-        # todo
+        # todo: impl: try to tokenize the string and check if the last word is in the pronouncing dictionary
+        # todo: impl: the best phonetic approach from research/rhymes
+        # todo: add tests
 
         yield ('rhyming_name',)
 
