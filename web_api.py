@@ -142,7 +142,12 @@ async def root(name: Name):
 
 @app.post("/collections/template", response_model=list[Collection])
 async def template_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
+    collections = collections_matcher.search(
+        query.query,
+        tokenized=True,
+        limit=query.limit,
+        diversify_mode=query.diversify_mode
+    )
 
     response = [
         {
@@ -159,7 +164,12 @@ async def template_collections(query: CollectionSearch):
 
 @app.post("/collections/featured", response_model=list[Collection])
 async def featured_collections(query: CollectionSearch):
-    collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
+    collections = collections_matcher.search(
+        query.query,
+        tokenized=False,
+        limit=query.limit,
+        diversify_mode=query.diversify_mode
+    )
 
     response = [
         {

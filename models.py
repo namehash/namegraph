@@ -59,6 +59,7 @@ class Suggestion(BaseModel):
 class CollectionSearch(BaseModel):
     query: str = Field(title='input query which is used to search for template collections')
     limit: int = Field(10, title='the number of best matches to return')
+    diversify_mode: str = Field('none', title='diversify mode', regex=r'^(none|names-cover|types-cover|all)$')
 
 
 class Collection(BaseModel):
