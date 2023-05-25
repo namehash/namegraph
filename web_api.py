@@ -92,7 +92,9 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionResult, CollectionSearchByCollection, CollectionSearchByString
+    CollectionResult,
+    CollectionSearchByCollection,
+    CollectionSearchByString
 )
 
 
@@ -139,11 +141,11 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-# 
+#
 # @app.post("/collections/template", response_model=list[Collection])
 # async def template_collections(query: CollectionSearch):
 #     collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
-# 
+#
 #     response = [
 #         {
 #             'title': collection.title,
@@ -153,14 +155,14 @@ async def root(name: Name):
 #         }
 #         for collection in collections
 #     ]
-# 
+#
 #     return JSONResponse(response)
-# 
-# 
+#
+#
 # @app.post("/collections/featured", response_model=list[Collection])
 # async def featured_collections(query: CollectionSearch):
 #     collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
-# 
+#
 #     response = [
 #         {
 #             'title': collection.title,
@@ -170,7 +172,7 @@ async def root(name: Name):
 #         }
 #         for collection in collections
 #     ]
-# 
+#
 #     return JSONResponse(response)
 
 

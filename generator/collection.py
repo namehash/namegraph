@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from typing import Any, Union, Iterable
+from collections import defaultdict
+from operator import itemgetter
 import logging
 
 import elastic_transport
@@ -20,6 +22,7 @@ class Collection:
             title: str,
             names: list[dict],
             tokenized_names: list[tuple[str]],
+            name_types: list[str],
             rank: float,
             score: float,
             owner: str,
@@ -30,6 +33,7 @@ class Collection:
         self.title = title
         self.names = names
         self.tokenized_names = tokenized_names
+        self.name_types = name_types
         self.rank = rank
         self.score = score
         self.owner = owner
@@ -43,6 +47,7 @@ class Collection:
             names=[{'name': x['normalized_name'], 'namehash': x['namehash']} for x in
                    hit['_source']['template']['names']],
             tokenized_names=[tuple(x['tokenized_name']) for x in hit['_source']['data']['names']],
+            name_types=list(map(itemgetter(0), hit['_source']['template']['collection_types'])),
             rank=hit['_source']['template']['collection_rank'],
             score=hit['_score'],
             owner=hit['_source']['metadata']['owner'],
@@ -83,7 +88,7 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
 
-    def _search(self, query: str, limit: int) -> list[Collection]:
+    def _search(self, query: str, limit: int, diversify_mode: str = 'none') -> list[Collection]:
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -124,12 +129,59 @@ class CollectionMatcher(metaclass=Singleton):
                     }
 
                 },
-                "size": limit,
+                "size": limit if diversify_mode == 'none' else limit * 3,
             },
         )
 
         hits = response["hits"]["hits"]
-        return [Collection.from_elasticsearch_hit(hit) for hit in hits]
+        collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
+
+        print(diversify_mode)
+        if diversify_mode == 'none':
+            return collections[:limit]
+
+        # diversify collections
+        diversified = []
+        penalized_collections = []
+
+        # names cover
+        used_names = set()
+
+        # types cover
+        used_types = defaultdict(int)
+
+        for collection in collections:
+            if diversify_mode == 'names-cover' or diversify_mode == 'all':
+                number_of_covered_names = len(set(collection.names) & used_names)
+
+                # FIXME move `0.5` to request parameters
+                # if more than 50% of the names have already been used, penalize the collection
+                if number_of_covered_names / len(collection.names) < 0.5:
+                    used_names.update(collection.names)
+                else:
+                    penalized_collections.append(collection)
+                    continue
+
+            if diversify_mode == 'types-cover' or diversify_mode == 'all':
+                # FIXME move `3` to request parameters
+                # if any of the types has occurred more than 3 times, penalize the collection
+                if all([
+                    used_types[name_type] < 3
+                    for name_type in collection.name_types
+                ]):
+
+                    for name_type in collection.name_types:
+                        used_types[name_type] += 1
+                else:
+                    penalized_collections.append(collection)
+                    continue
+
+            diversified.append(collection)
+
+            if len(diversified) >= limit:
+                return diversified
+
+        return diversified + penalized_collections[:limit - len(diversified)]
 
     def search_by_string(self, query: str,
                          mode: str,
