@@ -2,6 +2,7 @@ import json
 from argparse import ArgumentParser
 from math import log10
 import pprint
+import re
 
 from copy import deepcopy
 
@@ -92,14 +93,52 @@ def print_exlanation(hits):
     for hit in hits:
         name = hit['_source']['data']['collection_name']
         explanation = hit['_explanation']
-        print(
-            f'<tr><td class="font-bold px-5 py-2">{name}</td></tr><tr><td class="px-5 py-2"><pre>{json.dumps(explanation, indent=2, ensure_ascii=False)}</pre></td></tr>')
+        explanation = json.dumps(explanation, indent=2, ensure_ascii=False)
+        print(f'<tr><td class="font-bold px-5 py-2">{name}</td></tr><tr><td class="px-5 py-2"><pre>{explanation}</pre></td></tr>')
     print('</table></details>')
+
+def is_good_prediction(hits, rf_model):
+    df = pd.DataFrame(columns=[
+        "rank_log",
+        "mrank_mean_log",
+        "mrank_median_log",
+        "members system interesting score mean",
+        "members system interesting score median",
+        "valid members count",
+        "invalid members count",
+        "valid members ratio",
+        "nonavailable members count",
+        "nonavailable members ratio",
+        "is merged",
+        ])
+
+    for hit in hits:
+        values = search.values(hit, args) 
+        values = [float(values[2]), *[float(e) for e in values[4:13]], int(values[13])]
+        #values = [float(values[2]), *[float(e) for e in values[4:]]]
+        df.loc[len(df)] = values
+
+    # change order to match model
+    df = df[["members system interesting score mean",
+        "members system interesting score median",
+        "valid members count",
+        "invalid members count",
+        "valid members ratio",
+        "nonavailable members count",
+        "nonavailable members ratio",
+        "is merged",
+        "rank_log",
+        "mrank_mean_log",
+        "mrank_median_log",]]
+        
+    #df = df.drop(['user_score', 'query', 'elastic_score'], axis=1)
+
+    return rf_model.predict_proba(df)[:, 1]
 
 
 class Search:
     def description(self):
-        return '<h2 class="px-5 py-2 font-sans text-lg font-bold">%s</h2>' % self.header()
+        return self.header()
 
     def values(self, hit, args):
         score = "%.1f" % hit['_score']
@@ -141,14 +180,18 @@ class Search:
 
         return [score, name, rank, members_value, rank_mean, rank_median, 
                 score_mean, score_median, valid_count, invalid_count, 
-                valid_ratio, noavb_count, noavb_ratio, is_merged, wikidata_id, type_wikidata_ids, 
-                description, keywords, names, ]
+                valid_ratio, noavb_count, noavb_ratio, is_merged, 
+                wikidata_id, type_wikidata_ids, 
+                #description, keywords, 
+                names, ]
 
     def columns(self):
         return ['score', 'name', 'u. score', 'is bad', 'rank', 'members', 'm. rank mean', 'm. rank median', 
                 'm. int. score mean', 'm. int. score median', 'valid m. count', 'invalid m. count', 
-                'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 'wikidata', 'types', 
-                'desciption', 'keywords', 'names']
+                'valid m. ratio', 'nonav. count', 'nonav. ratio', 'is merged', 
+                'wikidata', 'types', 
+                #'desciption', 'keywords', 
+                'names']
 
     def __call__(self, query, args):
 
@@ -203,6 +246,8 @@ if __name__ == '__main__':
     parser.add_argument('--ranking_model', default=None, help='name of the model to re-rank the results')
     parser.add_argument('--scores', default=None, help='file with scores assigned by users (JSONL)')
     parser.add_argument('--imputed_scores', default=None, help='file with relevance scores computed automatically')
+    parser.add_argument('--train_results', default=None, help='file with scores on the train dataset')
+    parser.add_argument('--test_results', default=None, help='file with scores on the test dataset')
 
     args = parser.parse_args()
 
@@ -225,29 +270,64 @@ if __name__ == '__main__':
         rf_model = load(args.random_forest_model)
 
     scores = {}
+    query_ids = {}
     if args.scores:
         with open(args.scores) as input:
-            for row in input:
+            for idx, row in enumerate(input):
                 data = json.loads(row.strip())
                 query = list(data.keys())[0]
                 scores[query] = {}
+                query_ids[idx+1] = query
                 for result, score in data[query].items():
                     scores[query][result] = score['user_score']
 
+    testing_results = {}
+    baseline_results = {}
+    if args.train_results:
+        for fname in [args.train_results, args.test_results]:
+            with open(fname) as input:
+                for row in input:
+                    _, id, value = [e for e in row.strip().split(r" ") if len(e) > 0]
+                    if(id == 'all'):
+                        continue
+                    testing_results[query_ids[int(id)]] = float(value)
+
+            fname = re.sub(r"\d+.report$", 'baseline.report', fname)
+            with open(fname) as input:
+                for row in input:
+                    _, id, value = [e for e in row.strip().split(r" ") if len(e) > 0]
+                    if(id == 'all'):
+                        continue
+                    baseline_results[query_ids[int(id)]] = float(value)
 
     with open(args.output, "w") as output:
         print(f'<head><script src="https://cdn.tailwindcss.com"></script></head>', file=output)
 
         for search in [AllFieldsSearch()]:
-            print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{search.description()}</h1>', file=output)
 
             queries = []
             with open(args.queries) as input:
                 for row in input:
-                    queries.append(row.strip())
+                    query = row.strip()
+                    value = 0
+                    base_value = 0
+                    if(query in testing_results):
+                        value = testing_results[query]
 
-            for query in queries:
-                print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query}</h2>', file=output)
+                    if(query in baseline_results):
+                        base_value = baseline_results[query]
+                    queries.append((query, value, base_value))
+
+            avg_score = np.average([e[1] for e in  queries])
+            avg_base = np.average([e[2] for e in queries])
+
+            delta = f'Δ {"%+.3f" % (avg_score - avg_base)}'
+            print(f'<h1 class="px-5 py-2 font-sans text-xl font-bold">{search.description()} ({"%.3f" %avg_score} {delta})</h1>', file=output)
+
+
+            for query, score, base in sorted(queries, key=lambda x: -x[1]):
+                delta = f'Δ {"%+.3f" % (score - base)}'
+                print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query} ({"%.3f" %score} {delta} )</h2>', file=output)
                 hits = search(query, args)
                 print('<table class="m-5">', file=output)
                 print(f'<tr>', file=output)
@@ -256,41 +336,7 @@ if __name__ == '__main__':
                 print(f'</tr>', file=output)
 
                 if(rf_model and len(hits) > 0):
-                    df = pd.DataFrame(columns=[
-                        "rank_log",
-                        "mrank_mean_log",
-                        "mrank_median_log",
-                        "members system interesting score mean",
-                        "members system interesting score median",
-                        "valid members count",
-                        "invalid members count",
-                        "valid members ratio",
-                        "nonavailable members count",
-                        "nonavailable members ratio",
-                        "is merged",
-                        ])
-
-                    for hit in hits:
-                        values = search.values(hit, args) 
-                        values = [float(values[2]), *[float(e) for e in values[4:13]], int(values[13])]
-                        df.loc[len(df)] = values
-
-                    # change order to match model
-                    df = df[["members system interesting score mean",
-                        "members system interesting score median",
-                        "valid members count",
-                        "invalid members count",
-                        "valid members ratio",
-                        "nonavailable members count",
-                        "nonavailable members ratio",
-                        "is merged",
-                        "rank_log",
-                        "mrank_mean_log",
-                        "mrank_median_log",]]
-                        
-                    #df = df.drop(['user_score', 'query', 'elastic_score'], axis=1)
-
-                    decision = rf_model.predict_proba(df)[:, 1]
+                    decision = is_good_prediction(hits, rf_model)
                 else:
                     decision = [0.0] * len(hits)
 
