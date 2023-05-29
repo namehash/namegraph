@@ -69,16 +69,22 @@ class Suggestion(BaseModel):
 
 
 class BaseCollectionSearch(BaseModel):  # instant search, domain details
-    min_limit: int = Field(10, title='the min number of collections to return')
-    max_limit: int = Field(10, title='the max number of collections to return')
-    name_diversity_ratio: float = Field(0.5, title='add penalty to collections with similar names to other collections')
-    max_per_type: int = Field(3, title='add penalty to collections with the same type')
+    max_related_collections: int = Field(3, title='max number of related collections to return')
+    min_other_collections: int = Field(3, title='min number of other collections to return')
+    max_other_collections: int = Field(3, title='max number of other collections to return')
+    max_total_collections: int = Field(6, title='max number of total (related + other) collections to return')
+
+    name_diversity_ratio: float = Field(
+        0.5,
+        title='similarity value used for adding penalty to collections with similar names to other collections'
+    )
+    max_per_type: int = Field(3, title='number of collections with the same type which are not penalized')
     limit_names: int = Field(10, title='the number of names returned in each collection')
 
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections')
-    mode: str = Field(title='instant or domain_details')
+    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 
 class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
@@ -94,7 +100,7 @@ class Collection(BaseModel):
     title: str = Field('title of the collections')
     names: list[CollectionName] = Field('names stored in the collection (limited by limit_names)')
     owner: str = Field('ETH address of the collection owner')
-    number_of_names: int = Field('total number of names int he collection')
+    number_of_names: int = Field('total number of names in the collection')
     rank: float = Field('rank of the collection')  # ?
     score: float = Field('Elasticsearch score for the query result')  # ?
     collection_id: str = Field('id of the collection')

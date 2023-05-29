@@ -179,8 +179,10 @@ async def find_collections_by_string(query: CollectionSearchByString):
     collections = collections_matcher.search_by_string(
         query.query,
         mode=query.mode,
-        min_limit=query.min_limit,
-        max_limit=query.max_limit,
+        max_related_collections=query.max_related_collections,
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
@@ -206,8 +208,10 @@ async def find_collections_by_string(query: CollectionSearchByString):
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     collections = collections_matcher.search_by_collection(
         query.collection_id,
-        min_limit=query.min_limit,
-        max_limit=query.max_limit,
+        max_related_collections=query.max_related_collections,
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,

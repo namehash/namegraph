@@ -133,8 +133,10 @@ class CollectionMatcher(metaclass=Singleton):
 
     def search_by_string(self, query: str,
                          mode: str,
-                         min_limit: int = 10,
-                         max_limit: int = 10,
+                         max_related_collections: int = 3,
+                         min_other_collections: int = 3,
+                         max_other_collections: int = 3,
+                         max_total_collections: int = 6,
                          name_diversity_ratio: float = 0.5,
                          max_per_type: int = 3,
                          limit_names: int = 10) -> list[Collection]:
@@ -147,14 +149,16 @@ class CollectionMatcher(metaclass=Singleton):
             query = f'{query} {tokenized_query}'
 
         try:
-            return self._search(query, max_limit)
+            return self._search(query, max_related_collections)
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
 
     def search_by_collection(self, collection_id: str,
-                             min_limit: int = 10,
-                             max_limit: int = 10,
+                             max_related_collections: int = 3,
+                             min_other_collections: int = 3,
+                             max_other_collections: int = 3,
+                             max_total_collections: int = 6,
                              name_diversity_ratio: float = 0.5,
                              max_per_type: int = 3,
                              limit_names: int = 10) -> list[
@@ -163,7 +167,7 @@ class CollectionMatcher(metaclass=Singleton):
             return []
 
         try:
-            return self._search(collection_id, max_limit)  # TODO
+            return self._search(collection_id, max_related_collections)  # TODO
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
