@@ -170,7 +170,7 @@ class CollectionMatcher(metaclass=Singleton):
 
         # diversify collections
         diversified = []
-        penalized_collections = []
+        penalized_collections: list[tuple[float, Collection]] = []
 
         # names cover
         used_names = set()
@@ -187,7 +187,7 @@ class CollectionMatcher(metaclass=Singleton):
                 if number_of_covered_names / len(collection.names) < 0.5:
                     used_names.update(collection.names)
                 else:
-                    penalized_collections.append(collection)
+                    penalized_collections.append((collection.score * 0.8, collection))
                     continue
 
             if diversify_mode == 'types-cover' or diversify_mode == 'all':
@@ -201,13 +201,18 @@ class CollectionMatcher(metaclass=Singleton):
                     for name_type in collection.name_types:
                         used_types[name_type] += 1
                 else:
-                    penalized_collections.append(collection)
+                    penalized_collections.append((collection.score, collection))
                     continue
 
             diversified.append(collection)
 
             if len(diversified) >= limit:
                 return diversified
+
+        penalized_collections: list[Collection] = [
+            collection
+            for _, collection in sorted(penalized_collections, key=itemgetter(0), reverse=True)
+        ]
 
         return diversified + penalized_collections[:limit - len(diversified)]
 
