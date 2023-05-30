@@ -32,7 +32,6 @@ if __name__ == '__main__':
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
-        all_collections = [hit['title'] for hit in search_by_all(query, args.limit * 3, 'none')]
         none, none_latency = search_with_latency(query, args.limit, 'none')
         names_cover, names_cover_latency = search_with_latency(query, args.limit, 'names-cover')
         types_cover, types_cover_latency = search_with_latency(query, args.limit, 'types-cover')
@@ -40,8 +39,6 @@ if __name__ == '__main__':
 
         same = none == names_cover == types_cover == combined
         print(f'<h2>{"same" if same else "diversified"}</h2>')
-
-        print(' '.join(all_collections))
 
         names_cover_stayed = len(names_cover) - len(set(names_cover) - set(none))
         types_cover_stayed = len(types_cover) - len(set(types_cover) - set(none))

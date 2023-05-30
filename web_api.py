@@ -168,7 +168,8 @@ async def featured_collections(query: CollectionSearch):
         query.query,
         tokenized=False,
         limit=query.limit,
-        diversify_mode=query.diversify_mode
+        diversify_mode=query.diversify_mode,
+        limit_names=query.limit_names
     )
 
     response = [

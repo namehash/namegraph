@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Union, Iterable
+from typing import Any, Union, Iterable, Optional
 from collections import defaultdict
 from operator import itemgetter
 import logging
@@ -38,11 +38,11 @@ class Collection:
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
         return cls(
-            title=hit['_source']['data']['collection_name'],
-            names=[x['normalized_name'] for x in hit['_source']['data']['names']],
-            tokenized_names=[tuple(x['tokenized_name']) for x in hit['_source']['data']['names']],
-            name_types=list(map(itemgetter(0), hit['_source']['template']['collection_types'])),
-            rank=hit['_source']['template']['collection_rank'],
+            title=hit['fields']['data.collection_name'][0],
+            names=hit['fields']['normalized_names'],
+            tokenized_names=[tuple(tokens) for tokens in hit['fields']['tokenized_names']],
+            name_types=hit['fields']['collection_types'],
+            rank=hit['fields']['template.collection_rank'][0],
             score=hit['_score']
         )
 
@@ -79,7 +79,15 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
 
-    def _search(self, query: str, limit: int, diversify_mode: str = 'none') -> list[Collection]:
+    def _search(
+            self,
+            query: str,
+            limit: int,
+            diversify_mode: str = 'none',
+            limit_names: Optional[int] = 50
+    ) -> list[Collection]:
+
+        limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -121,13 +129,42 @@ class CollectionMatcher(metaclass=Singleton):
 
                 },
                 "size": limit if diversify_mode == 'none' else limit * 3,
+                "fields": [
+                    "data.collection_name",
+                    "template.collection_rank",
+                ],
+                "_source": False,
+                "script_fields": {
+                    "normalized_names": {
+                        "script": {
+                            "source": f"params['_source'].data.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.normalized_name)" \
+                                      + ".collect(Collectors.toList())"
+                        }
+                    },
+                    "tokenized_names": {
+                        "script": {
+                            "source": f"params['_source'].data.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.tokenized_name)" \
+                                      + ".collect(Collectors.toList())"
+                        }
+                    },
+                    "collection_types": {
+                        "script": {
+                            "source": "params['_source'].template.collection_types.stream()"
+                                      ".map(p -> p[0])"
+                                      ".collect(Collectors.toList())"
+                        }
+                    }
+                }
             },
         )
 
         hits = response["hits"]["hits"]
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-        print(diversify_mode)
         if diversify_mode == 'none':
             return collections[:limit]
 
@@ -179,7 +216,8 @@ class CollectionMatcher(metaclass=Singleton):
             query: Union[str, Iterable[str]],
             tokenized: bool = False,
             limit: int = 3,
-            diversify_mode: str = 'none'
+            diversify_mode: str = 'none',
+            limit_names: Optional[int] = 50,
     ) -> list[Collection]:
 
         if not self.active:
@@ -190,7 +228,7 @@ class CollectionMatcher(metaclass=Singleton):
 
         query = query if tokenized else ' '.join(self.tokenizer.tokenize(query)[0])
         try:
-            return self._search(query, limit, diversify_mode=diversify_mode)
+            return self._search(query, limit, diversify_mode=diversify_mode, limit_names=limit_names)
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
