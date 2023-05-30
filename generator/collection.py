@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Union, Iterable
+from typing import Any, Union, Iterable, Optional
 from collections import defaultdict
 from operator import itemgetter
 import logging
@@ -88,7 +88,15 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
 
-    def _search(self, query: str, limit: int, diversify_mode: str = 'none') -> list[Collection]:
+    def _search(
+            self,
+            query: str,
+            limit: int,
+            diversify_mode: str = 'none',
+            limit_names: Optional[int] = 50
+    ) -> list[Collection]:
+
+        limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -130,13 +138,42 @@ class CollectionMatcher(metaclass=Singleton):
 
                 },
                 "size": limit if diversify_mode == 'none' else limit * 3,
+                "fields": [
+                    "data.collection_name",
+                    "template.collection_rank",
+                ],
+                "_source": False,
+                "script_fields": {
+                    "normalized_names": {
+                        "script": {
+                            "source": f"params['_source'].data.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.normalized_name)" \
+                                      + ".collect(Collectors.toList())"
+                        }
+                    },
+                    "tokenized_names": {
+                        "script": {
+                            "source": f"params['_source'].data.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.tokenized_name)" \
+                                      + ".collect(Collectors.toList())"
+                        }
+                    },
+                    "collection_types": {
+                        "script": {
+                            "source": "params['_source'].template.collection_types.stream()"
+                                      ".map(p -> p[0])"
+                                      ".collect(Collectors.toList())"
+                        }
+                    }
+                }
             },
         )
 
         hits = response["hits"]["hits"]
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-        print(diversify_mode)
         if diversify_mode == 'none':
             return collections[:limit]
 
@@ -204,13 +241,16 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
 
-    def search_by_collection(self, collection_id: str,
-                             min_limit: int = 10,
-                             max_limit: int = 10,
-                             name_diversity_ratio: float = 0.5,
-                             max_per_type: int = 3,
-                             limit_names: int = 10) -> list[
-        Collection]:
+    def search_by_collection(
+            self,
+            collection_id: str,
+            min_limit: int = 10,
+            max_limit: int = 10,
+            name_diversity_ratio: float = 0.5,
+            max_per_type: int = 3,
+            limit_names: int = 10
+    ) -> list[Collection]:
+
         if not self.active:
             return []
 
