@@ -70,18 +70,41 @@ class VowelMetaphone:
         if self.word.get_letters(0) == 'X':
             # 'Z' maps to 'S'
             self.primary_phone = self.secondary_phone = 'S'
+            self.primary_phone_with_vowels = self.secondary_phone_with_vowels = 'S'
             self.position += 1
 
-    def process_vowels(self, c):
+    def process_vowels(self, ch):
         self.next = (None, 1)
         if self.position == self.word.start_index:
-            self.next = (c, 1)
+            self.next = (ch, 1)
 
-        # preserving vowels (and skipping if the same one)
-        if self.word.buffer[self.position + 1] == c:
+
+        # preserving vowels
+        self.next_vowel = ch
+
+        # skipping if triple or more, double vowels should be preserved or collapsed to a single vowel
+        if self.word.buffer[self.position + 1] == ch and self.word.buffer[self.position + 2] == ch:
             self.next_vowel = None
-        else:
-            self.next_vowel = c
+
+        # todo: collapse some vowel pairs into a single vowel
+        # but: collapsing vowel pairs could actually worsen the rhyme matching
+        # (English vowels' phones are very irregular)
+        #  'ai', 'ay', 'ee', 'ea', 'ie', 'ei', 'oo', 'ou', 'oy', 'oa', 'oi'
+
+        # if ch == 'O' and self.word.buffer[self.position - 1] == 'O' and \
+        #         self.word.buffer[self.position + 1] != 'O':  # OO
+        #     if self.word.buffer[self.position - 2] == 'L' and self.word.buffer[self.position + 1] == 'D':  # BLOOD
+        #         self.primary_phone_with_vowels = self.primary_phone_with_vowels[:-1] + 'A'
+        #         self.secondary_phone_with_vowels = self.secondary_phone_with_vowels[:-1] + 'A'
+        #         self.next_vowel = None
+        #     elif self.word.buffer[self.position + 2] == 'R':  # DOOR
+        #         self.primary_phone_with_vowels = self.primary_phone_with_vowels[:-1] + 'O'
+        #         self.secondary_phone_with_vowels = self.secondary_phone_with_vowels[:-1] + 'O'
+        #         self.next_vowel = None
+        #     else:  # MOON
+        #         self.primary_phone_with_vowels = self.primary_phone_with_vowels[:-1] + 'U'
+        #         self.secondary_phone_with_vowels = self.secondary_phone_with_vowels[:-1] + 'U'
+        #         self.next_vowel = None
 
     def process_b(self):
         # "-mb", e.g., "dumb", already skipped over... see 'M' below
