@@ -37,7 +37,7 @@ def create_suffix_dict(n_top: int):
         seen = set()
         suffix_dict[suffix] = [r for r in rhymes if not (r in seen or seen.add(r))]
 
-    with open('../../data/suffix_rhymes.json', 'w') as f:
+    with open('../../data/suffix2rhymes.json', 'w') as f:
         json.dump(suffix_dict, f, indent=4)
 
 
