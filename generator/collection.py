@@ -20,7 +20,8 @@ class Collection:
     def __init__(
             self,
             title: str,
-            names: list[dict],
+            names: list[str],
+            namehashes: list[str],
             tokenized_names: list[tuple[str]],
             name_types: list[str],
             rank: float,
@@ -32,6 +33,7 @@ class Collection:
     ):
         self.title = title
         self.names = names
+        self.namehashes = namehashes
         self.tokenized_names = tokenized_names
         self.name_types = name_types
         self.rank = rank
@@ -43,16 +45,16 @@ class Collection:
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
         return cls(
-            title=hit['_source']['data']['collection_name'],
-            names=[{'name': x['normalized_name'], 'namehash': x['namehash']} for x in
-                   hit['_source']['template']['names']],
-            tokenized_names=[tuple(x['tokenized_name']) for x in hit['_source']['data']['names']],
-            name_types=list(map(itemgetter(0), hit['_source']['template']['collection_types'])),
-            rank=hit['_source']['template']['collection_rank'],
+            title=hit['fields']['data.collection_name'][0],
+            names=hit['fields']['normalized_names'],
+            namehashes=hit['fields']['namehashes'],
+            tokenized_names=[tuple(tokens) for tokens in hit['fields']['tokenized_names']],
+            name_types=hit['fields']['collection_types'],
+            rank=hit['fields']['template.collection_rank'][0],
             score=hit['_score'],
-            owner=hit['_source']['metadata']['owner'],
-            number_of_names=len(hit['_source']['data']['names']),
-            collection_id=hit['_source']['metadata']['id'],
+            owner=hit['fields']['metadata.owner'][0],
+            number_of_names=hit['fields']['metadata.members_count'][0],
+            collection_id=hit['fields']['metadata.id'][0],
         )
 
 
@@ -91,10 +93,14 @@ class CollectionMatcher(metaclass=Singleton):
     def _search(
             self,
             query: str,
-            limit: int,
-            diversify_mode: str = 'none',
+            min_limit: int,
+            max_limit: int,
+            name_diversity_ratio: Optional[float] = None,
+            max_per_type: Optional[int] = None,
             limit_names: Optional[int] = 50
     ) -> list[Collection]:
+
+        apply_diversity = name_diversity_ratio is not None and max_per_type is not None
 
         limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
         response = self.elastic.search(
@@ -137,10 +143,13 @@ class CollectionMatcher(metaclass=Singleton):
                     }
 
                 },
-                "size": limit if diversify_mode == 'none' else limit * 3,
+                "size": max_limit if not apply_diversity else max_limit * 3,
                 "fields": [
                     "data.collection_name",
                     "template.collection_rank",
+                    "metadata.owner",
+                    "metadata.members_count",
+                    "metadata.id",
                 ],
                 "_source": False,
                 "script_fields": {
@@ -149,6 +158,14 @@ class CollectionMatcher(metaclass=Singleton):
                             "source": f"params['_source'].data.names.stream()" \
                                       + limit_names_script \
                                       + ".map(p -> p.normalized_name)" \
+                                      + ".collect(Collectors.toList())"
+                        }
+                    },
+                    "namehashes": {
+                        "script": {
+                            "source": f"params['_source'].template.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.namehash)" \
                                       + ".collect(Collectors.toList())"
                         }
                     },
@@ -171,11 +188,13 @@ class CollectionMatcher(metaclass=Singleton):
             },
         )
 
+        from pprint import pprint
+
         hits = response["hits"]["hits"]
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
-        if diversify_mode == 'none':
-            return collections[:limit]
+        if not apply_diversity:
+            return collections[:max_limit]
 
         # diversify collections
         diversified = []
@@ -188,22 +207,20 @@ class CollectionMatcher(metaclass=Singleton):
         used_types = defaultdict(int)
 
         for collection in collections:
-            if diversify_mode == 'names-cover' or diversify_mode == 'all':
+            if name_diversity_ratio is not None:
                 number_of_covered_names = len(set(collection.names) & used_names)
 
-                # FIXME move `0.5` to request parameters
-                # if more than 50% of the names have already been used, penalize the collection
-                if number_of_covered_names / len(collection.names) < 0.5:
+                # if more than `name_diversity_ration` of the names have already been used, penalize the collection
+                if number_of_covered_names / len(collection.names) < name_diversity_ratio:
                     used_names.update(collection.names)
                 else:
                     penalized_collections.append((collection.score * 0.8, collection))
                     continue
 
-            if diversify_mode == 'types-cover' or diversify_mode == 'all':
-                # FIXME move `3` to request parameters
-                # if any of the types has occurred more than 3 times, penalize the collection
+            if max_per_type is not None:
+                # if any of the types has occurred more than `max_per_type` times, penalize the collection
                 if all([
-                    used_types[name_type] < 3
+                    used_types[name_type] < max_per_type
                     for name_type in collection.name_types
                 ]):
 
@@ -215,23 +232,34 @@ class CollectionMatcher(metaclass=Singleton):
 
             diversified.append(collection)
 
-            if len(diversified) >= limit:
+            # if we reach the max limit, return
+            if len(diversified) >= max_limit:
                 return diversified
 
+        # if we haven't reached the max limit, but we have enough
+        # collections for the min limit, then return
+        if len(diversified) >= min_limit:
+            return diversified
+
+        # otherwise, pad with penalized collections until we reach the min limit
         penalized_collections: list[Collection] = [
             collection
             for _, collection in sorted(penalized_collections, key=itemgetter(0), reverse=True)
         ]
 
-        return diversified + penalized_collections[:limit - len(diversified)]
+        return diversified + penalized_collections[:min_limit - len(diversified)]
 
-    def search_by_string(self, query: str,
-                         mode: str,
-                         min_limit: int = 10,
-                         max_limit: int = 10,
-                         name_diversity_ratio: float = 0.5,
-                         max_per_type: int = 3,
-                         limit_names: int = 10) -> list[Collection]:
+    def search_by_string(
+            self,
+            query: str,
+            mode: str,
+            min_limit: int = 10,
+            max_limit: int = 10,
+            name_diversity_ratio: Optional[float] = 0.5,
+            max_per_type: Optional[int] = 3,
+            limit_names: Optional[int] = 10
+    ) -> list[Collection]:
+
         if not self.active:
             return []
 
@@ -241,7 +269,14 @@ class CollectionMatcher(metaclass=Singleton):
             query = f'{query} {tokenized_query}'
 
         try:
-            return self._search(query, max_limit)
+            return self._search(
+                query=query,
+                min_limit=min_limit,
+                max_limit=max_limit,
+                name_diversity_ratio=name_diversity_ratio,
+                max_per_type=max_per_type,
+                limit_names=limit_names
+            )
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []

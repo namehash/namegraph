@@ -56,24 +56,13 @@ class Suggestion(BaseModel):
                                          description="if metadata=False this key is absent")
 
 
-# class CollectionSearch(BaseModel):
-#     query: str = Field(title='input query which is used to search for template collections')
-#     limit: int = Field(10, title='the number of best matches to return')
-# 
-# 
-# class Collection(BaseModel):
-#     title: str = Field('title of the collections')
-#     names: list[str] = Field('names stored in the collection')
-#     rank: float = Field('rank of the collection')
-#     score: float = Field('Elasticsearch score for the query result')
-
-
 class BaseCollectionSearch(BaseModel):  # instant search, domain details
     min_limit: int = Field(10, title='the min number of collections to return')
     max_limit: int = Field(10, title='the max number of collections to return')
-    name_diversity_ratio: float = Field(0.5, title='add penalty to collections with similar names to other collections')
-    max_per_type: int = Field(3, title='add penalty to collections with the same type')
-    limit_names: int = Field(10, title='the number of names returned in each collection')
+    name_diversity_ratio: Optional[float] = \
+        Field(0.5, title='add penalty to collections with similar names to other collections, may be null')
+    max_per_type: Optional[int] = Field(3, title='add penalty to collections with the same type, may be null')
+    limit_names: Optional[int] = Field(50, title='the number of names returned in each collection, may be null')
 
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
@@ -94,7 +83,7 @@ class Collection(BaseModel):
     title: str = Field('title of the collections')
     names: list[CollectionName] = Field('names stored in the collection (limited by limit_names)')
     owner: str = Field('ETH address of the collection owner')
-    number_of_names: int = Field('total number of names int he collection')
+    number_of_names: int = Field('total number of names in the collection')
     rank: float = Field('rank of the collection')  # ?
     score: float = Field('Elasticsearch score for the query result')  # ?
     collection_id: str = Field('id of the collection')
