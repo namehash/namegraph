@@ -322,7 +322,8 @@ def test_elasticsearch_template_collections_search(prod_test_client):
     response = client.post("/find_collections_by_string", json={
         "query": "highest mountains",
         "mode": "instant",
-        "max_limit": 5
+        "max_related_collections": 5,
+        "max_total_collections": 5
     })
 
     assert response.status_code == 200
@@ -336,7 +337,8 @@ def test_elasticsearch_featured_collections_search(prod_test_client):
     response = client.post("/find_collections_by_string", json={
         "query": "highestmountains",
         "mode": "instant",
-        "max_limit": 5
+        "max_related_collections": 5,
+        "max_total_collections": 5
     })
 
     assert response.status_code == 200
