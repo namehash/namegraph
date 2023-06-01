@@ -146,7 +146,8 @@ async def template_collections(query: CollectionSearch):
         query.query,
         tokenized=True,
         limit=query.limit,
-        diversify_mode=query.diversify_mode
+        diversify_mode=query.diversify_mode,
+        limit_names=query.limit_names
     )
 
     response = [
