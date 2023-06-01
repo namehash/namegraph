@@ -92,7 +92,9 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionResult, CollectionSearchByCollection, CollectionSearchByString
+    CollectionResult,
+    CollectionSearchByCollection,
+    CollectionSearchByString
 )
 
 
@@ -139,41 +141,6 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-# 
-# @app.post("/collections/template", response_model=list[Collection])
-# async def template_collections(query: CollectionSearch):
-#     collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
-# 
-#     response = [
-#         {
-#             'title': collection.title,
-#             'names': collection.names,
-#             'rank': collection.rank,
-#             'score': collection.score
-#         }
-#         for collection in collections
-#     ]
-# 
-#     return JSONResponse(response)
-# 
-# 
-# @app.post("/collections/featured", response_model=list[Collection])
-# async def featured_collections(query: CollectionSearch):
-#     collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
-# 
-#     response = [
-#         {
-#             'title': collection.title,
-#             'names': collection.names,
-#             'rank': collection.rank,
-#             'score': collection.score
-#         }
-#         for collection in collections
-#     ]
-# 
-#     return JSONResponse(response)
-
-
 @app.post("/find_collections_by_string", response_model=CollectionResult)
 async def find_collections_by_string(query: CollectionSearchByString):
     collections = collections_matcher.search_by_string(
@@ -190,7 +157,10 @@ async def find_collections_by_string(query: CollectionSearchByString):
     collections = [
         {
             'title': collection.title,
-            'names': collection.names,
+            'names': [{
+                'name': name,
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
             'score': collection.score,
             'owner': collection.owner,
@@ -219,7 +189,10 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     collections = [
         {
             'title': collection.title,
-            'names': collection.names,
+            'names': [{
+                'name': name,
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
             'score': collection.score,
             'owner': collection.owner,
