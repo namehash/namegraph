@@ -90,10 +90,9 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
 
-    def _search(
+    def _search_related(
             self,
             query: str,
-            min_limit: int,
             max_limit: int,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
@@ -188,8 +187,6 @@ class CollectionMatcher(metaclass=Singleton):
             },
         )
 
-        from pprint import pprint
-
         hits = response["hits"]["hits"]
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
@@ -232,29 +229,26 @@ class CollectionMatcher(metaclass=Singleton):
 
             diversified.append(collection)
 
-            # if we reach the max limit, return
+            # if we reach the max limit, then return
             if len(diversified) >= max_limit:
                 return diversified
 
-        # if we haven't reached the max limit, but we have enough
-        # collections for the min limit, then return
-        if len(diversified) >= min_limit:
-            return diversified
-
-        # otherwise, pad with penalized collections until we reach the min limit
+        # if we haven't reached the max limit, pad with penalized collections until we reach the max limit
         penalized_collections: list[Collection] = [
             collection
             for _, collection in sorted(penalized_collections, key=itemgetter(0), reverse=True)
         ]
 
-        return diversified + penalized_collections[:min_limit - len(diversified)]
+        return diversified + penalized_collections[:max_limit - len(diversified)]
 
     def search_by_string(
             self,
             query: str,
             mode: str,
-            min_limit: int = 10,
-            max_limit: int = 10,
+            max_related_collections: int = 3,
+            min_other_collections: int = 3,
+            max_other_collections: int = 3,
+            max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
@@ -269,10 +263,9 @@ class CollectionMatcher(metaclass=Singleton):
             query = f'{query} {tokenized_query}'
 
         try:
-            return self._search(
+            return self._search_related(
                 query=query,
-                min_limit=min_limit,
-                max_limit=max_limit,
+                max_limit=max_related_collections,
                 name_diversity_ratio=name_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names
@@ -284,8 +277,10 @@ class CollectionMatcher(metaclass=Singleton):
     def search_by_collection(
             self,
             collection_id: str,
-            min_limit: int = 10,
-            max_limit: int = 10,
+            max_related_collections: int = 3,
+            min_other_collections: int = 3,
+            max_other_collections: int = 3,
+            max_total_collections: int = 6,
             name_diversity_ratio: float = 0.5,
             max_per_type: int = 3,
             limit_names: int = 10
@@ -295,7 +290,7 @@ class CollectionMatcher(metaclass=Singleton):
             return []
 
         try:
-            return self._search(collection_id, max_limit)  # TODO
+            return self._search_related(collection_id, max_related_collections)  # TODO
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return []
