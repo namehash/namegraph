@@ -1,25 +1,49 @@
 from argparse import ArgumentParser
+from typing import Optional
 import requests
 import time
 import tqdm
 
 
-def request_generator_http(query: str, limit: int, diversify_mode: str):
+def request_generator_http(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
     data = {
         "query": query,
-        "limit": limit,
-        "diversify_mode": diversify_mode
+        "max_related_collections": limit,
+        "min_other_collections": 0,
+        "max_other_collections": 0,
+        "max_total_collections": limit,
+        "name_diversity_ratio": name_diversity_ratio,
+        "max_per_type": max_per_type,
+        "limit_names": limit_names,
     }
-    return requests.post('http://localhost:8000/collections/featured', json=data).json()
+    return requests.post('http://localhost:8000/find_collections_by_string', json=data).json()
 
 
-def search_by_all(query: str, limit: int, diversify_mode: str):
-    return request_generator_http(query, limit, diversify_mode)
+def search_by_all(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
+    return request_generator_http(query, limit, name_diversity_ratio, max_per_type, limit_names)['related_collections']
 
 
-def search_with_latency(query: str, limit: int, diversify_mode: str):
+def search_with_latency(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
     t0 = time.time()
-    results = [hit['title'] for hit in search_by_all(query, limit, diversify_mode)]
+    results = [hit['title'] for hit in search_by_all(query, limit, name_diversity_ratio, max_per_type, limit_names)]
     return results, time.time() - t0
 
 
@@ -32,10 +56,10 @@ if __name__ == '__main__':
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
-        none, none_latency = search_with_latency(query, args.limit, 'none')
-        names_cover, names_cover_latency = search_with_latency(query, args.limit, 'names-cover')
-        types_cover, types_cover_latency = search_with_latency(query, args.limit, 'types-cover')
-        combined, combined_latency = search_with_latency(query, args.limit, 'all')
+        none, none_latency = search_with_latency(query, args.limit, None, None, None)
+        names_cover, names_cover_latency = search_with_latency(query, args.limit, 0.5, None, 50)
+        types_cover, types_cover_latency = search_with_latency(query, args.limit, None, 3, 50)
+        combined, combined_latency = search_with_latency(query, args.limit, 0.5, 3, 50)
 
         same = none == names_cover == types_cover == combined
         print(f'<h2>{"same" if same else "diversified"}</h2>')

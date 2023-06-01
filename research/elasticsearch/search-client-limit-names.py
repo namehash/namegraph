@@ -1,26 +1,49 @@
 from argparse import ArgumentParser
+from typing import Optional
 import requests
 import time
 import tqdm
 
 
-def request_generator_http(query: str, limit: int, diversify_mode: str, limit_names: int):
+def request_generator_http(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
     data = {
         "query": query,
-        "limit": limit,
-        "diversify_mode": diversify_mode,
-        "limit_names": limit_names
+        "max_related_collections": limit,
+        "min_other_collections": 0,
+        "max_other_collections": 0,
+        "max_total_collections": limit,
+        "name_diversity_ratio": name_diversity_ratio,
+        "max_per_type": max_per_type,
+        "limit_names": limit_names,
     }
-    return requests.post('http://localhost:8000/collections/featured', json=data).json()
+    return requests.post('http://localhost:8000/find_collections_by_string', json=data).json()
 
 
-def search_by_all(query: str, limit: int, diversify_mode: str, limit_names: int):
-    return request_generator_http(query, limit, diversify_mode, limit_names)
+def search_by_all(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
+    return request_generator_http(query, limit, name_diversity_ratio, max_per_type, limit_names)['related_collections']
 
 
-def search_with_latency(query: str, limit: int, diversify_mode: str, limit_names: int):
+def search_with_latency(
+        query: str,
+        limit: int,
+        name_diversity_ratio: Optional[float],
+        max_per_type: Optional[int],
+        limit_names: Optional[int],
+):
     t0 = time.time()
-    results = [hit['title'] for hit in search_by_all(query, limit, diversify_mode, limit_names)]
+    results = [hit['title'] for hit in search_by_all(query, limit, name_diversity_ratio, max_per_type, limit_names)]
     return results, time.time() - t0
 
 
@@ -41,8 +64,8 @@ if __name__ == '__main__':
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
-        none, none_latency = search_with_latency(query, args.limit, 'none', None)
-        names_cover = [search_with_latency(query, args.limit, 'names-cover', limit) for limit in names_limits]
+        none, none_latency = search_with_latency(query, args.limit, None, None, None)
+        names_cover = [search_with_latency(query, args.limit, 0.5, None, limit) for limit in names_limits]
         names_cover_stayed = [len(res) - len(set(res) - set(none)) for (res, _) in names_cover]
 
         same = all([

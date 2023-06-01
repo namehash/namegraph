@@ -99,7 +99,7 @@ class CollectionMatcher(metaclass=Singleton):
             limit_names: Optional[int] = 50
     ) -> list[Collection]:
 
-        apply_diversity = name_diversity_ratio is not None and max_per_type is not None
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
         limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
         response = self.elastic.search(
@@ -281,9 +281,9 @@ class CollectionMatcher(metaclass=Singleton):
             min_other_collections: int = 3,
             max_other_collections: int = 3,
             max_total_collections: int = 6,
-            name_diversity_ratio: float = 0.5,
-            max_per_type: int = 3,
-            limit_names: int = 10
+            name_diversity_ratio: Optional[float] = 0.5,
+            max_per_type: Optional[int] = 3,
+            limit_names: Optional[int] = 10
     ) -> list[Collection]:
 
         if not self.active:
