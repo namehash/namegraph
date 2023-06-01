@@ -67,7 +67,7 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
         title='similarity value used for adding penalty to collections with similar names to other collections'
     )
     max_per_type: int = Field(3, title='number of collections with the same type which are not penalized')
-    limit_names: int = Field(10, title='the number of names returned in each collection')
+    limit_names: int = Field(50, title='the number of names returned in each collection')
 
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
