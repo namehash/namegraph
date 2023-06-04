@@ -27,6 +27,7 @@ from generator.generation import (
     SymbolGenerator,
     EasterEggGenerator,
     CollectionGenerator,
+    ReverseGenerator,
     RhymesGenerator,
 )
 from generator.generated_name import GeneratedName
@@ -609,6 +610,16 @@ def test_collection_generator():
         tokenized_name = ('pink', 'floyd')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('the', 'dark', 'side', 'of', 'the', 'moon') in generated_names
+
+
+def test_reverse_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = ReverseGenerator(config)
+        tokenized_name = ('piotrus',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert len(generated_names) == 1
+        assert generated_names[0] == ('surtoip',)
 
 
 def test_rhymes_generator():

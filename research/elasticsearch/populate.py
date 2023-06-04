@@ -116,9 +116,17 @@ def initialize_index(es: Elasticsearch):
                 "data.names.tokenized_name": {"type": "text", "similarity": "BM25_b0"},
                 "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
-                # "template.collection_articles": {"type": "text", "similarity": "BM25"},  # TODO remove?
                 "template.collection_rank": {"type": "rank_feature"},
                 "metadata.members_count": {"type": "rank_feature"},
+                "template.members_rank_mean": {"type": "rank_feature"},
+                "template.members_rank_median": {"type": "rank_feature"},
+                "template.members_system_interesting_score_mean": {"type": "rank_feature"},
+                "template.members_system_interesting_score_median": {"type": "rank_feature"},
+                "template.valid_members_count": {"type": "rank_feature"},
+                "template.invalid_members_count": {"type": "rank_feature", "positive_score_impact": False},
+                "template.valid_members_ratio": {"type": "rank_feature"},
+                "template.nonavailable_members_count": {"type": "rank_feature"},
+                "template.nonavailable_members_ratio": {"type": "rank_feature"},
             }
         },
     }
@@ -136,7 +144,7 @@ def insert_collection(es: Elasticsearch, collection: dict):
 
 
 def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
-    number_of_docs = 500000
+    number_of_docs = 561000
     progress = tqdm(unit="docs", total=number_of_docs)
     successes = 0
 
@@ -154,14 +162,20 @@ def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
 
 def gen(path, limit):
     with jsonlines.open(path, 'r') as reader:
+        too_long = 0
         for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), limit):
             # rank_feature must be positive
 
-            if doc['data']['collection_name'].startswith('Lists of'):
-                continue
-            doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
-            doc['metadata']['members_count'] = len(doc['data']['names'])
+            # if doc['data']['collection_name'].startswith('Lists of'):
+            #     continue
+            # doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
+            # doc['metadata']['members_count'] = len(doc['data']['names'])
+
+            doc['template']['nonavailable_members_count'] += 1 #TODO?
+            doc['template']['invalid_members_count'] += 1 #TODO?
+            
             if doc['metadata']['members_count'] > 10000:
+                too_long += 1
                 continue
 
             yield {
@@ -169,6 +183,7 @@ def gen(path, limit):
                 # "_type": '_doc',
                 "_source": doc
             }
+    print(f'{too_long} collections too long')
 
 
 if __name__ == '__main__':
@@ -188,9 +203,14 @@ if __name__ == '__main__':
     else:
         es = connect_to_elasticsearch(args.scheme, args.host, args.port, args.username, args.password)
 
+    if es.indices.exists(index=INDEX_NAME):
+        es.indices.delete(index=INDEX_NAME)
+
     initialize_index(es)
 
     insert_collections(es, gen(args.input, args.limit))
 
     search = es.search(index=INDEX_NAME, body={'query': {'bool': {}}})
     print(f'Documents overall in {INDEX_NAME} - {len(search["hits"]["hits"])}')
+    # 103 collections too long
+    # Indexed 424307 documents
