@@ -1,6 +1,7 @@
 import json
 import re
 import unicodedata
+import random
 from typing import Tuple, Iterator
 
 from generator.generation import NameGenerator
@@ -25,22 +26,40 @@ class RhymesGenerator(NameGenerator):
 
         name = ''.join(tokens)
 
-        if len(name) < 3 or not any([c.upper() in VOWELS for c in name]):
+        if len(name) < 3 or not name.isalpha() or not any([c.upper() in VOWELS for c in name]):
             return []
 
         name_vmetaphone_repr = self.to_vowel_metaphone(name)
-        if len(name_vmetaphone_repr) < 2 or not any([c in VOWELS for c in name_vmetaphone_repr]):
+        if len(name_vmetaphone_repr) < 3 or not any([c in VOWELS for c in name_vmetaphone_repr]):
             return []
 
         rhyme_suffix = RhymesGenerator.get_rhyme_suffix(name_vmetaphone_repr)
 
-        for suffix_len in range(len(rhyme_suffix), 1, -1):
+        for suffix_len in range(len(rhyme_suffix), 2, -1):
             suffix = rhyme_suffix[-suffix_len:]
             rhymes = self.suffix2rhymes.get(suffix, None)
             if rhymes is None:
                 continue
+
+            # shuffle rhymes
+            rhymes_len = len(rhymes)
+            if rhymes_len > 50:
+                shuffle_threshold = 20
+            elif rhymes_len > 25:
+                shuffle_threshold = 10
+            elif rhymes_len > 10:
+                shuffle_threshold = 5
+            else:
+                shuffle_threshold = rhymes_len // 2
+
+            rhymes_top = rhymes[:shuffle_threshold]
+            rhymes_bottom = rhymes[shuffle_threshold:]
+            random.shuffle(rhymes_top)
+            random.shuffle(rhymes_bottom)
+            rhymes = rhymes_top + rhymes_bottom
+
             try:
-                yield from [r for r in rhymes if r != name]  # todo: diversify?
+                yield from [(r,) for r in rhymes if r != name]
             except StopIteration:
                 continue
 
@@ -57,13 +76,24 @@ class RhymesGenerator(NameGenerator):
 
     @staticmethod
     def get_rhyme_suffix(s_vmet: str) -> str:
+        assert len(s_vmet) >= 3
+        if len(s_vmet) == 3:
+            return s_vmet
+
         vowel_positions = [match.start() for match in re.finditer(r'[AEIOUY]', s_vmet)]
         if len(vowel_positions) == 1 and vowel_positions[0] != len(s_vmet) - 1:
-            return s_vmet[vowel_positions[0]:]  # ex.: czad [SAT | XAT] -> AT, smith [SMI0 | XMIT] -> I0
+            suf = s_vmet[vowel_positions[0]:]
+            if len(suf) >= 3:
+                return suf  # ex.: czad [SAT | XAT] -> SAT, smith [SMI0 | XMIT] -> MI0
+            else:
+                return s_vmet[-3:]
         elif (len(vowel_positions) == 1 and vowel_positions[0] != len(s_vmet) - 1) or \
                 len(vowel_positions) > 1:
-            return s_vmet[
-                   vowel_positions[-1] - 1:]  # ex.: crew [KRE] -> RE, affair [AFAIR] -> AIR, salmon [SALMON] -> MON
+            suf = s_vmet[vowel_positions[-1] - 1:]
+            if len(suf) >= 3:
+                return suf  # ex.: crew [KRE] -> KRE, affair [AFAIR] -> AIR, salmon [SALMON] -> MON
+            else:
+                return s_vmet[-3:]
         else:
             return ''  # no rhymes for string without vowels
 
@@ -77,10 +107,7 @@ SILENT_STARTERS = ["GN", "KN", "PN", "WR", "PS"]
 class MetaphoneWord:
     def __init__(self, input_str):
         self.original = input_str
-        if isinstance(input_str, bytes):
-            self.decoded = input_str.decode('utf-8', 'ignore')
-        else:
-            self.decoded = input_str
+        self.decoded = input_str
         self.decoded = self.decoded.replace('\xc7', "s")
         self.decoded = self.decoded.replace('\xe7', "s")
         self.normalized = ''.join(

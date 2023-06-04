@@ -379,10 +379,15 @@
   weights:
     ngram:
       default: 1
+      en: 5
     person:
-      default: 1
+      default: 0.1
     other:
-      default: 1
+      default: 0
+  mode_weights_multiplier:
+    instant: 0.166
+    domain_detail: 0.15
+    full: 0.5
   global_limits:
     instant: 1
     domain_detail: 1

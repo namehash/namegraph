@@ -27,6 +27,7 @@ from generator.generation import (
     SymbolGenerator,
     EasterEggGenerator,
     CollectionGenerator,
+    RhymesGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -608,3 +609,14 @@ def test_collection_generator():
         tokenized_name = ('pink', 'floyd')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('the', 'dark', 'side', 'of', 'the', 'moon') in generated_names
+
+
+def test_rhymes_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = RhymesGenerator(config)
+        tokenized_name = ('caravan',)
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: x[0], list(gen)))
+        assert all([name in generated_names for name in ("van", "fan", "sullivan", "ivan", "stefan", "evan", "ativan",
+                                                         "donovan", "stephan", "orphan", "minivan", "sylvan")])
