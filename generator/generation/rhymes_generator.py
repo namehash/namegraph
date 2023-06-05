@@ -59,11 +59,9 @@ class RhymesGenerator(NameGenerator):
             rhymes = rhymes_top + rhymes_bottom
 
             try:
-                yield from [(r,) for r in rhymes if r != name]
+                yield from [(name + r,) for r in rhymes if r != name]
             except StopIteration:
                 continue
-
-    # todo: add tests
 
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:

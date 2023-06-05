@@ -629,5 +629,8 @@ def test_rhymes_generator():
         tokenized_name = ('caravan',)
         gen = strategy.generate(tokenized_name)
         generated_names = list(map(lambda x: x[0], list(gen)))
-        assert all([name in generated_names for name in ("van", "fan", "sullivan", "ivan", "stefan", "evan", "ativan",
-                                                         "donovan", "stephan", "orphan", "minivan", "sylvan")])
+        expected_names = map(lambda s: tokenized_name[0] + s, (
+            "van", "fan", "sullivan", "ivan", "stefan", "evan",
+            "ativan", "donovan", "stephan", "orphan", "minivan", "sylvan")
+                             )
+        assert all([name in generated_names for name in expected_names])
