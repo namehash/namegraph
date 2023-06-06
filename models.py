@@ -94,7 +94,11 @@ class Collection(BaseModel):
     collection_id: str = Field('id of the collection')
 
 
+class CollectionResultMetadata(BaseModel):
+    total_number_of_collections_matched: int = Field(title='number of total collections before trimming the result')
+    processing_time: float = Field(title='time elapsed for this query')
+
 class CollectionResult(BaseModel):
-    related_collections: list[Collection] = Field('list of related collections')
-    other_collections: list[Collection] = Field('list of other collections (if not enough related collections)')
-    # some meta?
+    related_collections: list[Collection] = Field(title='list of related collections')
+    other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
+    metadata: CollectionResultMetadata = Field(title='additional information about collection search result')

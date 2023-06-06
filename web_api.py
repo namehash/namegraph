@@ -1,6 +1,7 @@
 import gc
 import logging, random, hashlib, json
 from typing import List, Optional
+from time import perf_counter
 
 import numpy as np
 from fastapi import FastAPI
@@ -143,7 +144,9 @@ async def root(name: Name):
 
 @app.post("/find_collections_by_string", response_model=CollectionResult)
 async def find_collections_by_string(query: CollectionSearchByString):
-    collections = collections_matcher.search_by_string(
+    t_before = perf_counter()
+
+    collections, es_search_metadata = collections_matcher.search_by_string(
         query.query,
         mode=query.mode,
         max_related_collections=query.max_related_collections,
@@ -158,7 +161,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         {
             'title': collection.title,
             'names': [{
-                'name': name,
+                'name': name + '.eth',
                 'namehash': namehash,
             } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
@@ -169,14 +172,24 @@ async def find_collections_by_string(query: CollectionSearchByString):
         }
         for collection in collections
     ]
-    response = {'related_collections': collections, 'other_collections': []}
+
+    time_elapsed = perf_counter() - t_before
+    metadata = {
+        'total_number_of_collections_matched': es_search_metadata.get('n_total_hits', None),
+        'processing_time': time_elapsed
+    }
+
+    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
+
 
     return JSONResponse(response)
 
 
 @app.post("/find_collections_by_collection", response_model=CollectionResult)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
-    collections = collections_matcher.search_by_collection(
+    t_before = perf_counter()
+
+    collections, es_search_metadata  = collections_matcher.search_by_collection(
         query.collection_id,
         max_related_collections=query.max_related_collections,
         min_other_collections=query.min_other_collections,
@@ -190,7 +203,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         {
             'title': collection.title,
             'names': [{
-                'name': name,
+                'name': name + '.eth',
                 'namehash': namehash,
             } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
@@ -201,6 +214,13 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         }
         for collection in collections
     ]
-    response = {'related_collections': collections, 'other_collections': []}
+
+    time_elapsed = perf_counter() - t_before
+    metadata = {
+        'total_number_of_collections_matched': es_search_metadata.get('n_total_hits', None),
+        'processing_time': time_elapsed
+    }
+
+    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
 
     return JSONResponse(response)

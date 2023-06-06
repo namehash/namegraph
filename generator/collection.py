@@ -97,7 +97,7 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: Optional[int] = 50
-    ) -> list[Collection]:
+    ) -> tuple[list[Collection], dict]:
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
@@ -188,10 +188,12 @@ class CollectionMatcher(metaclass=Singleton):
         )
 
         hits = response["hits"]["hits"]
+        es_response_metadata = {'n_total_hits': response["hits"]['total']['value']}
+
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
         if not apply_diversity:
-            return collections[:max_limit]
+            return collections[:max_limit], es_response_metadata
 
         # diversify collections
         diversified = []
@@ -231,7 +233,7 @@ class CollectionMatcher(metaclass=Singleton):
 
             # if we reach the max limit, then return
             if len(diversified) >= max_limit:
-                return diversified
+                return diversified, es_response_metadata
 
         # if we haven't reached the max limit, pad with penalized collections until we reach the max limit
         penalized_collections: list[Collection] = [
@@ -239,7 +241,7 @@ class CollectionMatcher(metaclass=Singleton):
             for _, collection in sorted(penalized_collections, key=itemgetter(0), reverse=True)
         ]
 
-        return diversified + penalized_collections[:max_limit - len(diversified)]
+        return diversified + penalized_collections[:max_limit - len(diversified)], es_response_metadata
 
     def search_by_string(
             self,
@@ -252,10 +254,10 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
-    ) -> list[Collection]:
+    ) -> tuple[list[Collection], dict]:
 
         if not self.active:
-            return []
+            return [], {}
 
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
@@ -272,7 +274,7 @@ class CollectionMatcher(metaclass=Singleton):
             )
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
-            return []
+            return [], {}
 
     def search_by_collection(
             self,
@@ -284,13 +286,13 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
-    ) -> list[Collection]:
+    ) -> tuple[list[Collection], dict]:
 
         if not self.active:
-            return []
+            return [], {}
 
         try:
             return self._search_related(collection_id, max_related_collections)  # TODO
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
-            return []
+            return [], {}
