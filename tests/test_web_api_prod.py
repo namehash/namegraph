@@ -261,6 +261,7 @@ def test_instant_search(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 def test_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
@@ -277,6 +278,7 @@ def test_instant_search_temp(prod_test_client):
         for name in json
         for strategy in name['metadata']['applied_strategies']
     ])
+
 
 def test_not_instant_search(prod_test_client):
     client = prod_test_client
@@ -295,6 +297,7 @@ def test_not_instant_search(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 def test_not_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
@@ -312,28 +315,34 @@ def test_not_instant_search_temp(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 @pytest.mark.integration_test
 def test_elasticsearch_template_collections_search(prod_test_client):
     client = prod_test_client
-    response = client.post("/collections/template", json={
+    response = client.post("/find_collections_by_string", json={
         "query": "highest mountains",
-        "limit": 5
+        "mode": "instant",
+        "max_related_collections": 5,
+        "max_total_collections": 5
     })
 
     assert response.status_code == 200
-    titles = [collection['title'] for collection in response.json()]
+    titles = [collection['title'] for collection in response.json()['related_collections']]
     assert 'Highest mountains on Earth' in titles
+
 
 @pytest.mark.integration_test
 def test_elasticsearch_featured_collections_search(prod_test_client):
     client = prod_test_client
-    response = client.post("/collections/featured", json={
+    response = client.post("/find_collections_by_string", json={
         "query": "highestmountains",
-        "limit": 5
+        "mode": "instant",
+        "max_related_collections": 5,
+        "max_total_collections": 5
     })
 
     assert response.status_code == 200
-    titles = [collection['title'] for collection in response.json()]
+    titles = [collection['title'] for collection in response.json()['related_collections']]
     assert 'Highest mountains on Earth' in titles
 
 
