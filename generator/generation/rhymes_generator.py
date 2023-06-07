@@ -60,7 +60,6 @@ class RhymesGenerator(NameGenerator):
 
             try:
                 yield from [(name + r,) for r in rhymes if r != name and r not in tokens]
-                # todo: fix tokens
             except StopIteration:
                 continue
 
