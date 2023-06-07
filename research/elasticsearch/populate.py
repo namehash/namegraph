@@ -112,9 +112,9 @@ def initialize_index(es: Elasticsearch):
                                              }
                                          }},
                 # b=0 so document length doesn't matter
-                "data.names.normalized_name": {"type": "text", "similarity": "BM25_b0"},
+                "data.names.normalized_name": {"type": "text", "similarity": "BM25_b0"}, #keyword?
                 "data.names.tokenized_name": {"type": "text", "similarity": "BM25_b0"},
-                "data.collection_description": {"type": "text", "similarity": "BM25"},
+                # "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
                 "template.collection_rank": {"type": "rank_feature"},
                 "metadata.members_count": {"type": "rank_feature"},
