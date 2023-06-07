@@ -271,6 +271,6 @@ class TestCollections:
                     for member_name in collection['names']])
 
     def test_collection_api_membership_count(self, test_client):
-        response = test_client.get('/get_collections_membership_count?normalized_name=opeth')
+        response = test_client.post('/get_collections_membership_count', json={'normalized_name': 'opeth'})
         assert response.status_code == 200
         assert response.json()['count'] >= 0

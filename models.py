@@ -85,23 +85,28 @@ class CollectionName(BaseModel):
 
 
 class Collection(BaseModel):
-    title: str = Field('title of the collections')
-    names: list[CollectionName] = Field('names stored in the collection (limited by limit_names)')
-    owner: str = Field('ETH address of the collection owner')
-    number_of_names: int = Field('total number of names in the collection')
-    rank: float = Field('rank of the collection')  # ?
-    score: float = Field('Elasticsearch score for the query result')  # ?
-    collection_id: str = Field('id of the collection')
+    title: str = Field(title='title of the collections')
+    names: list[CollectionName] = Field(title='names stored in the collection (limited by limit_names)')
+    owner: str = Field(title='ETH address of the collection owner')
+    number_of_names: int = Field(title='total number of names in the collection')
+    rank: float = Field(title='rank of the collection')  # ?
+    score: float = Field(title='Elasticsearch score for the query result')  # ?
+    collection_id: str = Field(title='id of the collection')
 
 
 class CollectionResultMetadata(BaseModel):
     total_number_of_related_collections: int = Field(title='number of related collections before trimming the result')
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
 
-class CollectionResult(BaseModel):
+class CollectionSearchResult(BaseModel):
     related_collections: list[Collection] = Field(title='list of related collections')
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
     metadata: CollectionResultMetadata = Field(title='additional information about collection search result')
 
+
+class CollectionMembershipCountRequest(BaseModel):
+    normalized_name: str = Field(title='normalized name for which collection membership will be checked')
+
+
 class CollectionCountResult(BaseModel):
-    count: int = Field(title='count of matched collections')
+    count: int = Field(title='count of collections containing input name')
