@@ -296,3 +296,20 @@ class CollectionMatcher(metaclass=Singleton):
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return [], {}
+
+    def get_collections_membership_count_for_name(self, normalized_name: str):
+        response = self.elastic.count(
+            index=self.index_name,
+            body={
+                  "query": {
+                    "bool": {
+                      "filter": [
+                        {"term": {"data.names.normalized_name": normalized_name}},
+                        {"term": {"data.public": True}}
+                      ]
+                    }
+                  }
+                },
+        )
+
+        return response['count']
