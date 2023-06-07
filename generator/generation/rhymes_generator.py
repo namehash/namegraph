@@ -60,6 +60,7 @@ class RhymesGenerator(NameGenerator):
 
             try:
                 yield from [(name + r,) for r in rhymes if r != name and r not in tokens]
+                # todo: fix tokens
             except StopIteration:
                 continue
 
@@ -69,7 +70,7 @@ class RhymesGenerator(NameGenerator):
 
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid_long_name,)}
+        return {'tokens': interpretation.tokenization}
 
 
     @staticmethod
