@@ -102,3 +102,6 @@ class CollectionResult(BaseModel):
     related_collections: list[Collection] = Field(title='list of related collections')
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
     metadata: CollectionResultMetadata = Field(title='additional information about collection search result')
+
+class CollectionCountResult(BaseModel):
+    count: int = Field(title='count of matched collections')

@@ -95,7 +95,8 @@ from models import (
     Suggestion,
     CollectionResult,
     CollectionSearchByCollection,
-    CollectionSearchByString
+    CollectionSearchByString,
+    CollectionCountResult
 )
 
 
@@ -226,3 +227,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
 
     return JSONResponse(response)
+
+
+@app.get("/get_collections_membership_count", response_model=CollectionCountResult)
+async def get_collections_membership_count(normalized_name: str):
+    count = collections_matcher.get_collections_membership_count_for_name(normalized_name)
+    return JSONResponse({'count': count})

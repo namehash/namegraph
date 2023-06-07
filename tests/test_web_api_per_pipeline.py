@@ -234,6 +234,8 @@ class TestCollections:
         assert "Pink Floyd albums" in collection_names
 
 
+    #============== collection api tests ==============
+
     def test_collection_api_metadata(self, test_client):
         t0 = perf_counter()
 
@@ -267,3 +269,8 @@ class TestCollections:
         assert all([member_name['name'].endswith('.eth')
                     for collection in response_json['related_collections'] + response_json['other_collections']
                     for member_name in collection['names']])
+
+    def test_collection_api_membership_count(self, test_client):
+        response = test_client.get('/get_collections_membership_count?normalized_name=opeth')
+        assert response.status_code == 200
+        assert response.json()['count'] >= 0
