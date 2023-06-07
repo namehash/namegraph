@@ -398,8 +398,8 @@
     - ValidNameLengthFilter
   weights:
     ngram:
-      default: 1
-      en: 5
+      default: 0.5
+      en: 1
     person:
       default: 0.1
     other:

@@ -59,7 +59,7 @@ class RhymesGenerator(NameGenerator):
             rhymes = rhymes_top + rhymes_bottom
 
             try:
-                yield from [(name + r,) for r in rhymes if r != name]
+                yield from [(name + r,) for r in rhymes if r != name and r not in tokens]
             except StopIteration:
                 continue
 
