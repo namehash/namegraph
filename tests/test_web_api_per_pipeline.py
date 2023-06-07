@@ -252,7 +252,7 @@ class TestCollections:
                 len(response_json['related_collections']))
 
         # processing_time
-        assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) / 1000
+        assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
 
     def test_collection_api_eth_suffix(self, test_client):
