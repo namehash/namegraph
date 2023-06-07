@@ -8,6 +8,79 @@ from tqdm import tqdm
 from populate import INDEX_NAME, connect_to_elasticsearch_using_cloud_id, connect_to_elasticsearch
 
 
+def search_by_query_and_names(query, names, limit):
+    response = es.search(
+        index=INDEX_NAME,
+        explain=args.explain,
+        body={
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": [
+                                    "data.collection_name^3",
+                                    "data.collection_name.exact^3",
+                                    "data.collection_keywords^2"
+                                ],
+                                "type": "cross_fields"
+                            }
+                        },
+                        {
+                            "multi_match": {
+                                "query": names,
+                                "fields": [
+                                    "data.names.normalized_name",
+                                    # "data.names.tokenized_name"
+                                ],
+                                "type": "cross_fields"
+                            }
+                        },
+
+                        {
+                            "rank_feature": {
+                                "field": "template.collection_rank",
+                                "boost": 100,
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "metadata.members_count",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.members_rank_mean",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.members_system_interesting_score_median",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.valid_members_ratio",
+                            }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "template.nonavailable_members_ratio",
+                            }
+                        }
+                    ]
+                }
+
+            },
+            "size": limit,
+        },
+    )
+
+    hits = response["hits"]["hits"]
+    return hits
+
+
 def search_by_all(query, limit):
     response = es.search(
         index=INDEX_NAME,
@@ -213,9 +286,10 @@ if __name__ == '__main__':
 
             try:
                 print(f'<h2>search by collection name and members</h2>')
-                query2 = ' '.join([f'{token}' for token in query.split(' ')]) + ' ' + the_names
+                # query2 = ' '.join([f'{token}' for token in query.split(' ')]) + ' ' + the_names
                 # print(query2)
-                hits = search_by_all(query2, args.limit)
+                # print('<pre>', query, the_names, '</pre>')
+                hits = search_by_query_and_names(query, the_names, args.limit)
                 print_resutls(hits)
 
                 if args.explain: print_exlanation(hits)
