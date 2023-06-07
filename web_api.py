@@ -93,10 +93,10 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionResult,
+    CollectionSearchResult,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionCountResult
+    CollectionCountResult, CollectionMembershipCountRequest
 )
 
 
@@ -143,7 +143,7 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_string", response_model=CollectionResult)
+@app.post("/find_collections_by_string", response_model=CollectionSearchResult)
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
@@ -187,7 +187,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_collection", response_model=CollectionResult)
+@app.post("/find_collections_by_collection", response_model=CollectionSearchResult)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     t_before = perf_counter()
 
@@ -229,7 +229,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return JSONResponse(response)
 
 
-@app.get("/get_collections_membership_count", response_model=CollectionCountResult)
-async def get_collections_membership_count(normalized_name: str):
-    count = collections_matcher.get_collections_membership_count_for_name(normalized_name)
+@app.post("/get_collections_membership_count", response_model=CollectionCountResult)
+async def get_collections_membership_count(request: CollectionMembershipCountRequest):
+    count = collections_matcher.get_collections_membership_count_for_name(request.normalized_name)
     return JSONResponse({'count': count})
