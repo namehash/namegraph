@@ -1,3 +1,4 @@
+import bz2
 from argparse import ArgumentParser
 from itertools import islice
 
@@ -7,6 +8,7 @@ from typing import Iterable
 import jsonlines
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
+from jsonlines import Reader
 from tqdm import tqdm
 
 INDEX_NAME = 'collection-templates-1'
@@ -109,15 +111,22 @@ def initialize_index(es: Elasticsearch):
                                              "exact": {
                                                  "type": "text",
                                                  "analyzer": "english_exact"
+                                             },
+                                             "raw": {
+                                                 "type": "keyword"
                                              }
                                          }},
                 # b=0 so document length doesn't matter
-                "data.names.normalized_name": {"type": "text", "similarity": "BM25_b0"}, #keyword?
+                "data.names.normalized_name": {"type": "text", "similarity": "BM25_b0"},  # keyword?
                 "data.names.tokenized_name": {"type": "text", "similarity": "BM25_b0"},
                 # "data.collection_description": {"type": "text", "similarity": "BM25"},
                 "data.collection_keywords": {"type": "text", "similarity": "BM25"},
                 "template.collection_rank": {"type": "rank_feature"},
-                "metadata.members_count": {"type": "rank_feature"},
+                "metadata.members_count": {"type": "rank_feature", "fields": {
+                    "raw": {
+                        "type": "float"
+                    }
+                }},
                 "template.members_rank_mean": {"type": "rank_feature"},
                 "template.members_rank_median": {"type": "rank_feature"},
                 "template.members_system_interesting_score_mean": {"type": "rank_feature"},
@@ -126,7 +135,12 @@ def initialize_index(es: Elasticsearch):
                 "template.invalid_members_count": {"type": "rank_feature", "positive_score_impact": False},
                 "template.valid_members_ratio": {"type": "rank_feature"},
                 "template.nonavailable_members_count": {"type": "rank_feature"},
-                "template.nonavailable_members_ratio": {"type": "rank_feature"},
+                "template.nonavailable_members_ratio": {"type": "rank_feature", "fields": {
+                    "raw": {
+                        "type": "float"
+                    }
+                }},
+                "metadata.collection_name_log_probability": {"type": "float"},
             }
         },
     }
@@ -161,28 +175,32 @@ def insert_collections(es: Elasticsearch, collections: Iterable[dict]):
 
 
 def gen(path, limit):
-    with jsonlines.open(path, 'r') as reader:
-        too_long = 0
-        for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), limit):
-            # rank_feature must be positive
+    if path.endswith('.jsonl'):
+        reader = jsonlines.open(path, 'r')
+    elif path.endswith('.bz2'):
+        reader = Reader(bz2.open(args.input, "rb"))
 
-            # if doc['data']['collection_name'].startswith('Lists of'):
-            #     continue
-            # doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
-            # doc['metadata']['members_count'] = len(doc['data']['names'])
+    too_long = 0
+    for doc in islice(reader.iter(skip_empty=True, skip_invalid=True), limit):
+        # rank_feature must be positive
 
-            doc['template']['nonavailable_members_count'] += 1 #TODO?
-            doc['template']['invalid_members_count'] += 1 #TODO?
-            
-            if doc['metadata']['members_count'] > 10000:
-                too_long += 1
-                continue
+        # if doc['data']['collection_name'].startswith('Lists of'):
+        #     continue
+        # doc['template']['collection_rank'] = max(1, doc['template']['collection_rank'])  # remove?
+        # doc['metadata']['members_count'] = len(doc['data']['names'])
 
-            yield {
-                "_index": INDEX_NAME,
-                # "_type": '_doc',
-                "_source": doc
-            }
+        doc['template']['nonavailable_members_count'] += 1  # TODO?
+        doc['template']['invalid_members_count'] += 1  # TODO?
+
+        if doc['metadata']['members_count'] > 10000:
+            too_long += 1
+            continue
+
+        yield {
+            "_index": INDEX_NAME,
+            # "_type": '_doc',
+            "_source": doc
+        }
     print(f'{too_long} collections too long')
 
 

@@ -1,6 +1,7 @@
 import gc
 import logging, random, hashlib, json
 from typing import List, Optional
+from time import perf_counter
 
 import numpy as np
 from fastapi import FastAPI
@@ -92,7 +93,10 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionResult, CollectionSearchByCollection, CollectionSearchByString
+    CollectionSearchResult,
+    CollectionSearchByCollection,
+    CollectionSearchByString,
+    CollectionCountResult, CollectionMembershipCountRequest
 )
 
 
@@ -139,48 +143,17 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-# 
-# @app.post("/collections/template", response_model=list[Collection])
-# async def template_collections(query: CollectionSearch):
-#     collections = collections_matcher.search(query.query, tokenized=True, limit=query.limit)
-# 
-#     response = [
-#         {
-#             'title': collection.title,
-#             'names': collection.names,
-#             'rank': collection.rank,
-#             'score': collection.score
-#         }
-#         for collection in collections
-#     ]
-# 
-#     return JSONResponse(response)
-# 
-# 
-# @app.post("/collections/featured", response_model=list[Collection])
-# async def featured_collections(query: CollectionSearch):
-#     collections = collections_matcher.search(query.query, tokenized=False, limit=query.limit)
-# 
-#     response = [
-#         {
-#             'title': collection.title,
-#             'names': collection.names,
-#             'rank': collection.rank,
-#             'score': collection.score
-#         }
-#         for collection in collections
-#     ]
-# 
-#     return JSONResponse(response)
-
-
-@app.post("/find_collections_by_string", response_model=CollectionResult)
+@app.post("/find_collections_by_string", response_model=CollectionSearchResult)
 async def find_collections_by_string(query: CollectionSearchByString):
-    collections = collections_matcher.search_by_string(
+    t_before = perf_counter()
+
+    collections, es_search_metadata = collections_matcher.search_by_string(
         query.query,
         mode=query.mode,
-        min_limit=query.min_limit,
-        max_limit=query.max_limit,
+        max_related_collections=query.max_related_collections,
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
@@ -188,7 +161,10 @@ async def find_collections_by_string(query: CollectionSearchByString):
     collections = [
         {
             'title': collection.title,
-            'names': collection.names,
+            'names': [{
+                'name': name + '.eth',
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
             'score': collection.score,
             'owner': collection.owner,
@@ -197,17 +173,30 @@ async def find_collections_by_string(query: CollectionSearchByString):
         }
         for collection in collections
     ]
-    response = {'related_collections': collections, 'other_collections': []}
+
+    time_elapsed = (perf_counter() - t_before) * 1000
+  
+    metadata = {
+        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'processing_time_ms': time_elapsed
+    }
+
+    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
+
 
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_collection", response_model=CollectionResult)
+@app.post("/find_collections_by_collection", response_model=CollectionSearchResult)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
-    collections = collections_matcher.search_by_collection(
+    t_before = perf_counter()
+
+    collections, es_search_metadata  = collections_matcher.search_by_collection(
         query.collection_id,
-        min_limit=query.min_limit,
-        max_limit=query.max_limit,
+        max_related_collections=query.max_related_collections,
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
@@ -215,7 +204,10 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     collections = [
         {
             'title': collection.title,
-            'names': collection.names,
+            'names': [{
+                'name': name + '.eth',
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
             'rank': collection.rank,
             'score': collection.score,
             'owner': collection.owner,
@@ -224,6 +216,20 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         }
         for collection in collections
     ]
-    response = {'related_collections': collections, 'other_collections': []}
+    
+    time_elapsed = (perf_counter() - t_before) * 1000
+  
+    metadata = {
+        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'processing_time_ms': time_elapsed
+    }
+
+    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
 
     return JSONResponse(response)
+
+
+@app.post("/get_collections_membership_count", response_model=CollectionCountResult)
+async def get_collections_membership_count(request: CollectionMembershipCountRequest):
+    count = collections_matcher.get_collections_membership_count_for_name(request.normalized_name)
+    return JSONResponse({'count': count})
