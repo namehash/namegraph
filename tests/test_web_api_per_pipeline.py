@@ -247,12 +247,12 @@ class TestCollections:
         response_json = response.json()
         t1 = perf_counter()
 
-        # total_number_of_collections_matched
-        assert (response_json['metadata']['total_number_of_collections_matched'] >=
-                len(response_json['related_collections']) + len(response_json['other_collections']))
+        # total_number_of_related_collections
+        assert (response_json['metadata']['total_number_of_related_collections'] >=
+                len(response_json['related_collections']))
 
         # processing_time
-        assert response_json['metadata']['processing_time'] <= t1 - t0
+        assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) / 1000
 
 
     def test_collection_api_eth_suffix(self, test_client):
