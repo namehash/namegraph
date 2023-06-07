@@ -297,7 +297,7 @@ class CollectionMatcher(metaclass=Singleton):
             logger.warning(f'Elasticsearch search failed: {ex}')
             return [], {}
 
-    def get_collections_membership_count_for_name(self, normalized_name: str):
+    def get_collections_membership_count_for_name(self, normalized_name: str) -> int:
         response = self.elastic.count(
             index=self.index_name,
             body={
@@ -313,3 +313,79 @@ class CollectionMatcher(metaclass=Singleton):
         )
 
         return response['count']
+
+
+    def get_collections_membership_list_for_name(self, normalized_name: str, top_n_names: int) -> list:
+        response = self.elastic.search(
+            index=self.index_name,
+            body={
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "data.names.normalized_name": normalized_name
+                      }
+                    },
+                    {
+                      "term": {
+                        "data.public": True
+                      }
+                    }
+                  ],
+                  "should": [
+                    {
+                        "rank_feature": {
+                            "field": "metadata.members_count"
+                        }
+                    },
+                    {
+                        "rank_feature": {
+                            "field": "template.members_system_interesting_score_median"
+                        }
+                    },
+                    {
+                        "rank_feature": {
+                            "field": "template.valid_members_ratio"
+                        }
+                    },
+                    {
+                        "rank_feature": {
+                            "field": "template.nonavailable_members_ratio",
+                            "boost": 10
+                        }
+                    }
+                  ]
+                }
+              },
+              "_source": False,
+              "fields": [
+                  "data.collection_name",
+                  "metadata.owner",
+                  "metadata.modified",
+                  "metadata.members_count",
+                  "metadata.id"
+              ],
+              "script_fields": {
+                "names": {
+                  "script": {
+                    "source": f"params['_source'].data.names.stream().map(p -> p.normalized_name).collect(Collectors.toList())"
+                  }
+                }
+              }
+            }
+    )
+
+        found_collections = [
+            {
+                'title': hit['fields']['data.collection_name'][0],
+                'owner': hit['fields']['metadata.owner'][0],
+                'last_updated_timestamp': hit['fields']['metadata.modified'][0],
+                'number_of_names': hit['fields']['metadata.members_count'][0],
+                'top_names_list': hit['fields']['names'][:top_n_names],
+                'collection_id': hit['fields']['metadata.id'][0]
+            }
+            for hit in response['hits']['hits']
+        ]
+
+        return found_collections
