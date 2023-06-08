@@ -11,6 +11,8 @@ def request_generator_http(
         name_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
+        host: str = 'localhost',
+        port: int = 8000,
 ):
     data = {
         "query": query,
@@ -22,7 +24,10 @@ def request_generator_http(
         "max_per_type": max_per_type,
         "limit_names": limit_names,
     }
-    return requests.post('http://localhost:8000/find_collections_by_string', json=data).json()
+    return requests.post(
+        f'http://{host}:{port}/find_collections_by_string',
+        json=data,
+    ).json()
 
 
 def search_by_all(
@@ -31,8 +36,19 @@ def search_by_all(
         name_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
+        host: str = 'localhost',
+        port: int = 8000,
 ):
-    return request_generator_http(query, limit, name_diversity_ratio, max_per_type, limit_names)['related_collections']
+    response = request_generator_http(
+        query,
+        limit,
+        name_diversity_ratio,
+        max_per_type,
+        limit_names,
+        host=host,
+        port=port,
+    )
+    return response['related_collections'], response['metadata']['processing_time_ms']
 
 
 def search_with_latency(
@@ -41,10 +57,20 @@ def search_with_latency(
         name_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
+        host: str = 'localhost',
+        port: int = 8000,
 ):
-    t0 = time.time()
-    results = [hit['title'] for hit in search_by_all(query, limit, name_diversity_ratio, max_per_type, limit_names)]
-    return results, time.time() - t0
+    results, latency = search_by_all(
+        query,
+        limit,
+        name_diversity_ratio,
+        max_per_type,
+        limit_names,
+        host=host,
+        port=port
+    )
+    titles = [hit['title'] for hit in results]
+    return titles, latency
 
 
 if __name__ == '__main__':
@@ -52,6 +78,8 @@ if __name__ == '__main__':
     parser.add_argument('queries', nargs='+', help='queries')
     parser.add_argument('--limit', type=int, default=10, help='limit')
     parser.add_argument('--names_limits', type=int, nargs='+', default=[15, 50, 100], help='names limits')
+    parser.add_argument('--host', type=str, default='localhost', help='host')
+    parser.add_argument('--port', type=int, default=8000, help='port')
     args = parser.parse_args()
 
     identifiers = '🟩🔴🔵🟢🟡🟠🟣🟤'
@@ -64,8 +92,11 @@ if __name__ == '__main__':
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
-        none, none_latency = search_with_latency(query, args.limit, None, None, None)
-        names_cover = [search_with_latency(query, args.limit, 0.5, None, limit) for limit in names_limits]
+        none, none_latency = search_with_latency(query, args.limit, None, None, None, host=args.host, port=args.port)
+        names_cover = [
+            search_with_latency(query, args.limit, 0.5, None, limit, host=args.host, port=args.port)
+            for limit in names_limits
+        ]
         names_cover_stayed = [len(res) - len(set(res) - set(none)) for (res, _) in names_cover]
 
         same = all([
@@ -75,9 +106,9 @@ if __name__ == '__main__':
         print(f'<h2>{"same" if same else "impacted"}</h2>')
 
         print('<table>')
-        print(f'<tr><th width="15%">none {none_latency:.3f}s</th>', end='')
+        print(f'<tr><th width="15%">none {none_latency:.3f}ms</th>', end='')
         for limit, identifier, (_, latency) in zip(names_limits, identifiers, names_cover):
-            print(f'<th width="10%">names-cover {limit} {identifier} {latency:.3f}s</th>', end='')
+            print(f'<th width="10%">names-cover {limit} {identifier} {latency:.3f}ms</th>', end='')
         print(f'<th>empty</th></tr>')
 
         for i, none_ in enumerate(none):
