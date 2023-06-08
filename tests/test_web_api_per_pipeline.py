@@ -224,7 +224,7 @@ def collection_test_pipelines():
 
 
 @mark.usefixtures("collection_test_pipelines")
-@mark.integration_test
+# @mark.integration_test
 class TestCollections:
     def test_metadata_collection_field(self, test_client):
         response = test_client.post("/", json={"name": "pinkfloyd"})
@@ -233,18 +233,17 @@ class TestCollections:
         collection_names = [name["metadata"]["collection"] for name in json]
         assert "Pink Floyd albums" in collection_names
 
-
-    #============== collection api tests ==============
+    # ============== collection api tests ==============
 
     def test_collection_api_metadata(self, test_client):
         t0 = perf_counter()
 
         response = test_client.post("/find_collections_by_string", json={
-        "query": "australia",
-        "mode": "instant",
-        "max_related_collections": 5,
-        "max_total_collections": 5
-    })
+            "query": "australia",
+            "mode": "instant",
+            "max_related_collections": 5,
+            "max_total_collections": 5
+        })
         assert response.status_code == 200
         response_json = response.json()
         t1 = perf_counter()
@@ -256,14 +255,13 @@ class TestCollections:
         # processing_time
         assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
-
     def test_collection_api_eth_suffix(self, test_client):
         response = test_client.post("/find_collections_by_string", json={
-        "query": "australia",
-        "mode": "instant",
-        "max_related_collections": 5,
-        "max_total_collections": 5
-    })
+            "query": "australia",
+            "mode": "instant",
+            "max_related_collections": 5,
+            "max_total_collections": 5
+        })
         assert response.status_code == 200
         response_json = response.json()
         assert all([member_name['name'].endswith('.eth')
@@ -274,3 +272,109 @@ class TestCollections:
         response = test_client.post('/get_collections_membership_count', json={'normalized_name': 'opeth'})
         assert response.status_code == 200
         assert response.json()['count'] >= 0
+
+    # real parameters calls
+    # instant search
+    def test_collection_api_instant_search(self, test_client):
+        response = test_client.post("/find_collections_by_string", json={
+            "query": "australia", #TODO: who will strip .eth?
+            "mode": "instant",
+            "max_related_collections": 15,
+            "min_other_collections": 0,
+            "max_other_collections": 15,
+            "max_total_collections": 15,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+    # domain details
+    def test_collection_api_domain_details(self, test_client):
+        response = test_client.post("/find_collections_by_string", json={
+            "query": "australia", #TODO with or without .eth?
+            "mode": "domain_detail",
+            "max_related_collections": 3,
+            "min_other_collections": 3,
+            "max_other_collections": 3,
+            "max_total_collections": 6,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+        
+    # related collections to normalized name
+    def test_collection_api_domain_details_more(self, test_client):
+        response = test_client.post("/find_collections_by_string", json={
+            "query": "australia", #TODO with or without .eth?
+            "mode": "domain_detail",
+            "max_related_collections": 100,
+            "min_other_collections": 0,
+            "max_other_collections": 0,
+            "max_total_collections": 100,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+    # count membership
+    def test_collection_api_get_collections_membership_count(self, test_client):
+        response = test_client.post("/get_collections_membership_count", json={
+            "normalized_name": "australia", #TODO with or without .eth?
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+    # memebership collections 
+    def test_collection_api_find_collections_membership_list_az(self, test_client):
+        response = test_client.post("/find_collections_membership_list", json={
+            "normalized_name": "australia", #TODO with or without .eth?
+            "sort_order": "A-Z",
+            #TODO add collections limit with default 100?
+            #TODO add limit_names with default 10?
+            #TODO diversity algorithm?
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+        
+    def test_collection_api_find_collections_membership_list_ai(self, test_client):
+        response = test_client.post("/find_collections_membership_list", json={
+            "normalized_name": "australia", #TODO with or without .eth?
+            "sort_order": "AI",
+            #TODO as above
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+    # related collections to collection
+    def test_collection_api_find_collections_by_collection(self, test_client):
+        response = test_client.post("/find_collections_by_collection", json={
+            "collection_id": "Q1510366",
+            "max_related_collections": 15, #TODO
+            "min_other_collections": 0,
+            "max_other_collections": 0, #TODO
+            "max_total_collections": 15, #TODO
+            "name_diversity_ratio": 0.5, #TODO
+            "max_per_type": 3, #TODO
+            "limit_names": 10, #TODO
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
