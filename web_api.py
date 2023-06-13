@@ -160,7 +160,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         max_other_collections=query.max_other_collections,
         max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
-        max_per_type=query.max_per_type,
+        max_per_type=query.max_per_type,  # todo: disable max per type
         limit_names=query.limit_names,
     )
 
@@ -230,6 +230,7 @@ async def find_collections_membership_list(request: CollectionsFeaturingNameRequ
     )
 
     # todo: move sort to ES query
+    # todo: add pagination (later)
     if sort_order == 'A-Z':
         collections_featuring_label.sort(key=lambda x: x['title'])
     elif sort_order == 'Z-A':

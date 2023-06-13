@@ -250,7 +250,7 @@ class TestCollections:
         t1 = perf_counter()
 
         # total_number_of_related_collections
-        assert (response_json['metadata']['total_number_of_related_collections'] >=
+        assert (response_json['metadata']['total_number_of_matched_collections'] >=
                 len(response_json['related_collections']))
 
         # processing_time
