@@ -56,6 +56,28 @@ class Suggestion(BaseModel):
                                          description="if metadata=False this key is absent")
 
 
+# ========================= Collections API models =========================
+
+class CollectionName(BaseModel):
+    name: str = Field(title='name with .eth')
+    namehash: str = Field(title='namehash of the name')
+
+class Collection(BaseModel):
+    title: str = Field(title='title of the collections')
+    names: Optional[list[CollectionName]] = Field(
+        title='names stored in the collection (limited by limit_names)')  # todo: check if optional todo do wyjebvania
+    owner: str = Field(title='ETH address of the collection owner')
+    number_of_names: int = Field(title='total number of names in the collection')
+    rank: Optional[float] = Field(title='rank of the collection')  # ? # todo: check if optional todo do wyjebvania
+    score: Optional[float] = Field(title='Elasticsearch score for the query result')  # ? # todo: check if optional todo do wyjebvania
+    collection_id: str = Field(title='id of the collection')
+
+    last_updated_timestamp: Optional[int] = Field('integer timestamp of last collection update')  # todo: check if optional
+    top_names_list: Optional[list[str]] = Field('top names of the collection')  # todo: check if optional
+
+
+# ======== Collection Search ========
+
 class BaseCollectionSearch(BaseModel):  # instant search, domain details
     max_related_collections: int = Field(3, title='max number of related collections to return')
     min_other_collections: int = Field(3, title='min number of other collections to return')
@@ -79,21 +101,6 @@ class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
     collection_id: str = Field(title='id of the collection used for search')
 
 
-class CollectionName(BaseModel):
-    name: str = Field(title='name with .eth')
-    namehash: str = Field(title='namehash of the name')
-
-
-class Collection(BaseModel):
-    title: str = Field(title='title of the collections')
-    names: list[CollectionName] = Field(title='names stored in the collection (limited by limit_names)')
-    owner: str = Field(title='ETH address of the collection owner')
-    number_of_names: int = Field(title='total number of names in the collection')
-    rank: float = Field(title='rank of the collection')  # ?
-    score: float = Field(title='Elasticsearch score for the query result')  # ?
-    collection_id: str = Field(title='id of the collection')
-
-
 class CollectionSearchResultMetadata(BaseModel):
     total_number_of_related_collections: int = Field(title='number of related collections before trimming the result')
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
@@ -105,26 +112,26 @@ class CollectionSearchResult(BaseModel):
     metadata: CollectionSearchResultMetadata = Field(title='additional information about collection search result')
 
 
-# ============== Collection Membership ==============
+# ======== Collection Membership ========
 
-class CollectionMembershipCountRequest(BaseModel):
-    normalized_name: str = Field(title='normalized name for which collection membership will be checked')
+class CollectionsFeaturingNameCountRequest(BaseModel):
+    label: str = Field(title='name (label) for which collection membership will be checked')
 
-class CollectionCountResult(BaseModel):
+class CollectionsFeaturingNameCountResult(BaseModel):
     count: int = Field(title='count of collections containing input name')
 
-class CollectionMembershipListRequest(BaseModel):
-    normalized_name: str = Field(title='normalized name for which membership will be checked for each collection')
+class CollectionsFeaturingNameRequest(BaseModel):
+    label: str = Field(title='name (label) for which membership will be checked for each collection')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
 
-class MembershipCollection(BaseModel):
-    title: str = Field('title of the collection')
-    owner: str = Field('ETH address of the collection owner')
-    last_updated_timestamp: str = Field('timestamp of last collection update')
-    number_of_names: int = Field('total number of names in the collection')
-    top_names_list: list[str] = Field('top names of the collection')
-    collection_id: str = Field('id of the collection')
+# class MembershipCollection(BaseModel):
+#     title: str = Field('title of the collection')  #
+#     owner: str = Field('ETH address of the collection owner')  #
+#     last_updated_timestamp: str = Field('timestamp of last collection update')
+#     number_of_names: int = Field('total number of names in the collection')  #
+#     top_names_list: list[str] = Field('top names of the collection')
+#     collection_id: str = Field('id of the collection')  #
 
-class CollectionMembershipListResult(BaseModel):
-    collections: list[MembershipCollection] = Field(title='list of public collections the provided name is a member of')
+class CollectionsFeaturingNameResult(BaseModel):
+    collections: list[Collection] = Field(title='list of public collections the provided name is a member of')

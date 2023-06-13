@@ -315,7 +315,7 @@ class CollectionMatcher(metaclass=Singleton):
         return response['count']
 
 
-    def get_collections_membership_list_for_name(self, normalized_name: str, top_n_names: int) -> list:
+    def get_collections_membership_list_for_name(self, normalized_name: str, n_top_names: int) -> list:
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -376,14 +376,17 @@ class CollectionMatcher(metaclass=Singleton):
             }
     )
 
-        found_collections = [
+        found_collections = [  # todo: fill the rest for the collection (names, rank, score)
             {
                 'title': hit['fields']['data.collection_name'][0],
+                # 'names'
                 'owner': hit['fields']['metadata.owner'][0],
-                'last_updated_timestamp': hit['fields']['metadata.modified'][0],
                 'number_of_names': hit['fields']['metadata.members_count'][0],
-                'top_names_list': hit['fields']['names'][:top_n_names],
-                'collection_id': hit['fields']['metadata.id'][0]
+                # 'rank'
+                # 'score'
+                'collection_id': hit['fields']['metadata.id'][0],
+                'last_updated_timestamp': hit['fields']['metadata.modified'][0],
+                'top_names_list': hit['fields']['names'][:n_top_names]
             }
             for hit in response['hits']['hits']
         ]

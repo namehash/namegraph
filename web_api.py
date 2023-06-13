@@ -96,10 +96,10 @@ from models import (
     CollectionSearchResult,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionCountResult,
-    CollectionMembershipCountRequest,
-    CollectionMembershipListResult,
-    CollectionMembershipListRequest
+    CollectionsFeaturingNameCountResult,
+    CollectionsFeaturingNameCountRequest,
+    CollectionsFeaturingNameRequest,
+    CollectionsFeaturingNameResult
 )
 
 
@@ -232,18 +232,18 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return JSONResponse(response)
 
 
-@app.post("/get_collections_membership_count", response_model=CollectionCountResult)
-async def get_collections_membership_count(request: CollectionMembershipCountRequest):
-    count = collections_matcher.get_collections_membership_count_for_name(request.normalized_name)
+@app.post("/get_collections_featuring_name_count", response_model=CollectionsFeaturingNameCountResult)
+async def get_collections_membership_count(request: CollectionsFeaturingNameCountRequest):
+    count = collections_matcher.get_collections_membership_count_for_name(request.label)
     return JSONResponse({'count': count})
 
 
-@app.post("/find_collections_membership_list", response_model=CollectionMembershipListResult)
-async def find_collections_membership_list(request: CollectionMembershipListRequest):
+@app.post("/find_collections_featuring_name", response_model=CollectionsFeaturingNameResult)
+async def find_collections_membership_list(request: CollectionsFeaturingNameRequest):
     sort_order = request.sort_order
     membership_collections = collections_matcher.get_collections_membership_list_for_name(
-        request.normalized_name,
-        top_n_names=15
+        request.label,
+        n_top_names=15
     )
 
     if sort_order == 'A-Z':
@@ -251,7 +251,7 @@ async def find_collections_membership_list(request: CollectionMembershipListRequ
     elif sort_order == 'Z-A':
         membership_collections.sort(key=lambda x: x['title'], reverse=True)
     elif sort_order == 'AI':
-        pass  # todo: for now the same order as for ES query result, change to available ratio
+        pass  # todo: add appropriate "AI" sort in ES query
     else:
         logger.warning(f"Unexpected type of sort_order: '{sort_order}'. Using A-Z order.")
         membership_collections.sort(key=lambda x: x['title'])
