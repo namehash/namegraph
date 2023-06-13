@@ -277,7 +277,7 @@ class TestCollections:
     # instant search
     def test_collection_api_instant_search(self, test_client):
         response = test_client.post("/find_collections_by_string", json={
-            "query": "australia", #TODO: who will strip .eth?
+            "query": "australia", #without .eth #TODO query can't contain "."
             "mode": "instant",
             "max_related_collections": 15,
             "min_other_collections": 0,
@@ -285,7 +285,7 @@ class TestCollections:
             "max_total_collections": 15,
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
-            "limit_names": 10,
+            "limit_names": 10, #can't be greater than 10
         })
 
         assert response.status_code == 200
@@ -295,7 +295,7 @@ class TestCollections:
     # domain details
     def test_collection_api_domain_details(self, test_client):
         response = test_client.post("/find_collections_by_string", json={
-            "query": "australia", #TODO with or without .eth?
+            "query": "australia", #without .eth
             "mode": "domain_detail",
             "max_related_collections": 3,
             "min_other_collections": 3,
@@ -313,25 +313,27 @@ class TestCollections:
     # related collections to normalized name
     def test_collection_api_domain_details_more(self, test_client):
         response = test_client.post("/find_collections_by_string", json={
-            "query": "australia", #TODO with or without .eth?
+            "query": "australia", #without .eth
             "mode": "domain_detail",
             "max_related_collections": 100,
             "min_other_collections": 0,
             "max_other_collections": 0,
             "max_total_collections": 100,
-            "name_diversity_ratio": 0.5,
-            "max_per_type": 3,
+            "name_diversity_ratio": 0.0,
+            "max_per_type": 3, #TODO: disable
             "limit_names": 10,
+            #TODO: add sorting and pagination
+            #TODO: maximum number of results should be 1000, if there is more results then return "1000+" in "number_of_names" field
         })
 
         assert response.status_code == 200
         response_json = response.json()
         print(response_json)
 
-    # count membership
+    # count membership #TODO: won't be used
     def test_collection_api_get_collections_membership_count(self, test_client):
         response = test_client.post("/get_collections_membership_count", json={
-            "normalized_name": "australia", #TODO with or without .eth?
+            "normalized_name": "australia", #TODO change name to "label"
         })
 
         assert response.status_code == 200
@@ -341,11 +343,9 @@ class TestCollections:
     # memebership collections 
     def test_collection_api_find_collections_membership_list_az(self, test_client):
         response = test_client.post("/find_collections_membership_list", json={
-            "normalized_name": "australia", #TODO with or without .eth?
+            "normalized_name": "australia", #without .eth #TODO change name to "label"
             "sort_order": "A-Z",
-            #TODO add collections limit with default 100?
-            #TODO add limit_names with default 10?
-            #TODO diversity algorithm?
+            #TODO: add mode, pagination, limit_names
         })
 
         assert response.status_code == 200
@@ -367,13 +367,13 @@ class TestCollections:
     def test_collection_api_find_collections_by_collection(self, test_client):
         response = test_client.post("/find_collections_by_collection", json={
             "collection_id": "Q1510366",
-            "max_related_collections": 15, #TODO
+            "max_related_collections": 3,
             "min_other_collections": 0,
-            "max_other_collections": 0, #TODO
-            "max_total_collections": 15, #TODO
-            "name_diversity_ratio": 0.5, #TODO
-            "max_per_type": 3, #TODO
-            "limit_names": 10, #TODO
+            "max_other_collections": 3,
+            "max_total_collections": 6,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
         })
 
         assert response.status_code == 200
