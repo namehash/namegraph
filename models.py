@@ -57,17 +57,17 @@ class Suggestion(BaseModel):
 
 
 class BaseCollectionSearch(BaseModel):  # instant search, domain details
-    max_related_collections: int = Field(3, title='max number of related collections to return')
-    min_other_collections: int = Field(3, title='min number of other collections to return')
-    max_other_collections: int = Field(3, title='max number of other collections to return')
-    max_total_collections: int = Field(6, title='max number of total (related + other) collections to return')
+    max_related_collections: int = Field(3, ge=0, title='max number of related collections to return')
+    min_other_collections: int = Field(3, ge=0, title='min number of other collections to return')
+    max_other_collections: int = Field(3, ge=0, title='max number of other collections to return')
+    max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return')
 
     name_diversity_ratio: Optional[float] = Field(
-        0.5,
+        0.5, ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar names to other collections'
     )
     max_per_type: Optional[int] = Field(3, title='number of collections with the same type which are not penalized')
-    limit_names: Optional[int] = Field(50, title='the number of names returned in each collection')
+    limit_names: Optional[int] = Field(50, ge=0, le=10, title='the number of names returned in each collection')
 
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
