@@ -4,7 +4,7 @@ from itertools import cycle, islice
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
-from ..collection import CollectionMatcher
+from ..collection_for_generator import CollectionMatcherForGenerator
 from ..generated_name import GeneratedName
 
 logger = logging.getLogger('generator')
@@ -32,7 +32,7 @@ class CollectionGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__(config)
-        self.collection_matcher = CollectionMatcher(config)
+        self.collection_matcher = CollectionMatcherForGenerator(config)
         self.collections_limit = config.collections.collections_limit
         self.suggestions_limit = config.collections.suggestions_limit
 

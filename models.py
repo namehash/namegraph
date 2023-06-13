@@ -64,16 +64,12 @@ class CollectionName(BaseModel):
 
 class Collection(BaseModel):
     title: str = Field(title='title of the collections')
-    names: Optional[list[CollectionName]] = Field(
-        title='names stored in the collection (limited by limit_names)')  # todo: check if optional todo do wyjebvania
     owner: str = Field(title='ETH address of the collection owner')
     number_of_names: int = Field(title='total number of names in the collection')
-    rank: Optional[float] = Field(title='rank of the collection')  # ? # todo: check if optional todo do wyjebvania
-    score: Optional[float] = Field(title='Elasticsearch score for the query result')  # ? # todo: check if optional todo do wyjebvania
     collection_id: str = Field(title='id of the collection')
-
-    last_updated_timestamp: Optional[int] = Field('integer timestamp of last collection update')  # todo: check if optional
-    top_names_list: Optional[list[str]] = Field('top names of the collection')  # todo: check if optional
+    last_updated_timestamp: int = Field(title='integer timestamp of last collection update')  # todo: add in search
+    top_names_list: list[CollectionName] = Field(
+        title='top names stored in the collection (limited by limit_names)')  # todo: add in search, add CollectionName
 
 
 # ======== Collection Search ========
@@ -91,20 +87,16 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
     max_per_type: Optional[int] = Field(3, title='number of collections with the same type which are not penalized')
     limit_names: Optional[int] = Field(50, title='the number of names returned in each collection')
 
-
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
-
 class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
     collection_id: str = Field(title='id of the collection used for search')
-
 
 class CollectionSearchResultMetadata(BaseModel):
     total_number_of_related_collections: int = Field(title='number of related collections before trimming the result')
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
-
 
 class CollectionSearchResult(BaseModel):
     related_collections: list[Collection] = Field(title='list of related collections')
@@ -115,23 +107,15 @@ class CollectionSearchResult(BaseModel):
 # ======== Collection Membership ========
 
 class CollectionsFeaturingNameCountRequest(BaseModel):
-    label: str = Field(title='name (label) for which collection membership will be checked')
+    label: str = Field(title='label for which collection membership will be checked')
 
 class CollectionsFeaturingNameCountResult(BaseModel):
     count: int = Field(title='count of collections containing input name')
 
 class CollectionsFeaturingNameRequest(BaseModel):
-    label: str = Field(title='name (label) for which membership will be checked for each collection')
+    label: str = Field(title='label for which membership will be checked for each collection')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
-
-# class MembershipCollection(BaseModel):
-#     title: str = Field('title of the collection')  #
-#     owner: str = Field('ETH address of the collection owner')  #
-#     last_updated_timestamp: str = Field('timestamp of last collection update')
-#     number_of_names: int = Field('total number of names in the collection')  #
-#     top_names_list: list[str] = Field('top names of the collection')
-#     collection_id: str = Field('id of the collection')  #
 
 class CollectionsFeaturingNameResult(BaseModel):
     collections: list[Collection] = Field(title='list of public collections the provided name is a member of')

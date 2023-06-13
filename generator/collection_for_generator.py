@@ -1,6 +1,8 @@
+"""Deprecated collection left here for generator purposes."""
+
 from __future__ import annotations
 
-from typing import Any, Union, Iterable, Optional
+from typing import Any, Optional
 from collections import defaultdict
 from operator import itemgetter
 import logging
@@ -16,7 +18,7 @@ from generator.utils import Singleton
 logger = logging.getLogger('generator')
 
 
-class Collection:
+class CollectionForGenerator:
     def __init__(
             self,
             title: str,
@@ -28,8 +30,7 @@ class Collection:
             score: float,
             owner: str,
             number_of_names: int,
-            collection_id: str,
-            # TODO do we need those above? and do we need anything else?
+            collection_id: str
     ):
         self.title = title
         self.names = names
@@ -43,7 +44,7 @@ class Collection:
         self.collection_id = collection_id
 
     @classmethod
-    def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
+    def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> CollectionForGenerator:
         return cls(
             title=hit['fields']['data.collection_name'][0],
             names=hit['fields']['normalized_names'],
@@ -58,7 +59,7 @@ class Collection:
         )
 
 
-class CollectionMatcher(metaclass=Singleton):
+class CollectionMatcherForGenerator(metaclass=Singleton):
     def __init__(self, config: DictConfig):
         self.config = config
         self.tokenizer = WordNinjaTokenizer(config)
@@ -74,7 +75,7 @@ class CollectionMatcher(metaclass=Singleton):
             )
 
             self.active = index_exists(self.elastic, self.index_name)
-            if not self.active:  # TODO should we raise Exception instead?
+            if not self.active:
                 logger.warning(f'Elasticsearch index {self.index_name} does not exist')
 
         except elasticsearch.ConnectionError as ex:
@@ -97,7 +98,7 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: Optional[int] = 50
-    ) -> tuple[list[Collection], dict]:
+    ) -> tuple[list[CollectionForGenerator], dict]:
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
@@ -190,14 +191,14 @@ class CollectionMatcher(metaclass=Singleton):
         hits = response["hits"]["hits"]
         es_response_metadata = {'n_total_hits': response["hits"]['total']['value']}
 
-        collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
+        collections = [CollectionForGenerator.from_elasticsearch_hit(hit) for hit in hits]
 
         if not apply_diversity:
             return collections[:max_limit], es_response_metadata
 
         # diversify collections
         diversified = []
-        penalized_collections: list[tuple[float, Collection]] = []
+        penalized_collections: list[tuple[float, CollectionForGenerator]] = []
 
         # names cover
         used_names = set()
@@ -236,7 +237,7 @@ class CollectionMatcher(metaclass=Singleton):
                 return diversified, es_response_metadata
 
         # if we haven't reached the max limit, pad with penalized collections until we reach the max limit
-        penalized_collections: list[Collection] = [
+        penalized_collections: list[CollectionForGenerator] = [
             collection
             for _, collection in sorted(penalized_collections, key=itemgetter(0), reverse=True)
         ]
@@ -254,7 +255,7 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
-    ) -> tuple[list[Collection], dict]:
+    ) -> tuple[list[CollectionForGenerator], dict]:
 
         if not self.active:
             return [], {}
@@ -275,117 +276,3 @@ class CollectionMatcher(metaclass=Singleton):
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return [], {}
-
-    def search_by_collection(
-            self,
-            collection_id: str,
-            max_related_collections: int = 3,
-            min_other_collections: int = 3,
-            max_other_collections: int = 3,
-            max_total_collections: int = 6,
-            name_diversity_ratio: Optional[float] = 0.5,
-            max_per_type: Optional[int] = 3,
-            limit_names: Optional[int] = 10
-    ) -> tuple[list[Collection], dict]:
-
-        if not self.active:
-            return [], {}
-
-        try:
-            return self._search_related(collection_id, max_related_collections)  # TODO
-        except Exception as ex:
-            logger.warning(f'Elasticsearch search failed: {ex}')
-            return [], {}
-
-    def get_collections_membership_count_for_name(self, normalized_name: str) -> int:
-        response = self.elastic.count(
-            index=self.index_name,
-            body={
-                  "query": {
-                    "bool": {
-                      "filter": [
-                        {"term": {"data.names.normalized_name": normalized_name}},
-                        {"term": {"data.public": True}}
-                      ]
-                    }
-                  }
-                },
-        )
-
-        return response['count']
-
-
-    def get_collections_membership_list_for_name(self, normalized_name: str, n_top_names: int) -> list:
-        response = self.elastic.search(
-            index=self.index_name,
-            body={
-              "query": {
-                "bool": {
-                  "filter": [
-                    {
-                      "term": {
-                        "data.names.normalized_name": normalized_name
-                      }
-                    },
-                    {
-                      "term": {
-                        "data.public": True
-                      }
-                    }
-                  ],
-                  "should": [
-                    {
-                        "rank_feature": {
-                            "field": "metadata.members_count"
-                        }
-                    },
-                    {
-                        "rank_feature": {
-                            "field": "template.members_system_interesting_score_median"
-                        }
-                    },
-                    {
-                        "rank_feature": {
-                            "field": "template.valid_members_ratio"
-                        }
-                    },
-                    {
-                        "rank_feature": {
-                            "field": "template.nonavailable_members_ratio",
-                            "boost": 10
-                        }
-                    }
-                  ]
-                }
-              },
-              "_source": False,
-              "fields": [
-                  "data.collection_name",
-                  "metadata.owner",
-                  "metadata.modified",
-                  "metadata.members_count",
-                  "metadata.id"
-              ],
-              "script_fields": {
-                "names": {
-                  "script": {
-                    "source": f"params['_source'].data.names.stream().map(p -> p.normalized_name).collect(Collectors.toList())"
-                  }
-                }
-              }
-            }
-    )
-
-        found_collections = [  # todo: fill the rest for the collection (names, rank, score)
-            {
-                'title': hit['fields']['data.collection_name'][0],
-                'owner': hit['fields']['metadata.owner'][0],
-                'number_of_names': hit['fields']['metadata.members_count'][0],
-                'collection_id': hit['fields']['metadata.id'][0],
-                'last_updated_timestamp': hit['fields']['metadata.modified'][0],
-                'top_names': hit['fields']['names'][:n_top_names]
-            }
-            for hit in response['hits']['hits']
-        ]
-
-        return found_collections
