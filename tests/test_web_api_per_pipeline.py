@@ -268,7 +268,7 @@ class TestCollections:
         response_json = response.json()
         assert all([member_name['name'].endswith('.eth')
                     for collection in response_json['related_collections'] + response_json['other_collections']
-                    for member_name in collection['names']])
+                    for member_name in collection['top_names']])
 
     def test_collection_api_membership_count(self, test_client):
         response = test_client.post('/get_collections_featuring_name_count', json={'label': 'opeth'})

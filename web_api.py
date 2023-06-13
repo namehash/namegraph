@@ -84,22 +84,19 @@ def seed_all(seed: int | str):
 generator = init()
 inspector = init_inspector()
 
-# TODO move this elsewhere, temporary for now
-collections_matcher = CollectionMatcher(generator.config)
-
 domains = Domains(generator.config)
 categories = Categories(generator.config)
 
 from models import (
     Name,
     Suggestion,
-    CollectionSearchResult,
+    CollectionSearchResponse,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionsFeaturingNameCountResult,
+    CollectionsFeaturingNameCountResponse,
     CollectionsFeaturingNameCountRequest,
     CollectionsFeaturingNameRequest,
-    CollectionsFeaturingNameResult
+    CollectionsFeaturingNameResponse
 )
 
 
@@ -146,7 +143,12 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_string", response_model=CollectionSearchResult)
+# ========================= Collections API =========================
+
+collections_matcher = CollectionMatcher(generator.config)
+
+
+@app.post("/find_collections_by_string", response_model=CollectionSearchResponse)
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
@@ -161,24 +163,11 @@ async def find_collections_by_string(query: CollectionSearchByString):
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
-    collections = [
-        {
-            'title': collection.title,
-            'names': [{
-                'name': name + '.eth',
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
-            'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
-            'collection_id': collection.collection_id,
-        }
-        for collection in collections
-    ]
 
     time_elapsed = (perf_counter() - t_before) * 1000
   
     metadata = {
-        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed
     }
 
@@ -188,7 +177,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_collection", response_model=CollectionSearchResult)
+@app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     t_before = perf_counter()
 
@@ -202,24 +191,11 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
-    collections = [
-        {
-            'title': collection.title,
-            'names': [{
-                'name': name + '.eth',
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
-            'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
-            'collection_id': collection.collection_id,
-        }
-        for collection in collections
-    ]
     
     time_elapsed = (perf_counter() - t_before) * 1000
   
     metadata = {
-        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed
     }
 
@@ -228,28 +204,47 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return JSONResponse(response)
 
 
-@app.post("/get_collections_featuring_name_count", response_model=CollectionsFeaturingNameCountResult)
+@app.post("/get_collections_featuring_name_count", response_model=CollectionsFeaturingNameCountResponse)
 async def get_collections_membership_count(request: CollectionsFeaturingNameCountRequest):
+    t_before = perf_counter()
+
     count = collections_matcher.get_collections_membership_count_for_name(request.label)
-    return JSONResponse({'count': count})
+
+    time_elapsed = (perf_counter() - t_before) * 1000
+
+    metadata = {
+        'processing_time_ms': time_elapsed
+    }
+
+    return JSONResponse({'count': count, 'metadata': metadata})
 
 
-@app.post("/find_collections_featuring_name", response_model=CollectionsFeaturingNameResult)
+@app.post("/find_collections_featuring_name", response_model=CollectionsFeaturingNameResponse)
 async def find_collections_membership_list(request: CollectionsFeaturingNameRequest):
+    t_before = perf_counter()
+
     sort_order = request.sort_order
-    membership_collections = collections_matcher.get_collections_membership_list_for_name(
+    collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
         request.label,
-        n_top_names=15
+        n_top_names=request.limit_names
     )
 
+    # todo: move sort to ES query
     if sort_order == 'A-Z':
-        membership_collections.sort(key=lambda x: x['title'])
+        collections_featuring_label.sort(key=lambda x: x['title'])
     elif sort_order == 'Z-A':
-        membership_collections.sort(key=lambda x: x['title'], reverse=True)
+        collections_featuring_label.sort(key=lambda x: x['title'], reverse=True)
     elif sort_order == 'AI':
-        pass  # todo: add appropriate "AI" sort in ES query
+        pass
     else:
         logger.warning(f"Unexpected type of sort_order: '{sort_order}'. Using A-Z order.")
-        membership_collections.sort(key=lambda x: x['title'])
+        collections_featuring_label.sort(key=lambda x: x['title'])
 
-    return JSONResponse({'collections': membership_collections})
+    time_elapsed = (perf_counter() - t_before) * 1000
+
+    metadata = {
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
+        'processing_time_ms': time_elapsed
+    }
+
+    return JSONResponse({'collections': collections_featuring_label, 'metadata': metadata})

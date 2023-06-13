@@ -67,9 +67,18 @@ class Collection(BaseModel):
     owner: str = Field(title='ETH address of the collection owner')
     number_of_names: int = Field(title='total number of names in the collection')
     collection_id: str = Field(title='id of the collection')
-    last_updated_timestamp: int = Field(title='integer timestamp of last collection update')  # todo: add in search
-    top_names_list: list[CollectionName] = Field(
-        title='top names stored in the collection (limited by limit_names)')  # todo: add in search, add CollectionName
+    last_updated_timestamp: int = Field(title='integer timestamp of last collection update')
+    top_names: list[CollectionName] = Field(
+        title='top names stored in the collection (limited by limit_names)')
+    types: list[str] = Field(title='list of types to which the collection belongs')
+
+class CollectionQueryMetadata(BaseModel):
+    total_number_of_matched_collections: Optional[int] = Field(
+        title='number of matched collections before trimming the result')
+    processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
+
+class BaseCollectionQueryResponse(BaseModel):
+    metadata: CollectionQueryMetadata = Field(title='additional information about collection query')
 
 
 # ======== Collection Search ========
@@ -85,7 +94,7 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
         title='similarity value used for adding penalty to collections with similar names to other collections'
     )
     max_per_type: Optional[int] = Field(3, title='number of collections with the same type which are not penalized')
-    limit_names: Optional[int] = Field(50, title='the number of names returned in each collection')
+    limit_names: Optional[int] = Field(10, title='the number of names returned in each collection')
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections')
@@ -94,14 +103,9 @@ class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain 
 class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
     collection_id: str = Field(title='id of the collection used for search')
 
-class CollectionSearchResultMetadata(BaseModel):
-    total_number_of_related_collections: int = Field(title='number of related collections before trimming the result')
-    processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
-
-class CollectionSearchResult(BaseModel):
+class CollectionSearchResponse(BaseCollectionQueryResponse):
     related_collections: list[Collection] = Field(title='list of related collections')
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
-    metadata: CollectionSearchResultMetadata = Field(title='additional information about collection search result')
 
 
 # ======== Collection Membership ========
@@ -109,13 +113,14 @@ class CollectionSearchResult(BaseModel):
 class CollectionsFeaturingNameCountRequest(BaseModel):
     label: str = Field(title='label for which collection membership will be checked')
 
-class CollectionsFeaturingNameCountResult(BaseModel):
+class CollectionsFeaturingNameCountResponse(BaseCollectionQueryResponse):
     count: int = Field(title='count of collections containing input name')
 
 class CollectionsFeaturingNameRequest(BaseModel):
     label: str = Field(title='label for which membership will be checked for each collection')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
+    limit_names: Optional[int] = Field(10, title='the number of names returned in each collection')
 
-class CollectionsFeaturingNameResult(BaseModel):
+class CollectionsFeaturingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided name is a member of')

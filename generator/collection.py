@@ -96,7 +96,7 @@ class CollectionMatcher(metaclass=Singleton):
             max_limit: int,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
-            limit_names: Optional[int] = 50
+            limit_names: Optional[int] = 10
     ) -> tuple[list[Collection], dict]:
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
@@ -254,7 +254,7 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
-    ) -> tuple[list[Collection], dict]:
+    ) -> tuple[list[dict], dict]:
 
         if not self.active:
             return [], {}
@@ -265,13 +265,31 @@ class CollectionMatcher(metaclass=Singleton):
             query = f'{query} {tokenized_query}'
 
         try:
-            return self._search_related(
+            collections, es_response_metadata =  self._search_related(
                 query=query,
                 max_limit=max_related_collections,
                 name_diversity_ratio=name_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names
             )
+
+            collections_records = [
+                {
+                    'title': collection.title,
+                    'owner': collection.owner,
+                    'number_of_names': collection.number_of_names,
+                    'collection_id': collection.collection_id,
+                    'last_updated_timestamp': 12345,  # todo: find timestamp
+                    'top_names': [{
+                        'name': name + '.eth',
+                        'namehash': namehash,
+                    } for name, namehash in zip(collection.names, collection.namehashes)],
+                    'types': []  # todo: find types
+                }
+                for collection in collections
+            ]
+            return collections_records, es_response_metadata
+
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return [], {}
@@ -286,13 +304,31 @@ class CollectionMatcher(metaclass=Singleton):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
-    ) -> tuple[list[Collection], dict]:
+    ) -> tuple[list[dict], dict]:
 
         if not self.active:
             return [], {}
 
         try:
-            return self._search_related(collection_id, max_related_collections)  # TODO
+            collections, es_response_metadata = self._search_related(collection_id, max_related_collections)
+
+            collections_records = [
+                {
+                    'title': collection.title,
+                    'owner': collection.owner,
+                    'number_of_names': collection.number_of_names,
+                    'collection_id': collection.collection_id,
+                    'last_updated_timestamp': 12345,  # todo: find timestamp
+                    'top_names': [{
+                        'name': name + '.eth',
+                        'namehash': namehash,
+                    } for name, namehash in zip(collection.names, collection.namehashes)],
+                    'types': []  # todo: find types
+                }
+                for collection in collections
+            ]
+            return collections_records, es_response_metadata
+
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
             return [], {}
@@ -309,13 +345,12 @@ class CollectionMatcher(metaclass=Singleton):
                       ]
                     }
                   }
-                },
+                }
         )
-
         return response['count']
 
 
-    def get_collections_membership_list_for_name(self, normalized_name: str, n_top_names: int) -> list:
+    def get_collections_membership_list_for_name(self, normalized_name: str, n_top_names: int) -> tuple[list, dict]:
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -376,16 +411,23 @@ class CollectionMatcher(metaclass=Singleton):
             }
     )
 
-        found_collections = [  # todo: fill the rest for the collection (names, rank, score)
+        collections_records = [
             {
                 'title': hit['fields']['data.collection_name'][0],
                 'owner': hit['fields']['metadata.owner'][0],
                 'number_of_names': hit['fields']['metadata.members_count'][0],
                 'collection_id': hit['fields']['metadata.id'][0],
                 'last_updated_timestamp': hit['fields']['metadata.modified'][0],
-                'top_names': hit['fields']['names'][:n_top_names]
+                'top_names': [
+                    {
+                    'name': name + '.eth',
+                    'namehash': namehash
+                    } for name, namehash in zip(hit['fields']['names'][:n_top_names],
+                                                hit['fields']['names'][:n_top_names])],  # todo: find namehashes
+                'types': []  # todo: find types
             }
             for hit in response['hits']['hits']
         ]
 
-        return found_collections
+        es_response_metadata = {'n_total_hits': response["hits"]['total']['value']}
+        return collections_records, es_response_metadata
