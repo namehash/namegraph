@@ -97,7 +97,8 @@ class CollectionMatcher(metaclass=Singleton):
             max_limit: int,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
-            limit_names: Optional[int] = 50
+            limit_names: Optional[int] = 50,
+            get_tokens: bool = False,
     ) -> tuple[list[Collection], dict]:
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
@@ -106,88 +107,89 @@ class CollectionMatcher(metaclass=Singleton):
         names_field = 'names' if limit_names is None or limit_names > 10 else 'top10_names'
         limit_names_script = f"params['_source'].template.{names_field}.stream(){limit_names_subscript}"
 
-        response = self.elastic.search(
-            index=self.index_name,
-            body={
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "multi_match": {
-                                    "query": query,
-                                    "fields": [
-                                        "data.collection_name^3",
-                                        "data.collection_name.exact^3",
-                                        # "data.collection_description^2",
-                                        "data.collection_keywords^2",
-                                        "data.names.normalized_name",
-                                        "data.names.tokenized_name",
-                                    ],
-                                    "type": "cross_fields",
-                                }
+        body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": [
+                                    "data.collection_name^3",
+                                    "data.collection_name.exact^3",
+                                    # "data.collection_description^2",
+                                    "data.collection_keywords^2",
+                                    "data.names.normalized_name",
+                                    "data.names.tokenized_name",
+                                ],
+                                "type": "cross_fields",
                             }
-                        ],
-                        "should": [
-                            {
-                                "rank_feature": {
-                                    "field": "template.collection_rank",
-                                    "boost": 100,
-                                    # "log": {
-                                    #     "scaling_factor": 4
-                                    # }
-                                }
-                            },
-                            {
-                                "rank_feature": {
-                                    "field": "metadata.members_count",
-                                }
+                        }
+                    ],
+                    "should": [
+                        {
+                            "rank_feature": {
+                                "field": "template.collection_rank",
+                                "boost": 100,
+                                # "log": {
+                                #     "scaling_factor": 4
+                                # }
                             }
-                        ]
-                    }
+                        },
+                        {
+                            "rank_feature": {
+                                "field": "metadata.members_count",
+                            }
+                        }
+                    ]
+                }
 
+            },
+            "size": max_limit if not apply_diversity else max_limit * 3,
+            "fields": [
+                "data.collection_name",
+                "template.collection_rank",
+                "metadata.owner",
+                "metadata.members_count",
+                "metadata.id",
+            ],
+            "_source": False,
+            "script_fields": {
+                "normalized_names": {
+                    "script": {
+                        "source": limit_names_script \
+                                  + ".map(p -> p.normalized_name)" \
+                                  + ".collect(Collectors.toList())"
+                    }
                 },
-                "size": max_limit if not apply_diversity else max_limit * 3,
-                "fields": [
-                    "data.collection_name",
-                    "template.collection_rank",
-                    "metadata.owner",
-                    "metadata.members_count",
-                    "metadata.id",
-                ],
-                "_source": False,
-                "script_fields": {
-                    "normalized_names": {
-                        "script": {
-                            "source": limit_names_script \
-                                      + ".map(p -> p.normalized_name)" \
-                                      + ".collect(Collectors.toList())"
-                        }
-                    },
-                    "namehashes": {
-                        "script": {
-                            "source": limit_names_script \
-                                      + ".map(p -> p.namehash)" \
-                                      + ".collect(Collectors.toList())"
-                        }
-                    },
-                    # "tokenized_names": {
-                    #     "script": {
-                    #         "source": f"params['_source'].data.names.stream()" \
-                    #                   + limit_names_script \
-                    #                   + ".map(p -> p.tokenized_name)" \
-                    #                   + ".collect(Collectors.toList())"
-                    #     }
-                    # },
-                    "collection_types": {
-                        "script": {
-                            "source": "params['_source'].template.collection_types.stream()"
-                                      ".map(p -> p[0])"
-                                      ".collect(Collectors.toList())"
-                        }
+                "namehashes": {
+                    "script": {
+                        "source": limit_names_script \
+                                  + ".map(p -> p.namehash)" \
+                                  + ".collect(Collectors.toList())"
+                    }
+                },
+                "collection_types": {
+                    "script": {
+                        "source": "params['_source'].template.collection_types.stream()"
+                                  ".map(p -> p[0])"
+                                  ".collect(Collectors.toList())"
                     }
                 }
-            },
-        )
+            }
+        }
+
+        if get_tokens:
+            body['script_fields']['tokenized_names'] = {
+                "script": {
+                    "source": "params['_source'].data.names.stream()" \
+                              + limit_names_subscript \
+                              + ".map(p -> p.tokenized_name)" \
+                              + ".collect(Collectors.toList())"
+                }
+            }
+
+        response = self.elastic.search(index=self.index_name, body=body)
 
         hits = response["hits"]["hits"]
         es_response_metadata = {
@@ -258,7 +260,8 @@ class CollectionMatcher(metaclass=Singleton):
             max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
-            limit_names: Optional[int] = 10
+            limit_names: Optional[int] = 10,
+            get_tokens: bool = False,
     ) -> tuple[list[Collection], dict]:
 
         if not self.active:
@@ -275,7 +278,8 @@ class CollectionMatcher(metaclass=Singleton):
                 max_limit=max_related_collections,
                 name_diversity_ratio=name_diversity_ratio,
                 max_per_type=max_per_type,
-                limit_names=limit_names
+                limit_names=limit_names,
+                get_tokens=get_tokens,
             )
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed: {ex}')
