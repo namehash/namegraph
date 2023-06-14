@@ -188,7 +188,10 @@ class CollectionMatcher(metaclass=Singleton):
         )
 
         hits = response["hits"]["hits"]
-        es_response_metadata = {'n_total_hits': response["hits"]['total']['value']}
+        es_response_metadata = {
+            'n_total_hits': response["hits"]['total']['value'],
+            'took': response['took'],
+        }
 
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
 
