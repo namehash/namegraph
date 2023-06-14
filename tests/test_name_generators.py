@@ -602,7 +602,6 @@ def test_easteregg_generator():
 
 
 @pytest.mark.integration_test
-@pytest.mark.xfail
 def test_collection_generator():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")

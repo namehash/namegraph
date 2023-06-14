@@ -38,9 +38,12 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
-        # FIXME make a new method for this generator, `search_by_string` does not get the tokens
-        collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
-                                                               max_related_collections=self.collections_limit)
+        collections, _ = self.collection_matcher.search_by_string(
+            ' '.join(tokens),
+            mode='instant',
+            max_related_collections=self.collections_limit,
+            get_tokens=True
+        )
 
         for collection in collections:
             logger.info(f'Collection: {collection.title} score: {collection.score} names: {len(collection.names)}')
@@ -58,9 +61,12 @@ class CollectionGenerator(NameGenerator):
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        # FIXME make a new method for this generator, `search_by_string` does not get the tokens
-        collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
-                                                               max_related_collections=self.collections_limit)
+        collections, _ = self.collection_matcher.search_by_string(
+            ' '.join(tokens),
+            mode='instant',
+            max_related_collections=self.collections_limit,
+            get_tokens=True
+        )
         # TODO round robin? weighted sampling?
         return [
             name_tokens

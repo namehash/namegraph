@@ -225,7 +225,6 @@ def collection_test_pipelines():
 @mark.usefixtures("collection_test_pipelines")
 @mark.integration_test
 class TestCollections:
-    @mark.xfail
     def test_metadata_collection_field(self, test_client):
         response = test_client.post("/", json={"name": "pinkfloyd"})
         assert response.status_code == 200
