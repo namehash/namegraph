@@ -38,11 +38,9 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
-        collections, _ = self.collection_matcher.search_by_string(
-            ' '.join(tokens),
-            mode='instant',
+        collections, _ = self.collection_matcher.search_for_generator(
+            tokens,
             max_related_collections=self.collections_limit,
-            get_tokens=True
         )
 
         for collection in collections:
@@ -61,11 +59,9 @@ class CollectionGenerator(NameGenerator):
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        collections, _ = self.collection_matcher.search_by_string(
-            ' '.join(tokens),
-            mode='instant',
+        collections, _ = self.collection_matcher.search_for_generator(
+            tokens,
             max_related_collections=self.collections_limit,
-            get_tokens=True
         )
         # TODO round robin? weighted sampling?
         return [
