@@ -87,6 +87,16 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=5, help='repeats')
     args = parser.parse_args()
 
+    all_none_latencies = []
+    all_names_cover_latencies = []
+    all_types_cover_latencies = []
+    all_combined_latencies = []
+
+    all_none_tooks = []
+    all_names_cover_tooks = []
+    all_types_cover_tooks = []
+    all_combined_tooks = []
+
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
@@ -102,7 +112,7 @@ if __name__ == '__main__':
 
         for _ in range(args.repeats):
             none, none_latency, none_took = \
-                search_with_latency(query, args.limit, None, None, None, host=args.host, port=args.port)
+                search_with_latency(query, args.limit, None, None, args.limit_names, host=args.host, port=args.port)
             names_cover, names_cover_latency, names_cover_took = \
                 search_with_latency(query, args.limit, 0.5, None, args.limit_names, host=args.host, port=args.port)
             types_cover, types_cover_latency, types_cover_took = \
@@ -119,6 +129,16 @@ if __name__ == '__main__':
             names_cover_tooks.append(names_cover_took)
             types_cover_tooks.append(types_cover_took)
             combined_tooks.append(combined_took)
+
+        all_none_latencies.extend(none_latencies)
+        all_names_cover_latencies.extend(names_cover_latencies)
+        all_types_cover_latencies.extend(types_cover_latencies)
+        all_combined_latencies.extend(combined_latencies)
+
+        all_none_tooks.extend(none_tooks)
+        all_names_cover_tooks.extend(names_cover_tooks)
+        all_types_cover_tooks.extend(types_cover_tooks)
+        all_combined_tooks.extend(combined_tooks)
 
         same = none == names_cover == types_cover == combined
         print(f'<h2>{"same" if same else "diversified"}</h2>')
@@ -164,3 +184,20 @@ if __name__ == '__main__':
             )
             print()
         print('</table>')
+
+    print(f'<h2>all times aggregated</h2>')
+    print('<table>')
+    print(f'<tr><th width="15%">none '
+            f'{np.mean(all_none_latencies):.3f} ± {np.std(all_none_latencies):.1f}ms'
+            f' | took {np.mean(all_none_tooks):.3f} ± {np.std(all_none_tooks):.1f}ms</th>')
+    print(f'<th width="15%">names-cover 🔴 '
+            f'{np.mean(all_names_cover_latencies):.3f} ± {np.std(all_names_cover_latencies):.1f}ms'
+            f' | took {np.mean(all_names_cover_tooks):.3f} ± {np.std(all_names_cover_tooks):.1f}ms</th>')
+    print(f'<th width="15%">types-cover 🔵 '
+            f'{np.mean(all_types_cover_latencies):.3f} ± {np.std(all_types_cover_latencies):.1f}ms'
+            f' | took {np.mean(all_types_cover_tooks):.3f} ± {np.std(all_types_cover_tooks):.1f}ms</th>')
+    print(f'<th width="15%">all 🟢 '
+            f'{np.mean(all_combined_latencies):.3f} ± {np.std(all_combined_latencies):.1f}ms'
+            f' | took {np.mean(all_combined_tooks):.3f} ± {np.std(all_combined_tooks):.1f}ms</th>')
+    print(f'<th>empty</th></tr>')
+    print('</table>')

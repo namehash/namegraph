@@ -94,6 +94,12 @@ if __name__ == '__main__':
 
     names_limits = [None] + args.names_limits
 
+    all_none_latencies = []
+    all_names_covers_latencies = [[] for _ in names_limits]
+
+    all_none_tooks = []
+    all_names_covers_tooks = [[] for _ in names_limits]
+
     for query in tqdm.tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
@@ -116,6 +122,11 @@ if __name__ == '__main__':
                 names_covers_latencies[i].append(latency)
                 names_covers_tooks[i].append(took)
 
+        all_none_latencies.extend(none_latencies)
+        all_none_tooks.extend(none_tooks)
+        for i, (latency, took) in enumerate(zip(names_covers_latencies, names_covers_tooks)):
+            all_names_covers_latencies[i].extend(latency)
+            all_names_covers_tooks[i].extend(took)
 
         names_cover_stayed = [len(res) - len(set(res) - set(none)) for (res, _, _) in names_cover]
 
@@ -150,3 +161,16 @@ if __name__ == '__main__':
             print('<td></td></tr>')
 
         print('</table>')
+
+    print(f'<h2>all times aggregated</h2>')
+    print('<table>')
+    print(f'<tr><th width="15%">none {np.mean(all_none_latencies):.3f} ± {np.std(all_none_latencies):.1f}ms</th>', end='')
+    for limit, identifier, latencies, tooks in zip(names_limits, identifiers, all_names_covers_latencies, all_names_covers_tooks):
+        latency = np.mean(latencies)
+        latency_std = np.std(latencies)
+        took = np.mean(tooks)
+        took_std = np.std(tooks)
+        print(f'<th width="10%">names-cover {limit} {identifier} {latency:.3f} ± {latency_std:.1f}ms '
+              f'| took {took:.3f} ± {took_std:.1f}ms</th>', end='')
+    print(f'<th>empty</th></tr>')
+    print('</table>')

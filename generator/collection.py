@@ -103,7 +103,7 @@ class CollectionMatcher(metaclass=Singleton):
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
         limit_names_subscript = f'.limit({limit_names})' if limit_names is not None else ''
-        names_field = 'names' if limit_names > 10 else 'top10_names'
+        names_field = 'names' if limit_names is None or limit_names > 10 else 'top10_names'
         limit_names_script = f"params['_source'].template.{names_field}.stream(){limit_names_subscript}"
 
         response = self.elastic.search(
