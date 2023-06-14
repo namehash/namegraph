@@ -178,7 +178,8 @@ async def find_collections_by_string(query: CollectionSearchByString):
   
     metadata = {
         'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
-        'processing_time_ms': time_elapsed
+        'processing_time_ms': time_elapsed,
+        'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
 
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
@@ -191,7 +192,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     t_before = perf_counter()
 
-    collections, es_search_metadata  = collections_matcher.search_by_collection(
+    collections, es_search_metadata = collections_matcher.search_by_collection(
         query.collection_id,
         max_related_collections=query.max_related_collections,
         min_other_collections=query.min_other_collections,
@@ -221,7 +222,8 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
   
     metadata = {
         'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
-        'processing_time_ms': time_elapsed
+        'processing_time_ms': time_elapsed,
+        'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
 
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
