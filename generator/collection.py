@@ -22,7 +22,7 @@ class Collection:
             title: str,
             names: list[str],
             namehashes: list[str],
-            tokenized_names: list[tuple[str]],
+            tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
             rank: float,
             score: float,
@@ -48,7 +48,8 @@ class Collection:
             title=hit['fields']['data.collection_name'][0],
             names=hit['fields']['normalized_names'],
             namehashes=hit['fields']['namehashes'],
-            tokenized_names=[tuple(tokens) for tokens in hit['fields']['tokenized_names']],
+            tokenized_names=[tuple(tokens) for tokens in hit['fields']['tokenized_names']] \
+                if 'tokenized_names' in hit['fields'] else None,
             name_types=hit['fields']['collection_types'],
             rank=hit['fields']['template.collection_rank'][0],
             score=hit['_score'],
@@ -101,7 +102,10 @@ class CollectionMatcher(metaclass=Singleton):
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
-        limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
+        limit_names_subscript = f'.limit({limit_names})' if limit_names is not None else ''
+        names_field = 'names' if limit_names > 10 else 'top10_names'
+        limit_names_script = f"params['_source'].template.{names_field}.stream(){limit_names_subscript}"
+
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -154,28 +158,26 @@ class CollectionMatcher(metaclass=Singleton):
                 "script_fields": {
                     "normalized_names": {
                         "script": {
-                            "source": f"params['_source'].data.names.stream()" \
-                                      + limit_names_script \
+                            "source": limit_names_script \
                                       + ".map(p -> p.normalized_name)" \
                                       + ".collect(Collectors.toList())"
                         }
                     },
                     "namehashes": {
                         "script": {
-                            "source": f"params['_source'].template.names.stream()" \
-                                      + limit_names_script \
+                            "source": limit_names_script \
                                       + ".map(p -> p.namehash)" \
                                       + ".collect(Collectors.toList())"
                         }
                     },
-                    "tokenized_names": {
-                        "script": {
-                            "source": f"params['_source'].data.names.stream()" \
-                                      + limit_names_script \
-                                      + ".map(p -> p.tokenized_name)" \
-                                      + ".collect(Collectors.toList())"
-                        }
-                    },
+                    # "tokenized_names": {
+                    #     "script": {
+                    #         "source": f"params['_source'].data.names.stream()" \
+                    #                   + limit_names_script \
+                    #                   + ".map(p -> p.tokenized_name)" \
+                    #                   + ".collect(Collectors.toList())"
+                    #     }
+                    # },
                     "collection_types": {
                         "script": {
                             "source": "params['_source'].template.collection_types.stream()"
@@ -304,15 +306,15 @@ class CollectionMatcher(metaclass=Singleton):
         response = self.elastic.count(
             index=self.index_name,
             body={
-                  "query": {
+                "query": {
                     "bool": {
-                      "filter": [
-                        {"term": {"data.names.normalized_name": normalized_name}},
-                        {"term": {"data.public": True}}
-                      ]
+                        "filter": [
+                            {"term": {"data.names.normalized_name": normalized_name}},
+                            {"term": {"data.public": True}}
+                        ]
                     }
-                  }
-                },
+                }
+            },
         )
 
         return response['count']

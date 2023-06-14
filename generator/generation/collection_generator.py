@@ -38,6 +38,7 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
+        # FIXME make a new method for this generator, `search_by_string` does not get the tokens
         collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
                                                                max_related_collections=self.collections_limit)
 
@@ -57,6 +58,7 @@ class CollectionGenerator(NameGenerator):
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        # FIXME make a new method for this generator, `search_by_string` does not get the tokens
         collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
                                                                max_related_collections=self.collections_limit)
         # TODO round robin? weighted sampling?
