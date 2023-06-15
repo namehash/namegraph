@@ -65,7 +65,7 @@ class CollectionName(BaseModel):
 class Collection(BaseModel):
     title: str = Field(title='title of the collections')
     owner: str = Field(title='ETH address of the collection owner')
-    number_of_names: int | str = Field(title='total number of names in the collection (or "+1000" string')
+    number_of_names: int = Field(title='total number of names in the collection')
     collection_id: str = Field(title='id of the collection')
     last_updated_timestamp: int = Field(title='integer timestamp of last collection update')
     top_names: list[CollectionName] = Field(
@@ -74,7 +74,7 @@ class Collection(BaseModel):
  
 class CollectionResultMetadata(BaseModel):
     total_number_of_matched_collections: Optional[int] = Field(
-        title='number of matched collections before trimming the result')
+        title='number of matched collections before trimming the result or "+1000" if more than 1000 results') #TODO
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
 
 class BaseCollectionQueryResponse(BaseModel):
@@ -93,7 +93,7 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
         0.5, ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar names to other collections'
     )
-    limit_names: Optional[int] = Field(10, ge=0, le=10, title='the number of names returned in each collection')
+    limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection')
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',

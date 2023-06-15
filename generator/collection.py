@@ -281,7 +281,7 @@ class CollectionMatcher(metaclass=Singleton):
                 {
                     'title': collection.title,
                     'owner': collection.owner,
-                    'number_of_names': collection.number_of_names if collection.number_of_names <= 1000 else '+1000',
+                    'number_of_names': collection.number_of_names,
                     'collection_id': collection.collection_id,
                     'last_updated_timestamp': collection.modified_timestamp,
                     'top_names': [{
@@ -320,7 +320,7 @@ class CollectionMatcher(metaclass=Singleton):
                 {
                     'title': collection.title,
                     'owner': collection.owner,
-                    'number_of_names': collection.number_of_names if collection.number_of_names <= 1000 else '+1000',
+                    'number_of_names': collection.number_of_names,
                     'collection_id': collection.collection_id,
                     'last_updated_timestamp':  collection.modified_timestamp,
                     'top_names': [{
@@ -442,8 +442,7 @@ class CollectionMatcher(metaclass=Singleton):
                 'owner': hit['fields']['metadata.owner'][0],
                 'number_of_names': hit['fields']['metadata.members_count'][0],
                 'collection_id': hit['fields']['metadata.id'][0],
-                'last_updated_timestamp': hit['fields']['metadata.modified'][0] \
-                    if hit['fields']['metadata.members_count'][0] <= 1000 else '+1000',
+                'last_updated_timestamp': hit['fields']['metadata.modified'][0],
                 'top_names': [
                     {
                     'name': name + '.eth',
