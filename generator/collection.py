@@ -98,11 +98,11 @@ class CollectionMatcher(metaclass=Singleton):
             query: str,
             max_limit: int,
             name_diversity_ratio: Optional[float] = None,
- #           max_per_type: Optional[int] = None,  # todo: can it be removed?
+            max_per_type: Optional[int] = None,
             limit_names: Optional[int] = 10
     ) -> tuple[list[Collection], dict]:
 
-        apply_diversity = name_diversity_ratio is not None
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
         limit_names_script = f'.limit({limit_names})' if limit_names is not None else ''
         response = self.elastic.search(
@@ -220,18 +220,18 @@ class CollectionMatcher(metaclass=Singleton):
                     penalized_collections.append((collection.score * 0.8, collection))
                     continue
 
-            # if max_per_type is not None:
-            #     # if any of the types has occurred more than `max_per_type` times, penalize the collection
-            #     if all([
-            #         used_types[name_type] < max_per_type
-            #         for name_type in collection.name_types
-            #     ]):
-            #
-            #         for name_type in collection.name_types:
-            #             used_types[name_type] += 1
-            #     else:
-            #         penalized_collections.append((collection.score, collection))
-            #         continue
+            if max_per_type is not None:
+                # if any of the types has occurred more than `max_per_type` times, penalize the collection
+                if all([
+                    used_types[name_type] < max_per_type
+                    for name_type in collection.name_types
+                ]):
+
+                    for name_type in collection.name_types:
+                        used_types[name_type] += 1
+                else:
+                    penalized_collections.append((collection.score, collection))
+                    continue
 
             diversified.append(collection)
 
@@ -256,6 +256,7 @@ class CollectionMatcher(metaclass=Singleton):
             max_other_collections: int = 3,
             max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
+            max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
     ) -> tuple[list[dict], dict]:
 
@@ -272,6 +273,7 @@ class CollectionMatcher(metaclass=Singleton):
                 query=query,
                 max_limit=max_related_collections,
                 name_diversity_ratio=name_diversity_ratio,
+                max_per_type=max_per_type,
                 limit_names=limit_names
             )
 
@@ -304,6 +306,7 @@ class CollectionMatcher(metaclass=Singleton):
             max_other_collections: int = 3,
             max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
+            max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
     ) -> tuple[list[dict], dict]:
 
