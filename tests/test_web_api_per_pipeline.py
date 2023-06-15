@@ -249,9 +249,13 @@ class TestCollections:
         response_json = response.json()
         t1 = perf_counter()
 
-        # total_number_of_related_collections
-        assert (response_json['metadata']['total_number_of_matched_collections'] >=
-                len(response_json['related_collections']))
+        # total_number_of_matched_collections
+        number_of_matched = response_json['metadata']['total_number_of_matched_collections']
+        if isinstance(number_of_matched, int):
+            assert (response_json['metadata']['total_number_of_matched_collections'] >=
+                    len(response_json['related_collections']))
+        else:
+            assert number_of_matched == '+1000'
 
         # processing_time
         assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000

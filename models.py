@@ -65,7 +65,7 @@ class CollectionName(BaseModel):
 class Collection(BaseModel):
     title: str = Field(title='title of the collections')
     owner: str = Field(title='ETH address of the collection owner')
-    number_of_names: int = Field(title='total number of names in the collection')
+    number_of_names: int | str = Field(title='total number of names in the collection (or "+1000" string')
     collection_id: str = Field(title='id of the collection')
     last_updated_timestamp: int = Field(title='integer timestamp of last collection update')
     top_names: list[CollectionName] = Field(
@@ -121,6 +121,7 @@ class CollectionsFeaturingNameRequest(BaseModel):
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
     limit_names: Optional[int] = Field(10, title='the number of names returned in each collection')
+    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail|full)$')
 
 class CollectionsFeaturingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided name is a member of')
