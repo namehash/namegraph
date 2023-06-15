@@ -71,7 +71,7 @@ class Collection(BaseModel):
     top_names: list[CollectionName] = Field(
         title='top names stored in the collection (limited by limit_names)')
     types: list[str] = Field(title='list of types to which the collection belongs')
-
+ 
 class CollectionResultMetadata(BaseModel):
     total_number_of_matched_collections: Optional[int] = Field(
         title='number of matched collections before trimming the result')
