@@ -97,8 +97,8 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
     limit_names: Optional[int] = Field(10, ge=0, le=10, title='the number of names returned in each collection')
 
 class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
-    # todo: query cannot contain '.'
-    query: str = Field(title='input query (with or without spaces) which is used to search for template collections')
+    query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
+                       regex=r'^[^\.]*$')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
