@@ -29,6 +29,7 @@ class Collection:
             owner: str,
             number_of_names: int,
             collection_id: str,
+            modified_timestamp: int,
             # TODO do we need those above? and do we need anything else?
     ):
         self.title = title
@@ -41,6 +42,7 @@ class Collection:
         self.owner = owner
         self.number_of_names = number_of_names
         self.collection_id = collection_id
+        self.modified_timestamp = modified_timestamp
 
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
@@ -55,6 +57,7 @@ class Collection:
             owner=hit['fields']['metadata.owner'][0],
             number_of_names=hit['fields']['metadata.members_count'][0],
             collection_id=hit['fields']['metadata.id'][0],
+            modified_timestamp=hit['fields']['metadata.modified'][0]
         )
 
 
@@ -149,6 +152,7 @@ class CollectionMatcher(metaclass=Singleton):
                     "metadata.owner",
                     "metadata.members_count",
                     "metadata.id",
+                    "metadata.modified",
                 ],
                 "_source": False,
                 "script_fields": {
@@ -277,12 +281,12 @@ class CollectionMatcher(metaclass=Singleton):
                     'owner': collection.owner,
                     'number_of_names': collection.number_of_names if collection.number_of_names <= 1000 else '+1000',
                     'collection_id': collection.collection_id,
-                    'last_updated_timestamp': 12345,  # todo: find timestamp
+                    'last_updated_timestamp': collection.modified_timestamp,
                     'top_names': [{
                         'name': name + '.eth',
                         'namehash': namehash,
                     } for name, namehash in zip(collection.names, collection.namehashes)],
-                    'types': []  # todo: find types
+                    'types': collection.name_types
                 }
                 for collection in collections
             ]
@@ -315,12 +319,12 @@ class CollectionMatcher(metaclass=Singleton):
                     'owner': collection.owner,
                     'number_of_names': collection.number_of_names if collection.number_of_names <= 1000 else '+1000',
                     'collection_id': collection.collection_id,
-                    'last_updated_timestamp': 12345,  # todo: find timestamp
+                    'last_updated_timestamp':  collection.modified_timestamp,
                     'top_names': [{
                         'name': name + '.eth',
                         'namehash': namehash,
                     } for name, namehash in zip(collection.names, collection.namehashes)],
-                    'types': []  # todo: find types
+                    'types': collection.name_types
                 }
                 for collection in collections
             ]
@@ -348,6 +352,9 @@ class CollectionMatcher(metaclass=Singleton):
 
 
     def get_collections_membership_list_for_name(self, normalized_name: str, n_top_names: int) -> tuple[list, dict]:
+
+        limit_names_script = f'.limit({n_top_names})'
+
         response = self.elastic.search(
             index=self.index_name,
             body={
@@ -399,11 +406,29 @@ class CollectionMatcher(metaclass=Singleton):
                   "metadata.id"
               ],
               "script_fields": {
+                  "collection_types": {
+                    "script": {
+                      "source": "params['_source'].template.collection_types.stream()"
+                        ".map(p -> p[0])"
+                          ".collect(Collectors.toList())"
+                    }
+                  },
                 "names": {
                   "script": {
-                    "source": f"params['_source'].data.names.stream().map(p -> p.normalized_name).collect(Collectors.toList())"
+                    "source": f"params['_source'].data.names.stream()" \
+                                      + limit_names_script \
+                                      + ".map(p -> p.normalized_name)"
+                                      + ".collect(Collectors.toList())"
                   }
-                }
+                },
+                "namehashes": {
+                    "script": {
+                        "source": f"params['_source'].template.names.stream()" \
+                                  + limit_names_script \
+                                  + ".map(p -> p.namehash)" \
+                                  + ".collect(Collectors.toList())"
+                    }
+                    }
               }
             }
     )
@@ -420,9 +445,9 @@ class CollectionMatcher(metaclass=Singleton):
                     {
                     'name': name + '.eth',
                     'namehash': namehash
-                    } for name, namehash in zip(hit['fields']['names'][:n_top_names],
-                                                hit['fields']['names'][:n_top_names])],  # todo: find namehashes
-                'types': []  # todo: find types
+                    } for name, namehash in zip(hit['fields']['names'],
+                                                hit['fields']['namehashes'])],
+                'types': hit['fields']['collection_types']
             }
             for hit in response['hits']['hits']
         ]
