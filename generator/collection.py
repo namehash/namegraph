@@ -302,7 +302,6 @@ class CollectionMatcher(metaclass=Singleton):
             max_other_collections: int = 3,
             max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
-            max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10
     ) -> tuple[list[dict], dict]:
 
