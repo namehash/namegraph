@@ -93,10 +93,10 @@ from models import (
     CollectionSearchResponse,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionsFeaturingNameCountResponse,
-    CollectionsFeaturingNameCountRequest,
-    CollectionsFeaturingNameRequest,
-    CollectionsFeaturingNameResponse
+    CollectionsContainingNameCountResponse,
+    CollectionsContainingNameCountRequest,
+    CollectionsContainingNameRequest,
+    CollectionsContainingNameResponse
 )
 
 
@@ -204,8 +204,8 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return JSONResponse(response)
 
 
-@app.post("/get_collections_featuring_name_count", response_model=CollectionsFeaturingNameCountResponse)
-async def get_collections_membership_count(request: CollectionsFeaturingNameCountRequest):
+@app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse)
+async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
     t_before = perf_counter()
 
     count = collections_matcher.get_collections_membership_count_for_name(request.label)
@@ -219,8 +219,8 @@ async def get_collections_membership_count(request: CollectionsFeaturingNameCoun
     return JSONResponse({'count': count, 'metadata': metadata})
 
 
-@app.post("/find_collections_featuring_name", response_model=CollectionsFeaturingNameResponse)
-async def find_collections_membership_list(request: CollectionsFeaturingNameRequest):
+@app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
+async def find_collections_membership_list(request: CollectionsContainingNameRequest):
     t_before = perf_counter()
 
     sort_order = request.sort_order
