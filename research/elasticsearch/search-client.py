@@ -9,7 +9,7 @@ def request_generator_http(
         query: str,
         limit: int,
         name_diversity_ratio: Optional[float],
-#        max_per_type: Optional[int],
+        max_per_type: Optional[int],
         limit_names: Optional[int],
 ):
     data = {
@@ -19,7 +19,7 @@ def request_generator_http(
         "max_other_collections": 0,
         "max_total_collections": limit,
         "name_diversity_ratio": name_diversity_ratio,
- #       "max_per_type": max_per_type,
+        "max_per_type": max_per_type,
         "limit_names": limit_names,
     }
     return requests.post('http://localhost:8000/find_collections_by_string', json=data).json()
@@ -29,7 +29,7 @@ def search_by_all(
         query: str,
         limit: int,
         name_diversity_ratio: Optional[float],
-#        max_per_type: Optional[int],
+        max_per_type: Optional[int],
         limit_names: Optional[int],
 ):
     return request_generator_http(query, limit, name_diversity_ratio, max_per_type, limit_names)['related_collections']
@@ -39,7 +39,7 @@ def search_with_latency(
         query: str,
         limit: int,
         name_diversity_ratio: Optional[float],
-#        max_per_type: Optional[int],
+        max_per_type: Optional[int],
         limit_names: Optional[int],
 ):
     t0 = time.time()

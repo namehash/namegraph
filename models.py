@@ -72,13 +72,13 @@ class Collection(BaseModel):
         title='top names stored in the collection (limited by limit_names)')
     types: list[str] = Field(title='list of types to which the collection belongs')
 
-class CollectionQueryMetadata(BaseModel):
+class CollectionResultMetadata(BaseModel):
     total_number_of_matched_collections: Optional[int] = Field(
         title='number of matched collections before trimming the result')
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
 
 class BaseCollectionQueryResponse(BaseModel):
-    metadata: CollectionQueryMetadata = Field(title='additional information about collection query')
+    metadata: CollectionResultMetadata = Field(title='additional information about collection query')
 
 
 # ======== Collection Search ========
@@ -88,7 +88,7 @@ class BaseCollectionSearch(BaseModel):  # instant search, domain details
     min_other_collections: int = Field(3, ge=0, title='min number of other collections to return')
     max_other_collections: int = Field(3, ge=0, title='max number of other collections to return')
     max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return')
-
+    max_per_type: Optional[int] = Field(3, title='number of collections with the same type which are not penalized')
     name_diversity_ratio: Optional[float] = Field(
         0.5, ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar names to other collections'
@@ -121,7 +121,7 @@ class CollectionsFeaturingNameRequest(BaseModel):
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
     limit_names: Optional[int] = Field(10, title='the number of names returned in each collection')
-    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail|full)$')
+    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 class CollectionsFeaturingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided name is a member of')

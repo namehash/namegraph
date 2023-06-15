@@ -160,7 +160,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         max_other_collections=query.max_other_collections,
         max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
-#        max_per_type=query.max_per_type,  # todo: disable max per type
+        max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
 
@@ -188,6 +188,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         max_other_collections=query.max_other_collections,
         max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
+        max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
     
