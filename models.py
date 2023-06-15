@@ -78,7 +78,7 @@ class CollectionResultMetadata(BaseModel):
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
 
 class BaseCollectionQueryResponse(BaseModel):
-    metadata: CollectionResultMetadata = Field(title='additional information about collection query')
+    metadata: CollectionResultMetadata = Field(title='additional information about collection query response')
 
 
 # ======== Collection Search ========
@@ -110,18 +110,18 @@ class CollectionSearchResponse(BaseCollectionQueryResponse):
 
 # ======== Collection Membership ========
 
-class CollectionsFeaturingNameCountRequest(BaseModel):
+class CollectionsContainingNameCountRequest(BaseModel):
     label: str = Field(title='label for which collection membership will be checked')
 
-class CollectionsFeaturingNameCountResponse(BaseCollectionQueryResponse):
+class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
     count: int = Field(title='count of collections containing input name')
 
-class CollectionsFeaturingNameRequest(BaseModel):
+class CollectionsContainingNameRequest(BaseModel):
     label: str = Field(title='label for which membership will be checked for each collection')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field(
         title='order of the resulting collections (by title for alphabetic sort)')
     limit_names: Optional[int] = Field(10, title='the number of names returned in each collection')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
-class CollectionsFeaturingNameResponse(BaseCollectionQueryResponse):
+class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided name is a member of')
