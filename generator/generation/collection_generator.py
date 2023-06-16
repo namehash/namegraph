@@ -4,7 +4,7 @@ from itertools import cycle, islice
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
-from ..collection import CollectionMatcher
+from ..collections import CollectionMatcher
 from ..generated_name import GeneratedName
 
 logger = logging.getLogger('generator')
