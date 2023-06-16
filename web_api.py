@@ -12,7 +12,7 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
-from generator.collections import CollectionMatcher
+from generator.xcollections import CollectionMatcher
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
 

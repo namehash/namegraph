@@ -85,7 +85,7 @@ class CollectionName(BaseModel):
 
 
 class Collection(BaseModel):
-    title: str = Field(title='title of the collections')
+    title: str = Field(title='title of the collection')
     names: list[CollectionName] = Field(title='names stored in the collection (limited by limit_names)')
     owner: str = Field(title='ETH address of the collection owner')
     number_of_names: int = Field(title='total number of names in the collection')

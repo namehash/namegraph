@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
-from generator.collections import CollectionMatcher
+from generator.xcollections import CollectionMatcher
 from fastapi.testclient import TestClient
 
 

@@ -10,7 +10,7 @@ import elasticsearch
 from omegaconf import DictConfig
 
 from generator.tokenization import WordNinjaTokenizer
-from generator.collections.collection import Collection
+from generator.xcollections.collection import Collection
 from generator.utils.elastic import connect_to_elasticsearch, index_exists
 from generator.utils import Singleton
 

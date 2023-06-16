@@ -9,7 +9,7 @@ from ens_normalize import is_ens_normalized, ens_cure
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
-from generator.collections import CollectionMatcher
+from generator.xcollections import CollectionMatcher
 
 from helpers import check_generator_response, generate_example_names
 
