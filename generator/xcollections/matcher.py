@@ -111,7 +111,7 @@ class CollectionMatcher(metaclass=Singleton):
             'took': response['took'],
         }
 
-        collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
+        collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]
         return collections, es_response_metadata
 
     def _search_related(

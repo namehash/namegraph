@@ -1,6 +1,7 @@
 import gc
 import logging, random, hashlib, json
 from typing import List, Optional
+from operator import attrgetter
 from time import perf_counter
 
 import numpy as np
@@ -13,6 +14,7 @@ from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
 from generator.xcollections import CollectionMatcherForAPI
+from generator.xcollections.collection import Collection
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
 
@@ -93,10 +95,16 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionSearchResult,
+)
+
+from collection_models import (
+    CollectionSearchResponse,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionCountResult, CollectionMembershipCountRequest
+    CollectionsContainingNameCountResponse,
+    CollectionsContainingNameCountRequest,
+    CollectionsContainingNameRequest,
+    CollectionsContainingNameResponse,
 )
 
 
@@ -143,7 +151,26 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_string", response_model=CollectionSearchResult)
+def convert_to_collection_format(collections: list[Collection]):
+    collections_json = [
+        {
+            'collection_id': collection.collection_id,
+            'title': collection.title,
+            'owner': collection.owner,
+            'number_of_names': collection.number_of_names,
+            'last_updated_timestamp': collection.modified_timestamp,
+            'top_names': [{
+                'name': name + '.eth',
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
+            'types': collection.name_types,
+        }
+        for collection in collections
+    ]
+    return collections_json
+
+
+@app.post("/find_collections_by_string", response_model=CollectionSearchResponse)
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
@@ -158,26 +185,12 @@ async def find_collections_by_string(query: CollectionSearchByString):
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
-    collections = [
-        {
-            'title': collection.title,
-            'names': [{
-                'name': name + '.eth',
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
-            'rank': collection.rank,
-            'score': collection.score,
-            'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
-            'collection_id': collection.collection_id,
-        }
-        for collection in collections
-    ]
+    collections = convert_to_collection_format(collections)
 
     time_elapsed = (perf_counter() - t_before) * 1000
   
     metadata = {
-        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
@@ -187,7 +200,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     return JSONResponse(response)
 
 
-@app.post("/find_collections_by_collection", response_model=CollectionSearchResult)
+@app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     t_before = perf_counter()
 
@@ -201,21 +214,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
-    collections = [
-        {
-            'title': collection.title,
-            'names': [{
-                'name': name + '.eth',
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
-            'rank': collection.rank,
-            'score': collection.score,
-            'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
-            'collection_id': collection.collection_id,
-        }
-        for collection in collections
-    ]
+    collections = convert_to_collection_format(collections)
     
     time_elapsed = (perf_counter() - t_before) * 1000
   
@@ -230,7 +229,50 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return JSONResponse(response)
 
 
-@app.post("/get_collections_membership_count", response_model=CollectionCountResult)
-async def get_collections_membership_count(request: CollectionMembershipCountRequest):
-    count = collections_matcher.get_collections_membership_count_for_name(request.normalized_name)
-    return JSONResponse({'count': count})
+@app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse)
+async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
+    t_before = perf_counter()
+
+    count = collections_matcher.get_collections_membership_count_for_name(request.label)
+
+    time_elapsed = (perf_counter() - t_before) * 1000
+
+    metadata = {
+        'processing_time_ms': time_elapsed
+    }
+
+    return JSONResponse({'count': count, 'metadata': metadata})
+
+
+@app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
+async def find_collections_membership_list(request: CollectionsContainingNameRequest):
+    t_before = perf_counter()
+
+    sort_order = request.sort_order
+    collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
+        request.label,
+        limit_names=request.limit_names
+    )
+
+    # todo: move sort to ES query
+    # todo: add pagination (later)
+    if sort_order == 'A-Z':
+        collections_featuring_label.sort(key=attrgetter('title'))
+    elif sort_order == 'Z-A':
+        collections_featuring_label.sort(key=attrgetter('title'), reverse=True)
+    elif sort_order == 'AI':
+        pass
+    else:
+        logger.warning(f"Unexpected type of sort_order: '{sort_order}'. Using A-Z order.")
+        collections_featuring_label.sort(key=attrgetter('title'))
+
+    collections = convert_to_collection_format(collections_featuring_label)
+
+    time_elapsed = (perf_counter() - t_before) * 1000
+
+    metadata = {
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
+        'processing_time_ms': time_elapsed
+    }
+
+    return JSONResponse({'collections': collections, 'metadata': metadata})

@@ -32,7 +32,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',
             'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.top10_names.namehash', 'template.collection_types'
+            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
         ]
 
         try:
@@ -81,3 +81,30 @@ class CollectionMatcherForAPI(CollectionMatcher):
         )
 
         return response['count']
+
+    def get_collections_membership_list_for_name(
+            self,
+            normalized_name: str,
+            limit_names: int = 10
+    ) -> tuple[list[Collection], dict]:
+
+        fields = [
+            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
+            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+        ]
+
+        query_body = ElasticsearchQueryBuilder() \
+            .add_filter('term', {'data.names.normalized_name': normalized_name}) \
+            .add_filter('term', {'data.public': True}) \
+            .add_rank_feature('metadata.members_count') \
+            .add_rank_feature('template.members_system_interesting_score_median') \
+            .add_rank_feature('template.valid_members_ratio') \
+            .add_rank_feature('template.nonavailable_members_ratio', boost=10) \
+            .set_source(False) \
+            .include_fields(fields) \
+            .build()
+
+        collections, es_response_metadata = self._execute_query(query_body, limit_names)
+
+        return collections, es_response_metadata

@@ -16,6 +16,7 @@ class Collection:
             namehashes: Optional[list[str]],
             tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
+            modified_timestamp: int
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
@@ -28,12 +29,14 @@ class Collection:
         self.namehashes = namehashes
         self.tokenized_names = tokenized_names
         self.name_types = name_types
+        self.modified_timestamp = modified_timestamp
 
     # FIXME make more universal or split into multiple methods
+    # FIXME should we move limit_names somewhere else?
     @classmethod
-    def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
+    def from_elasticsearch_hit(cls, hit: dict[str, Any], limit_names: int = 10) -> Collection:
         try:
-            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']]
+            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']][:limit_names]
         except KeyError:
             tokenized_names = None
 
@@ -45,8 +48,10 @@ class Collection:
             rank=fields['template.collection_rank'][0],
             owner=fields['metadata.owner'][0],
             number_of_names=fields['metadata.members_count'][0],
-            names=fields['template.top10_names.normalized_name'],
-            namehashes=fields['template.top10_names.namehash'] if 'template.top10_names.namehash' in fields else None,
+            names=fields['template.top10_names.normalized_name'][:limit_names],
+            namehashes=fields['template.top10_names.namehash'][:limit_names]
+                if 'template.top10_names.namehash' in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][::2],  # FIXME does this work?
+            modified_timestamp=fields['metadata.modified'][0]
         )
