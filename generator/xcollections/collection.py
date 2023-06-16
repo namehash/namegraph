@@ -6,41 +6,47 @@ from typing import Optional, Any
 class Collection:
     def __init__(
             self,
-            title: str,
-            names: list[str],
-            namehashes: list[str],
-            tokenized_names: Optional[list[tuple[str]]],
-            name_types: list[str],
-            rank: float,
             score: float,
+            collection_id: str,
+            title: str,
+            rank: float,
             owner: str,
             number_of_names: int,
-            collection_id: str,
+            names: list[str],
+            namehashes: Optional[list[str]],
+            tokenized_names: Optional[list[tuple[str]]],
+            name_types: list[str],
             # TODO do we need those above? and do we need anything else?
     ):
+        self.score = score
+        self.collection_id = collection_id
         self.title = title
+        self.rank = rank
+        self.owner = owner
+        self.number_of_names = number_of_names
         self.names = names
         self.namehashes = namehashes
         self.tokenized_names = tokenized_names
         self.name_types = name_types
-        self.rank = rank
-        self.score = score
-        self.owner = owner
-        self.number_of_names = number_of_names
-        self.collection_id = collection_id
 
+    # FIXME make more universal or split into multiple methods
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any]) -> Collection:
+        try:
+            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']]
+        except KeyError:
+            tokenized_names = None
+
+        fields = hit['fields']
         return cls(
-            title=hit['fields']['data.collection_name'][0],
-            names=hit['fields']['normalized_names'],
-            namehashes=hit['fields']['namehashes'],
-            tokenized_names=[tuple(tokens) for tokens in hit['fields']['tokenized_names']] \
-                if 'tokenized_names' in hit['fields'] else None,
-            name_types=hit['fields']['collection_types'],
-            rank=hit['fields']['template.collection_rank'][0],
             score=hit['_score'],
-            owner=hit['fields']['metadata.owner'][0],
-            number_of_names=hit['fields']['metadata.members_count'][0],
-            collection_id=hit['fields']['metadata.id'][0],
+            collection_id=fields['metadata.id'][0],
+            title=fields['data.collection_name'][0],
+            rank=fields['template.collection_rank'][0],
+            owner=fields['metadata.owner'][0],
+            number_of_names=fields['metadata.members_count'][0],
+            names=fields['template.top10_names.normalized_name'],
+            namehashes=fields['template.top10_names.namehash'] if 'template.top10_names.namehash' in fields else None,
+            tokenized_names=tokenized_names,
+            name_types=fields['template.collection_types'][::2],  # FIXME does this work?
         )

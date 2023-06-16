@@ -11,6 +11,7 @@ from omegaconf import DictConfig
 
 from generator.tokenization import WordNinjaTokenizer
 from generator.xcollections.collection import Collection
+from generator.xcollections.query_builder import ElasticsearchQueryBuilder
 from generator.utils.elastic import connect_to_elasticsearch, index_exists
 from generator.utils import Singleton
 
@@ -48,102 +49,6 @@ class CollectionMatcher(metaclass=Singleton):
         except Exception as ex:
             logger.warning('Elasticsearch connection failed: ' + str(ex))
             self.active = False
-
-    def _construct_request_body(
-            self,
-            query: str,
-            limit_collections: int,
-            limit_names: Optional[int],
-            include_tokens: bool = False,
-    ) -> dict[str, Any]:
-
-        limit_names_subscript = f'.limit({limit_names})' if limit_names is not None else ''
-        names_field = 'names' if limit_names is None or limit_names > 10 else 'top10_names'
-        limit_names_script = f"params['_source'].template.{names_field}.stream(){limit_names_subscript}"
-
-        body = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "multi_match": {
-                                "query": query,
-                                "fields": [
-                                    "data.collection_name^3",
-                                    "data.collection_name.exact^3",
-                                    # "data.collection_description^2",
-                                    "data.collection_keywords^2",
-                                    "data.names.normalized_name",
-                                    "data.names.tokenized_name",
-                                ],
-                                "type": "cross_fields",
-                            }
-                        }
-                    ],
-                    "should": [
-                        {
-                            "rank_feature": {
-                                "field": "template.collection_rank",
-                                "boost": 100,
-                                # "log": {
-                                #     "scaling_factor": 4
-                                # }
-                            }
-                        },
-                        {
-                            "rank_feature": {
-                                "field": "metadata.members_count",
-                            }
-                        }
-                    ]
-                }
-
-            },
-            "size": limit_collections,
-            "fields": [
-                "data.collection_name",
-                "template.collection_rank",
-                "metadata.owner",
-                "metadata.members_count",
-                "metadata.id",
-            ],
-            "_source": False,
-            "script_fields": {
-                "normalized_names": {
-                    "script": {
-                        "source": limit_names_script \
-                                  + ".map(p -> p.normalized_name)" \
-                                  + ".collect(Collectors.toList())"
-                    }
-                },
-                "namehashes": {
-                    "script": {
-                        "source": limit_names_script \
-                                  + ".map(p -> p.namehash)" \
-                                  + ".collect(Collectors.toList())"
-                    }
-                },
-                "collection_types": {
-                    "script": {
-                        "source": "params['_source'].template.collection_types.stream()"
-                                  ".map(p -> p[0])"
-                                  ".collect(Collectors.toList())"
-                    }
-                }
-            }
-        }
-
-        if include_tokens:
-            body['script_fields']['tokenized_names'] = {
-                "script": {
-                    "source": "params['_source'].data.names.stream()" \
-                              + limit_names_subscript \
-                              + ".map(p -> p.tokenized_name)" \
-                              + ".collect(Collectors.toList())"
-                }
-            }
-
-        return body
 
     def _apply_diversity(
             self,
@@ -197,25 +102,8 @@ class CollectionMatcher(metaclass=Singleton):
 
         return diversified + penalized_collections[:max_limit - len(diversified)]
 
-    def _search_related(
-            self,
-            query: str,
-            max_limit: int,
-            name_diversity_ratio: Optional[float] = None,
-            max_per_type: Optional[int] = None,
-            limit_names: Optional[int] = 50,
-            include_tokens: bool = False,
-    ) -> tuple[list[Collection], dict]:
-
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
-        body = self._construct_request_body(
-            query,
-            max_limit if not apply_diversity else max_limit * 3,
-            limit_names,
-            include_tokens=include_tokens
-        )
-
-        response = self.elastic.search(index=self.index_name, body=body)
+    def _execute_query(self, query_body: dict, limit_names: int) -> tuple[list[Collection], dict[str, Any]]:
+        response = self.elastic.search(index=self.index_name, body=query_body)
 
         hits = response["hits"]["hits"]
         es_response_metadata = {
@@ -224,6 +112,29 @@ class CollectionMatcher(metaclass=Singleton):
         }
 
         collections = [Collection.from_elasticsearch_hit(hit) for hit in hits]
+        return collections, es_response_metadata
+
+    def _search_related(
+            self,
+            query: str,
+            max_limit: int,
+            fields: list[str],
+            name_diversity_ratio: Optional[float] = None,
+            max_per_type: Optional[int] = None,
+            limit_names: int = 10,
+    ) -> tuple[list[Collection], dict]:
+
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        query_body = ElasticsearchQueryBuilder() \
+            .add_query(query) \
+            .add_limit(max_limit if not apply_diversity else max_limit * 3) \
+            .add_rank_feature('template.collection_rank', boost=100) \
+            .add_rank_feature('metadata.members_count') \
+            .set_source(False) \
+            .include_fields(fields) \
+            .build()
+
+        collections, es_response_metadata = self._execute_query(query_body, limit_names)
 
         if not apply_diversity:
             return collections[:max_limit], es_response_metadata

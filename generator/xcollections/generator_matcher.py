@@ -3,6 +3,7 @@ import logging
 
 from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
+from generator.xcollections.query_builder import ElasticsearchQueryBuilder
 
 logger = logging.getLogger('generator')
 
@@ -14,7 +15,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_related_collections: int = 5,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
-            limit_names: Optional[int] = 10,
+            limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
         if not self.active:
@@ -22,15 +23,35 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         tokenized_query = ' '.join(tokens)
 
+        fields = [
+            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
+            'template.collection_types'
+        ]
+
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        query_body = ElasticsearchQueryBuilder() \
+            .add_query(tokenized_query) \
+            .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
+            .add_rank_feature('template.collection_rank', boost=100) \
+            .add_rank_feature('metadata.members_count') \
+            .include_fields(fields) \
+            .set_source({'includes': ['data.names.tokenized_name']}) \
+            .build()
+
         try:
-            return self._search_related(
-                query=tokenized_query,
-                max_limit=max_related_collections,
-                name_diversity_ratio=name_diversity_ratio,
-                max_per_type=max_per_type,
-                limit_names=limit_names,
-                include_tokens=True,
+            collections, es_response_metadata = self._execute_query(query_body, limit_names)
+
+            if not apply_diversity:
+                return collections[:max_related_collections], es_response_metadata
+
+            diversified = self._apply_diversity(
+                collections,
+                max_related_collections,
+                name_diversity_ratio,
+                max_per_type
             )
+            return diversified, es_response_metadata
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed', exc_info=True)
             return [], {}
