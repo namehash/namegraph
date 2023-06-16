@@ -184,7 +184,6 @@ async def find_collections_by_string(query: CollectionSearchByString):
 
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
 
-
     return JSONResponse(response)
 
 
