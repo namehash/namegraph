@@ -6,7 +6,7 @@ import pytest
 from pytest import mark
 from fastapi.testclient import TestClient
 
-from generator.xcollections import CollectionMatcher
+from generator.xcollections import CollectionMatcherForAPI
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
 
@@ -29,7 +29,7 @@ def emoji_pipeline():
 def test_client():
     Domains.remove_self()
     Categories.remove_self()
-    CollectionMatcher.remove_self()
+    CollectionMatcherForAPI.remove_self()
     os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api
     if 'web_api' not in sys.modules:

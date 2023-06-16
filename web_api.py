@@ -12,7 +12,7 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcher
+from generator.xcollections import CollectionMatcherForAPI
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
 
@@ -85,7 +85,7 @@ generator = init()
 inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
-collections_matcher = CollectionMatcher(generator.config)
+collections_matcher = CollectionMatcherForAPI(generator.config)
 
 domains = Domains(generator.config)
 categories = Categories(generator.config)

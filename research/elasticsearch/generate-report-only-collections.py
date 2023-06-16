@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
-from generator.xcollections import CollectionMatcher
+from generator.xcollections import CollectionMatcherForAPI
 from fastapi.testclient import TestClient
 
 
@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient
 def prod_test_client(config):
     Domains.remove_self()
     Categories.remove_self()
-    CollectionMatcher.remove_self()
+    CollectionMatcherForAPI.remove_self()
     os.environ['CONFIG_NAME'] = config
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:

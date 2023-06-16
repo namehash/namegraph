@@ -9,7 +9,8 @@ from ens_normalize import is_ens_normalized, ens_cure
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
-from generator.xcollections import CollectionMatcher
+from generator.xcollections.api_matcher import CollectionMatcherForAPI
+from generator.xcollections.generator_matcher import CollectionMatcherForGenerator
 
 from helpers import check_generator_response, generate_example_names
 
@@ -18,7 +19,8 @@ from helpers import check_generator_response, generate_example_names
 def prod_test_client():
     Domains.remove_self()
     Categories.remove_self()
-    CollectionMatcher.remove_self()
+    CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
