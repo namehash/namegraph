@@ -170,11 +170,9 @@ def test_collection_api_find_collections_membership_list_az(test_test_client):
     # test limit names
     assert all([len(c['top_names']) <= lim for c in collection_list])
 
-    # # test A-Z sort  # todo: enable when sort works
-    # titles = [c['title'] for c in collection_list]
-    # assert titles == sorted(titles)
-
-    print(response_json)
+    # # test A-Z sort
+    titles = [c['title'] for c in collection_list]
+    assert titles == sorted(titles)
 
 
 @mark.integration_test
@@ -187,7 +185,9 @@ def test_collection_api_find_collections_membership_list_ai(test_test_client):
 
     assert response.status_code == 200
     response_json = response.json()
-    print(response_json)
+    collection_list = response_json['collections']
+    titles = [c['title'] for c in collection_list]
+    assert any(['Countries' in t for t in titles])
 
 
 # related collections to collection
