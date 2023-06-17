@@ -28,6 +28,7 @@ from generator.generation import (
     EasterEggGenerator,
     CollectionGenerator,
     ReverseGenerator,
+    RhymesGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -619,3 +620,25 @@ def test_reverse_generator():
         generated_names = list(strategy.generate(tokenized_name))
         assert len(generated_names) == 1
         assert generated_names[0] == ('surtoip',)
+
+
+def test_rhymes_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = RhymesGenerator(config)
+
+        tokenized_name = ('caravan',)
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: x[0], list(gen)))
+        expected_names = map(lambda s: tokenized_name[0] + s, (
+            "van", "fan", "sullivan", "ivan", "stefan", "evan",
+            "ativan", "donovan", "stephan", "orphan", "minivan", "sylvan")
+                             )
+        assert all([name in generated_names for name in expected_names])
+
+        tokenized_name = ('van', 'fan', 'sullivan')
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: x[0], list(gen)))
+        discarded_names = map(lambda s: ''.join(tokenized_name) + s,
+                              ("van", "fan", "sullivan"))
+        assert all([name not in generated_names for name in discarded_names])

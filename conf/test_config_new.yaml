@@ -68,6 +68,7 @@ generation:
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
   person_name_affixes_path: data/person_name_affixes.json
+  suffix2rhymes_path: data/suffix2rhymes.json
 sorting:
   weighted_sampling:
     weights:

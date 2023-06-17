@@ -23,4 +23,5 @@ data/person_names_*.json
 research/symbol/*.xlsx
 !research/symbol/*.ipynb
 research/elasticsearch/*.jsonl
+!research/rhymes/*.ipynb
 research/elasticsearch/*diver*.html
