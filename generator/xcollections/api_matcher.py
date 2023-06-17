@@ -69,7 +69,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.warning(f'Elasticsearch search failed', exc_info=True)
             return [], {}
 
-    def get_collections_membership_count_for_name(self, normalized_name: str) -> int:
+    def get_collections_membership_count_for_name(self, normalized_name: str) -> tuple[int, dict]:
         query_body = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': normalized_name}) \
             .add_filter('term', {'data.public': True}) \
@@ -80,7 +80,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             body=query_body
         )
 
-        return response['count']
+        return response['count'], dict()
 
     def get_collections_membership_list_for_name(
             self,

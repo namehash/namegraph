@@ -233,12 +233,14 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
 async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
     t_before = perf_counter()
 
-    count = collections_matcher.get_collections_membership_count_for_name(request.label)
+    count, es_response_metadata = collections_matcher.get_collections_membership_count_for_name(request.label)
 
     time_elapsed = (perf_counter() - t_before) * 1000
 
     metadata = {
-        'processing_time_ms': time_elapsed
+        'total_number_of_related_collections': None,
+        'processing_time_ms': time_elapsed,
+        'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
     }
 
     return JSONResponse({'count': count, 'metadata': metadata})
@@ -272,7 +274,8 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
 
     metadata = {
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
-        'processing_time_ms': time_elapsed
+        'processing_time_ms': time_elapsed,
+        'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
 
     return JSONResponse({'collections': collections, 'metadata': metadata})
