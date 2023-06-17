@@ -103,7 +103,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .add_rank_feature('template.valid_members_ratio')
             .add_rank_feature('template.nonavailable_members_ratio', boost=10)
             .set_source(False)
-            .set_sort_order(sort_order=sort_order, field='metadata.owner')  # fixme: field='data.collection_name' (requires keyword)
+            .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')  # fixme: field='data.collection_name' (requires keyword)
             .include_fields(fields)
             .build())
 
