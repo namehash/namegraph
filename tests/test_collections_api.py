@@ -63,6 +63,7 @@ def test_collection_api_eth_suffix(test_test_client):
     })
     assert response.status_code == 200
     response_json = response.json()
+    assert response_json['related_collections'] + response_json['other_collections']
     assert all([member_name['name'].endswith('.eth')
                 for collection in response_json['related_collections'] + response_json['other_collections']
                 for member_name in collection['top_names']])
@@ -88,7 +89,7 @@ def test_collection_api_instant_search(test_test_client):
         "max_total_collections": 15,
         "name_diversity_ratio": 0.5,
         "max_per_type": 3,
-        "limit_names": 10,  # can't be greater than 10
+        "limit_names": 10,
     })
 
     assert response.status_code == 200
@@ -100,7 +101,7 @@ def test_collection_api_instant_search(test_test_client):
 @mark.integration_test
 def test_collection_api_domain_details(test_test_client):
     response = test_test_client.post("/find_collections_by_string", json={
-        "query": "australia",  # without .eth
+        "query": "australia",
         "mode": "domain_detail",
         "max_related_collections": 3,
         "min_other_collections": 3,
@@ -120,14 +121,14 @@ def test_collection_api_domain_details(test_test_client):
 @mark.integration_test
 def test_collection_api_domain_details_more(test_test_client):
     response = test_test_client.post("/find_collections_by_string", json={
-        "query": "australia",  # without .eth
+        "query": "australia",
         "mode": "domain_detail",
         "max_related_collections": 100,
         "min_other_collections": 0,
         "max_other_collections": 0,
         "max_total_collections": 100,
         "name_diversity_ratio": 0.0,
-        "max_per_type": 3,  # TODO: disable
+        "max_per_type": None,
         "limit_names": 10,
         # TODO: add sorting and pagination
         # TODO: maximum number of results should be 1000, if there is more results then return "1000+" in "number_of_names" field
@@ -205,3 +206,28 @@ def test_collection_api_find_collections_by_collection(test_test_client):
 
     assert response.status_code == 200
     response_json = response.json()
+
+
+@mark.integration_test
+def test_collection_api_instant_search_dot(test_test_client):
+    response = test_test_client.post("/find_collections_by_string", json={
+        "query": "australia.eth"
+    })
+    assert response.status_code == 422
+
+
+@mark.integration_test
+def test_collection_api_member_dot(test_test_client):
+    response = test_test_client.post("/find_collections_by_member", json={
+        "query": "australia.eth"
+    })
+    assert response.status_code == 422
+
+
+@mark.integration_test
+def test_collection_api_instant_search_limit_names_gt_10(test_test_client):
+    response = test_test_client.post("/find_collections_by_string", json={
+        "query": "australia",
+        "limit_names": 11,
+    })
+    assert response.status_code == 422
