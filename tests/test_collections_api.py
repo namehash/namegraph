@@ -80,7 +80,7 @@ def test_collection_api_membership_count(test_test_client):
 @mark.integration_test
 def test_collection_api_instant_search(test_test_client):
     response = test_test_client.post("/find_collections_by_string", json={
-        "query": "australia",  # without .eth #TODO query can't contain "."
+        "query": "australia",
         "mode": "instant",
         "max_related_collections": 15,
         "min_other_collections": 0,
@@ -142,7 +142,7 @@ def test_collection_api_domain_details_more(test_test_client):
 @mark.integration_test
 def test_collection_api_get_collections_membership_count(test_test_client):
     response = test_test_client.post("/count_collections_by_member", json={
-        "label": "australia",  # TODO change name to "label"
+        "label": "australia",
     })
 
     assert response.status_code == 200
@@ -153,21 +153,33 @@ def test_collection_api_get_collections_membership_count(test_test_client):
 # memebership collections
 @mark.integration_test
 def test_collection_api_find_collections_membership_list_az(test_test_client):
+    lim = 8
     response = test_test_client.post("/find_collections_by_member", json={
-        "label": "australia",  # without .eth #TODO change name to "label"
+        "label": "australia",
         "sort_order": "A-Z",
-        # TODO: add mode, pagination, limit_names
+        "limit_names": lim,
+        "mode": 'domain_detail'
+        # TODO: add pagination
     })
 
     assert response.status_code == 200
     response_json = response.json()
+    collection_list = response_json['collections']
+
+    # test limit names
+    assert all([len(c['top_names']) <= lim for c in collection_list])
+
+    # # test A-Z sort  # todo: enable when sort works
+    # titles = [c['title'] for c in collection_list]
+    # assert titles == sorted(titles)
+
     print(response_json)
 
 
 @mark.integration_test
 def test_collection_api_find_collections_membership_list_ai(test_test_client):
     response = test_test_client.post("/find_collections_by_member", json={
-        "label": "australia",  # TODO with or without .eth?
+        "label": "australia",
         "sort_order": "AI",
         # TODO as above
     })
