@@ -22,7 +22,8 @@ class CollectionResultMetadata(BaseModel):
     total_number_of_matched_collections: Optional[int] = Field(
         title='number of matched collections before trimming the result or "+1000" if more than 1000 results')  # TODO
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
-    elasticsearch_processing_time_ms: float = Field(title='time elapsed for elasticsearch query in milliseconds')
+    elasticsearch_processing_time_ms: Optional[float] = Field(
+        title='time elapsed for elasticsearch query in milliseconds')
 
 
 class BaseCollectionQueryResponse(BaseModel):
