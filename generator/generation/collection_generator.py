@@ -4,7 +4,7 @@ from itertools import cycle, islice
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
-from ..collection import CollectionMatcher
+from ..xcollections import CollectionMatcherForGenerator
 from ..generated_name import GeneratedName
 
 logger = logging.getLogger('generator')
@@ -32,14 +32,16 @@ class CollectionGenerator(NameGenerator):
 
     def __init__(self, config):
         super().__init__(config)
-        self.collection_matcher = CollectionMatcher(config)
+        self.collection_matcher = CollectionMatcherForGenerator(config)
         self.collections_limit = config.collections.collections_limit
         self.suggestions_limit = config.collections.suggestions_limit
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         tokens = interpretation.tokenization
-        collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
-                                                               max_related_collections=self.collections_limit)
+        collections, _ = self.collection_matcher.search_for_generator(
+            tokens,
+            max_related_collections=self.collections_limit,
+        )
 
         for collection in collections:
             logger.info(f'Collection: {collection.title} score: {collection.score} names: {len(collection.names)}')
@@ -57,8 +59,10 @@ class CollectionGenerator(NameGenerator):
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        collections, _ = self.collection_matcher.search_by_string(' '.join(tokens), mode='instant',
-                                                               max_related_collections=self.collections_limit)
+        collections, _ = self.collection_matcher.search_for_generator(
+            tokens,
+            max_related_collections=self.collections_limit,
+        )
         # TODO round robin? weighted sampling?
         return [
             name_tokens

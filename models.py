@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, Field
 
 from web_api import generator
@@ -54,61 +54,3 @@ class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
-
-
-class BaseCollectionSearch(BaseModel):  # instant search, domain details
-    max_related_collections: int = Field(3, title='max number of related collections to return')
-    min_other_collections: int = Field(3, title='min number of other collections to return')
-    max_other_collections: int = Field(3, title='max number of other collections to return')
-    max_total_collections: int = Field(6, title='max number of total (related + other) collections to return')
-
-    name_diversity_ratio: Optional[float] = Field(
-        0.5,
-        title='similarity value used for adding penalty to collections with similar names to other collections'
-    )
-    max_per_type: Optional[int] = Field(3, title='number of collections with the same type which are not penalized')
-    limit_names: Optional[int] = Field(50, title='the number of names returned in each collection')
-
-
-class CollectionSearchByString(BaseCollectionSearch):  # instant search, domain details
-    query: str = Field(title='input query (with or without spaces) which is used to search for template collections')
-    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
-
-
-class CollectionSearchByCollection(BaseCollectionSearch):  # collection_details
-    collection_id: str = Field(title='id of the collection used for search')
-
-
-class CollectionName(BaseModel):
-    name: str = Field(title='name with .eth')
-    namehash: str = Field(title='namehash of the name')
-
-
-class Collection(BaseModel):
-    title: str = Field(title='title of the collections')
-    names: list[CollectionName] = Field(title='names stored in the collection (limited by limit_names)')
-    owner: str = Field(title='ETH address of the collection owner')
-    number_of_names: int = Field(title='total number of names in the collection')
-    rank: float = Field(title='rank of the collection')  # ?
-    score: float = Field(title='Elasticsearch score for the query result')  # ?
-    collection_id: str = Field(title='id of the collection')
-
-
-class CollectionResultMetadata(BaseModel):
-    total_number_of_related_collections: int = Field(title='number of related collections before trimming the result')
-    processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
-
-class CollectionSearchResult(BaseModel):
-    related_collections: list[Collection] = Field(title='list of related collections')
-    other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
-    metadata: CollectionResultMetadata = Field(title='additional information about collection search result')
-
-
-class CollectionMembershipCountRequest(BaseModel):
-    normalized_name: str = Field(title='normalized name for which collection membership will be checked')
-
-
-class CollectionCountResult(BaseModel):
-    count: int = Field(title='count of collections containing input name')
-
-
