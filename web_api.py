@@ -253,20 +253,11 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     sort_order = request.sort_order
     collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
         request.label,
-        limit_names=request.limit_names
+        limit_names=request.limit_names,
+        sort_order=sort_order
     )
 
-    # todo: move sort to ES query
-    # todo: add pagination (later)
-    if sort_order == 'A-Z':
-        collections_featuring_label.sort(key=attrgetter('title'))
-    elif sort_order == 'Z-A':
-        collections_featuring_label.sort(key=attrgetter('title'), reverse=True)
-    elif sort_order == 'AI':
-        pass
-    else:
-        logger.warning(f"Unexpected type of sort_order: '{sort_order}'. Using A-Z order.")
-        collections_featuring_label.sort(key=attrgetter('title'))
+    # todo: add pagination
 
     collections = convert_to_collection_format(collections_featuring_label)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, Optional
 from copy import deepcopy
 
 
@@ -124,6 +124,25 @@ class ElasticsearchQueryBuilder:
         """
         self._query['_source'] = value
         return self
+
+    def set_sort_order(self, sort_order: Literal['A-Z', 'Z-A', 'AI'], field: Optional[str]) -> ElasticsearchQueryBuilder:
+        """
+        Sets the sort field of the query builder based on the sort_order.
+
+        :return: self
+        """
+
+        if sort_order == 'AI':
+            pass
+        elif sort_order == 'A-Z':
+            self._query['sort'] = [{f"{field}.keyword": {"order": "asc"}}, "_score"]
+        elif sort_order == 'Z-A':
+            self._query['sort'] = [{f"{field}.keyword": {"order": "desc"}}, "_score"]
+        else:
+            raise ValueError(f"Unexpected sort_order value: '{sort_order}'")
+
+        return self
+
 
     def include_fields(self, fields: list[str]) -> ElasticsearchQueryBuilder:
         """
