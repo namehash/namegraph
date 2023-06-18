@@ -127,7 +127,7 @@ def test_collection_api_domain_details_more(test_test_client):
         "min_other_collections": 0,
         "max_other_collections": 0,
         "max_total_collections": 100,
-        "name_diversity_ratio": 0.0,
+        "name_diversity_ratio": None,
         "max_per_type": None,
         "limit_names": 10,
         # TODO: add sorting and pagination

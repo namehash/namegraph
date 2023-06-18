@@ -68,7 +68,7 @@ class CollectionMatcher(metaclass=Singleton):
             if name_diversity_ratio is not None:
                 number_of_covered_names = len(set(collection.names) & used_names)
 
-                # if more than `name_diversity_ration` of the names have already been used, penalize the collection
+                # if more than `name_diversity_ratio` of the names have already been used, penalize the collection
                 if number_of_covered_names / len(collection.names) < name_diversity_ratio:
                     used_names.update(collection.names)
                 else:
