@@ -131,12 +131,11 @@ def test_collection_api_domain_details_more(test_test_client):
         "max_per_type": None,
         "limit_names": 10,
         # TODO: add sorting and pagination
-        # TODO: maximum number of results should be 1000, if there is more results then return "1000+" in "number_of_names" field
     })
 
     assert response.status_code == 200
     response_json = response.json()
-    print(response_json)
+    assert response_json['metadata']['total_number_of_matched_collections'] == '1000+'
 
 
 # count membership #TODO: won't be used
@@ -149,6 +148,19 @@ def test_collection_api_get_collections_membership_count(test_test_client):
     assert response.status_code == 200
     response_json = response.json()
     print(response_json)
+    assert response_json['count'] >= 0
+
+@mark.integration_test
+def test_collection_api_get_collections_membership_count_gt_1000(test_test_client):
+    response = test_test_client.post("/count_collections_by_member", json={
+        "label": "listedbuilding",
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+    print(response_json)
+    assert response_json['count'] == '1000+'
+
 
 
 # memebership collections

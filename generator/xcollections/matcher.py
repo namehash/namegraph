@@ -106,8 +106,9 @@ class CollectionMatcher(metaclass=Singleton):
         response = self.elastic.search(index=self.index_name, body=query_body)
 
         hits = response["hits"]["hits"]
+        n_total_hits=response["hits"]['total']['value']
         es_response_metadata = {
-            'n_total_hits': response["hits"]['total']['value'],
+            'n_total_hits': n_total_hits if n_total_hits <= 1000 else '1000+',
             'took': response['took'],
         }
 

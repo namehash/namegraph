@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 import logging
 
 from generator.xcollections.matcher import CollectionMatcher
@@ -69,7 +69,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.warning(f'Elasticsearch search failed', exc_info=True)
             return [], {}
 
-    def get_collections_membership_count_for_name(self, name_label: str) -> tuple[int, dict]:
+    def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int,str], dict]:
         query_body = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
             .add_filter('term', {'data.public': True}) \
@@ -79,8 +79,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             index=self.index_name,
             body=query_body
         )
+        count = response['count']
 
-        return response['count'], dict()
+        return count if count <= 1000 else '1000+', dict()
 
     def get_collections_membership_list_for_name(
             self,
@@ -96,16 +97,18 @@ class CollectionMatcherForAPI(CollectionMatcher):
         ]
 
         query_body = (ElasticsearchQueryBuilder()
-            .add_filter('term', {'data.names.normalized_name': name_label})
-            .add_filter('term', {'data.public': True})
-            .add_rank_feature('metadata.members_count')
-            .add_rank_feature('template.members_system_interesting_score_median')
-            .add_rank_feature('template.valid_members_ratio')
-            .add_rank_feature('template.nonavailable_members_ratio', boost=10)
-            .set_source(False)
-            .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')  # fixme: field='data.collection_name' (requires keyword)
-            .include_fields(fields)
-            .build())
+                      .add_filter('term', {'data.names.normalized_name': name_label})
+                      .add_filter('term', {'data.public': True})
+                      .add_rank_feature('metadata.members_count')
+                      .add_rank_feature('template.members_system_interesting_score_median')
+                      .add_rank_feature('template.valid_members_ratio')
+                      .add_rank_feature('template.nonavailable_members_ratio', boost=10)
+                      .set_source(False)
+                      .set_sort_order(sort_order=sort_order,
+                                      field='data.collection_name.raw')
+                      .include_fields(fields)
+                      .include_fields(fields)
+                      .build())
 
         collections, es_response_metadata = self._execute_query(query_body, limit_names)
 
