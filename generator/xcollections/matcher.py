@@ -127,6 +127,7 @@ class CollectionMatcher(metaclass=Singleton):
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_body = ElasticsearchQueryBuilder() \
             .add_query(query) \
+            .add_filter('term', {'data.public': True}) \
             .add_limit(max_limit if not apply_diversity else max_limit * 3) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .add_rank_feature('metadata.members_count') \
