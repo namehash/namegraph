@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field
 
 
@@ -20,9 +20,9 @@ class Collection(BaseModel):
 
 
 class CollectionResultMetadata(BaseModel):
-    total_number_of_matched_collections: Optional[int] = Field(
-        title='number of matched collections before trimming the result or "+1000" if more than 1000 results',
-        description='return null for `count*` endpoints')  # TODO
+    total_number_of_matched_collections: Optional[Union[int, str]] = Field(
+        title='number of matched collections before trimming the result or `1000+` if more than 1000 results',
+        description='return null for `count*` endpoints')
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
     elasticsearch_processing_time_ms: Optional[float] = Field(
         title='time elapsed for elasticsearch query in milliseconds', description='return null for `count*` endpoints')
@@ -85,7 +85,8 @@ class CollectionsContainingNameCountRequest(BaseModel):
 
 
 class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
-    count: int = Field(title='count of collections containing input label')
+    count: Union[int, str] = Field(
+        title='count of collections containing input label or `1000+` if more than 1000 results')
 
 
 class CollectionsContainingNameRequest(BaseCollectionSearch):
