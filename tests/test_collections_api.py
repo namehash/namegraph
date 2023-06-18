@@ -47,7 +47,7 @@ def test_collection_api_metadata(test_test_client):
         assert (response_json['metadata']['total_number_of_matched_collections'] >=
                 len(response_json['related_collections']))
     else:
-        assert number_of_matched == '+1000'
+        assert number_of_matched == '1000+'
 
     # processing_time
     assert response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
