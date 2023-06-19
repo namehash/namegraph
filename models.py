@@ -6,13 +6,14 @@ from web_api import generator
 
 class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
-                                   description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null")
+                                   description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null",
+                                   example='us')
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       regex=r'^(instant|domain_detail|full)$')
 
 
 class Name(BaseModel):
-    name: str = Field(title='input name')
+    name: str = Field(title='input name', example='zeus')
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('weighted-sampling', title='sorter algorithm',
                         regex=r'^(round-robin|count|length|weighted-sampling)$')
