@@ -87,7 +87,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI'
+            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            max_results: int = 3
     ) -> tuple[list[Collection], dict]:
 
         fields = [
@@ -107,7 +108,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .set_sort_order(sort_order=sort_order,
                                       field='data.collection_name.raw')
                       .include_fields(fields)
-                      .include_fields(fields)
+                      .add_limit(max_results)
                       .build())
 
         collections, es_response_metadata = self._execute_query(query_body, limit_names)

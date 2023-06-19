@@ -254,7 +254,8 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
         request.label,
         limit_names=request.limit_names,
-        sort_order=sort_order
+        sort_order=sort_order,
+        max_results=request.max_results,
     )
 
     # todo: add pagination
