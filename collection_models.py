@@ -34,7 +34,17 @@ class BaseCollectionQueryResponse(BaseModel):
 
 # ======== Collection Search ========
 
-class BaseCollectionSearch(BaseModel):
+class BaseCollectionSearchLimitOffsetSort(BaseModel):
+    limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection',
+                             description='can not be greater than 10')
+    offset: int = Field(0,
+                        title='offset of the first collection to return (used for pagination)',
+                        description='DO NOT use pagination with diversity algorithm')
+    sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI',
+                                                    title='order of the resulting collections (by title for alphabetic sort)')
+
+
+class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
     max_related_collections: int = Field(3, ge=0, title='max number of related collections to return')
     max_per_type: Optional[int] = Field(3,
                                         title='number of collections with the same type which are not penalized',
@@ -47,13 +57,6 @@ class BaseCollectionSearch(BaseModel):
                     '* set to null if you want disable the penalization\n'
                     '* if the penalization algorithm is turned on then 3 times more results (than max_related_collections) are retrieved from Elasticsearch'
     )
-    limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection',
-                             description='can not be greater than 10')
-    offset: int = Field(0,
-                        title='offset of the first collection to return (used for pagination)',
-                        description='DO NOT use pagination with diversity algorithm')
-    sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI',
-                                                    title='order of the resulting collections (by title for alphabetic sort)')
 
 
 class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, domain details
@@ -89,9 +92,10 @@ class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
         title='count of collections containing input label or `1000+` if more than 1000 results')
 
 
-class CollectionsContainingNameRequest(BaseCollectionSearch):
+class CollectionsContainingNameRequest(BaseCollectionSearchLimitOffsetSort):
     label: str = Field(title='label for which membership will be checked for each collection', example='zeus')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
+    max_results: int = Field(3, ge=0, title='max number of collections to return')
 
 
 class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
