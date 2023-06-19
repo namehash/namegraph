@@ -284,19 +284,18 @@ dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
 name = "ens-normalize"
-version = "2.0.0"
+version = "2.0.1"
 description = "Ethereum Name Service (ENS) Name Normalizer"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "ens_normalize-2.0.0-py3-none-any.whl", hash = "sha256:5a77347944886d7afa1dcc7721f6c6d6c69c515521c07c535e3ab42528c126eb"},
-    {file = "ens_normalize-2.0.0.tar.gz", hash = "sha256:74a02b72b03cb450613caa591b42a63df1c580e220a36d8e3861dd2fb6c5c2cd"},
+    {file = "ens_normalize-2.0.1-py3-none-any.whl", hash = "sha256:c3d53bf404e5ec0963fff5b7a4fbe3a5f03ff8d132f0b055a13eae3d708badad"},
+    {file = "ens_normalize-2.0.1.tar.gz", hash = "sha256:e0601f2100e77532bc44f6ca101f8a179104d41d18603fa38d6712460a1deb34"},
 ]
 
 [package.dependencies]
 pyunormalize = ">=15.0.0,<16.0.0"
-regex = ">=2022.10.31,<2023.0.0"
 
 [[package]]
 name = "exceptiongroup"
@@ -1289,4 +1288,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "72bd1df30faab8436c34e375fd09bcc77873fef7bb7b073ec8785f4bbec085fa"
+content-hash = "88d9670ce98125a96b617a499d0ebaf64a3c631fbe3b91732ccc70723ceb48f9"
