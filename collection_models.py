@@ -65,12 +65,12 @@ class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, do
 class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search, domain details
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
                        description='can not contain dots (.)',
-                       regex=r'^[^\.]*$')
+                       regex='^[^.]+$', example='zeus god')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 
 class CollectionSearchByCollection(BaseCollectionSearchWithOther):  # collection_details
-    collection_id: str = Field(title='id of the collection used for search')
+    collection_id: str = Field(title='id of the collection used for search', example='Q24284129')
 
 
 class CollectionSearchResponse(BaseCollectionQueryResponse):
@@ -81,7 +81,7 @@ class CollectionSearchResponse(BaseCollectionQueryResponse):
 # ======== Collection Membership ========
 
 class CollectionsContainingNameCountRequest(BaseModel):
-    label: str = Field(title='label for which collection membership will be checked')
+    label: str = Field(title='label for which collection membership will be checked', example='zeus')
 
 
 class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
@@ -90,7 +90,7 @@ class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
 
 
 class CollectionsContainingNameRequest(BaseCollectionSearch):
-    label: str = Field(title='label for which membership will be checked for each collection')
+    label: str = Field(title='label for which membership will be checked for each collection', example='zeus')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 
