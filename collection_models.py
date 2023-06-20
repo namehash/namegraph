@@ -53,7 +53,7 @@ class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
                                                     '* if the penalization algorithm is turned on then 3 times more results (than max_related_collections) are retrieved from Elasticsearch')
     name_diversity_ratio: Optional[float] = Field(None, example=0.5, ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar names to other collections',
-        description='* if more than name_diversity_ration of the names have already been used, penalize the collection\n'
+        description='* if more than name_diversity_ratio % of the names have already been used, penalize the collection\n'
                     '* set to null if you want disable the penalization\n'
                     '* if the penalization algorithm is turned on then 3 times more results (than max_related_collections) are retrieved from Elasticsearch'
     )
@@ -95,7 +95,8 @@ class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
 class CollectionsContainingNameRequest(BaseCollectionSearchLimitOffsetSort):
     label: str = Field(title='label for which membership will be checked for each collection', example='zeus')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
-    max_results: int = Field(3, ge=0, title='max number of collections to return (for each page)')
+    max_results: int = Field(3, ge=0, title='max number of collections to return (for each page)',
+                 description='return collections at [offset, offset + max_results) positions (order as in sort_order)')
 
 
 class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
