@@ -41,7 +41,8 @@ class BaseCollectionSearchLimitOffsetSort(BaseModel):
                         title='offset of the first collection to return (used for pagination)',
                         description='DO NOT use pagination with diversity algorithm')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI', title='order of the resulting collections',
-                                                    description='* if A-Z or Z-A - sort by title (asc/desc)')
+                        description='* if A-Z or Z-A - sort by title (asc/desc)'
+                                    '* if AI - use intelligent, endpoint-specific sort approach')
 
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):

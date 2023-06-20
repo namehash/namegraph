@@ -131,7 +131,7 @@ class CollectionMatcher(metaclass=Singleton):
         query_body = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
-            .set_sort_order(sort_order, field='data.collection_name.raw') \
+            .set_sort_order(sort_order if sort_order != 'AI' else 'ES', field='data.collection_name.raw') \
             .add_limit(max_limit if not apply_diversity else max_limit * 3) \
             .add_offset(offset) \
             .add_rank_feature('template.collection_rank', boost=100) \
