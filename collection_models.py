@@ -56,8 +56,8 @@ class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
         title='similarity value used for adding penalty to collections with similar names to other collections',
         description='* if more than name_diversity_ratio % of the names have already been used, penalize the collection\n'
                     '* set to null if you want disable the penalization\n'
-                    '* if the penalization algorithm is turned on then 3 times more results (than `max_related_collections`) '
-                    'or `total_number_of_matched_collections` are retrieved from Elasticsearch'
+                    '* if the penalization algorithm is turned on then 3 times more results than `max_related_collections` '
+                    'or `max_results` are retrieved from Elasticsearch'
     )
 
 
