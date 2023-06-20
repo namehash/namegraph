@@ -119,17 +119,19 @@ class CollectionMatcher(metaclass=Singleton):
             self,
             query: str,
             max_limit: int,
+            offset: Optional[int],
             fields: list[str],
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = (name_diversity_ratio is not None or max_per_type is not None) and offset is None
         query_body = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
             .add_limit(max_limit if not apply_diversity else max_limit * 3) \
+            .add_offset(offset if offset is not None else 0) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .add_rank_feature('metadata.members_count') \
             .set_source(False) \
