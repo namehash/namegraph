@@ -14,7 +14,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             query: str,
             mode: str,
             max_related_collections: int = 3,
-            offset: Optional[int] = None,
+            offset: int = 0,
             sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = None,
             min_other_collections: int = 3,
             max_other_collections: int = 3,
@@ -93,7 +93,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             limit_names: int = 10,
             sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = None,
             max_results: int = 3,
-            offset: Optional[int] = None
+            offset: int = 0
     ) -> tuple[list[Collection], dict]:
 
         fields = [
@@ -114,7 +114,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                                       field='data.collection_name.raw')
                       .include_fields(fields)
                       .add_limit(max_results)
-                      .add_offset(offset if offset is not None else 0)
+                      .add_offset(offset)
                       .build())
 
         collections, es_response_metadata = self._execute_query(query_body, limit_names)
