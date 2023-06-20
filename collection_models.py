@@ -37,9 +37,9 @@ class BaseCollectionQueryResponse(BaseModel):
 class BaseCollectionSearchLimitOffsetSort(BaseModel):
     limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection',
                              description='can not be greater than 10')
-    offset: int = Field(0,
-                        title='offset of the first collection to return (used for pagination)',
-                        description='DO NOT use pagination with diversity algorithm')
+    offset: Optional[int] = Field(None,
+                                  title='offset of the first collection to return (used for pagination)',
+                                  description='DO NOT use pagination with diversity algorithm')
     sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI',
                                                     title='order of the resulting collections (by title for alphabetic sort)')
 

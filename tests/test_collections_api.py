@@ -163,7 +163,7 @@ def test_collection_api_get_collections_membership_count_gt_1000(test_test_clien
 
 
 
-# memebership collections
+# membership collections
 @mark.integration_test
 def test_collection_api_find_collections_membership_list_az(test_test_client):
     lim = 8
