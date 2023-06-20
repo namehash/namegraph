@@ -93,7 +93,6 @@ def test_collection_api_eth_suffix(test_test_client):
         "max_total_collections": 5,
         "min_other_collections": 0,
         "max_other_collections": 0,
-        "max_total_collections": 100,
         "name_diversity_ratio": None,  # no diversity
         "max_per_type": None,
     })
