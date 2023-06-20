@@ -15,6 +15,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             mode: str,
             max_related_collections: int = 3,
             offset: Optional[int] = None,
+            sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = None,
             min_other_collections: int = 3,
             max_other_collections: int = 3,
             max_total_collections: int = 6,
@@ -40,8 +41,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             return self._search_related(
                 query=query,
                 max_limit=max_related_collections,
-                offset=offset,
                 fields=fields,
+                offset=offset,
+                sort_order=sort_order,
                 name_diversity_ratio=name_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names,
@@ -89,7 +91,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = None,
             max_results: int = 3,
             offset: Optional[int] = None
     ) -> tuple[list[Collection], dict]:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Union, Iterable, Optional
+from typing import Any, Union, Iterable, Optional, Literal
 from collections import defaultdict
 from operator import itemgetter
 import logging
@@ -119,17 +119,19 @@ class CollectionMatcher(metaclass=Singleton):
             self,
             query: str,
             max_limit: int,
-            offset: Optional[int],
             fields: list[str],
+            offset: Optional[int] = None,
+            sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = None,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
-        apply_diversity = (name_diversity_ratio is not None or max_per_type is not None) and offset is None
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_body = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
+            .set_sort_order(sort_order, field='data.collection_name.raw') \
             .add_limit(max_limit if not apply_diversity else max_limit * 3) \
             .add_offset(offset if offset is not None else 0) \
             .add_rank_feature('template.collection_rank', boost=100) \
