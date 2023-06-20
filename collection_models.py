@@ -42,16 +42,15 @@ class BaseCollectionSearchLimitOffsetSort(BaseModel):
                                   description='DO NOT use pagination with diversity algorithm')
     sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = Field(None,
                                   title='order of the resulting collections (by title for alphabetic sort)')
-# todo: can offset and sort_order be optional (lack of offset indicate that pagination is not to be used)
+# todo: can offset and sort_order be optional (one should use either offset or diversity)
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
     max_related_collections: int = Field(3, ge=0, title='max number of related collections to return')
-    max_per_type: Optional[int] = Field(3,
+    max_per_type: Optional[int] = Field(None, example=3,
                                         title='number of collections with the same type which are not penalized',
                                         description='* set to null if you want to disable the penalization\n'
                                                     '* if the penalization algorithm is turned on then 3 times more results (than max_related_collections) are retrieved from Elasticsearch')
-    name_diversity_ratio: Optional[float] = Field(
-        0.5, ge=0.0, le=1.0,
+    name_diversity_ratio: Optional[float] = Field(None, example=0.5, ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar names to other collections',
         description='* if more than name_diversity_ration of the names have already been used, penalize the collection\n'
                     '* set to null if you want disable the penalization\n'
