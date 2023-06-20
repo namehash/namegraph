@@ -27,6 +27,34 @@ def test_test_client():
     return client
 
 
+@pytest.mark.integration_test
+def test_elasticsearch_template_collections_search(test_test_client):
+    response = test_test_client.post("/find_collections_by_string", json={
+        "query": "highest mountains",
+        "mode": "instant",
+        "max_related_collections": 5,
+        "max_total_collections": 5
+    })
+
+    assert response.status_code == 200
+    titles = [collection['title'] for collection in response.json()['related_collections']]
+    assert 'Highest mountains on Earth' in titles
+
+
+@pytest.mark.integration_test
+def test_elasticsearch_featured_collections_search(test_test_client):
+    response = test_test_client.post("/find_collections_by_string", json={
+        "query": "highestmountains",
+        "mode": "instant",
+        "max_related_collections": 5,
+        "max_total_collections": 5
+    })
+
+    assert response.status_code == 200
+    titles = [collection['title'] for collection in response.json()['related_collections']]
+    assert 'Highest mountains on Earth' in titles
+
+
 @mark.integration_test
 def test_collection_api_metadata(test_test_client):
     t0 = perf_counter()
@@ -62,7 +90,12 @@ def test_collection_api_eth_suffix(test_test_client):
         "query": "australia",
         "mode": "instant",
         "max_related_collections": 5,
-        "max_total_collections": 5
+        "max_total_collections": 5,
+        "min_other_collections": 0,
+        "max_other_collections": 0,
+        "max_total_collections": 100,
+        "name_diversity_ratio": None,  # no diversity
+        "max_per_type": None,
     })
     assert response.status_code == 200
     response_json = response.json()

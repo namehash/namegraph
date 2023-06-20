@@ -110,7 +110,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_rank_feature('template.valid_members_ratio')
                       .add_rank_feature('template.nonavailable_members_ratio', boost=10)
                       .set_source(False)
-                      .set_sort_order(sort_order=sort_order,
+                      .set_sort_order(sort_order=sort_order if sort_order != 'AI' else 'AI-by-member',
                                       field='data.collection_name.raw')
                       .include_fields(fields)
                       .add_limit(max_results)
