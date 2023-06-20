@@ -46,7 +46,8 @@ class BaseCollectionSearchLimitOffsetSort(BaseModel):
 
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
-    max_related_collections: int = Field(3, ge=0, title='max number of related collections to return (for each page)')
+    max_related_collections: int = Field(3, ge=0, title='max number of related collections to return (for each page)',
+        description='return collections at [offset, offset + max_related_collections) positions (order as in sort_order)')
     max_per_type: Optional[int] = Field(None, example=3,
                                         title='number of collections with the same type which are not penalized',
                                         description='* set to null if you want to disable the penalization\n'
