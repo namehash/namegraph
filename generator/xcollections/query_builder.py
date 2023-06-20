@@ -64,12 +64,35 @@ class ElasticsearchQueryBuilder:
 
         return self
 
-    def add_query(self, query: str, type: str = 'cross_fields', fields: list[str] = None) -> ElasticsearchQueryBuilder:
+    def add_term(self, field: str, value: Any) -> ElasticsearchQueryBuilder:
+        """
+        Adds a filter to the query builder
+
+        :param field: field name
+        :param value: value to exactly match
+        :return: self
+        """
+
+        if 'term' not in self._query['query']:
+            self._query['query']['term'] = {}
+
+        self._query['query']['term'][field] = value
+
+        return self
+
+    def add_query(
+            self,
+            query: str,
+            boolean_clause: Literal['must', 'should'] = 'must',
+            type_: str = 'cross_fields',
+            fields: list[str] = None
+    ) -> ElasticsearchQueryBuilder:
         """
         Adds a query to the query builder
 
         :param query: query string
-        :param type: type of query
+        :param boolean_clause: boolean_clause used with this query (must, should...)
+        :param type_: type of query
         :param fields: fields to search in, if None, default fields will be used
         :return: self
         """
@@ -82,11 +105,21 @@ class ElasticsearchQueryBuilder:
                 'data.names.tokenized_name',
             ]
 
-        return self.add_must('multi_match', {
-            'query': query,
-            'fields': fields,
-            'type': type,
-        })
+        if boolean_clause == 'must':
+            return self.add_must('multi_match', {
+                'query': query,
+                'fields': fields,
+                'type': type_,
+            })
+        elif boolean_clause == 'should':
+            return self.add_should('multi_match', {
+                'query': query,
+                'fields': fields,
+                'type': type_,
+            })
+        else:
+            raise ValueError(f"Unexpected boolean_clause value: '{boolean_clause}'")
+
 
     def add_rank_feature(self, field: str, boost: int = None) -> ElasticsearchQueryBuilder:
         """

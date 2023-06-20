@@ -290,7 +290,7 @@ def test_collection_api_find_collections_by_member_page_out_of_bounds(test_test_
 @mark.integration_test
 def test_collection_api_find_collections_by_collection(test_test_client):
     response = test_test_client.post("/find_collections_by_collection", json={
-        "collection_id": "Q1510366",
+        "collection_id": "Q6607079",
         "max_related_collections": 3,
         "min_other_collections": 0,
         "max_other_collections": 3,
@@ -302,6 +302,9 @@ def test_collection_api_find_collections_by_collection(test_test_client):
 
     assert response.status_code == 200
     response_json = response.json()
+    print(response_json)
+
+    assert 'Music artists and bands from London' in [c['title'] for c in response_json['related_collections']]
 
 
 @mark.integration_test

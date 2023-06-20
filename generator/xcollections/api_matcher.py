@@ -67,11 +67,66 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if not self.active:
             return [], {}
 
+        fields = [
+            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
+            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+        ]
+
+        # find collection with specified collection_id
+        id_match_body = (ElasticsearchQueryBuilder()
+                         .add_term('metadata.id.keyword', collection_id)
+                         .set_source(False)
+                         .include_fields(fields)
+                         .build())
+
+        del id_match_body['query']['bool']  # fixme: it's working but it's ugly :)
+
         try:
-            return self._search_related(collection_id, max_related_collections)  # TODO
+            collections, es_response_metadata = self._execute_query(id_match_body, limit_names=10)
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed', exc_info=True)
             return [], {} #TODO: API should fail
+
+        es_time_first = es_response_metadata['took']
+        if len(collections) == 0:
+            logger.warning(f'no collection found with id {collection_id}')
+            return [], es_response_metadata
+        elif es_response_metadata['n_total_hits'] > 1:
+            logger.warning(f'more than 1 collection found with id {collection_id}')
+
+        found_collection = collections[0]
+
+        # search similar collections
+        query_body = (ElasticsearchQueryBuilder()
+                      .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
+                                 fields=["data.collection_name^3", "data.collection_name.exact^3", 'data.collection_keywords^2'])
+                      .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
+                                 fields=["data.names.normalized_name"])
+                      .add_filter('term', {'data.public': True})  # todo: should it be here?
+                      .add_rank_feature('template.collection_rank', boost=100)
+                      .add_rank_feature('metadata.members_count')
+                      .add_rank_feature('template.members_rank_mean')
+                      .add_rank_feature('template.members_system_interesting_score_median')
+                      .add_rank_feature('template.valid_members_ratio')
+                      .add_rank_feature('template.nonavailable_members_ratio')
+                      .set_source(False)
+                      # .set_sort_order(sort_order=sort_order, field='data.collection_name.raw') # todo: add pagination
+                      .include_fields(fields)
+                      .add_limit(max_related_collections)
+                      .build())
+
+        try:
+            collections, es_response_metadata = self._execute_query(query_body, limit_names)
+        except Exception as ex:
+            logger.warning(f'Elasticsearch search failed', exc_info=True)
+            return [], {}
+
+        es_response_metadata['took'] += es_time_first
+
+        return collections, es_response_metadata
+
+
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
         query_body = ElasticsearchQueryBuilder() \
@@ -79,10 +134,15 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .add_filter('term', {'data.public': True}) \
             .build()
 
-        response = self.elastic.count(
-            index=self.index_name,
-            body=query_body
-        )
+        try:
+            response = self.elastic.count(
+                index=self.index_name,
+                body=query_body
+            )
+        except Exception as ex:
+            logger.warning(f'Elasticsearch count failed', exc_info=True)
+            return -1, {} #TODO: API should fail
+
         count = response['count']
 
         return count if count <= 1000 else '1000+', dict()
@@ -118,7 +178,10 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_limit(max_results)
                       .add_offset(offset)
                       .build())
-
-        collections, es_response_metadata = self._execute_query(query_body, limit_names)
+        try:
+            collections, es_response_metadata = self._execute_query(query_body, limit_names)
+        except Exception as ex:
+            logger.warning(f'Elasticsearch search failed', exc_info=True)
+            return [], {} #TODO: API should fail
 
         return collections, es_response_metadata

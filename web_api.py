@@ -221,7 +221,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     time_elapsed = (perf_counter() - t_before) * 1000
   
     metadata = {
-        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
@@ -240,7 +240,7 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
     time_elapsed = (perf_counter() - t_before) * 1000
 
     metadata = {
-        'total_number_of_related_collections': None,
+        'total_number_of_matched_collections': None,
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
     }

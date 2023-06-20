@@ -75,7 +75,7 @@ class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search
 
 
 class CollectionSearchByCollection(BaseCollectionSearchWithOther):  # collection_details
-    collection_id: str = Field(title='id of the collection used for search', example='Q24284129')
+    collection_id: str = Field(title='id of the collection used for search', example='Q6607079')
 
 
 class CollectionSearchResponse(BaseCollectionQueryResponse):
