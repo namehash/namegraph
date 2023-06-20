@@ -179,6 +179,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         mode=query.mode,
         max_related_collections=query.max_related_collections,
         offset=query.offset,
+        sort_order=query.sort_order,
         min_other_collections=query.min_other_collections,
         max_other_collections=query.max_other_collections,
         max_total_collections=query.max_total_collections,

@@ -135,15 +135,16 @@ class ElasticsearchQueryBuilder:
         self._query['_source'] = value
         return self
 
-    def set_sort_order(self, sort_order: Literal['A-Z', 'Z-A', 'AI'],
+    def set_sort_order(self, sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']],
                        field: Optional[str]) -> ElasticsearchQueryBuilder:
         """
         Sets the sort field of the query builder based on the sort_order.
 
         :return: self
         """
-
-        if sort_order == 'AI':
+        if sort_order is None:
+            pass
+        elif sort_order == 'AI':
             self._query['sort'] = [{"template.nonavailable_members_ratio.raw": {"order": "desc"}},
                                    {"metadata.members_count.raw": {"order": "desc"}}, "_score"]
         elif sort_order == 'A-Z':

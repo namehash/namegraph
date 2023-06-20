@@ -40,9 +40,9 @@ class BaseCollectionSearchLimitOffsetSort(BaseModel):
     offset: Optional[int] = Field(None,
                                   title='offset of the first collection to return (used for pagination)',
                                   description='DO NOT use pagination with diversity algorithm')
-    sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI',
-                                                    title='order of the resulting collections (by title for alphabetic sort)')
-
+    sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = Field(None,
+                                  title='order of the resulting collections (by title for alphabetic sort)')
+# todo: can offset and sort_order be optional (lack of offset indicate that pagination is not to be used)
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
     max_related_collections: int = Field(3, ge=0, title='max number of related collections to return')
