@@ -37,15 +37,15 @@ class BaseCollectionQueryResponse(BaseModel):
 class BaseCollectionSearchLimitOffsetSort(BaseModel):
     limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection',
                              description='can not be greater than 10')
-    offset: Optional[int] = Field(None,
-                                  title='offset of the first collection to return (used for pagination)',
-                                  description='DO NOT use pagination with diversity algorithm')
-    sort_order: Optional[Literal['A-Z', 'Z-A', 'AI']] = Field(None,
-                                  title='order of the resulting collections (by title for alphabetic sort)')
-# todo: can offset and sort_order be optional (one should use either offset or diversity)
+    offset: int = Field(0,
+                        title='offset of the first collection to return (used for pagination)',
+                        description='DO NOT use pagination with diversity algorithm')
+    sort_order: Literal['A-Z', 'Z-A', 'AI'] = Field('AI', title='order of the resulting collections',
+                                                    description='* if A-Z or Z-A - sort by title (asc/desc)')
+
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
-    max_related_collections: int = Field(3, ge=0, title='max number of related collections to return')
+    max_related_collections: int = Field(3, ge=0, title='max number of related collections to return (for each page)')
     max_per_type: Optional[int] = Field(None, example=3,
                                         title='number of collections with the same type which are not penalized',
                                         description='* set to null if you want to disable the penalization\n'
@@ -94,7 +94,7 @@ class CollectionsContainingNameCountResponse(BaseCollectionQueryResponse):
 class CollectionsContainingNameRequest(BaseCollectionSearchLimitOffsetSort):
     label: str = Field(title='label for which membership will be checked for each collection', example='zeus')
     mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
-    max_results: int = Field(3, ge=0, title='max number of collections to return')
+    max_results: int = Field(3, ge=0, title='max number of collections to return (for each page)')
 
 
 class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
