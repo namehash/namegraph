@@ -75,7 +75,9 @@ class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search
 
 
 class CollectionSearchByCollection(BaseCollectionSearchWithOther):  # collection_details
-    collection_id: str = Field(title='id of the collection used for search', example='Q6607079')
+    collection_id: str = Field(title='id of the collection used for search', example='Q6607079',
+                               description='this search raises exception with status code 404 if the collection'
+                                           'with id `collection_id` is absent')
 
 
 class CollectionSearchResponse(BaseCollectionQueryResponse):
