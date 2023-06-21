@@ -104,6 +104,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.warning(f'more than 1 collection found with id {collection_id}')
 
         # search similar collections
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+
         query_body = (ElasticsearchQueryBuilder()
                       .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
                                  fields=["data.collection_name^3", "data.collection_name.exact^3", 'data.collection_keywords^2'])
@@ -116,12 +118,11 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_rank_feature('template.members_system_interesting_score_median')
                       .add_rank_feature('template.valid_members_ratio')
                       .add_rank_feature('template.nonavailable_members_ratio')
-                      .set_sort_order(sort_order, field='data.collection_name.raw')
                       .set_source(False)
                       .include_fields(fields)
-                      .add_limit(max_related_collections)
+                      .set_sort_order(sort_order, field='data.collection_name.raw')
+                      .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
                       .build())
-
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
         except Exception as ex:
@@ -130,8 +131,11 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         es_response_metadata['took'] += es_time_first
 
-        return collections, es_response_metadata
+        if not apply_diversity:
+            return collections, es_response_metadata
 
+        diversified = self._apply_diversity(collections, max_related_collections, name_diversity_ratio, max_per_type)
+        return diversified, es_response_metadata
 
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:

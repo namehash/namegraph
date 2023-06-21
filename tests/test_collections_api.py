@@ -291,13 +291,14 @@ def test_collection_api_find_collections_by_member_page_out_of_bounds(test_test_
 def test_collection_api_find_collections_by_collection(test_test_client):
     response = test_test_client.post("/find_collections_by_collection", json={
         "collection_id": "Q6607079",
-        "max_related_collections": 3,
+        "max_related_collections": 10,
         "min_other_collections": 0,
         "max_other_collections": 3,
         "max_total_collections": 6,
         "name_diversity_ratio": 0.5,
         "max_per_type": 3,
         "limit_names": 10,
+        "sort_order": 'AI'
     })
 
     assert response.status_code == 200
