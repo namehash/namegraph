@@ -309,6 +309,33 @@ def test_collection_api_find_collections_by_collection(test_test_client):
 
 
 @mark.integration_test
+def test_collection_api_find_collections_by_collection_az(test_test_client):
+    response = test_test_client.post("/find_collections_by_collection", json={
+        "collection_id": "Q6607079",
+        "max_related_collections": 8,
+        "min_other_collections": 0,
+        "max_other_collections": 3,
+        "max_total_collections": 6,
+        "limit_names": 6,
+        "offset": 8,
+        "sort_order": 'A-Z'
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+    print(response_json)
+
+    collection_list = response_json['related_collections']
+
+    # test limit names
+    assert all([len(c['top_names']) <= 6 for c in collection_list])
+
+    # test A-Z sort
+    titles = [c['title'] for c in collection_list]
+    assert titles == sorted(titles)
+
+
+@mark.integration_test
 def test_collection_api_find_collections_by_collection_not_found(test_test_client):
     response = test_test_client.post("/find_collections_by_collection", json={
         "collection_id": "NoSuChId",

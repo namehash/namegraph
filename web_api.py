@@ -204,6 +204,9 @@ async def find_collections_by_string(query: CollectionSearchByString):
 
 @app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
+    """
+    * this search raises exception with status code 404 if the collection with id `collection_id` is absent
+    """
     t_before = perf_counter()
 
     collections, es_search_metadata = collections_matcher.search_by_collection(
