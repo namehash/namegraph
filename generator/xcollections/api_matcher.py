@@ -80,8 +80,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
                          .include_fields(fields)
                          .build())
 
-        del id_match_body['query']['bool']  # fixme: it's working but it's ugly :)
-
         try:
             collections, es_response_metadata = self._execute_query(id_match_body, limit_names=10)
         except Exception as ex:

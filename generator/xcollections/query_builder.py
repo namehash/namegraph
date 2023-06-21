@@ -7,9 +7,7 @@ from copy import deepcopy
 class ElasticsearchQueryBuilder:
     def __init__(self):
         self._query = {
-            'query': {
-                'bool': {}
-            },
+            'query': {},
         }
 
     def add_must(self, type: str, query: dict) -> ElasticsearchQueryBuilder:
@@ -20,6 +18,9 @@ class ElasticsearchQueryBuilder:
         :param query: query
         :return: self
         """
+        if 'bool' not in self._query['query']:
+            self._query['query']['bool'] = {}
+
         if 'must' not in self._query['query']['bool']:
             self._query['query']['bool']['must'] = []
 
@@ -37,6 +38,9 @@ class ElasticsearchQueryBuilder:
         :param query: query
         :return: self
         """
+        if 'bool' not in self._query['query']:
+            self._query['query']['bool'] = {}
+
         if 'should' not in self._query['query']['bool']:
             self._query['query']['bool']['should'] = []
 
@@ -54,6 +58,8 @@ class ElasticsearchQueryBuilder:
         :param query: query
         :return: self
         """
+        if 'bool' not in self._query['query']:
+            self._query['query']['bool'] = {}
 
         if 'filter' not in self._query['query']['bool']:
             self._query['query']['bool']['filter'] = []
