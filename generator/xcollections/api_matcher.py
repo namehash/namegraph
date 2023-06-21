@@ -25,10 +25,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
-        if not self.active:
-            logger.warning(f'Elasticsearch is not active', exc_info=True)
-            return [], {}  # todo: should we raise an exception
-
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'
@@ -67,10 +63,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI'
     ) -> tuple[list[Collection], dict]:
 
-        if not self.active:
-            logger.warning(f'Elasticsearch is not active', exc_info=True)
-            return [], {}
-
         if sort_order == 'AI':
             sort_order = 'ES'
 
@@ -82,7 +74,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         # find collection with specified collection_id
         id_match_body = (ElasticsearchQueryBuilder()
-                         .add_term('metadata.id.keyword', collection_id)
+                         .set_term('metadata.id.keyword', collection_id)
                          .set_source(False)
                          .include_fields(fields)
                          .build())
@@ -111,7 +103,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                                  fields=["data.collection_name^3", "data.collection_name.exact^3", 'data.collection_keywords^2'])
                       .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
                                  fields=["data.names.normalized_name"])
-                      .add_filter('term', {'data.public': True})  # todo: should it be here?
+                      .add_filter('term', {'data.public': True})
                       .add_rank_feature('template.collection_rank', boost=100)
                       .add_rank_feature('metadata.members_count')
                       .add_rank_feature('template.members_rank_mean')
@@ -139,9 +131,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
-        if not self.active:
-            logger.warning(f'Elasticsearch is not active', exc_info=True)
-            return -1, {}
 
         query_body = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
@@ -169,9 +158,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
-        if not self.active:
-            logger.warning(f'Elasticsearch is not active', exc_info=True)
-            return [], {}
 
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',

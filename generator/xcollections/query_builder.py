@@ -70,19 +70,16 @@ class ElasticsearchQueryBuilder:
 
         return self
 
-    def add_term(self, field: str, value: Any) -> ElasticsearchQueryBuilder:
+    def set_term(self, field: str, value: Any) -> ElasticsearchQueryBuilder:
         """
-        Adds a filter to the query builder
+        Sets a term of the query builder
 
-        :param field: field name
+        :param field: field name (shouldn't be analyzed)
         :param value: value to exactly match
         :return: self
         """
 
-        if 'term' not in self._query['query']:
-            self._query['query']['term'] = {}
-
-        self._query['query']['term'][field] = value
+        self._query['query']['term'] = {field: value}
 
         return self
 
