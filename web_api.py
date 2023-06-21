@@ -204,6 +204,9 @@ async def find_collections_by_string(query: CollectionSearchByString):
 
 @app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
 async def find_collections_by_collection(query: CollectionSearchByCollection):
+    """
+    * this search raises exception with status code 404 if the collection with id `collection_id` is absent
+    """
     t_before = perf_counter()
 
     collections, es_search_metadata = collections_matcher.search_by_collection(
@@ -215,13 +218,15 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
+        sort_order=query.sort_order,
+        offset=query.offset
     )
     collections = convert_to_collection_format(collections)
     
     time_elapsed = (perf_counter() - t_before) * 1000
   
     metadata = {
-        'total_number_of_related_collections': es_search_metadata.get('n_total_hits', None),
+        'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
     }
@@ -240,7 +245,7 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
     time_elapsed = (perf_counter() - t_before) * 1000
 
     metadata = {
-        'total_number_of_related_collections': None,
+        'total_number_of_matched_collections': None,
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
     }
