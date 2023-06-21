@@ -50,7 +50,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             )
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {}
+            return [], {} #TODO: API should fail
 
     def search_by_collection(
             self,
@@ -71,9 +71,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             return self._search_related(collection_id, max_related_collections)  # TODO
         except Exception as ex:
             logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {}
+            return [], {} #TODO: API should fail
 
-    def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int,str], dict]:
+    def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
         query_body = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
             .add_filter('term', {'data.public': True}) \
@@ -104,7 +104,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         if sort_order == 'AI':
             sort_order = 'AI-by-member'
-        
+
         query_body = (ElasticsearchQueryBuilder()
                       .add_filter('term', {'data.names.normalized_name': name_label})
                       .add_filter('term', {'data.public': True})
