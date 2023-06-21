@@ -314,8 +314,8 @@ def test_collection_api_find_collections_by_collection_az(test_test_client):
         "collection_id": "Q6607079",
         "max_related_collections": 8,
         "min_other_collections": 0,
-        "max_other_collections": 3,
-        "max_total_collections": 6,
+        "max_other_collections": 2,
+        "max_total_collections": 10,
         "limit_names": 6,
         "offset": 8,
         "sort_order": 'A-Z'
