@@ -1,5 +1,6 @@
 from typing import Optional, Literal, Union
 import logging
+from fastapi import HTTPException
 
 from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
@@ -25,7 +26,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         if not self.active:
-            return [], {}
+            logger.warning(f'Elasticsearch is not active', exc_info=True)
+            return [], {}  # todo: should we raise an exception
 
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
@@ -49,8 +51,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 limit_names=limit_names,
             )
         except Exception as ex:
-            logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {} #TODO: API should fail
+            logger.error(f'Elasticsearch search failed', exc_info=True)
+            raise ex
 
     def search_by_collection(
             self,
@@ -65,6 +67,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         if not self.active:
+            logger.warning(f'Elasticsearch is not active', exc_info=True)
             return [], {}
 
         fields = [
@@ -83,17 +86,18 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(id_match_body, limit_names=10)
         except Exception as ex:
-            logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {} #TODO: API should fail
+            logger.error(f'Elasticsearch search failed', exc_info=True)
+            raise ex
+
+        try:
+            found_collection = collections[0]
+        except KeyError as ex:
+            logger.error(f'could not find collection with id {collection_id}', exc_info=True)
+            raise HTTPException(status_code=404, detail=f"Collection with id={collection_id} not found.")
 
         es_time_first = es_response_metadata['took']
-        if len(collections) == 0:
-            logger.warning(f'no collection found with id {collection_id}')
-            return [], es_response_metadata
-        elif es_response_metadata['n_total_hits'] > 1:
+        if es_response_metadata['n_total_hits'] > 1:
             logger.warning(f'more than 1 collection found with id {collection_id}')
-
-        found_collection = collections[0]
 
         # search similar collections
         query_body = (ElasticsearchQueryBuilder()
@@ -109,7 +113,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_rank_feature('template.valid_members_ratio')
                       .add_rank_feature('template.nonavailable_members_ratio')
                       .set_source(False)
-                      # .set_sort_order(sort_order=sort_order, field='data.collection_name.raw') # todo: add pagination
+                      # .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')
                       .include_fields(fields)
                       .add_limit(max_related_collections)
                       .build())
@@ -127,6 +131,10 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
+        if not self.active:
+            logger.warning(f'Elasticsearch is not active', exc_info=True)
+            return -1, {}
+
         query_body = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
             .add_filter('term', {'data.public': True}) \
@@ -138,8 +146,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 body=query_body
             )
         except Exception as ex:
-            logger.warning(f'Elasticsearch count failed', exc_info=True)
-            return -1, {} #TODO: API should fail
+            logger.error(f'Elasticsearch count failed', exc_info=True)
+            raise ex
 
         count = response['count']
 
@@ -153,6 +161,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
+        if not self.active:
+            logger.warning(f'Elasticsearch is not active', exc_info=True)
+            return [], {}
 
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',
@@ -179,7 +190,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
         except Exception as ex:
-            logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {} #TODO: API should fail
+            logger.error(f'Elasticsearch count failed', exc_info=True)
+            raise ex
 
         return collections, es_response_metadata
