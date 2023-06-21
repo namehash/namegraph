@@ -102,6 +102,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
         ]
 
+        if sort_order == 'AI':
+            sort_order = 'AI-by-member'
+        
         query_body = (ElasticsearchQueryBuilder()
                       .add_filter('term', {'data.names.normalized_name': name_label})
                       .add_filter('term', {'data.public': True})
@@ -110,8 +113,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_rank_feature('template.valid_members_ratio')
                       .add_rank_feature('template.nonavailable_members_ratio', boost=10)
                       .set_source(False)
-                      .set_sort_order(sort_order=sort_order if sort_order != 'AI' else 'AI-by-member',
-                                      field='data.collection_name.raw')
+                      .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')
                       .include_fields(fields)
                       .add_limit(max_results)
                       .add_offset(offset)
