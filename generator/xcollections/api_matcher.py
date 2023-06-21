@@ -90,7 +90,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(id_match_body, limit_names=10)
         except Exception as ex:
-            logger.error(f'Elasticsearch search failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [id-to-collection search]', exc_info=True)
             raise ex
 
         try:
@@ -125,8 +125,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
         except Exception as ex:
-            logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {}
+            logger.error(f'Elasticsearch search failed [collection-to-collections search]', exc_info=True)
+            raise ex
 
         es_response_metadata['took'] += es_time_first
 
