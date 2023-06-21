@@ -51,8 +51,7 @@ class ElasticsearchQueryBuilder:
         Adds a filter to the query builder
 
         :param type: type of filter
-        :param field: field name
-        :param value: value to filter
+        :param query: query
         :return: self
         """
 
