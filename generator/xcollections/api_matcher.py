@@ -63,12 +63,16 @@ class CollectionMatcherForAPI(CollectionMatcher):
             max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
-            limit_names: Optional[int] = 10
+            limit_names: Optional[int] = 10,
+            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI'
     ) -> tuple[list[Collection], dict]:
 
         if not self.active:
             logger.warning(f'Elasticsearch is not active', exc_info=True)
             return [], {}
+
+        if sort_order == 'AI':
+            sort_order = 'ES'
 
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',
@@ -112,8 +116,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_rank_feature('template.members_system_interesting_score_median')
                       .add_rank_feature('template.valid_members_ratio')
                       .add_rank_feature('template.nonavailable_members_ratio')
+                      .set_sort_order(sort_order, field='data.collection_name.raw')
                       .set_source(False)
-                      # .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')
                       .include_fields(fields)
                       .add_limit(max_related_collections)
                       .build())

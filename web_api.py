@@ -215,6 +215,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
+        sort_order=query.sort_order
     )
     collections = convert_to_collection_format(collections)
     
