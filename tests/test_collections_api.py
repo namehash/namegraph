@@ -78,9 +78,7 @@ def test_collection_api_metadata(test_test_client):
         assert number_of_matched == '1000+'
 
     # processing_time
-    es_time = response_json['metadata'].get('elasticsearch_processing_time_ms', None)
-    if es_time is None:
-        es_time = 0.
+    es_time = response_json['metadata'].get('elasticsearch_processing_time_ms', 0)
     assert es_time <= response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
 
