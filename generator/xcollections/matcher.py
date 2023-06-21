@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Union, Iterable, Optional
+from typing import Any, Optional, Literal
 from collections import defaultdict
 from operator import itemgetter
 import logging
@@ -106,7 +106,7 @@ class CollectionMatcher(metaclass=Singleton):
         response = self.elastic.search(index=self.index_name, body=query_body)
 
         hits = response["hits"]["hits"]
-        n_total_hits=response["hits"]['total']['value']
+        n_total_hits = response["hits"]['total']['value']
         es_response_metadata = {
             'n_total_hits': n_total_hits if n_total_hits <= 1000 else '1000+',
             'took': response['took'],
@@ -120,16 +120,23 @@ class CollectionMatcher(metaclass=Singleton):
             query: str,
             max_limit: int,
             fields: list[str],
+            offset: int = 0,
+            sort_order: Literal['A-Z', 'Z-A', 'AI'] = None,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
+        if sort_order == 'AI':
+            sort_order = 'ES'
+
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_body = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
+            .set_sort_order(sort_order, field='data.collection_name.raw') \
             .add_limit(max_limit if not apply_diversity else max_limit * 3) \
+            .add_offset(offset) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .add_rank_feature('metadata.members_count') \
             .set_source(False) \

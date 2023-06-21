@@ -51,8 +51,7 @@ class ElasticsearchQueryBuilder:
         Adds a filter to the query builder
 
         :param type: type of filter
-        :param field: field name
-        :param value: value to filter
+        :param query: query
         :return: self
         """
 
@@ -149,6 +148,16 @@ class ElasticsearchQueryBuilder:
         self._query['size'] = limit
         return self
 
+    def add_offset(self, offset: int) -> ElasticsearchQueryBuilder:
+        """
+        Adds an offset (ES from) to the query builder
+
+        :param offset: offset (from)
+        :return: self
+        """
+        self._query['from'] = offset
+        return self
+
     def set_source(self, value: Any) -> ElasticsearchQueryBuilder:
         """
         Sets the source of the query builder
@@ -158,21 +167,22 @@ class ElasticsearchQueryBuilder:
         self._query['_source'] = value
         return self
 
-    def set_sort_order(self, sort_order: Literal['A-Z', 'Z-A', 'AI'],
+    def set_sort_order(self, sort_order: Literal['A-Z', 'Z-A', 'AI-by-member', 'ES'],
                        field: Optional[str]) -> ElasticsearchQueryBuilder:
         """
         Sets the sort field of the query builder based on the sort_order.
 
         :return: self
         """
-
-        if sort_order == 'AI':
+        if sort_order == 'ES':
+            pass
+        elif sort_order == 'AI-by-member':
             self._query['sort'] = [{"template.nonavailable_members_ratio.raw": {"order": "desc"}},
                                    {"metadata.members_count.raw": {"order": "desc"}}, "_score"]
         elif sort_order == 'A-Z':
-            self._query['sort'] = [{f"{field}": {"order": "asc"}}, "_score"]
+            self._query['sort'] = [{field: {"order": "asc"}}, "_score"]
         elif sort_order == 'Z-A':
-            self._query['sort'] = [{f"{field}": {"order": "desc"}}, "_score"]
+            self._query['sort'] = [{field: {"order": "desc"}}, "_score"]
         else:
             raise ValueError(f"Unexpected sort_order value: '{sort_order}'")
 

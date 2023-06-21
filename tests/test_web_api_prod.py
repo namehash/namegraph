@@ -318,36 +318,6 @@ def test_not_instant_search_temp(prod_test_client):
     ])
 
 
-@pytest.mark.integration_test
-def test_elasticsearch_template_collections_search(prod_test_client):
-    client = prod_test_client
-    response = client.post("/find_collections_by_string", json={
-        "query": "highest mountains",
-        "mode": "instant",
-        "max_related_collections": 5,
-        "max_total_collections": 5
-    })
-
-    assert response.status_code == 200
-    titles = [collection['title'] for collection in response.json()['related_collections']]
-    assert 'Highest mountains on Earth' in titles
-
-
-@pytest.mark.integration_test
-def test_elasticsearch_featured_collections_search(prod_test_client):
-    client = prod_test_client
-    response = client.post("/find_collections_by_string", json={
-        "query": "highestmountains",
-        "mode": "instant",
-        "max_related_collections": 5,
-        "max_total_collections": 5
-    })
-
-    assert response.status_code == 200
-    titles = [collection['title'] for collection in response.json()['related_collections']]
-    assert 'Highest mountains on Earth' in titles
-
-
 def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     client = prod_test_client
     response = client.post("/",

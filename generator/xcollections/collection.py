@@ -50,7 +50,7 @@ class Collection:
             number_of_names=fields['metadata.members_count'][0],
             names=fields['template.top10_names.normalized_name'][:limit_names],
             namehashes=fields['template.top10_names.namehash'][:limit_names]
-                if 'template.top10_names.namehash' in fields else None,
+            if 'template.top10_names.namehash' in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0]

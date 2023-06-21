@@ -178,6 +178,8 @@ async def find_collections_by_string(query: CollectionSearchByString):
         query.query,
         mode=query.mode,
         max_related_collections=query.max_related_collections,
+        offset=query.offset,
+        sort_order=query.sort_order,
         min_other_collections=query.min_other_collections,
         max_other_collections=query.max_other_collections,
         max_total_collections=query.max_total_collections,
@@ -250,15 +252,13 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
 async def find_collections_membership_list(request: CollectionsContainingNameRequest):
     t_before = perf_counter()
 
-    sort_order = request.sort_order
     collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
         request.label,
         limit_names=request.limit_names,
-        sort_order=sort_order,
+        sort_order=request.sort_order,
         max_results=request.max_results,
+        offset=request.offset,
     )
-
-    # todo: add pagination
 
     collections = convert_to_collection_format(collections_featuring_label)
 
