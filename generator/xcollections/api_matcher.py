@@ -91,7 +91,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         try:
             found_collection = collections[0]
-        except KeyError as ex:
+        except IndexError as ex:
             logger.error(f'could not find collection with id {collection_id}', exc_info=True)
             raise HTTPException(status_code=404, detail=f"Collection with id={collection_id} not found.")
 

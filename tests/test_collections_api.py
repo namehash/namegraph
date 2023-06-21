@@ -308,6 +308,21 @@ def test_collection_api_find_collections_by_collection(test_test_client):
 
 
 @mark.integration_test
+def test_collection_api_find_collections_by_collection_not_found(test_test_client):
+    response = test_test_client.post("/find_collections_by_collection", json={
+        "collection_id": "NoSuChId",
+        "max_related_collections": 3,
+        "min_other_collections": 0,
+        "max_other_collections": 3,
+        "max_total_collections": 6,
+        "name_diversity_ratio": 0.5,
+        "max_per_type": 3,
+        "limit_names": 10,
+    })
+    assert response.status_code == 404
+
+
+@mark.integration_test
 def test_collection_api_instant_search_dot(test_test_client):
     response = test_test_client.post("/find_collections_by_string", json={
         "query": "australia.eth"
