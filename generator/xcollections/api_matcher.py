@@ -60,7 +60,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI'
+            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            offset: int = 0
     ) -> tuple[list[Collection], dict]:
 
         if sort_order == 'AI':
@@ -114,6 +115,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .include_fields(fields)
                       .set_sort_order(sort_order, field='data.collection_name.raw')
                       .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
+                      .add_offset(offset)
                       .build())
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
