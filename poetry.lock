@@ -230,6 +230,7 @@ automaton-tools = "*"
 [package.source]
 type = "url"
 url = "https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl"
+
 [[package]]
 name = "elastic-transport"
 version = "8.4.0"
@@ -284,14 +285,14 @@ dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
 name = "ens-normalize"
-version = "2.0.1"
+version = "3.0.2"
 description = "Ethereum Name Service (ENS) Name Normalizer"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "ens_normalize-2.0.1-py3-none-any.whl", hash = "sha256:c3d53bf404e5ec0963fff5b7a4fbe3a5f03ff8d132f0b055a13eae3d708badad"},
-    {file = "ens_normalize-2.0.1.tar.gz", hash = "sha256:e0601f2100e77532bc44f6ca101f8a179104d41d18603fa38d6712460a1deb34"},
+    {file = "ens_normalize-3.0.2-py3-none-any.whl", hash = "sha256:12de9e8b672cee77a01bd13d3bc33d54db436fccadc6d69207506682ce19fc46"},
+    {file = "ens_normalize-3.0.2.tar.gz", hash = "sha256:c1e88decd6b052fa6c443f7f155c0ef0fe5281553bfb8ed575d43158f7021b49"},
 ]
 
 [package.dependencies]
@@ -1288,4 +1289,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "88d9670ce98125a96b617a499d0ebaf64a3c631fbe3b91732ccc70723ceb48f9"
+content-hash = "650ef41d7cf520a14bf0979b0d6514dc0d9f9ca9cc8a976d9dc3364bdd8109a9"
