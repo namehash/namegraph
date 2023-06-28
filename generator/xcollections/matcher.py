@@ -102,8 +102,8 @@ class CollectionMatcher(metaclass=Singleton):
 
         return diversified + penalized_collections[:max_limit - len(diversified)]
 
-    def _execute_query(self, query_body: dict, limit_names: int) -> tuple[list[Collection], dict[str, Any]]:
-        response = self.elastic.search(index=self.index_name, body=query_body)
+    def _execute_query(self, query_params: dict, limit_names: int) -> tuple[list[Collection], dict[str, Any]]:
+        response = self.elastic.search(index=self.index_name, **query_params)
 
         hits = response["hits"]["hits"]
         n_total_hits = response["hits"]['total']['value']
@@ -131,7 +131,7 @@ class CollectionMatcher(metaclass=Singleton):
             sort_order = 'ES'
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
-        query_body = ElasticsearchQueryBuilder() \
+        query_params = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
             .set_sort_order(sort_order, field='data.collection_name.raw') \
@@ -141,9 +141,9 @@ class CollectionMatcher(metaclass=Singleton):
             .add_rank_feature('metadata.members_count') \
             .set_source(False) \
             .include_fields(fields) \
-            .build()
+            .build_params()
 
-        collections, es_response_metadata = self._execute_query(query_body, limit_names)
+        collections, es_response_metadata = self._execute_query(query_params, limit_names)
 
         if not apply_diversity:
             return collections[:max_limit], es_response_metadata

@@ -74,14 +74,14 @@ class CollectionMatcherForAPI(CollectionMatcher):
         ]
 
         # find collection with specified collection_id
-        id_match_body = (ElasticsearchQueryBuilder()
+        id_match_params = (ElasticsearchQueryBuilder()
                          .set_term('metadata.id.keyword', collection_id)
                          .set_source(False)
                          .include_fields(fields)
-                         .build())
+                         .build_params())
 
         try:
-            collections, es_response_metadata = self._execute_query(id_match_body, limit_names=10)
+            collections, es_response_metadata = self._execute_query(id_match_params, limit_names=10)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [id-to-collection search]', exc_info=True)
             raise ex
@@ -99,7 +99,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         # search similar collections
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
-        query_body = (ElasticsearchQueryBuilder()
+        query_params = (ElasticsearchQueryBuilder()
                       .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
                                  fields=["data.collection_name^3", "data.collection_name.exact^3", 'data.collection_keywords^2'])
                       .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
@@ -117,10 +117,10 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .set_sort_order(sort_order, field='data.collection_name.raw')
                       .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
                       .add_offset(offset)
-                      .build())
+                      .build_params())
 
         try:
-            collections, es_response_metadata = self._execute_query(query_body, limit_names)
+            collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [collection-to-collections search]', exc_info=True)
             raise ex
@@ -136,15 +136,15 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
 
-        query_body = ElasticsearchQueryBuilder() \
+        query_params = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
             .add_filter('term', {'data.public': True}) \
-            .build()
+            .build_params()
 
         try:
             response = self.elastic.count(
                 index=self.index_name,
-                body=query_body
+                **query_params
             )
         except Exception as ex:
             logger.error(f'Elasticsearch count failed', exc_info=True)
@@ -172,7 +172,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if sort_order == 'AI':
             sort_order = 'AI-by-member'
 
-        query_body = (ElasticsearchQueryBuilder()
+        query_params = (ElasticsearchQueryBuilder()
                       .add_filter('term', {'data.names.normalized_name': name_label})
                       .add_filter('term', {'data.public': True})
                       .add_rank_feature('metadata.members_count')
@@ -184,9 +184,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .include_fields(fields)
                       .add_limit(max_results)
                       .add_offset(offset)
-                      .build())
+                      .build_params())
         try:
-            collections, es_response_metadata = self._execute_query(query_body, limit_names)
+            collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch count failed', exc_info=True)
             raise ex
