@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional, Literal
 from collections import defaultdict
 from operator import itemgetter
+from time import perf_counter
 import logging
 
 import elastic_transport
@@ -103,13 +104,16 @@ class CollectionMatcher(metaclass=Singleton):
         return diversified + penalized_collections[:max_limit - len(diversified)]
 
     def _execute_query(self, query_params: dict, limit_names: int) -> tuple[list[Collection], dict[str, Any]]:
+        t_before = perf_counter()
         response = self.elastic.search(index=self.index_name, **query_params)
+        time_elapsed = (perf_counter() - t_before) * 1000
 
         hits = response["hits"]["hits"]
         n_total_hits = response["hits"]['total']['value']
         es_response_metadata = {
             'n_total_hits': n_total_hits if n_total_hits <= 1000 else '1000+',
             'took': response['took'],
+            'elasticsearch_communication_time': time_elapsed,
         }
 
         collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]

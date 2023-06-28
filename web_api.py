@@ -195,6 +195,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
+        'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
@@ -229,6 +230,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
+        'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
     response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
@@ -248,6 +250,7 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
         'total_number_of_matched_collections': None,
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
+        'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
     }
 
     return JSONResponse({'count': count, 'metadata': metadata})
@@ -273,6 +276,7 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
         'elasticsearch_processing_time_ms': es_search_metadata.get('took', None),
+        'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
     return JSONResponse({'collections': collections, 'metadata': metadata})
