@@ -254,5 +254,20 @@ class ElasticsearchQueryBuilder:
 
         return self
 
-    def build(self):
+    def build_body(self):
+        """For use as a `body` parameter in elasticsearch query."""
         return deepcopy(self._query)
+
+    def build_params(self):
+        """For use as separate parameters (**es_params) in elasticsearch query."""
+        es_params = deepcopy(self._query)
+
+        if 'source' in es_params:
+            es_params['source'] = es_params['_source']
+            del es_params['_source']
+
+        if 'from_' in es_params:
+            es_params['from_'] = es_params['from']
+            del es_params['from']
+
+        return es_params
