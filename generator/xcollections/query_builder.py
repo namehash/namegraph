@@ -50,6 +50,26 @@ class ElasticsearchQueryBuilder:
 
         return self
 
+    def add_must_not(self, type: str, query: dict) -> ElasticsearchQueryBuilder:
+        """
+        Adds a must_not query to the query builder
+
+        :param type: type of query
+        :param query: query
+        :return: self
+        """
+        if 'bool' not in self._query['query']:
+            self._query['query']['bool'] = {}
+
+        if 'must_not' not in self._query['query']['bool']:
+            self._query['query']['bool']['must_not'] = []
+
+        self._query['query']['bool']['must_not'].append({
+            type: query
+        })
+
+        return self
+
     def add_filter(self, type: str, query: dict) -> ElasticsearchQueryBuilder:
         """
         Adds a filter to the query builder

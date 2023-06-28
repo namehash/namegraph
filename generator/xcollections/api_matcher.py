@@ -105,6 +105,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
                                  fields=["data.names.normalized_name"])
                       .add_filter('term', {'data.public': True})
+                      .add_must_not('term', {"metadata.id.keyword": collection_id})
                       .add_rank_feature('template.collection_rank', boost=100)
                       .add_rank_feature('metadata.members_count')
                       .add_rank_feature('template.members_rank_mean')
@@ -117,6 +118,10 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
                       .add_offset(offset)
                       .build())
+
+        print(query_body)
+        import time
+        time.sleep(20)
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
         except Exception as ex:
