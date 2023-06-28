@@ -1,5 +1,7 @@
 from typing import Optional, Literal, Union
+from time import perf_counter
 import logging
+
 from fastapi import HTTPException
 
 from generator.xcollections.matcher import CollectionMatcher
@@ -93,6 +95,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f"Collection with id={collection_id} not found.")
 
         es_time_first = es_response_metadata['took']
+        es_comm_time_first = es_response_metadata['elasticsearch_communication_time']
         if es_response_metadata['n_total_hits'] > 1:
             logger.warning(f'more than 1 collection found with id {collection_id}')
 
@@ -124,13 +127,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
             raise ex
 
         es_response_metadata['took'] += es_time_first
+        es_response_metadata['elasticsearch_communication_time'] += es_comm_time_first
 
         if not apply_diversity:
             return collections, es_response_metadata
 
         diversified = self._apply_diversity(collections, max_related_collections, name_diversity_ratio, max_per_type)
         return diversified, es_response_metadata
-
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
 
@@ -140,17 +143,19 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .build()
 
         try:
+            t_before = perf_counter()
             response = self.elastic.count(
                 index=self.index_name,
                 body=query_body
             )
+            time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
             logger.error(f'Elasticsearch count failed', exc_info=True)
             raise ex
 
         count = response['count']
 
-        return count if count <= 1000 else '1000+', dict()
+        return count if count <= 1000 else '1000+', {'elasticsearch_communication_time': time_elapsed}
 
     def get_collections_membership_list_for_name(
             self,
