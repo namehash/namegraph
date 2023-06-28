@@ -171,16 +171,16 @@ def print_resutls(hits):
         f'<th>rank</th>'
         f'<th>wikidata</th>'
         f'<th>type</th>'
-        f'<th>members rank mean</th>'
-        f'<th>members rank median</th>'
-        f'<th>members system interesting score mean</th>'
-        f'<th>members system interesting score median</th>'
-        f'<th>valid members count</th>'
-        f'<th>invalid members count</th>'
-        f'<th>valid members ratio</th>'
-        f'<th>nonavailable members count</th>'
-        f'<th>nonavailable members ratio</th>'
-        f'<th>is merged</th>'
+        # f'<th>members rank mean</th>'
+        # f'<th>members rank median</th>'
+        # f'<th>members system interesting score mean</th>'
+        # f'<th>members system interesting score median</th>'
+        # f'<th>valid members count</th>'
+        # f'<th>invalid members count</th>'
+        # f'<th>valid members ratio</th>'
+        # f'<th>nonavailable members count</th>'
+        # f'<th>nonavailable members ratio</th>'
+        # f'<th>is merged</th>'
         f'<th>names</th>'
         f'</tr>'
     )
@@ -220,16 +220,16 @@ def print_resutls(hits):
             f'<td>{rank}</td>'
             f'<td><a href="https://www.wikidata.org/wiki/{wikidata_id}">{wikidata_id}</a></td>'
             f'<td>{types}</td>',
-            f'<td>{members_rank_mean:.0f}</td>'
-            f'<td>{members_rank_median:.0f}</td>'
-            f'<td>{members_system_interesting_score_mean:.4f}</td>'
-            f'<td>{members_system_interesting_score_median:.4f}</td>'
-            f'<td>{valid_members_count}</td>'
-            f'<td>{invalid_members_count}</td>'
-            f'<td>{valid_members_ratio:.2f}</td>'
-            f'<td>{nonavailable_members_count}</td>'
-            f'<td>{nonavailable_members_ratio:.2f}</td>'
-            f'<td>{is_merged}</td>'
+            # f'<td>{members_rank_mean:.0f}</td>'
+            # f'<td>{members_rank_median:.0f}</td>'
+            # f'<td>{members_system_interesting_score_mean:.4f}</td>'
+            # f'<td>{members_system_interesting_score_median:.4f}</td>'
+            # f'<td>{valid_members_count}</td>'
+            # f'<td>{invalid_members_count}</td>'
+            # f'<td>{valid_members_ratio:.2f}</td>'
+            # f'<td>{nonavailable_members_count}</td>'
+            # f'<td>{nonavailable_members_ratio:.2f}</td>'
+            # f'<td>{is_merged}</td>'
             f'<td>{names}</td>'
             f'</tr>'
         )
@@ -237,7 +237,7 @@ def print_resutls(hits):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Search collections related to collection connecting to Elasticsearch')
+    parser = ArgumentParser()
     parser.add_argument('queries', nargs='+', help='queries')
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
@@ -261,9 +261,9 @@ if __name__ == '__main__':
     for query in tqdm(args.queries):
         print(f'<h1>{query}</h1>')
 
-        print(f'<h2>search by collection name</h2>')
+        # print(f'<h2>search by collection name</h2>')
         hits = search_by_all(query, args.limit)
-        print_resutls(hits)
+        # print_resutls(hits)
 
         the_collection = None
         for hit in hits:
@@ -276,16 +276,16 @@ if __name__ == '__main__':
         if the_collection:
             the_names = ' '.join(
                 [x['normalized_name'] for x in the_collection['_source']['data']['names'][:NUMBER_OF_NAMES_IN_QUERY]])
-            try:
-                print(f'<h2>search by collection members</h2>')
-                hits = search_by_all(the_names, args.limit)
-                print_resutls(hits)
-
-                if args.explain: print_exlanation(hits)
-            except Exception as e:
-                print(e, file=sys.stderr)
-                print(the_collection['_source']['data']['collection_name'], len(the_names), the_names[:50],
-                      file=sys.stderr)
+            # try:
+            #     # print(f'<h2>search by collection members</h2>')
+            #     hits = search_by_all(the_names, args.limit)
+            #     # print_resutls(hits)
+            # 
+            #     if args.explain: print_exlanation(hits)
+            # except Exception as e:
+            #     print(e, file=sys.stderr)
+            #     print(the_collection['_source']['data']['collection_name'], len(the_names), the_names[:50],
+            #           file=sys.stderr)
 
             try:
                 print(f'<h2>search by collection name and members</h2>')
