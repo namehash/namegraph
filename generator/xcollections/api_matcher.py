@@ -119,9 +119,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
                       .add_offset(offset)
                       .build())
 
-        print(query_body)
-        import time
-        time.sleep(20)
         try:
             collections, es_response_metadata = self._execute_query(query_body, limit_names)
         except Exception as ex:
