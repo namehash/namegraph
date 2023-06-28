@@ -306,6 +306,8 @@ def test_collection_api_find_collections_by_collection(test_test_client):
     print(response_json)
 
     assert 'Music artists and bands from London' in [c['title'] for c in response_json['related_collections']]
+    assert 'Q6607079' not in [c['collection_id'] for c in response_json['related_collections']]
+    assert len(response_json['related_collections']) == 10
 
 
 @mark.integration_test
