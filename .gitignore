@@ -25,3 +25,4 @@ research/symbol/*.xlsx
 research/elasticsearch/*.jsonl
 !research/rhymes/*.ipynb
 research/elasticsearch/*diver*.html
+research/collections-benchmark/*.html
