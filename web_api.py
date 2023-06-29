@@ -13,7 +13,7 @@ from pydantic import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcherForAPI
+from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler
 from generator.xcollections.collection import Collection
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
@@ -88,6 +88,7 @@ inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
+other_collections_sampler = OtherCollectionsSampler(generator.config)
 
 domains = Domains(generator.config)
 categories = Categories(generator.config)
@@ -174,20 +175,25 @@ def convert_to_collection_format(collections: list[Collection]):
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
-    collections, es_search_metadata = collections_matcher.search_by_string(
+    related_collections, es_search_metadata = collections_matcher.search_by_string(
         query.query,
         mode=query.mode,
         max_related_collections=query.max_related_collections,
         offset=query.offset,
         sort_order=query.sort_order,
-        min_other_collections=query.min_other_collections,
-        max_other_collections=query.max_other_collections,
-        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
     )
-    collections = convert_to_collection_format(collections)
+    related_collections = convert_to_collection_format(related_collections)
+
+    other_collections = other_collections_sampler.get_other_collections(
+        n_primary_collections=len(related_collections),
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections
+    )
+    other_collections = convert_to_collection_format(other_collections)
 
     time_elapsed = (perf_counter() - t_before) * 1000
   
@@ -198,7 +204,11 @@ async def find_collections_by_string(query: CollectionSearchByString):
         'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
-    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
+    response = {
+        'related_collections': related_collections,
+        'other_collections': other_collections,
+        'metadata': metadata
+    }
 
     return JSONResponse(response)
 
@@ -210,19 +220,24 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     """
     t_before = perf_counter()
 
-    collections, es_search_metadata = collections_matcher.search_by_collection(
+    related_collections, es_search_metadata = collections_matcher.search_by_collection(
         query.collection_id,
         max_related_collections=query.max_related_collections,
-        min_other_collections=query.min_other_collections,
-        max_other_collections=query.max_other_collections,
-        max_total_collections=query.max_total_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_names,
         sort_order=query.sort_order,
         offset=query.offset
     )
-    collections = convert_to_collection_format(collections)
+    related_collections = convert_to_collection_format(related_collections)
+
+    other_collections = other_collections_sampler.get_other_collections(
+        n_primary_collections=len(related_collections),
+        min_other_collections=query.min_other_collections,
+        max_other_collections=query.max_other_collections,
+        max_total_collections=query.max_total_collections
+    )
+    other_collections = convert_to_collection_format(other_collections)
     
     time_elapsed = (perf_counter() - t_before) * 1000
   
@@ -233,7 +248,11 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
-    response = {'related_collections': collections, 'other_collections': [], 'metadata': metadata}
+    response = {
+        'related_collections': related_collections,
+        'other_collections': other_collections,
+        'metadata': metadata
+    }
 
     return JSONResponse(response)
 
