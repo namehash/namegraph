@@ -316,7 +316,7 @@ def test_collection_api_find_collections_by_collection_az(test_test_client):
         "collection_id": "Q6607079",
         "max_related_collections": 8,
         "min_other_collections": 0,
-        "max_other_collections": 2,
+        "max_other_collections": 4,
         "max_total_collections": 10,
         "limit_names": 6,
         "offset": 8,
@@ -335,6 +335,10 @@ def test_collection_api_find_collections_by_collection_az(test_test_client):
     # test A-Z sort
     titles = [c['title'] for c in collection_list]
     assert titles == sorted(titles)
+
+    # test collection lists length
+    assert len(collection_list) <= 8
+    assert len(response_json['other_collections']) == min(8 - len(collection_list), 4)
 
 
 @mark.integration_test
@@ -419,3 +423,7 @@ def test_collection_api_min_other_plus_max_related_le_max_total(test_test_client
 
     assert response.status_code == 422
 
+# todo: add to docs info about those constraints
+# min_other_collections <= max_other_collections
+# max_other_collections <= max_total_collections
+# min_other_collections + max_related_collections  <= max_total_collections
