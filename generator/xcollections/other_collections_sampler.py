@@ -15,7 +15,6 @@ class OtherCollectionsSampler(metaclass=Singleton):
         with open(self.other_collections_path, 'r', encoding='utf-8') as f:
             other_collections_records: list[dict[str, str]] = json.load(f)
         self.other_collections: list[Collection] = self._retrieve_full_collections_from_es(other_collections_records)
-        random.shuffle(self.other_collections)
 
     def _sample_collections(self, k: int) -> list[Collection]:
         return random.sample(self.other_collections, k=k)

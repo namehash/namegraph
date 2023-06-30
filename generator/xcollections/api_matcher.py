@@ -46,7 +46,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 limit_names=limit_names,
             )
         except Exception as ex:
-            logger.error(f'Elasticsearch search failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise ex
 
     def search_by_collection(
@@ -146,7 +146,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             )
             time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed', exc_info=True)
+            logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
             raise ex
 
         count = response['count']
@@ -187,7 +187,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [by-member]', exc_info=True)
             raise ex
 
         return collections, es_response_metadata
@@ -207,7 +207,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             query_params = query_builder.include_fields(fields).add_limit(len(id_list)).build_params()
             collections, met = self._execute_query(query_params, limit_names=10)
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
             raise ex
 
         return collections
