@@ -376,3 +376,46 @@ def test_collection_api_instant_search_limit_names_gt_10(test_test_client):
     })
     assert response.status_code == 422
 
+
+# invalid field combinations tests
+@mark.integration_test
+def test_collection_api_min_other_le_max_other(test_test_client):
+    # violated check: min_other_collections <= max_other_collections
+    response = test_test_client.post("/find_collections_by_string", json={
+        "min_other_collections": 16,
+        "max_other_collections": 15,
+        "max_related_collections": 20,
+        "max_total_collections": 50,
+        "query": "australia",
+    })
+
+    assert response.status_code == 422
+
+
+@mark.integration_test
+def test_collection_api_max_other_le_max_total(test_test_client):
+    # violated check: max_other_collections <= max_total_collections
+    response = test_test_client.post("/find_collections_by_member", json={
+        "min_other_collections": 3,
+        "max_other_collections": 11,
+        "max_related_collections": 5,
+        "max_total_collections": 10,
+        "query": "australia",
+    })
+
+    assert response.status_code == 422
+
+
+@mark.integration_test
+def test_collection_api_min_other_plus_max_related_le_max_total(test_test_client):
+    # violated check: min_other_collections + max_related_collections  <= max_total_collections
+    response = test_test_client.post("/find_collections_by_string", json={
+        "min_other_collections": 3,
+        "max_other_collections": 5,
+        "max_related_collections": 8,
+        "max_total_collections": 10,
+        "query": "australia",
+    })
+
+    assert response.status_code == 422
+
