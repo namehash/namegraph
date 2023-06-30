@@ -338,7 +338,7 @@ def test_collection_api_find_collections_by_collection_az(test_test_client):
 
     # test collection lists length
     assert len(collection_list) <= 8
-    assert len(response_json['other_collections']) == min(8 - len(collection_list), 4)
+    assert len(response_json['other_collections']) == min(10 - len(collection_list), 4)
 
 
 @mark.integration_test
