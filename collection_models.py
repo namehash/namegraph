@@ -77,10 +77,15 @@ class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, do
             raise ValueError('max_other_collections must not be greater than max_total_collections')
         return v
 
-    @validator('max_related_collections')
+    @validator('max_total_collections')
     def max_related_between_min_other_and_max_total(cls, v: int, values, **kwargs) -> int:
-        if 'max_total_collections' in values and v > values['max_total_collections']:
+        if 'max_related_collections' in values and values['max_related_collections'] > v:
             raise ValueError('max_related_collections must not be greater than max_total_collections')
+
+        if 'min_other_collections' in values and 'max_related_collections' in values and \
+                values['min_other_collections'] + values['max_related_collections'] > v:
+            raise ValueError(
+                'min_other_collections + max_related_collections must not be greater than max_total_collections')
         return v
 
 

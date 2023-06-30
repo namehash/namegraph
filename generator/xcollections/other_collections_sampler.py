@@ -32,7 +32,7 @@ class OtherCollectionsSampler(metaclass=Singleton):
     ) -> list[Collection]:
         to_sample = max_total_collections - n_primary_collections
         if to_sample < min_other_collections:
-            pass  # todo: should we still set to_sample=min_other_collections even though total is gonna be too large?
+            pass  # not possible because of validation (min_other_c == max_total_c - max_related_c)
         elif to_sample > max_other_collections:
             to_sample = max_other_collections
         return self._sample_collections(k=to_sample)
