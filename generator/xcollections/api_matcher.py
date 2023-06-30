@@ -201,11 +201,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
         ]
 
         try:
-            query_builder = ElasticsearchQueryBuilder()
-            for collection_id in id_list:
-                query_builder.add_should(type='term', query={"metadata.id.keyword": collection_id})
-            query_params = query_builder.include_fields(fields).add_limit(len(id_list)).build_params()
-            collections, met = self._execute_query(query_params, limit_names=10)
+            query_params = (ElasticsearchQueryBuilder()
+                            .set_terms('metadata.id.keyword', id_list)
+                            .include_fields(fields)
+                            .add_limit(len(id_list))
+                            .build_params())
+
+            collections, _ = self._execute_query(query_params, limit_names=10)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
             raise ex
