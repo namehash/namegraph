@@ -65,7 +65,7 @@ class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
 
 
 class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, domain details
-    min_other_collections: int = Field(3, ge=0, title='min number of other collections to return')
+    min_other_collections: int = Field(0, ge=0, title='min number of other collections to return')
     max_other_collections: int = Field(3, ge=0, title='max number of other collections to return')
     max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return')
 
