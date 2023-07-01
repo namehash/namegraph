@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Union
 from copy import deepcopy
 
 
@@ -107,7 +107,7 @@ class ElasticsearchQueryBuilder:
             self,
             query: str,
             boolean_clause: Literal['must', 'should'] = 'must',
-            type_: str = 'cross_fields',
+            type_: str = 'most_fields',
             fields: list[str] = None
     ) -> ElasticsearchQueryBuilder:
         """
@@ -209,6 +209,17 @@ class ElasticsearchQueryBuilder:
         else:
             raise ValueError(f"Unexpected sort_order value: '{sort_order}'")
 
+        return self
+
+    def set_track_total_hits(self, value: Union[bool, int]) -> ElasticsearchQueryBuilder:
+        """
+        Sets the track_total_hits of the query builder
+
+        :param value: value, if `true` - the number of hits is tracked accurately, if `false` - the number of hits is
+                      not tracked at all, if `int` - the number of hits is tracked up to the specified value
+        :return: self
+        """
+        self._query['track_total_hits'] = value
         return self
 
     def include_fields(self, fields: list[str]) -> ElasticsearchQueryBuilder:

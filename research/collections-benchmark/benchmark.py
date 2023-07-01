@@ -31,6 +31,7 @@ MEMBERS = [
 
 TIME_NAMES = ['latency', 'took', 'communication']
 
+
 ############### SEARCH BY STRING ###############
 def find_collections_by_string(
         query: str,
