@@ -21,9 +21,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             max_related_collections: int = 3,
             offset: int = 0,
             sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
-            min_other_collections: int = 3,
-            max_other_collections: int = 3,
-            max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
@@ -51,16 +48,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 limit_names=limit_names,
             )
         except Exception as ex:
-            logger.error(f'Elasticsearch search failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise ex
 
     def search_by_collection(
             self,
             collection_id: str,
             max_related_collections: int = 3,
-            min_other_collections: int = 3,
-            max_other_collections: int = 3,
-            max_total_collections: int = 6,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
@@ -156,7 +150,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             )
             time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed', exc_info=True)
+            logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
             raise ex
 
         count = response['count']
@@ -197,7 +191,29 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed', exc_info=True)
+            logger.error(f'Elasticsearch search failed [by-member]', exc_info=True)
             raise ex
 
         return collections, es_response_metadata
+
+    def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
+
+        fields = [
+            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
+            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+        ]
+
+        try:
+            query_params = (ElasticsearchQueryBuilder()
+                            .set_terms('metadata.id.keyword', id_list)
+                            .include_fields(fields)
+                            .add_limit(len(id_list))
+                            .build_params())
+
+            collections, _ = self._execute_query(query_params, limit_names=10)
+        except Exception as ex:
+            logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
+            raise ex
+
+        return collections

@@ -1,5 +1,5 @@
 from typing import Optional, Literal, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class CollectionName(BaseModel):
@@ -65,9 +65,32 @@ class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
 
 
 class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, domain details
-    min_other_collections: int = Field(3, ge=0, title='min number of other collections to return')
-    max_other_collections: int = Field(3, ge=0, title='max number of other collections to return')
-    max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return')
+    min_other_collections: int = Field(0, ge=0, title='min number of other collections to return')
+    max_other_collections: int = Field(3, ge=0, title='max number of other collections to return',
+                                       description='constraint: \n'
+                                       '* min_other_collections <= max_other_collections\n'
+                                       '\nif not met, 422 status code is returned')
+    max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return',
+                                       description='constraints: \n'
+                                       '* max_other_collections <= max_total_collections\n'
+                                       '* min_other_collections + max_related_collections  <= max_total_collections\n'
+                                       '\nif not met, 422 status code is returned')
+
+    @validator('max_other_collections')
+    def max_other_between_min_other_and_max_total(cls, v: int, values, **kwargs) -> int:
+        if 'min_other_collections' in values and values['min_other_collections'] > v:
+            raise ValueError('min_other_collections must not be greater than max_other_collections')
+        return v
+
+    @validator('max_total_collections')
+    def max_related_between_min_other_and_max_total(cls, v: int, values, **kwargs) -> int:
+        if 'max_other_collections' in values and v < values['max_other_collections']:
+            raise ValueError('max_other_collections must not be greater than max_total_collections')
+        if 'min_other_collections' in values and 'max_related_collections' in values and \
+                values['min_other_collections'] + values['max_related_collections'] > v:
+            raise ValueError(
+                'min_other_collections + max_related_collections must not be greater than max_total_collections')
+        return v
 
 
 class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search, domain details
