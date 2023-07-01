@@ -422,8 +422,3 @@ def test_collection_api_min_other_plus_max_related_le_max_total(test_test_client
     })
 
     assert response.status_code == 422
-
-# todo: add to docs info about those constraints
-# min_other_collections <= max_other_collections
-# max_other_collections <= max_total_collections
-# min_other_collections + max_related_collections  <= max_total_collections
