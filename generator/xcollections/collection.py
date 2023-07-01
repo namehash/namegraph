@@ -55,3 +55,26 @@ class Collection:
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0]
         )
+
+    @classmethod
+    def from_elasticsearch_hit_script_names(cls, hit: dict[str, Any], limit_names: int = 100) -> Collection:
+        try:
+            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']][:limit_names]
+        except KeyError:
+            tokenized_names = None
+
+        fields = hit['fields']
+        return cls(
+            score=hit['_score'],
+            collection_id=fields['metadata.id'][0],
+            title=fields['data.collection_name'][0],
+            rank=fields['template.collection_rank'][0],
+            owner=fields['metadata.owner'][0],
+            number_of_names=fields['metadata.members_count'][0],
+            names=fields['script_names'][:limit_names],
+            namehashes=fields['script_namehashes'][:limit_names]
+            if 'script_namehashes' in fields else None,
+            tokenized_names=tokenized_names,
+            name_types=fields['template.collection_types'][1::2],
+            modified_timestamp=fields['metadata.modified'][0]
+        )

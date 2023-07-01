@@ -7,6 +7,8 @@ from fastapi import HTTPException
 from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
+from .utils import get_names_script, get_namehashes_script
+
 
 logger = logging.getLogger('generator')
 
@@ -80,10 +82,12 @@ class CollectionMatcherForAPI(CollectionMatcher):
                          .set_term('metadata.id.keyword', collection_id)
                          .set_source(False)
                          .include_fields(fields)
+                         .include_script_field('script_names', get_names_script(limit_names=100))
+                         .include_script_field('script_namehashes', get_namehashes_script(limit_names=100))
                          .build_params())
 
         try:
-            collections, es_response_metadata = self._execute_query(id_match_params, limit_names=10)
+            collections, es_response_metadata = self._execute_query(id_match_params, limit_names=100, script_names=True)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [id-to-collection search]', exc_info=True)
             raise ex

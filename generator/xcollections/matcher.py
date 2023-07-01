@@ -103,7 +103,12 @@ class CollectionMatcher(metaclass=Singleton):
 
         return diversified + penalized_collections[:max_limit - len(diversified)]
 
-    def _execute_query(self, query_params: dict, limit_names: int) -> tuple[list[Collection], dict[str, Any]]:
+    def _execute_query(
+            self,
+            query_params: dict,
+            limit_names: int,
+            script_names=False
+    ) -> tuple[list[Collection], dict[str, Any]]:
         t_before = perf_counter()
         response = self.elastic.search(index=self.index_name, **query_params)
         time_elapsed = (perf_counter() - t_before) * 1000
@@ -115,8 +120,10 @@ class CollectionMatcher(metaclass=Singleton):
             'took': response['took'],
             'elasticsearch_communication_time': time_elapsed,
         }
-
-        collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]
+        if script_names:
+            collections = [Collection.from_elasticsearch_hit_script_names(hit, limit_names) for hit in hits]
+        else:
+            collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]
         return collections, es_response_metadata
 
     def _search_related(
