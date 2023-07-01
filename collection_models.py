@@ -69,12 +69,12 @@ class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, do
     max_other_collections: int = Field(3, ge=0, title='max number of other collections to return',
                                        description='constraint: \n'
                                        '* min_other_collections <= max_other_collections\n'
-                                       'if not met, 422 status code is returned')
+                                       '\nif not met, 422 status code is returned')
     max_total_collections: int = Field(6, ge=0, title='max number of total (related + other) collections to return',
                                        description='constraints: \n'
                                        '* max_other_collections <= max_total_collections\n'
                                        '* min_other_collections + max_related_collections  <= max_total_collections\n'
-                                       'if not met, 422 status code is returned')
+                                       '\nif not met, 422 status code is returned')
 
     @validator('max_other_collections')
     def max_other_between_min_other_and_max_total(cls, v: int, values, **kwargs) -> int:
