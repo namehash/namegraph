@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from typing import Optional, Callable
 from collections import defaultdict
+from functools import partial
 import requests
 import tqdm
 
@@ -38,9 +39,11 @@ def find_collections_by_string(
         min_other_collections: int = 0,
         max_other_collections: int = 0,
         max_total_collections: int = 15,
-        name_diversity_ratio: float = 0.55,
-        max_per_type: int = 3,
+        name_diversity_ratio: Optional[float] = 0.55,
+        max_per_type: Optional[int] = 3,
         limit_names: int = 10,
+        sort_order: Optional[str] = None,
+        offset: Optional[int] = None,
 ):
     data = {
         "query": query,
@@ -53,21 +56,33 @@ def find_collections_by_string(
         "max_per_type": max_per_type,
         "limit_names": limit_names,
     }
+
+    if sort_order is not None and offset is not None:
+        data['sort_order'] = sort_order
+        data['offset'] = offset
+
     return requests.post(
         f'http://{HOST}:{PORT}/find_collections_by_string',
         json=data,
     ).json()
 
 
-def find_collections_by_string_instant_search(query: str):
-    return find_collections_by_string(query=query, mode='instant')
+def find_collections_by_string_instant_search(query: str, **overrides):
+    kwargs = {'mode': 'instant'} | overrides
+    return find_collections_by_string(query=query, **kwargs)
 
 
-def find_collections_by_string_domain_detail_search(query: str):
-    return find_collections_by_string(
-        query=query, mode='domain_detail', max_related_collections=3, min_other_collections=3,
-        max_other_collections=3, max_total_collections=6
-    )
+def find_collections_by_string_domain_detail_search(query: str, **overrides):
+    kwargs = {'mode': 'domain_detail', 'max_related_collections': 3, 'min_other_collections': 3,
+              'max_other_collections': 3, 'max_total_collections': 6} | overrides
+    return find_collections_by_string(query=query, **kwargs)
+
+
+def find_collections_by_string_pages(query: str, **overrides):
+    kwargs = {'mode': 'domain_detail', 'max_related_collections': 100, 'min_other_collections': 0,
+              'max_other_collections': 0, 'max_total_collections': 100, 'name_diversity_ratio': None,
+              'max_per_type': None, 'limit_names': 10, 'sort_order': 'Z-A', 'offset': 0} | overrides
+    return find_collections_by_string(query=query, **kwargs)
 
 
 ############### SEARCH BY COLLECTION ###############
@@ -121,12 +136,14 @@ def find_collections_by_member(
     ).json()
 
 
-def find_collections_by_member_instant(label: str):
-    return find_collections_by_member(label=label, mode='instant')
+def find_collections_by_member_instant(label: str, **overrides):
+    kwargs = {'mode': 'instant'} | overrides
+    return find_collections_by_member(label=label, **kwargs)
 
 
-def find_collections_by_member_domain_detail(label: str):
-    return find_collections_by_member(label=label, mode='domain_detail')
+def find_collections_by_member_domain_detail(label: str, **overrides):
+    kwargs = {'mode': 'domain_detail'} | overrides
+    return find_collections_by_member(label=label, **kwargs)
 
 
 ############### UTILS ###############
@@ -194,8 +211,24 @@ if __name__ == '__main__':
     times = collect_times(find_collections_by_string_instant_search, QUERIES, args.repeats)
     benchmark_report(times)
 
+    print(f'<h1>find_collections_by_string (instant, diversity off)</h1>')
+    times = collect_times(
+        partial(find_collections_by_string_instant_search, name_diversity_ratio=None, max_per_type=None),
+        QUERIES,
+        args.repeats
+    )
+    benchmark_report(times)
+
     print(f'<h1>find_collections_by_string (domain detail)</h1>')
     times = collect_times(find_collections_by_member_domain_detail, QUERIES, args.repeats)
+    benchmark_report(times)
+
+    print(f'<h1>find_collections_by_string (pagination, domain detail)</h1>')
+    times = collect_times(find_collections_by_string_pages, QUERIES, args.repeats)
+    benchmark_report(times)
+
+    print(f'<h1>find_collections_by_string (pagination, domain detail, 10th page)</h1>')
+    times = collect_times(partial(find_collections_by_string_pages, offset=900), QUERIES, args.repeats)
     benchmark_report(times)
 
     print(f'<h1>find_collections_by_collection</h1>')
@@ -206,6 +239,10 @@ if __name__ == '__main__':
     times = collect_times(count_collections_by_member, MEMBERS, args.repeats)
     benchmark_report(times)
 
-    print(f'<h1>find_collections_by_member (instant)</h1>')
-    times = collect_times(find_collections_by_member_instant, MEMBERS, args.repeats)
+    print(f'<h1>find_collections_by_member (pagination, domain detail)</h1>')
+    times = collect_times(find_collections_by_member_domain_detail, MEMBERS, args.repeats)
+    benchmark_report(times)
+
+    print(f'<h1>find_collections_by_member (pagination, domain detail, 10th page)</h1>')
+    times = collect_times(partial(find_collections_by_member_domain_detail, offset=900), MEMBERS, args.repeats)
     benchmark_report(times)
