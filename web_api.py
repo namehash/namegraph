@@ -20,6 +20,7 @@ from generator.generation.categories_generator import Categories
 
 logger = logging.getLogger('generator')
 
+
 # gc.set_debug(gc.DEBUG_STATS)
 
 class Settings(BaseSettings):
@@ -105,7 +106,7 @@ from collection_models import (
     CollectionsContainingNameCountResponse,
     CollectionsContainingNameCountRequest,
     CollectionsContainingNameRequest,
-    CollectionsContainingNameResponse,
+    CollectionsContainingNameResponse, CollectionCountByStringRequest,
 )
 
 
@@ -196,7 +197,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     other_collections = convert_to_collection_format(other_collections)
 
     time_elapsed = (perf_counter() - t_before) * 1000
-  
+
     metadata = {
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
@@ -211,6 +212,25 @@ async def find_collections_by_string(query: CollectionSearchByString):
     }
 
     return JSONResponse(response)
+
+
+@app.post("/count_collections_by_string", response_model=CollectionsContainingNameCountResponse)
+async def get_collections_count_by_string(query: CollectionCountByStringRequest):
+    t_before = perf_counter()
+
+    count, es_response_metadata = collections_matcher.get_collections_count_by_string(query.query,
+                                                                                      mode=query.mode)
+
+    time_elapsed = (perf_counter() - t_before) * 1000
+
+    metadata = {
+        'total_number_of_matched_collections': es_response_metadata.get('n_total_hits', None),
+        'processing_time_ms': time_elapsed,
+        'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
+        'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
+    }
+
+    return JSONResponse({'count': count, 'metadata': metadata})
 
 
 @app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
@@ -238,9 +258,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         max_total_collections=query.max_total_collections
     )
     other_collections = convert_to_collection_format(other_collections)
-    
+
     time_elapsed = (perf_counter() - t_before) * 1000
-  
+
     metadata = {
         'total_number_of_matched_collections': es_search_metadata.get('n_total_hits', None),
         'processing_time_ms': time_elapsed,
