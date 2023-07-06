@@ -51,6 +51,34 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise ex
 
+    def get_collections_count_by_string(self, query: str, mode: str) -> tuple[Union[int, str], dict]:
+
+        tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
+        if tokenized_query != query:
+            query = f'{query} {tokenized_query}'
+
+        query_params = ElasticsearchQueryBuilder() \
+            .add_query(query) \
+            .add_filter('term', {'data.public': True}) \
+            .add_rank_feature('template.collection_rank', boost=100) \
+            .add_rank_feature('metadata.members_count') \
+            .build_params()
+
+        try:
+            t_before = perf_counter()
+            response = self.elastic.count(
+                index=self.index_name,
+                **query_params
+            )
+            time_elapsed = (perf_counter() - t_before) * 1000
+        except Exception as ex:
+            logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
+            raise ex
+
+        count = response['count']
+
+        return count if count <= 1000 else '1000+', {'elasticsearch_communication_time': time_elapsed}
+
     def search_by_collection(
             self,
             collection_id: str,

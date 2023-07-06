@@ -200,6 +200,16 @@ def test_collection_api_domain_details_pagination_by_string(test_test_client):
               for c in response_page_1_json['related_collections'] + response_page_2_json['related_collections']]
     assert titles == sorted(titles, reverse=True)
 
+@mark.integration_test
+def test_collection_api_count_by_string(test_test_client):
+    response = test_test_client.post("/count_collections_by_string", json={
+        "query": "australia",
+        "mode": "instant"
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+    print(response_json)
 
 # count membership # TODO: won't be used
 @mark.integration_test

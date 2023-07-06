@@ -108,6 +108,11 @@ class CollectionSearchResponse(BaseCollectionQueryResponse):
     related_collections: list[Collection] = Field(title='list of related collections')
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
 
+class CollectionCountByStringRequest(BaseModel):
+    query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
+                       description='can not contain dots (.)',
+                       regex='^[^.]+$', example='zeus god')
+    mode: str = Field('instant', title='request mode: instant, domain_detail', regex=r'^(instant|domain_detail)$')
 
 # ======== Collection Membership ========
 
