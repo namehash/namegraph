@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
-from generator.xcollections.api_matcher import CollectionMatcherForAPI
+from generator.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 
 @pytest.fixture(scope="class")
@@ -17,6 +17,7 @@ def test_test_client():
     Categories.remove_self()
     Domains.remove_self()
     CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     os.environ['CONFIG_NAME'] = 'test_config_new'
     # import web_api
     if 'web_api' not in sys.modules:
@@ -205,6 +206,17 @@ class TestCorrectConfiguration:
                   for c in response_page_1_json['related_collections'] + response_page_2_json['related_collections']]
         assert titles == sorted(titles, reverse=True)
 
+    @mark.integration_test
+    def test_collection_api_count_by_string(self, test_test_client):
+        response = test_test_client.post("/count_collections_by_string", json={
+            "query": "australia",
+            "mode": "instant"
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
     # count membership # TODO: won't be used
     @mark.integration_test
     def test_collection_api_get_collections_membership_count(self, test_test_client):
@@ -304,10 +316,10 @@ class TestCorrectConfiguration:
         assert response.status_code == 200
         response_json = response.json()
         print(response_json)
-
-        assert 'Music artists and bands from London' in [c['title'] for c in response_json['related_collections']]
+        assert 'Progressive rock artists' in [c['title'] for c in response_json['related_collections']]
         assert 'Q6607079' not in [c['collection_id'] for c in response_json['related_collections']]
         assert len(response_json['related_collections']) == 10
+
 
     @mark.integration_test
     def test_collection_api_find_collections_by_collection_az(self, test_test_client):
@@ -315,7 +327,7 @@ class TestCorrectConfiguration:
             "collection_id": "Q6607079",
             "max_related_collections": 8,
             "min_other_collections": 0,
-            "max_other_collections": 2,
+            "max_other_collections": 4,
             "max_total_collections": 10,
             "limit_names": 6,
             "offset": 8,
@@ -334,6 +346,10 @@ class TestCorrectConfiguration:
         # test A-Z sort
         titles = [c['title'] for c in collection_list]
         assert titles == sorted(titles)
+
+        # test collection lists length
+        assert len(collection_list) <= 8
+        assert len(response_json['other_collections']) == min(10 - len(collection_list), 4)
 
     @mark.integration_test
     def test_collection_api_find_collections_by_collection_not_found(self, test_test_client):
@@ -369,6 +385,46 @@ class TestCorrectConfiguration:
             "query": "australia",
             "limit_names": 11,
         })
+        assert response.status_code == 422
+
+    # invalid field combinations tests
+    @mark.integration_test
+    def test_collection_api_min_other_le_max_other(self, test_test_client):
+        # violated check: min_other_collections <= max_other_collections
+        response = test_test_client.post("/find_collections_by_string", json={
+            "min_other_collections": 16,
+            "max_other_collections": 15,
+            "max_related_collections": 20,
+            "max_total_collections": 50,
+            "query": "australia",
+        })
+
+        assert response.status_code == 422
+
+    @mark.integration_test
+    def test_collection_api_max_other_le_max_total(self, test_test_client):
+        # violated check: max_other_collections <= max_total_collections
+        response = test_test_client.post("/find_collections_by_member", json={
+            "min_other_collections": 3,
+            "max_other_collections": 11,
+            "max_related_collections": 5,
+            "max_total_collections": 10,
+            "query": "australia",
+        })
+
+        assert response.status_code == 422
+
+    @mark.integration_test
+    def test_collection_api_min_other_plus_max_related_le_max_total(self, test_test_client):
+        # violated check: min_other_collections + max_related_collections  <= max_total_collections
+        response = test_test_client.post("/find_collections_by_string", json={
+            "min_other_collections": 3,
+            "max_other_collections": 5,
+            "max_related_collections": 8,
+            "max_total_collections": 10,
+            "query": "australia",
+        })
+
         assert response.status_code == 422
 
 

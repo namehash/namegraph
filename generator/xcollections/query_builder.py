@@ -103,6 +103,19 @@ class ElasticsearchQueryBuilder:
 
         return self
 
+    def set_terms(self, field: str, values: list[Any]) -> ElasticsearchQueryBuilder:
+        """
+        Sets terms of the query builder
+
+        :param field: field name (shouldn't be analyzed)
+        :param values: list of terms (match if document contains at least one of the terms)
+        :return: self
+        """
+
+        self._query['query']['terms'] = {field: values}
+
+        return self
+
     def add_query(
             self,
             query: str,
