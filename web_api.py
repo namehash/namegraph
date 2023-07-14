@@ -6,7 +6,7 @@ from time import perf_counter
 
 import numpy as np
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from hydra import initialize, compose
 from pydantic import BaseSettings
 
@@ -174,6 +174,9 @@ def convert_to_collection_format(collections: list[Collection]):
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     collections, es_search_metadata = collections_matcher.search_by_string(
         query.query,
         mode=query.mode,
@@ -210,6 +213,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     """
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     collections, es_search_metadata = collections_matcher.search_by_collection(
         query.collection_id,
         max_related_collections=query.max_related_collections,
@@ -242,6 +248,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
 async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     count, es_response_metadata = collections_matcher.get_collections_membership_count_for_name(request.label)
 
     time_elapsed = (perf_counter() - t_before) * 1000
@@ -259,6 +268,9 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
 @app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
 async def find_collections_membership_list(request: CollectionsContainingNameRequest):
     t_before = perf_counter()
+
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
 
     collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
         request.label,
