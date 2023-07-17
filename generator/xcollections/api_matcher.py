@@ -49,7 +49,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             )
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
     def get_collections_count_by_string(self, query: str, mode: str) -> tuple[Union[int, str], dict]:
 
@@ -73,7 +73,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
             logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         count = response['count']
 
@@ -112,7 +112,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             collections, es_response_metadata = self._execute_query(id_match_params, limit_names=100, script_names=True)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [id-to-collection search]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         try:
             found_collection = collections[0]
@@ -152,7 +152,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [collection-to-collections search]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         es_response_metadata['took'] += es_time_first
         es_response_metadata['elasticsearch_communication_time'] += es_comm_time_first
@@ -179,7 +179,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
             logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         count = response['count']
 
@@ -220,7 +220,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-member]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         return collections, es_response_metadata
 
@@ -242,6 +242,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             collections, _ = self._execute_query(query_params, limit_names=10)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         return collections
