@@ -17,6 +17,7 @@ from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSamp
 from generator.xcollections.collection import Collection
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
+from generator.normalization.namehash_normalizer import NamehashNormalizer
 
 logger = logging.getLogger('generator')
 
@@ -90,6 +91,7 @@ inspector = init_inspector()
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
 other_collections_sampler = OtherCollectionsSampler(generator.config)
+labelhash_normalizer = NamehashNormalizer(generator.config)
 
 domains = Domains(generator.config)
 categories = Categories(generator.config)
@@ -180,17 +182,21 @@ async def find_collections_by_string(query: CollectionSearchByString):
     if not collections_matcher.active:
         return Response(status_code=503, content='Elasticsearch Unavailable')
 
-    related_collections, es_search_metadata = collections_matcher.search_by_string(
-        query.query,
-        mode=query.mode,
-        max_related_collections=query.max_related_collections,
-        offset=query.offset,
-        sort_order=query.sort_order,
-        name_diversity_ratio=query.name_diversity_ratio,
-        max_per_type=query.max_per_type,
-        limit_names=query.limit_names,
-    )
-    related_collections = convert_to_collection_format(related_collections)
+    if not labelhash_normalizer.normalize(query.query):
+        related_collections = []
+        es_search_metadata = {'n_total_hits': 0}
+    else:
+        related_collections, es_search_metadata = collections_matcher.search_by_string(
+            query.query,
+            mode=query.mode,
+            max_related_collections=query.max_related_collections,
+            offset=query.offset,
+            sort_order=query.sort_order,
+            name_diversity_ratio=query.name_diversity_ratio,
+            max_per_type=query.max_per_type,
+            limit_names=query.limit_names,
+        )
+        related_collections = convert_to_collection_format(related_collections)
 
     other_collections = other_collections_sampler.get_other_collections(
         n_primary_collections=len(related_collections),
@@ -225,8 +231,12 @@ async def get_collections_count_by_string(query: CollectionCountByStringRequest)
     if not collections_matcher.active:
         return Response(status_code=503, content='Elasticsearch Unavailable')
 
-    count, es_response_metadata = collections_matcher.get_collections_count_by_string(query.query,
-                                                                                      mode=query.mode)
+    if not labelhash_normalizer.normalize(query.query):
+        count = 0
+        es_response_metadata = {'n_total_hits': 0}
+    else:
+        count, es_response_metadata = collections_matcher.get_collections_count_by_string(query.query,
+                                                                                          mode=query.mode)
 
     time_elapsed = (perf_counter() - t_before) * 1000
 
@@ -294,7 +304,11 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
     if not collections_matcher.active:
         return Response(status_code=503, content='Elasticsearch Unavailable')
 
-    count, es_response_metadata = collections_matcher.get_collections_membership_count_for_name(request.label)
+    if not labelhash_normalizer.normalize(request.label):
+        count = 0
+        es_response_metadata = {'n_total_hits': 0}
+    else:
+        count, es_response_metadata = collections_matcher.get_collections_membership_count_for_name(request.label)
 
     time_elapsed = (perf_counter() - t_before) * 1000
 
@@ -315,13 +329,17 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     if not collections_matcher.active:
         return Response(status_code=503, content='Elasticsearch Unavailable')
 
-    collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
-        request.label,
-        limit_names=request.limit_names,
-        sort_order=request.sort_order,
-        max_results=request.max_results,
-        offset=request.offset,
-    )
+    if not labelhash_normalizer.normalize(request.label):
+        collections_featuring_label = []
+        es_search_metadata = {'n_total_hits': 0}
+    else:
+        collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
+            request.label,
+            limit_names=request.limit_names,
+            sort_order=request.sort_order,
+            max_results=request.max_results,
+            offset=request.offset,
+        )
 
     collections = convert_to_collection_format(collections_featuring_label)
 
