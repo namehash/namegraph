@@ -20,6 +20,9 @@ class OtherCollectionsSampler(metaclass=Singleton):
         return random.sample(self.other_collections, k=k)
 
     def _retrieve_full_collections_from_es(self, collection_records: list[dict[str, str]]) -> list[Collection]:
+        if not self.api_matcher.active:
+            return []
+
         collection_ids = [c['id'] for c in collection_records]
         return self.api_matcher.get_collections_by_id_list(collection_ids)
 

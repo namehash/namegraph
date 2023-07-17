@@ -6,7 +6,7 @@ from time import perf_counter
 
 import numpy as np
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from hydra import initialize, compose
 from pydantic import BaseSettings
 
@@ -108,7 +108,8 @@ from collection_models import (
     CollectionsContainingNameCountResponse,
     CollectionsContainingNameCountRequest,
     CollectionsContainingNameRequest,
-    CollectionsContainingNameResponse, CollectionCountByStringRequest,
+    CollectionsContainingNameResponse,
+    CollectionCountByStringRequest,
 )
 
 
@@ -178,6 +179,9 @@ def convert_to_collection_format(collections: list[Collection]):
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     if not labelhash_normalizer.normalize(query.query):
         related_collections = []
         es_search_metadata = {'n_total_hits': 0}
@@ -224,6 +228,9 @@ async def find_collections_by_string(query: CollectionSearchByString):
 async def get_collections_count_by_string(query: CollectionCountByStringRequest):
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     if not labelhash_normalizer.normalize(query.query):
         count = 0
         es_response_metadata = {'n_total_hits': 0}
@@ -249,6 +256,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     * this search raises exception with status code 404 if the collection with id `collection_id` is absent
     """
     t_before = perf_counter()
+
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
 
     related_collections, es_search_metadata = collections_matcher.search_by_collection(
         query.collection_id,
@@ -291,6 +301,9 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
 async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
     t_before = perf_counter()
 
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
     if not labelhash_normalizer.normalize(request.label):
         count = 0
         es_response_metadata = {'n_total_hits': 0}
@@ -312,6 +325,9 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
 @app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
 async def find_collections_membership_list(request: CollectionsContainingNameRequest):
     t_before = perf_counter()
+
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
 
     if not labelhash_normalizer.normalize(request.label):
         collections_featuring_label = []
