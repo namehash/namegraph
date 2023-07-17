@@ -431,3 +431,62 @@ def test_collection_api_min_other_plus_max_related_le_max_total(test_test_client
     })
 
     assert response.status_code == 422
+
+
+@mark.integration_test
+def test_collection_api_find_collections_by_string_labelhash_input(test_test_client):
+    response = test_test_client.post("/find_collections_by_string", json={
+        "query": "[59204fd55f432a2d32b0d89aaf9455324dc11671927bedd3d91ce7b7968e5f80]",
+        "max_related_collections": 5,
+        "min_other_collections": 3,
+        "max_other_collections": 5,
+        "max_total_collections": 10,
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    # no related collections should be returned for labelhash input
+    assert len(response_json['related_collections']) == 0
+    # other collections should not be affected by the input type
+    assert 3 <= len(response_json['other_collections']) <= 5
+
+
+@mark.integration_test
+def test_collection_api_count_collections_by_string_labelhash_input(test_test_client):
+    response = test_test_client.post("/count_collections_by_string", json={
+        "query": "[59204fd55f432a2d32b0d89aaf9455324dc11671927bedd3d91ce7b7968e5f80]",
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    # no related collections should be returned for labelhash input
+    assert response_json['count'] == 0
+
+
+@mark.integration_test
+def test_collection_api_count_collections_by_member_labelhash_input(test_test_client):
+    response = test_test_client.post("/count_collections_by_member", json={
+        "label": "[59204fd55f432a2d32b0d89aaf9455324dc11671927bedd3d91ce7b7968e5f80]",
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    # no collections should be returned for labelhash input
+    assert response_json['count'] == 0
+
+
+@mark.integration_test
+def test_collection_api_find_collections_by_member_labelhash_input(test_test_client):
+    response = test_test_client.post("/find_collections_by_member", json={
+        "label": "[59204fd55f432a2d32b0d89aaf9455324dc11671927bedd3d91ce7b7968e5f80]",
+        "max_results": 10
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    # no collections should be returned for labelhash input
+    assert len(response_json['collections']) == 0
