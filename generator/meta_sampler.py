@@ -71,7 +71,7 @@ class MetaSampler:
         min_available_fraction = name.params['min_available_fraction']
         min_available_required = int(min_suggestions * min_available_fraction)
 
-        mode = name.params.get('mode', 'full')
+        mode = name.params.get('mode', 'full')  # todo: handle mode = grouped, try to use controlflow
 
         types_lang_weights = {}
         interpretation_weights = {}

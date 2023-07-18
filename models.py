@@ -9,7 +9,8 @@ class Params(BaseModel):
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null",
                                    example='us')
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
-                      regex=r'^(instant|domain_detail|full)$')
+                      regex=r'^(instant|domain_detail|full)$',
+                      description='for /grouped_by_category endpoint this field is ignored')
 
 
 class Name(BaseModel):
@@ -44,10 +45,15 @@ class Metadata(BaseModel):
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
-    collection: Optional[str] = Field(
+    collection_title: Optional[str] = Field(
         name='name of the collection',
         description='if name has been generated using a collection, '
                     'then this field would contains its name, else it is null'
+    )
+    collection_id: Optional[str] = Field(  # todo: maybe bundle collection's title and id together
+        name='id of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its id, else it is null'
     )
 
 

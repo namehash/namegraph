@@ -128,7 +128,8 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'categories': categories.get_categories(str(name)),
                 'interpretation': name.interpretation,
                 'pipeline_name': name.pipeline_name,
-                'collection': name.collection
+                'collection_title': name.collection_title,
+                'collection_id': name.collection_id
             }
 
     return response
@@ -140,6 +141,35 @@ async def root(name: Name):
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.name}')
     params = name.params.dict() if name.params is not None else dict()
+
+    generator.clear_cache()
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions,
+                                      min_available_fraction=name.min_primary_fraction,
+                                      params=params)
+
+    response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+
+    logger.info(json.dumps(log_entry.create_log_entry(name.dict(), result)))
+
+    return JSONResponse(response)
+
+
+def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True):
+    response = convert_to_suggestion_format(names, include_metadata=include_metadata)
+
+    # todo: group suggestions based on pipeline_name, collection_title and name
+
+
+@app.post("/grouped_by_category", response_model=list[Suggestion])
+async def root(name: Name):
+    seed_all(name.name)
+    log_entry = LogEntry(generator.config)
+    logger.debug(f'Request received: {name.name}')
+    params = name.params.dict() if name.params is not None else dict()
+    params['mode'] = 'grouped'
 
     generator.clear_cache()
     result = generator.generate_names(name.name,

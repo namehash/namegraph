@@ -2,14 +2,17 @@ from typing import Tuple, List, Optional
 
 
 class GeneratedName:
-    __slots__ = ['tokens', 'pipeline_name', 'status', 'applied_strategies', 'collection', 'interpretation']
+    __slots__ = [
+        'tokens', 'pipeline_name', 'status', 'applied_strategies', 'collection_title', 'collection_id', 'interpretation'
+    ]
 
     def __init__(self,
                  tokens: Tuple[str, ...],
                  pipeline_name: Optional[str] = None,
                  category: Optional[str] = None,
                  applied_strategies: Optional[List[List[str]]] = None,
-                 collection: Optional[str] = None):
+                 collection_title: Optional[str] = None,
+                 collection_id: Optional[str] = None):
 
         self.tokens = tokens
 
@@ -22,7 +25,8 @@ class GeneratedName:
         else:
             self.applied_strategies.append([])
 
-        self.collection = collection
+        self.collection_title = collection_title
+        self.collection_id = collection_id
         self.interpretation = None
 
     def __str__(self):
