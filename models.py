@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
 from web_api import generator
@@ -55,3 +55,20 @@ class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
+
+
+class GroupingCategory(BaseModel):
+    suggestions: list[Suggestion] = Field(title='generated suggestions belonging to the same category type')
+
+
+class CollectionCategory(GroupingCategory):
+    type: str = Field('related', const=True, title='category type',
+                      description='in CollectionCategory category type is always set to \'related\'')
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+
+
+class OtherCategory(GroupingCategory):
+    type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
+        Field(title='category type',
+              description='category type depends on the pipeline the suggestions came from')
