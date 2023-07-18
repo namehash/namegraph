@@ -27,7 +27,7 @@ logger = logging.getLogger('generator')
 class Settings(BaseSettings):
     # config_name: str = "test_config"
     config_name: str = "prod_config_new"
-    config_overrides: Optional[str] = None
+    config_overrides: Optional[list[str]] = None
 
     # elasticsearch_host: Optional[str] = None
     # elasticsearch_port: Optional[int] = None
@@ -42,7 +42,7 @@ app = FastAPI()
 
 def init():
     with initialize(version_base=None, config_path="conf/"):
-        overrides = json.loads(settings.config_overrides) if settings.config_overrides is not None else []
+        overrides = settings.config_overrides if settings.config_overrides is not None else []
         config = compose(config_name=settings.config_name, overrides=overrides)
         logger.setLevel(config.app.logging_level)
         for handler in logger.handlers:
