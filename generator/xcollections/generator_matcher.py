@@ -53,5 +53,5 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             )
             return diversified, es_response_metadata
         except Exception as ex:
-            logger.warning(f'Elasticsearch search failed', exc_info=True)
-            return [], {} #TODO: API should fail
+            logger.error(f'Elasticsearch search failed [collections generator]', exc_info=True)
+            raise ex

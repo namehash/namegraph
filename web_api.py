@@ -8,7 +8,7 @@ import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, Response
 from hydra import initialize, compose
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
@@ -139,7 +139,7 @@ async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.name}')
-    params = name.params.dict() if name.params is not None else dict()
+    params = name.params.model_dump() if name.params is not None else dict()
 
     generator.clear_cache()
     result = generator.generate_names(name.name,
@@ -151,7 +151,7 @@ async def root(name: Name):
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
 
-    logger.info(json.dumps(log_entry.create_log_entry(name.dict(), result)))
+    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return JSONResponse(response)
 
