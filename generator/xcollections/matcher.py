@@ -25,6 +25,11 @@ class CollectionMatcher(metaclass=Singleton):
         self.tokenizer = WordNinjaTokenizer(config)
         self.index_name = config.elasticsearch.index
 
+        self.ltr_feature_store = config.elasticsearch.ltr.feature_store
+        self.ltr_feature_set = config.elasticsearch.ltr.feature_set
+        self.ltr_model_name = config.elasticsearch.ltr.model_name
+        self.ltr_window_size = config.elasticsearch.ltr.window_size
+
         try:
             self.elastic = connect_to_elasticsearch(
                 config.elasticsearch.scheme,

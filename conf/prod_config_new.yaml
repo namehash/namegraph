@@ -34,6 +34,11 @@ elasticsearch:
   username: ${oc.env:ES_USERNAME,elastic}
   password: ${oc.env:ES_PASSWORD,password}
   index: ${oc.env:ES_INDEX,collection-templates-1}
+  ltr:
+    feature_store: ${oc.env:ES_LTR_FEATURE_STORE,ltr-metadata-index}
+    feature_set: ${oc.env:ES_LTR_FEATURE_SET,ltr-feature-set}
+    model_name: ${oc.env:ES_LTR_MODEL_NAME,exp6-8}
+    window_size: 50
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
