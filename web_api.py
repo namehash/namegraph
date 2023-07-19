@@ -169,7 +169,7 @@ async def root(name: Name):
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.name}')
     params = name.params.model_dump() if name.params is not None else dict()
-    params['mode'] = 'grouped'
+    params['mode'] = 'grouped_' + params['mode']
 
     generator.clear_cache()
     result = generator.generate_names(name.name,

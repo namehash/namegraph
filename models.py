@@ -10,7 +10,7 @@ class Params(BaseModel):
                                    examples=['us'])
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
-                      description='for /grouped_by_category endpoint this field is ignored')
+                      description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
 
 
 class Name(BaseModel):

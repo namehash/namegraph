@@ -191,6 +191,33 @@
     other:
       default: 0
 -
+  name: collections
+  controlflow:
+    - RunIfNotInstant
+  generator: CollectionGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 10
+    person:
+      default: 0.1
+    other:
+      default: 0
+  mode_weights_multiplier:
+    instant: 0
+    domain_detail: 0
+    full: 0
+  global_limits:
+    instant: 0
+    domain_detail: 0
+    full: 0
+    grouped_instant: 1
+    grouped_domain_detail: 1
+    grouped_full: 0.33
+-
   name: easteregg
   generator: EasterEggGenerator
   filters:
