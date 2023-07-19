@@ -68,8 +68,8 @@ class GroupingCategory(BaseModel):
 
 
 class CollectionCategory(GroupingCategory):
-    type: str = Field('related', const=True, title='category type',
-                      description='in CollectionCategory category type is always set to \'related\'')
+    type: Literal['related'] = Field('related', title='category type',
+                                     description='in CollectionCategory category type is always set to \'related\'')
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
 
