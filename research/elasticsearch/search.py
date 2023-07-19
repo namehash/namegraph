@@ -3,6 +3,8 @@ from argparse import ArgumentParser
 from math import log10
 import pprint
 import re
+import pandas as pd
+import numpy as np
 
 from copy import deepcopy
 
@@ -23,7 +25,7 @@ COMMON_QUERY = {
                                 "data.names.normalized_name", #5
                                 "data.names.tokenized_name", #6
                             ],
-                            "type": "cross_fields",
+                            "type": "most_fields",
                         }
                     }
                 ],
@@ -97,7 +99,7 @@ def print_exlanation(hits):
         print(f'<tr><td class="font-bold px-5 py-2">{name}</td></tr><tr><td class="px-5 py-2"><pre>{explanation}</pre></td></tr>')
     print('</table></details>')
 
-def is_good_prediction(hits, rf_model):
+def is_good_prediction(hits, rf_model, search, args):
     df = pd.DataFrame(columns=[
         "rank_log",
         "mrank_mean_log",
@@ -115,7 +117,6 @@ def is_good_prediction(hits, rf_model):
     for hit in hits:
         values = search.values(hit, args) 
         values = [float(values[2]), *[float(e) for e in values[4:13]], int(values[13])]
-        #values = [float(values[2]), *[float(e) for e in values[4:]]]
         df.loc[len(df)] = values
 
     # change order to match model
@@ -141,7 +142,7 @@ class Search:
         return self.header()
 
     def values(self, hit, args):
-        score = "%.1f" % hit['_score']
+        score = "%.3f" % (hit['_score'] or 0.0)
         data = hit['_source']['data']
         template = hit['_source']['template']
 
@@ -193,7 +194,7 @@ class Search:
                 #'desciption', 'keywords', 
                 'names']
 
-    def __call__(self, query, args):
+    def __call__(self, query, args, es):
 
         body = self.body(query)
 
@@ -264,8 +265,6 @@ if __name__ == '__main__':
     rf_model = None
     if args.random_forest_model:
         from joblib import dump, load
-        import pandas as pd
-        import numpy as np
 
         rf_model = load(args.random_forest_model)
 
@@ -328,7 +327,7 @@ if __name__ == '__main__':
             for query, score, base in sorted(queries, key=lambda x: -x[1]):
                 delta = f'Δ {"%+.3f" % (score - base)}'
                 print(f'<h2 class="px-5 py-2 font-sans text-lg font-bold">{query} ({"%.3f" %score} {delta} )</h2>', file=output)
-                hits = search(query, args)
+                hits = search(query, args, es)
                 print('<table class="m-5">', file=output)
                 print(f'<tr>', file=output)
                 for column in search.columns():
@@ -336,7 +335,7 @@ if __name__ == '__main__':
                 print(f'</tr>', file=output)
 
                 if(rf_model and len(hits) > 0):
-                    decision = is_good_prediction(hits, rf_model)
+                    decision = is_good_prediction(hits, rf_model, search, args)
                 else:
                     decision = [0.0] * len(hits)
 

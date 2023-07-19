@@ -20,6 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('--username', default='elastic', help='elasticsearch username')
     parser.add_argument('--password', default='password', help='elasticsearch password')
     parser.add_argument('--cloud_id', default=None, help='cloud id')
+    parser.add_argument('--featureset_name', default=None, help='the name of the featureset')
     args = parser.parse_args()
 
     if(args.model is None):
@@ -47,4 +48,4 @@ if __name__ == '__main__':
         }
     }
 
-    ltr.create_model(name=args.model_name, feature_set_name=FEATURE_SET_NAME, body=body)
+    ltr.create_model(name=args.model_name, feature_set_name=args.featureset_name, body=body)

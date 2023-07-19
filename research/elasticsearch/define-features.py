@@ -24,6 +24,35 @@ def rank_feature(feature_field, feature_name=None):
             }
         }
 
+def log_feature(feature_field, feature_name=None):
+    if feature_name is None:
+        feature_name = feature_field[feature_field.rindex(".")+1:]
+    return {
+            "name": f"{feature_name}_log", 
+            "params": [], 
+            "template": {
+                "rank_feature": {
+                    "field": feature_field,
+                    "log": {"scaling_factor": 1}
+                }
+            }
+        }
+
+def size_feature(feature_field, feature_name=None):
+    if feature_name is None:
+        feature_name = feature_field[feature_field.rindex(".")+1:]
+    
+    return {
+            "name": feature_name,
+            "params": [], 
+            "template_language": "script_feature",
+            "template": {
+                "lang": "painless",
+                "source": f"params['_source'].{feature_field}.size()",
+                "params": {} 
+            }
+    }
+
 def keyword_feature(feature_field, feature_name=None):
     if feature_name is None:
         feature_name = feature_field[feature_field.rindex(".")+1:]
@@ -32,12 +61,12 @@ def keyword_feature(feature_field, feature_name=None):
         "params": ["keywords"], 
         "template": {
             "match": {
-                feature_field: "{{keywords}}"
+                feature_field: "{{keywords}}",
             }
         }
     }
 
-def feature_query(keyword):
+def feature_query(keyword, featureset_name):
     return {
         "bool": {
             "must": [
@@ -45,12 +74,12 @@ def feature_query(keyword):
                     "multi_match": {
                         "query": keyword,
                         "fields": [
-                            "data.collection_name",
-                            "data.collection_name.exact",
+                            "data.collection_name^3",
+                            "data.collection_name.exact^3",
                             "data.names.normalized_name",
                             "data.names.tokenized_name",
-                            "data.collection_description",
-                            "data.collection_keywords",
+                            "data.collection_description^2",
+                            "data.collection_keywords^2",
                         ],
                         "type": "cross_fields",
                     }
@@ -60,6 +89,7 @@ def feature_query(keyword):
                 {
                     "rank_feature": {
                         "field": "template.collection_rank",
+                        "boost": 100
                     }
                 },
                 {
@@ -85,6 +115,7 @@ def feature_query(keyword):
                 {
                     "rank_feature": {
                         "field": "template.nonavailable_members_ratio",
+                        "boost": 100
                     }
                 }
             ],
@@ -92,7 +123,7 @@ def feature_query(keyword):
                 {
                     "sltr": {
                         "_name": "logged_featureset",
-                        "featureset": f"{FEATURE_SET_NAME}",
+                        "featureset": f"{featureset_name}",
                         "params": {
                             "keywords": keyword
                         }
@@ -115,6 +146,10 @@ if __name__ == '__main__':
     parser.add_argument('--scores', default=None, help='file with relevance scores (JSONL)')
     parser.add_argument('--train', default=None, help='file with output train features (ranklib)')
     parser.add_argument('--test', default=None, help='file with output test features (ranklib)')
+    parser.add_argument('--featureset_name', default=FEATURE_SET_NAME, help='the name of the created feature set')
+    parser.add_argument('--limit', default=None, help='limit export to only n-first examples')
+
+
     args = parser.parse_args()
 
     if args.cloud_id:
@@ -141,23 +176,33 @@ if __name__ == '__main__':
                 rank_feature("template.valid_members_ratio"),
                 rank_feature("template.nonavailable_members_count"), 
                 rank_feature("template.nonavailable_members_ratio"),
+                log_feature("template.collection_rank"),
+                log_feature("template.members_rank_mean"),
+                log_feature("template.members_rank_median"),
+                log_feature("template.valid_members_count"),
+                log_feature("template.nonavailable_members_count"), 
+                size_feature("data.names")
                 #rank_feature("template.is_merged"),
             ]
         }
     }
 
+    print(feature_definition)
+
     ltr = LTRClient(es)
 
     feature_sets = ltr.list_feature_sets()
     feature_sets = [e['_source']['name'] for e in feature_sets['hits']['hits']]
-    if(FEATURE_SET_NAME not in feature_sets or args.reset):
-        ltr.create_feature_set(FEATURE_SET_NAME, json.dumps(feature_definition))
+    featureset_name = args.featureset_name
+
+    if(featureset_name not in feature_sets or args.reset):
+        ltr.create_feature_set(featureset_name, json.dumps(feature_definition))
         feature_sets = ltr.list_feature_sets()
         feature_sets = [e['_source']['name'] for e in feature_sets['hits']['hits']]
-        assert FEATURE_SET_NAME in feature_sets, f"Failed to create feature set {FEATURE_SET_NAME}"
-        print(f"Feature set '{FEATURE_SET_NAME}' created.")
+        assert featureset_name in feature_sets, f"Failed to create feature set {featureset_name}"
+        print(f"Feature set '{featureset_name}' created.")
     else:
-        print(f"Feature set '{FEATURE_SET_NAME}' already present.")
+        print(f"Feature set '{featureset_name}' already present.")
 
 
     ext_query = {
@@ -174,6 +219,9 @@ if __name__ == '__main__':
 
     with open(args.scores) as input:
         for idx, row in tqdm.tqdm(enumerate(input)):
+            if(args.limit and idx == int(args.limit)):
+                break
+
             data = json.loads(row.strip())
             key = list(data)[0]
             data_package = []
@@ -184,9 +232,13 @@ if __name__ == '__main__':
             for collection, value in score_data.items():
                 scores[collection] = value['user_score']
 
-            result = es.search(query=feature_query(key), ext=ext_query, size=1000)
+            result = es.search(query=feature_query(key, featureset_name), 
+                               fields=["data.collection_name"], 
+                               ext=ext_query, 
+                               size=30, 
+                               source=False)
             for hit in result['hits']['hits']:
-                name = hit['_source']['data']['collection_name']
+                name = hit['fields']['data.collection_name'][0]
                 if(name not in scores):
                     continue
                 score = scores[name]
