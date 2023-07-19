@@ -38,7 +38,8 @@ class MetaSampler:
             if weights_multiplier is None and mode.startswith('grouped_'):
                 # use ungrouped mode weights_multiplier as default (if key 'grouped_{mode}' does not exist)
                 weights_multiplier = pipeline.mode_weights_multiplier.get(mode.removeprefix('grouped_'), 1.0)
-
+            elif weights_multiplier is None:
+                weights_multiplier = 1.0
             weights[pipeline] = pipeline_weight * weights_multiplier
         return weights
 

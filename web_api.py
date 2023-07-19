@@ -2,6 +2,7 @@ import gc
 import logging, random, hashlib, json
 from typing import List, Optional
 from operator import attrgetter
+from collections import defaultdict
 from time import perf_counter
 
 import numpy as np
@@ -99,6 +100,7 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
+    GroupingCategory,
 )
 
 from collection_models import (
@@ -113,7 +115,7 @@ from collection_models import (
 )
 
 
-def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict[str, str]]:
+def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict[str, str | dict]]:
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -129,7 +131,8 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'interpretation': name.interpretation,
                 'pipeline_name': name.pipeline_name,
                 'collection_title': name.collection_title,
-                'collection_id': name.collection_id
+                'collection_id': name.collection_id,
+                'grouping_category': name.grouping_category
             }
 
     return response
@@ -157,13 +160,41 @@ async def root(name: Name):
     return JSONResponse(response)
 
 
-def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True):
-    response = convert_to_suggestion_format(names, include_metadata=include_metadata)
+def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
+    ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
+    grouped_dict: dict[str, list] = {
+        c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
+    related_dict: dict[tuple[str, str], list] = defaultdict(list)
 
-    # todo: group suggestions based on pipeline_name, collection_title and name
+    for suggestion in ungrouped_response:
+        grouping_category_type = suggestion['metadata']['grouping_category']
+        if grouping_category_type == 'related':
+            related_dict[
+                (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
+            ].append(suggestion)
+        elif grouping_category_type not in grouped_dict.keys():
+            raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
+        else:
+            grouped_dict[grouping_category_type].append(suggestion)
+
+    grouped_response: list[dict] = []
+    for grouping_category_type, suggestions in grouped_dict.items():
+        grouped_response.append({
+            'suggestions': suggestions,
+            'type': grouping_category_type,
+        })
+    for (collection_title, collection_id), suggestions in related_dict.items():
+        grouped_response.append({
+            'suggestions': suggestions,
+            'type': 'related',
+            'collection_title': collection_title,
+            'collection_id': collection_id
+        })
+
+    return grouped_response
 
 
-@app.post("/grouped_by_category", response_model=list[Suggestion])
+@app.post("/grouped_by_category", response_model=list[GroupingCategory])
 async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)
@@ -179,7 +210,7 @@ async def root(name: Name):
                                       min_available_fraction=name.min_primary_fraction,
                                       params=params)
 
-    response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+    response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
 
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 

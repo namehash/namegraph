@@ -55,6 +55,7 @@ class Metadata(BaseModel):
         description='if name has been generated using a collection, '
                     'then this field would contains its id, else it is null'
     )
+    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
 
 
 class Suggestion(BaseModel):
@@ -77,4 +78,4 @@ class CollectionCategory(GroupingCategory):
 class OtherCategory(GroupingCategory):
     type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
         Field(title='category type',
-              description='category type depends on the pipeline the suggestions came from')
+              description='category type depends on the generator the suggestions came from')
