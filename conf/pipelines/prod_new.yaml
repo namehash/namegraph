@@ -344,8 +344,6 @@
       default: 0
   mode_weights_multiplier:
     instant: 0
-    domain_detail: 0
-    full: 0
   global_limits:  # todo: maybe global_limits should have keys: default, grouped
     instant: 0
     domain_detail: 0

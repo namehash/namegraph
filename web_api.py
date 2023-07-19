@@ -180,12 +180,12 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
     grouped_response: list[dict] = []
     for grouping_category_type, suggestions in grouped_dict.items():
         grouped_response.append({
-            'suggestions': suggestions,
+            'suggestions': suggestions if include_metadata else [{'name': s['name']} for s in suggestions],
             'type': grouping_category_type,
         })
     for (collection_title, collection_id), suggestions in related_dict.items():
         grouped_response.append({
-            'suggestions': suggestions,
+            'suggestions': suggestions if include_metadata else [{'name': s['name']} for s in suggestions],
             'type': 'related',
             'collection_title': collection_title,
             'collection_id': collection_id
