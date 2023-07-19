@@ -8,7 +8,7 @@ import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, Response
 from hydra import initialize, compose
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
@@ -27,7 +27,7 @@ logger = logging.getLogger('generator')
 class Settings(BaseSettings):
     # config_name: str = "test_config"
     config_name: str = "prod_config_new"
-    config_overrides: Optional[str] = None
+    config_overrides: Optional[list[str]] = None
 
     # elasticsearch_host: Optional[str] = None
     # elasticsearch_port: Optional[int] = None
@@ -42,7 +42,7 @@ app = FastAPI()
 
 def init():
     with initialize(version_base=None, config_path="conf/"):
-        overrides = json.loads(settings.config_overrides) if settings.config_overrides is not None else []
+        overrides = settings.config_overrides if settings.config_overrides is not None else []
         config = compose(config_name=settings.config_name, overrides=overrides)
         logger.setLevel(config.app.logging_level)
         for handler in logger.handlers:
@@ -140,7 +140,7 @@ async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.name}')
-    params = name.params.dict() if name.params is not None else dict()
+    params = name.params.model_dump() if name.params is not None else dict()
 
     generator.clear_cache()
     result = generator.generate_names(name.name,
@@ -152,7 +152,7 @@ async def root(name: Name):
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
 
-    logger.info(json.dumps(log_entry.create_log_entry(name.dict(), result)))
+    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return JSONResponse(response)
 

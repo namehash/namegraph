@@ -7,17 +7,17 @@ from web_api import generator
 class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null",
-                                   example='us')
+                                   examples=['us'])
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
-                      regex=r'^(instant|domain_detail|full)$',
+                      pattern=r'^(instant|domain_detail|full)$',
                       description='for /grouped_by_category endpoint this field is ignored')
 
 
 class Name(BaseModel):
-    name: str = Field(title='input name', example='zeus')
+    name: str = Field(title='input name', examples=['zeus'])
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('weighted-sampling', title='sorter algorithm',
-                        regex=r'^(round-robin|count|length|weighted-sampling)$')
+                        pattern=r'^(round-robin|count|length|weighted-sampling)$')
     min_suggestions: int = Field(100, title='minimal number of suggestions to generate',
                                  ge=1, le=generator.config.generation.limit)
     max_suggestions: int = Field(100, title='maximal number of suggestions to generate',
@@ -46,7 +46,7 @@ class Metadata(BaseModel):
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
     collection_title: Optional[str] = Field(
-        name='name of the collection',
+        title='name of the collection',
         description='if name has been generated using a collection, '
                     'then this field would contains its name, else it is null'
     )
