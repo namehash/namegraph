@@ -51,7 +51,7 @@ class Metadata(BaseModel):
                     'then this field would contains its name, else it is null'
     )
     collection_id: Optional[str] = Field(  # todo: maybe bundle collection's title and id together
-        name='id of the collection',
+        title='id of the collection',
         description='if name has been generated using a collection, '
                     'then this field would contains its id, else it is null'
     )
