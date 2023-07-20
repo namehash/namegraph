@@ -166,38 +166,42 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
     related_dict: dict[tuple[str, str], list] = defaultdict(list)
-    categories_order = []
+    category_types_order = []
+    collection_categories_order = []
 
     for suggestion in ungrouped_response:
         grouping_category_type = suggestion['metadata']['grouping_category']
         if grouping_category_type == 'related':
             collection_key = (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
             related_dict[collection_key].append(suggestion)
-            if collection_key not in categories_order:
-                categories_order.append(collection_key)
+            if grouping_category_type not in category_types_order:
+                category_types_order.append(grouping_category_type)
+            if collection_key not in collection_categories_order:
+                collection_categories_order.append(collection_key)
         elif grouping_category_type not in grouped_dict.keys():
             raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
         else:
             grouped_dict[grouping_category_type].append(suggestion)
-            if grouping_category_type not in categories_order:
-                categories_order.append(grouping_category_type)
+            if grouping_category_type not in category_types_order:
+                category_types_order.append(grouping_category_type)
 
     grouped_response: list[dict] = []
 
-    for gcat_key in categories_order:
-        if isinstance(gcat_key, tuple):
-            grouped_response.append({
-                'suggestions': related_dict[gcat_key] if include_metadata else
-                [{'name': s['name']} for s in related_dict[gcat_key]],
-                'type': 'related',
-                'collection_title': gcat_key[0],
-                'collection_id': gcat_key[1]
-            })
+    for gcat in category_types_order:
+        if gcat == 'related':
+            for collection_key in collection_categories_order:
+                grouped_response.append({
+                    'suggestions': related_dict[collection_key] if include_metadata else
+                    [{'name': s['name']} for s in related_dict[collection_key]],
+                    'type': 'related',
+                    'collection_title': collection_key[0],
+                    'collection_id': collection_key[1]
+                })
         else:
             grouped_response.append({
-                'suggestions': grouped_dict[gcat_key] if include_metadata else
-                [{'name': s['name']} for s in grouped_dict[gcat_key]],
-                'type': gcat_key,
+                'suggestions': grouped_dict[gcat] if include_metadata else
+                [{'name': s['name']} for s in grouped_dict[gcat]],
+                'type': gcat,
             })
 
     return grouped_response
