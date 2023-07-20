@@ -17,7 +17,8 @@ class Tokenizer:
             GeneratedName(
                 subtokens,
                 pipeline_name=name.pipeline_name,
-                applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
+                applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies],
+                grouping_category=name.grouping_category
             )
             for name in tokenized_names
             for token in name.tokens
