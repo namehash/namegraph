@@ -249,7 +249,7 @@ span.i {
                     if 'CollectionGenerator' in processor:
                         generator_name = processor.replace('Generator', '')
                         generators[generator_name].append((s["name"], i))
-                        generators['Collection Name'].append((s["metadata"]["collection"], i))
+                        generators['Collection Name'].append((s["metadata"]["collection_title"], i))
 
         for generator_name, names in sorted(generators.items()):
             stats[generator_name].append(len(names) / generated)
