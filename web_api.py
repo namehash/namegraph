@@ -155,7 +155,6 @@ async def root(name: Name):
                                       params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
-
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return JSONResponse(response)
@@ -224,7 +223,6 @@ async def root(name: Name):
                                       params=params)
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
-
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return JSONResponse(response)
