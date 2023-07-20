@@ -328,8 +328,6 @@
     full: 0.2
 -
   name: collections
-  controlflow:
-    - RunIfNotInstant  # todo: should it be here?
   generator: CollectionGenerator
   filters:
     - SubnameFilter
@@ -344,7 +342,7 @@
       default: 0
   mode_weights_multiplier:
     instant: 0
-  global_limits:  # todo: maybe global_limits should have keys: default, grouped
+  global_limits:
     instant: 0
     domain_detail: 0
     full: 0

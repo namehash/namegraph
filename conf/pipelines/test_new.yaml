@@ -192,8 +192,6 @@
       default: 0
 -
   name: collections
-  controlflow:
-    - RunIfNotInstant
   generator: CollectionGenerator
   filters:
     - SubnameFilter
