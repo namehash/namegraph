@@ -288,6 +288,8 @@ class ElasticsearchQueryBuilder:
             model_name: str,
             feature_set: str,
             feature_store: str,
+            query_weight: float = 0.0,
+            rescore_query_weight: float = 1.0,
     ) -> ElasticsearchQueryBuilder:
         """
         Adds a learning to rank rescore to the query builder
@@ -297,6 +299,8 @@ class ElasticsearchQueryBuilder:
         :param model_name: model name
         :param feature_set: feature set
         :param feature_store: feature store
+        :param query_weight: query weight
+        :param rescore_query_weight: rescore query weight
         :return: self
         """
 
@@ -312,7 +316,8 @@ class ElasticsearchQueryBuilder:
                     }
                 }
             },
-            "query_weight": 0,
+            "query_weight": query_weight,
+            "rescore_query_weight": rescore_query_weight
         }
 
         return self.rescore(window_size, query)
