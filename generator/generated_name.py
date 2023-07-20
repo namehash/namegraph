@@ -7,7 +7,7 @@ class GeneratedName:
 
     def __init__(self,
                  tokens: Tuple[str, ...],
-                 grouping_category: Optional[str],
+                 grouping_category: Optional[str] = None,
                  pipeline_name: Optional[str] = None,
                  category: Optional[str] = None,
                  applied_strategies: Optional[List[List[str]]] = None,
