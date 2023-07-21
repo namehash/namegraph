@@ -7,7 +7,7 @@ from time import perf_counter
 
 import numpy as np
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import Response
 from hydra import initialize, compose
 from pydantic_settings import BaseSettings
 
@@ -225,7 +225,7 @@ async def root(name: Name):
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
-    return JSONResponse(response)
+    return response
 
 
 def convert_to_collection_format(collections: list[Collection]):
@@ -295,7 +295,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
         'metadata': metadata
     }
 
-    return JSONResponse(response)
+    return response
 
 
 @app.post("/count_collections_by_string", response_model=CollectionsContainingNameCountResponse)
@@ -321,7 +321,7 @@ async def get_collections_count_by_string(query: CollectionCountByStringRequest)
         'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
     }
 
-    return JSONResponse({'count': count, 'metadata': metadata})
+    return {'count': count, 'metadata': metadata}
 
 
 @app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
@@ -368,7 +368,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         'metadata': metadata
     }
 
-    return JSONResponse(response)
+    return response
 
 
 @app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse)
@@ -393,7 +393,7 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
         'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
     }
 
-    return JSONResponse({'count': count, 'metadata': metadata})
+    return {'count': count, 'metadata': metadata}
 
 
 @app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
@@ -426,4 +426,4 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
         'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
-    return JSONResponse({'collections': collections, 'metadata': metadata})
+    return {'collections': collections, 'metadata': metadata}

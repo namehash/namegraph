@@ -37,9 +37,9 @@ class Metadata(BaseModel):
                                                   'suggestion has been generated')
     cached_status: str = Field(title='cached status',
                                description='name\'s status cached at the time of application startup')
-    categories: str = Field(title='domain category',
-                            description='can be either available, taken, recently released or on sale')
-    cached_interesting_score: float = Field(title='cached interesting score',
+    categories: list[str] = Field(title='domain category',
+                                  description='can be either available, taken, recently released or on sale')
+    cached_interesting_score: Optional[float] = Field(title='cached interesting score',
                                             description='name\'s interesting score cached at the time of '
                                                         'application startup')
     applied_strategies: list[list[str]] = Field(
