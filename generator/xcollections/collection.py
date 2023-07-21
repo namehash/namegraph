@@ -17,7 +17,7 @@ class Collection:
             tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
             modified_timestamp: int,
-            avatar_emoji: Optional[str]  # todo: make non-optional (?)
+            avatar_emoji: str
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
