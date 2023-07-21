@@ -18,6 +18,9 @@ class Collection(BaseModel):
         title='top names stored in the collection (limited by `limit_names`)', description='can not be greater than 10')
     types: list[str] = Field(title='list of types to which the collection belongs',
                              description='example of type is `human`')
+    avatar_emoji: str = Field(title='avatar emoji associated with this collection')
+    avatar_image: Optional[str] = Field(None, title='avatar image associated with this collection',
+                                        description='for now, is always null')
 
 
 class CollectionResultMetadata(BaseModel):
@@ -108,6 +111,7 @@ class CollectionSearchByCollection(BaseCollectionSearchWithOther):  # collection
 class CollectionSearchResponse(BaseCollectionQueryResponse):
     related_collections: list[Collection] = Field(title='list of related collections')
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
+
 
 class CollectionCountByStringRequest(BaseModel):
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
