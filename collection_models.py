@@ -30,7 +30,7 @@ class CollectionResultMetadata(BaseModel):
     processing_time_ms: float = Field(title='time elapsed for this query in milliseconds')
     elasticsearch_processing_time_ms: Optional[float] = Field(
         title='time elapsed for elasticsearch query in milliseconds', description='return null for `count*` endpoints')
-    elasticsearch_communication_time_ms: float = Field(
+    elasticsearch_communication_time_ms: Optional[float] = Field(
         title='time elapsed for the communication with elasticsearch from the request sending to response receiving '
               'in milliseconds')
 
