@@ -169,6 +169,8 @@ def convert_to_collection_format(collections: list[Collection]):
                 'namehash': namehash,
             } for name, namehash in zip(collection.names, collection.namehashes)],
             'types': collection.name_types,
+            'avatar_emoji': collection.avatar_emoji,
+            'avatar_image': None  # todo: if exists, return avatar image
         }
         for collection in collections
     ]

@@ -16,7 +16,8 @@ class Collection:
             namehashes: Optional[list[str]],
             tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
-            modified_timestamp: int
+            modified_timestamp: int,
+            avatar_emoji: Optional[str]  # todo: make non-optional (?)
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
@@ -30,6 +31,7 @@ class Collection:
         self.tokenized_names = tokenized_names
         self.name_types = name_types
         self.modified_timestamp = modified_timestamp
+        self.avatar_emoji = avatar_emoji
 
     # FIXME make more universal or split into multiple methods
     # FIXME should we move limit_names somewhere else?
@@ -53,7 +55,8 @@ class Collection:
             if 'template.top10_names.namehash' in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
-            modified_timestamp=fields['metadata.modified'][0]
+            modified_timestamp=fields['metadata.modified'][0],
+            avatar_emoji=fields['data.avatar_emoji'][0]
         )
 
     @classmethod
@@ -76,5 +79,6 @@ class Collection:
             if 'script_namehashes' in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
-            modified_timestamp=fields['metadata.modified'][0]
+            modified_timestamp=fields['metadata.modified'][0],
+            avatar_emoji=fields['data.avatar_emoji']
         )
