@@ -2,6 +2,7 @@ import gc
 import logging, random, hashlib, json
 from typing import List, Optional
 from operator import attrgetter
+from collections import defaultdict
 from time import perf_counter
 
 import numpy as np
@@ -99,6 +100,7 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
+    GroupingCategory,
 )
 
 from collection_models import (
@@ -113,7 +115,8 @@ from collection_models import (
 )
 
 
-def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict[str, str]]:
+def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[
+    dict[str, str | dict]]:
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -128,7 +131,9 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'categories': categories.get_categories(str(name)),
                 'interpretation': name.interpretation,
                 'pipeline_name': name.pipeline_name,
-                'collection': name.collection
+                'collection_title': name.collection_title,
+                'collection_id': name.collection_id,
+                'grouping_category': name.grouping_category
             }
 
     return response
@@ -150,7 +155,74 @@ async def root(name: Name):
                                       params=params)
 
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
+    return JSONResponse(response)
+
+
+def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
+    ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
+    grouped_dict: dict[str, list] = {
+        c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
+    related_dict: dict[tuple[str, str], list] = defaultdict(list)
+    category_types_order = []
+    collection_categories_order = []
+
+    for suggestion in ungrouped_response:
+        grouping_category_type = suggestion['metadata']['grouping_category']
+        if grouping_category_type == 'related':
+            collection_key = (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
+            related_dict[collection_key].append(suggestion)
+            if grouping_category_type not in category_types_order:
+                category_types_order.append(grouping_category_type)
+            if collection_key not in collection_categories_order:
+                collection_categories_order.append(collection_key)
+        elif grouping_category_type not in grouped_dict.keys():
+            raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
+        else:
+            grouped_dict[grouping_category_type].append(suggestion)
+            if grouping_category_type not in category_types_order:
+                category_types_order.append(grouping_category_type)
+
+    grouped_response: list[dict] = []
+
+    for gcat in category_types_order:
+        if gcat == 'related':
+            for collection_key in collection_categories_order:
+                grouped_response.append({
+                    'suggestions': related_dict[collection_key] if include_metadata else
+                    [{'name': s['name']} for s in related_dict[collection_key]],
+                    'type': 'related',
+                    'collection_title': collection_key[0],
+                    'collection_id': collection_key[1]
+                })
+        else:
+            grouped_response.append({
+                'suggestions': grouped_dict[gcat] if include_metadata else
+                [{'name': s['name']} for s in grouped_dict[gcat]],
+                'type': gcat,
+            })
+
+    return grouped_response
+
+
+@app.post("/grouped_by_category", response_model=list[GroupingCategory])
+async def root(name: Name):
+    seed_all(name.name)
+    log_entry = LogEntry(generator.config)
+    logger.debug(f'Request received: {name.name}')
+    params = name.params.model_dump() if name.params is not None else dict()
+    params['mode'] = 'grouped_' + params['mode']
+
+    generator.clear_cache()
+    result = generator.generate_names(name.name,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions,
+                                      min_available_fraction=name.min_primary_fraction,
+                                      params=params)
+
+    response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return JSONResponse(response)

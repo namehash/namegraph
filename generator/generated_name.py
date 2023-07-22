@@ -2,17 +2,21 @@ from typing import Tuple, List, Optional
 
 
 class GeneratedName:
-    __slots__ = ['tokens', 'pipeline_name', 'status', 'applied_strategies', 'collection', 'interpretation']
+    __slots__ = ['tokens', 'pipeline_name', 'status', 'applied_strategies',
+                 'collection_title', 'collection_id', 'interpretation', 'grouping_category']
 
     def __init__(self,
                  tokens: Tuple[str, ...],
+                 grouping_category: Optional[str] = None,
                  pipeline_name: Optional[str] = None,
                  category: Optional[str] = None,
                  applied_strategies: Optional[List[List[str]]] = None,
-                 collection: Optional[str] = None):
+                 collection_title: Optional[str] = None,
+                 collection_id: Optional[str] = None):
 
         self.tokens = tokens
 
+        self.grouping_category = grouping_category
         self.pipeline_name = pipeline_name
         self.status = category
         self.applied_strategies = []  # history of applied strategies
@@ -22,7 +26,8 @@ class GeneratedName:
         else:
             self.applied_strategies.append([])
 
-        self.collection = collection
+        self.collection_title = collection_title
+        self.collection_id = collection_id
         self.interpretation = None
 
     def __str__(self):
@@ -45,6 +50,7 @@ class GeneratedName:
     def dict(self):
         return {
             'tokens': self.tokens,
+            'grouping_category': self.grouping_category,
             'pipeline_name': self.pipeline_name,
             'category': self.status,
             'applied_strategies': self.applied_strategies,

@@ -38,6 +38,7 @@ from generator.domains import Domains
 from generator.input_name import InputName
 
 from generator.utils.suffixtree import HAS_SUFFIX_TREE
+from generator.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
@@ -46,6 +47,8 @@ needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree 
 def run_around_tests():
     Domains.remove_self()
     Categories.remove_self()
+    CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     yield
 
 
@@ -605,7 +608,7 @@ def test_easteregg_generator():
 @pytest.mark.integration_test
 def test_collection_generator():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config_new")
+        config = compose(config_name="prod_config_new")
         strategy = CollectionGenerator(config)
         tokenized_name = ('pink', 'floyd')
         generated_names = list(strategy.generate(tokenized_name))

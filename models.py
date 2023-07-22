@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
 from web_api import generator
@@ -9,7 +9,8 @@ class Params(BaseModel):
                                    description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null",
                                    examples=['us'])
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
-                      pattern=r'^(instant|domain_detail|full)$')
+                      pattern=r'^(instant|domain_detail|full)$',
+                      description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
 
 
 class Name(BaseModel):
@@ -44,14 +45,37 @@ class Metadata(BaseModel):
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
-    collection: Optional[str] = Field(
+    collection_title: Optional[str] = Field(
         title='name of the collection',
         description='if name has been generated using a collection, '
                     'then this field would contains its name, else it is null'
     )
+    collection_id: Optional[str] = Field(  # todo: maybe bundle collection's title and id together
+        title='id of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its id, else it is null'
+    )
+    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
 
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
     metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
+
+
+class GroupingCategory(BaseModel):
+    suggestions: list[Suggestion] = Field(title='generated suggestions belonging to the same category type')
+
+
+class CollectionCategory(GroupingCategory):
+    type: Literal['related'] = Field('related', title='category type',
+                                     description='in CollectionCategory category type is always set to \'related\'')
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+
+
+class OtherCategory(GroupingCategory):
+    type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
+        Field(title='category type',
+              description='category type depends on the generator the suggestions came from')

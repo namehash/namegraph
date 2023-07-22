@@ -1,7 +1,7 @@
 import collections
 import json
 from operator import itemgetter
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Optional
 
 import numpy as np
 
@@ -69,3 +69,10 @@ class PersonNameGenerator(NameGenerator):
         except:
             gender = None
         return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'gender': gender}
+
+    def get_grouping_category(self, output_name: Optional[str] = None):
+        if self._grouping_category == 'dynamic_' and output_name is not None:
+            return 'expand' if output_name.isascii() else 'emojify'
+        elif self._grouping_category == 'dynamic_':
+            return 'expand'
+        return self._grouping_category

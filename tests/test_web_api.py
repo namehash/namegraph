@@ -62,7 +62,7 @@ def test_metadata_scheme(test_test_client, name: str):
         assert sorted(generated_name.keys()) == sorted(["name", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted([
             'applied_strategies', 'cached_interesting_score', 'cached_status',
-            'categories', 'interpretation', 'pipeline_name', 'collection'
+            'categories', 'interpretation', 'pipeline_name', 'collection_title', 'collection_id', 'grouping_category'
         ])
 
 

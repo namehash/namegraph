@@ -66,6 +66,38 @@ generation:
   wikipedia2vec_path: data/wikipedia2vec.pkl
   person_name_affixes_path: data/person_name_affixes.json
   suffix2rhymes_path: data/suffix2rhymes.json
+  grouping_categories:
+    related:
+      - CollectionGenerator
+    wordplay:
+      - AbbreviationGenerator
+      - PermuteGenerator
+      - HyphenGenerator
+    alternates:
+      - Wikipedia2VGenerator
+      - W2VGenerator
+      - WordnetSynonymsGenerator
+    emojify:
+      - EmojiGenerator
+      - FlagAffixGenerator
+      - KeycapGenerator
+      - SymbolGenerator
+    community:
+      - SubstringMatchGenerator
+      - OnSaleMatchGenerator
+      - CategoriesGenerator
+    expand:
+      - PrefixGenerator
+      - SuffixGenerator
+      - SpecialCharacterAffixGenerator
+      - RhymesGenerator
+    gowild:
+      - LeetGenerator
+      - RandomAvailableNameGenerator
+      - EasterEggGenerator
+      - ReverseGenerator
+    dynamic_:  # generator needs to implement get_grouping_category(output_name: str) method
+      - PersonNameGenerator
 sorting:
   weighted_sampling:
     weights:
