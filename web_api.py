@@ -1,7 +1,6 @@
 import gc
 import logging, random, hashlib, json
 from typing import List, Optional
-from operator import attrgetter
 from collections import defaultdict
 from time import perf_counter
 
@@ -158,7 +157,7 @@ async def root(name: Name):
     response = convert_to_suggestion_format(result, include_metadata=name.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
-    return JSONResponse(response)
+    return response
 
 
 def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
