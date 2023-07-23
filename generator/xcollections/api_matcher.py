@@ -33,7 +33,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         try:
@@ -96,7 +96,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         # find collection with specified collection_id
@@ -198,7 +198,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         if sort_order == 'AI':
@@ -230,7 +230,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         try:
