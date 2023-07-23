@@ -17,7 +17,8 @@ class Collection:
             tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
             modified_timestamp: int,
-            avatar_emoji: str
+            avatar_emoji: str,
+            avatar_image: Optional[str],
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
@@ -32,6 +33,7 @@ class Collection:
         self.name_types = name_types
         self.modified_timestamp = modified_timestamp
         self.avatar_emoji = avatar_emoji
+        self.avatar_image = avatar_image
 
     # FIXME make more universal or split into multiple methods
     # FIXME should we move limit_names somewhere else?
@@ -56,7 +58,8 @@ class Collection:
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
-            avatar_emoji=fields['data.avatar_emoji'][0]
+            avatar_emoji=fields['data.avatar_emoji'][0],
+            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None
         )
 
     @classmethod
@@ -80,5 +83,6 @@ class Collection:
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
-            avatar_emoji=fields['data.avatar_emoji']
+            avatar_emoji=fields['data.avatar_emoji'],
+            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None
         )

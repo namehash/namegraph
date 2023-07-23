@@ -28,7 +28,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
