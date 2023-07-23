@@ -385,6 +385,7 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
 
     assert response.status_code == response_code
     response_json = response.json()
+    print(response_json)
 
     assert sum([len(gcat['suggestions']) for gcat in response_json]) == n_suggestions
 

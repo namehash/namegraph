@@ -100,7 +100,8 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    GroupingCategory,
+    CollectionCategory,
+    OtherCategory,
 )
 
 from collection_models import (
@@ -206,7 +207,7 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
     return grouped_response
 
 
-@app.post("/grouped_by_category", response_model=list[GroupingCategory])
+@app.post("/grouped_by_category", response_model=list[CollectionCategory | OtherCategory])
 async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)
