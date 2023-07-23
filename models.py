@@ -32,8 +32,8 @@ class Name(BaseModel):
 
 class Metadata(BaseModel):
     pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
-    interpretation: list[str] = Field(title='interpretation tags',
-                                      description='list of interpretation tags based on which the '
+    interpretation: list[str | None] = Field(title='interpretation tags',
+                                             description='list of interpretation tags based on which the '
                                                   'suggestion has been generated')
     cached_status: str = Field(title='cached status',
                                description='name\'s status cached at the time of application startup')
@@ -60,7 +60,7 @@ class Metadata(BaseModel):
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
-    metadata: Optional[Metadata] = Field(title="information how suggestion was generated",
+    metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
 
