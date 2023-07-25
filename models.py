@@ -13,8 +13,9 @@ class Params(BaseModel):
                       description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
 
 
-class Name(BaseModel):
-    name: str = Field(title='input name', examples=['zeus'])
+class NameRequest(BaseModel):
+    label: str = Field(title='input label', description='cannot contain dots (.)',
+                       pattern='^[^.]*$', examples=['zeus'])
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('weighted-sampling', title='sorter algorithm',
                         pattern=r'^(round-robin|count|length|weighted-sampling)$')

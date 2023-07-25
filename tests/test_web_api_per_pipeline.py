@@ -40,7 +40,7 @@ def test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"name": "aaa.eth"})
+    client.post("/", json={"label": "aaa.eth"})
     return client
 
 
@@ -56,7 +56,7 @@ class TestFlagAffix:
     def test_country_generator_parameter(self, test_client, name: str, country: str, expected_suffix: str):
         client = test_client
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": {
                 "country": country
             }
@@ -75,7 +75,7 @@ class TestFlagAffix:
         country = '123'
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": {
                 "country": country
             }
@@ -86,7 +86,7 @@ class TestFlagAffix:
         assert names
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": {
                 "country": '123'
             }
@@ -97,7 +97,7 @@ class TestFlagAffix:
         assert names
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": {
                 "country": None
             }
@@ -108,7 +108,7 @@ class TestFlagAffix:
         assert names
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": {
             }
         })
@@ -118,7 +118,7 @@ class TestFlagAffix:
         assert names
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
             "params": None
         })
         assert response.status_code == 200
@@ -127,7 +127,7 @@ class TestFlagAffix:
         assert names
 
         response = client.post("/", json={
-            "name": name,
+            "label": name,
         })
         assert response.status_code == 200
         json = response.json()
@@ -147,7 +147,7 @@ class TestEmoji:
         ]
     )
     def test_emoji_generator_api(self, test_client, name: str, expected_names: list[str]):
-        response = test_client.post("/", json={"name": name})
+        response = test_client.post("/", json={"label": name})
         assert response.status_code == 200
 
         json = response.json()
@@ -169,7 +169,7 @@ def only_primary():
 @mark.usefixtures("only_primary")
 class TestOnlyPrimary:
     def test_only_primary_generator_filling_api(self, test_client):
-        response = test_client.post("/", json={"name": "fiftysix",
+        response = test_client.post("/", json={"label": "fiftysix",
                                                "min_suggestions": 1,
                                                "max_suggestions": 1,
                                                "min_primary_fraction": 1.0})
@@ -195,21 +195,21 @@ def substring_test_pipeline():
 @mark.usefixtures("substring_test_pipeline")
 class TestSubstringMatch:
     def test_normalized(self, test_client):
-        response = test_client.post("/", json={"name": "あかまい"})
+        response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
         names = [name["name"] for name in json]
         assert "akamaihd.eth" in names
 
     def test_unnormalized(self, test_client):
-        response = test_client.post("/", json={"name": "あかまい"})
+        response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
         names = [name["name"] for name in json]
         assert "あかまいhd.eth" in names
 
     def test_emoji(self, test_client):
-        response = test_client.post("/", json={"name": "💛"})
+        response = test_client.post("/", json={"label": "💛"})
         assert response.status_code == 200
         json = response.json()
         names = [name["name"] for name in json]
@@ -227,7 +227,7 @@ def collection_test_pipelines():
 @mark.integration_test
 class TestCollections:
     def test_metadata_collection_field(self, test_client):
-        response = test_client.post("/", json={"name": "pinkfloyd"})
+        response = test_client.post("/", json={"label": "pinkfloyd"})
         assert response.status_code == 200
         json = response.json()
         collection_names = [name["metadata"]["collection_title"] for name in json]

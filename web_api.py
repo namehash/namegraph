@@ -97,7 +97,7 @@ domains = Domains(generator.config)
 categories = Categories(generator.config)
 
 from models import (
-    Name,
+    NameRequest,
     Suggestion,
     CollectionCategory,
     OtherCategory,
@@ -140,14 +140,14 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
 
 
 @app.post("/", response_model=list[Suggestion])
-async def root(name: Name):
-    seed_all(name.name)
+async def root(name: NameRequest):
+    seed_all(name.label)
     log_entry = LogEntry(generator.config)
-    logger.debug(f'Request received: {name.name}')
+    logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
 
     generator.clear_cache()
-    result = generator.generate_names(name.name,
+    result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,
@@ -207,15 +207,15 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
 
 
 @app.post("/grouped_by_category", response_model=list[CollectionCategory | OtherCategory])
-async def root(name: Name):
-    seed_all(name.name)
+async def root(name: NameRequest):
+    seed_all(name.label)
     log_entry = LogEntry(generator.config)
-    logger.debug(f'Request received: {name.name}')
+    logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
 
     generator.clear_cache()
-    result = generator.generate_names(name.name,
+    result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,

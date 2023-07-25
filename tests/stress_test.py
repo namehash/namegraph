@@ -27,7 +27,7 @@ def prod_test_client():
 
 
 def request_generator(name):
-    return client.post('/', json={'name': name})
+    return client.post('/', json={'label': name})
 
 
 def verify_generator(name, json):

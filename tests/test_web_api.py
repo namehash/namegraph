@@ -26,13 +26,13 @@ def test_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"name": "aaa.eth"})
+    client.post("/", json={"label": "aaa.eth"})
     return client
 
 
 def test_read_main(test_test_client):
     client = test_test_client
-    response = client.post("/", json={"name": "fire", "metadata": False})
+    response = client.post("/", json={"label": "fire", "metadata": False})
 
     assert response.status_code == 200
 
@@ -52,7 +52,7 @@ def test_read_main(test_test_client):
 )
 def test_metadata_scheme(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/", json={"name": name})
+    response = client.post("/", json={"label": name})
 
     assert response.status_code == 200
 
@@ -83,7 +83,7 @@ def test_metadata_applied_strategies(test_test_client,
                                      expected_name: str,
                                      expected_strategies: List[List[str]]):
     client = test_test_client
-    response = client.post("/", json={"name": name})
+    response = client.post("/", json={"label": name})
 
     assert response.status_code == 200
 
@@ -114,7 +114,7 @@ def test_metadata_applied_strategies(test_test_client,
 @mark.skip(reason='no count sorter')
 def test_count_sorter(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/", json={"name": name, "sorter": "count"})
+    response = client.post("/", json={"label": name, "sorter": "count"})
 
     assert response.status_code == 200
 
@@ -137,7 +137,7 @@ def test_count_sorter(test_test_client, name: str):
 @mark.xfail
 def test_length_sorter(test_test_client, name: str):
     client = test_test_client
-    response = client.post("/", json={"name": name, "sorter": "length"})
+    response = client.post("/", json={"label": name, "sorter": "length"})
 
     assert response.status_code == 200
 
@@ -158,7 +158,7 @@ def test_length_sorter(test_test_client, name: str):
 def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggestions: int, max_suggestions: int):
     client = test_test_client
     response = client.post("/", json={
-        "name": name,
+        "label": name,
         "min_suggestions": min_suggestions,
         "max_suggestions": max_suggestions
     })
@@ -176,8 +176,8 @@ def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggest
 def test_min_primary_fraction(test_test_client):
     client = test_test_client
     response = client.post("/",
-                           json={"name": 'fire', "sorter": "round-robin", "min_primary_fraction": 1.0, "min_suggestions": 10,
-                                 "max_suggestions": 10})
+                           json={"label": 'fire', "sorter": "round-robin", "min_primary_fraction": 1.0,
+                                 "min_suggestions": 10, "max_suggestions": 10})
 
     assert response.status_code == 200
 
@@ -191,7 +191,7 @@ def test_min_primary_fraction(test_test_client):
 # work with an empty input in the test config
 def test_empty_input(test_test_client):
     client = test_test_client
-    response = client.post("/", json={"name": "",
+    response = client.post("/", json={"label": "",
                                       "min_primary_fraction": 1.0,
                                       "min_suggestions": 100,
                                       "max_suggestions": 100})
@@ -214,7 +214,7 @@ def test_empty_input(test_test_client):
 def test_person_name_generator(test_test_client):
     client = test_test_client
     response = client.post("/",
-                           json={"name": "chris", "params": {
+                           json={"label": "chris", "params": {
                                "country": 'pl'
                            }})
 
