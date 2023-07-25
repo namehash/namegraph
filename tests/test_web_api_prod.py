@@ -30,14 +30,14 @@ def prod_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"label": "aaa.eth"})
+    client.post("/", json={"label": "aaa"})
     return client
 
 
 @pytest.mark.slow
 def test_namehash(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"label": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+    response = client.post("/", json={"label": "003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91",
                                       "metadata": True})
 
     assert response.status_code == 200

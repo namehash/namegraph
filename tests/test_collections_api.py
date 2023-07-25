@@ -27,7 +27,7 @@ def test_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"label": "aaa.eth"})
+    client.post("/", json={"label": "aaa"})
     return client
 
 
