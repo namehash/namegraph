@@ -70,7 +70,7 @@ def test_metadata_scheme(test_test_client, name: str):
     "name, expected_name, expected_strategies",
     [(
             "dogcat",
-            "catdog",
+            "catdog.eth",
             [
                 [
                     "PermuteGenerator", "SubnameFilter", "ValidNameFilter"
@@ -89,6 +89,10 @@ def test_metadata_applied_strategies(test_test_client,
 
     json = response.json()
     assert len(json) > 0
+
+    print('==='*20, end='\n\n')
+    print(json)
+    print('==='*20)
 
     result = [name for name in json if name["name"] == expected_name]
 
