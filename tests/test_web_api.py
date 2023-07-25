@@ -210,8 +210,8 @@ def test_empty_input(test_test_client):
         ])
 
 
-def test_no_dots(prod_test_client):
-    client = prod_test_client
+def test_no_dots(test_test_client):
+    client = test_test_client
     response = client.post("/", json={"label": "there is a . dot"})
 
     assert response.status_code == 422
