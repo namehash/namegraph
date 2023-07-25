@@ -30,7 +30,7 @@ def prod_test_client(config):
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/?name=aaa")
     return client
 
 
