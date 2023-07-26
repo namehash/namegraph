@@ -645,3 +645,13 @@ def test_rhymes_generator():
         discarded_names = map(lambda s: ''.join(tokenized_name) + s,
                               ("van", "fan", "sullivan"))
         assert all([name not in generated_names for name in discarded_names])
+
+
+def test_person_name_dynamic_grouping_category():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameGenerator(config)
+        assert pn.get_grouping_category(output_name=None) == 'expand'
+        assert pn.get_grouping_category(output_name='piotrbyczong') == 'expand'
+        assert pn.get_grouping_category(output_name='piotr🐂byczong') == 'emojify'
+        assert pn.get_grouping_category(output_name='piotrbyczońg') == 'emojify'  # non-ascii -> emojify
