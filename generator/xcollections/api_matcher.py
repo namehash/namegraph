@@ -51,6 +51,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .include_fields(include_fields)
 
         if sort_order == 'AI':
+            window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
+
             query_params = query_builder \
                 .add_query(query, fields=query_fields, type_='most_fields') \
                 .add_rank_feature('metadata.members_rank_mean', boost=1) \
@@ -63,7 +65,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 .add_rank_feature('template.nonavailable_members_count', boost=1) \
                 .add_rank_feature('template.nonavailable_members_ratio', boost=1) \
                 .rescore_with_learning_to_rank(query,
-                                               window_size=self.ltr_window_size,
+                                               window_size=window_size,
                                                model_name=self.ltr_model_name,
                                                feature_set=self.ltr_feature_set,
                                                feature_store=self.ltr_feature_store,

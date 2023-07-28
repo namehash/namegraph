@@ -231,4 +231,4 @@ class TestCollections:
         assert response.status_code == 200
         json = response.json()
         collection_names = [name["metadata"]["collection"] for name in json]
-        assert "Pink Floyd albums" in collection_names
+        assert "Songs recorded by Pink Floyd" in collection_names

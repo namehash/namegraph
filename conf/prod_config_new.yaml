@@ -38,7 +38,9 @@ elasticsearch:
     feature_store: ${oc.env:ES_LTR_FEATURE_STORE,ltr-metadata-index}
     feature_set: ${oc.env:ES_LTR_FEATURE_SET,ltr-feature-set}
     model_name: ${oc.env:ES_LTR_MODEL_NAME,exp6-8}
-    window_size: 50
+    window_size:
+      instant: 20
+      domain_detail: 100
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
