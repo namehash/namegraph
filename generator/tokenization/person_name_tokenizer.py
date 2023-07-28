@@ -25,7 +25,8 @@ class PersonNameTokenizer(Tokenizer):
                     gn = GeneratedName(
                         tokenized,
                         pipeline_name=name.pipeline_name,
-                        applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies]
+                        applied_strategies=[sublist + [self.__class__.__name__] for sublist in name.applied_strategies],
+                        grouping_category=name.grouping_category
                     )
                     # TODO add meta info about country, gender and prob?
                     result.append(gn)

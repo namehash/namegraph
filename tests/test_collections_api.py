@@ -113,6 +113,27 @@ class TestCorrectConfiguration:
                     for member_name in collection['top_names']])
 
     @mark.integration_test
+    def test_collection_api_avatar_emojis_and_images(self, test_test_client):
+        response = test_test_client.post("/find_collections_by_string", json={
+            "query": "australia",
+            "max_related_collections": 3,
+            "max_total_collections": 6,
+            "min_other_collections": 3,
+            "max_other_collections": 3
+        })
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+        assert all(
+            [not collection['avatar_emoji'].isascii()
+             for collection in response_json['related_collections'] + response_json['other_collections']])
+
+        assert all(  # todo: add url validation (?)
+            [isinstance(collection['avatar_image'], str) or collection['avatar_image'] is None
+             for collection in response_json['related_collections'] + response_json['other_collections']])
+
+    @mark.integration_test
     def test_collection_api_membership_count(self, test_test_client):
         response = test_test_client.post('/count_collections_by_member', json={'label': 'opeth'})
         assert response.status_code == 200

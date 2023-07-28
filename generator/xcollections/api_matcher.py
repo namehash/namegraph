@@ -31,9 +31,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             query = f'{query} {tokenized_query}'
 
         include_fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
-            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         query_fields = [
@@ -118,7 +118,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             )
             time_elapsed = (perf_counter() - t_before) * 1000
         except Exception as ex:
-            logger.error(f'Elasticsearch count failed [by-member]', exc_info=True)
+            logger.error(f'Elasticsearch count failed [by-string]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         count = response['count']
@@ -140,19 +140,19 @@ class CollectionMatcherForAPI(CollectionMatcher):
             sort_order = 'ES'
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
-            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         # find collection with specified collection_id
         id_match_params = (ElasticsearchQueryBuilder()
-                         .set_term('metadata.id.keyword', collection_id)
-                         .set_source(False)
-                         .include_fields(fields)
-                         .include_script_field('script_names', get_names_script(limit_names=100))
-                         .include_script_field('script_namehashes', get_namehashes_script(limit_names=100))
-                         .build_params())
+                           .set_term('metadata.id.keyword', collection_id)
+                           .set_source(False)
+                           .include_fields(fields)
+                           .include_script_field('script_names', get_names_script(limit_names=100))
+                           .include_script_field('script_namehashes', get_namehashes_script(limit_names=100))
+                           .build_params())
 
         try:
             collections, es_response_metadata = self._execute_query(id_match_params, limit_names=100, script_names=True)
@@ -175,24 +175,25 @@ class CollectionMatcherForAPI(CollectionMatcher):
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
 
         query_params = (ElasticsearchQueryBuilder()
-                      .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
-                                 fields=["data.collection_name^3", "data.collection_name.exact^3", 'data.collection_keywords^2'])
-                      .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
-                                 fields=["data.names.normalized_name"])
-                      .add_filter('term', {'data.public': True})
-                      .add_must_not('term', {"metadata.id.keyword": collection_id})
-                      .add_rank_feature('template.collection_rank', boost=100)
-                      .add_rank_feature('metadata.members_count')
-                      .add_rank_feature('template.members_rank_mean')
-                      .add_rank_feature('template.members_system_interesting_score_median')
-                      .add_rank_feature('template.valid_members_ratio')
-                      .add_rank_feature('template.nonavailable_members_ratio')
-                      .set_source(False)
-                      .include_fields(fields)
-                      .set_sort_order(sort_order, field='data.collection_name.raw')
-                      .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
-                      .add_offset(offset)
-                      .build_params())
+                        .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
+                                   fields=["data.collection_name^3", "data.collection_name.exact^3",
+                                           'data.collection_keywords^2'])
+                        .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
+                                   fields=["data.names.normalized_name"])
+                        .add_filter('term', {'data.public': True})
+                        .add_must_not('term', {"metadata.id.keyword": collection_id})
+                        .add_rank_feature('template.collection_rank', boost=100)
+                        .add_rank_feature('metadata.members_count')
+                        .add_rank_feature('template.members_rank_mean')
+                        .add_rank_feature('template.members_system_interesting_score_median')
+                        .add_rank_feature('template.valid_members_ratio')
+                        .add_rank_feature('template.nonavailable_members_ratio')
+                        .set_source(False)
+                        .include_fields(fields)
+                        .set_sort_order(sort_order, field='data.collection_name.raw')
+                        .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3)
+                        .add_offset(offset)
+                        .build_params())
 
         try:
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
@@ -241,27 +242,27 @@ class CollectionMatcherForAPI(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
-            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         if sort_order == 'AI':
             sort_order = 'AI-by-member'
 
         query_params = (ElasticsearchQueryBuilder()
-                      .add_filter('term', {'data.names.normalized_name': name_label})
-                      .add_filter('term', {'data.public': True})
-                      .add_rank_feature('metadata.members_count')
-                      .add_rank_feature('template.members_system_interesting_score_median')
-                      .add_rank_feature('template.valid_members_ratio')
-                      .add_rank_feature('template.nonavailable_members_ratio', boost=10)
-                      .set_source(False)
-                      .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')
-                      .include_fields(fields)
-                      .add_limit(max_results)
-                      .add_offset(offset)
-                      .build_params())
+                        .add_filter('term', {'data.names.normalized_name': name_label})
+                        .add_filter('term', {'data.public': True})
+                        .add_rank_feature('metadata.members_count')
+                        .add_rank_feature('template.members_system_interesting_score_median')
+                        .add_rank_feature('template.valid_members_ratio')
+                        .add_rank_feature('template.nonavailable_members_ratio', boost=10)
+                        .set_source(False)
+                        .set_sort_order(sort_order=sort_order, field='data.collection_name.raw')
+                        .include_fields(fields)
+                        .add_limit(max_results)
+                        .add_offset(offset)
+                        .build_params())
         try:
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
         except Exception as ex:
@@ -273,9 +274,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
     def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
-            'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.top10_names.namehash', 'template.collection_types', 'metadata.modified'
+            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         try:

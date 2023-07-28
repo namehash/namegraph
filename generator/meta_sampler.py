@@ -34,8 +34,12 @@ class MetaSampler:
             except KeyError:
                 pipeline_weight = pipeline_weights[type]['default']
 
-            weights_multiplier = pipeline.mode_weights_multiplier.get(mode, 1.0)
-
+            weights_multiplier = pipeline.mode_weights_multiplier.get(mode, None)
+            if weights_multiplier is None and mode.startswith('grouped_'):
+                # use ungrouped mode weights_multiplier as default (if key 'grouped_{mode}' does not exist)
+                weights_multiplier = pipeline.mode_weights_multiplier.get(mode.removeprefix('grouped_'), 1.0)
+            elif weights_multiplier is None:
+                weights_multiplier = 1.0
             weights[pipeline] = pipeline_weight * weights_multiplier
         return weights
 
@@ -60,6 +64,9 @@ class MetaSampler:
         global_limits = {}
         for pipeline in self.pipelines:
             limit = pipeline.global_limits.get(mode, None)
+            if limit is None and mode.startswith('grouped_'):
+                # use ungrouped mode limit as default limit (if key 'grouped_{mode}' does not exist)
+                limit = pipeline.global_limits.get(mode.removeprefix('grouped_'), None)
             if isinstance(limit, float):
                 limit = int(min_suggestions * limit)
             global_limits[pipeline.pipeline_name] = limit
@@ -121,8 +128,8 @@ class MetaSampler:
                     sampled_pipeline = next(sorters[sampled_interpretation])
 
                     # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
-                    if global_limits[sampled_pipeline.pipeline_name] is not None and global_limits[
-                        sampled_pipeline.pipeline_name] == 0:
+                    if global_limits[sampled_pipeline.pipeline_name] is not None and \
+                            global_limits[sampled_pipeline.pipeline_name] == 0:
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
                         continue
 

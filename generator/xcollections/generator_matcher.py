@@ -1,6 +1,8 @@
 from typing import Optional
 import logging
 
+from fastapi import HTTPException
+
 from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
@@ -26,7 +28,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         include_fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',
             'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
-            'template.collection_types', 'metadata.modified'
+            'template.collection_types', 'metadata.modified',
         ]
 
         query_fields = [
@@ -74,4 +76,4 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             return diversified, es_response_metadata
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [collections generator]', exc_info=True)
-            raise ex
+            raise HTTPException(status_code=503, detail=str(ex)) from ex

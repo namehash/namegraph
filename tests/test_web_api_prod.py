@@ -362,3 +362,41 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
         str_names = [name["name"] for name in response.json()]
         for name in str_names:
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
+
+
+@pytest.mark.parametrize(
+    "name, metadata, n_suggestions, response_code",
+    [
+        ("jamesbond", True, 50, 200),
+        ("longboard", True, 50, 200),
+        ("soundgarden", True, 50, 200),
+        ("aligator", True, 50, 200),
+        ("burdenofdreams", False, 50, 200)
+    ]
+)
+def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestions, response_code):
+    client = prod_test_client
+
+    response = client.post("/grouped_by_category",
+                           json={"name": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
+                                 "metadata": metadata,
+                                 "params": {"mode": "full"}}
+                           )
+
+    assert response.status_code == response_code
+    response_json = response.json()
+    print(response_json)
+
+    assert sum([len(gcat['suggestions']) for gcat in response_json]) == n_suggestions
+
+    last_related_flag = False
+
+    for i, gcat in enumerate(response_json):
+        assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+        assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+
+        # assert related are after one another
+        if gcat['type'] == 'related':
+            assert not last_related_flag
+            if i + 1 < len(response_json) and response_json[i + 1]['type'] != 'related':
+                last_related_flag = True

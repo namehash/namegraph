@@ -230,5 +230,5 @@ class TestCollections:
         response = test_client.post("/", json={"name": "pinkfloyd"})
         assert response.status_code == 200
         json = response.json()
-        collection_names = [name["metadata"]["collection"] for name in json]
+        collection_names = [name["metadata"]["collection_title"] for name in json]
         assert "Songs recorded by Pink Floyd" in collection_names
