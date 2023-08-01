@@ -132,6 +132,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'pipeline_name': name.pipeline_name,
                 'collection_title': name.collection_title,
                 'collection_id': name.collection_id,
+                'collection_members_count': name.collection_members_count,
                 'grouping_category': name.grouping_category
             }
 
@@ -167,19 +168,26 @@ def convert_to_grouped_suggestions_format(
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
-    related_dict: dict[tuple[str, str], list] = defaultdict(list)
+    related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     category_types_order = []
     collection_categories_order = []
 
     for suggestion in ungrouped_response:
         grouping_category_type = suggestion['metadata']['grouping_category']
+
         if grouping_category_type == 'related':
-            collection_key = (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
+            collection_key = (
+                suggestion['metadata']['collection_title'],
+                suggestion['metadata']['collection_id'],
+                suggestion['metadata']['collection_members_count'],
+            )
             related_dict[collection_key].append(suggestion)
+
             if grouping_category_type not in category_types_order:
                 category_types_order.append(grouping_category_type)
             if collection_key not in collection_categories_order:
                 collection_categories_order.append(collection_key)
+
         elif grouping_category_type not in grouped_dict.keys():
             raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
         else:
@@ -197,7 +205,8 @@ def convert_to_grouped_suggestions_format(
                     [{'name': s['name']} for s in related_dict[collection_key]],
                     'type': 'related',
                     'collection_title': collection_key[0],
-                    'collection_id': collection_key[1]
+                    'collection_id': collection_key[1],
+                    'collection_members_count': collection_key[2],
                 })
         else:
             grouped_response.append({
