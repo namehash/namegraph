@@ -99,8 +99,7 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
-    CollectionCategory,
-    OtherCategory,
+    GroupedSuggestions,
 )
 
 from collection_models import (
@@ -160,7 +159,11 @@ async def root(name: Name):
     return response
 
 
-def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
+def convert_to_grouped_suggestions_format(
+        names: List[GeneratedName],
+        include_metadata: bool = True
+) -> dict[ str, list[dict]]:
+
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
@@ -203,10 +206,11 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
                 'type': gcat,
             })
 
-    return grouped_response
+    response = {'categories': grouped_response}
+    return response
 
 
-@app.post("/grouped_by_category", response_model=list[CollectionCategory | OtherCategory])
+@app.post("/grouped_by_category", response_model=GroupedSuggestions)
 async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)
