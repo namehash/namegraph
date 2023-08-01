@@ -388,11 +388,14 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     response_json = response.json()
     print(response_json)
 
-    assert sum([len(gcat['suggestions']) for gcat in response_json]) == n_suggestions
+    assert 'categories' in response_json
+    categories = response_json['categories']
+
+    assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
 
     last_related_flag = False
 
-    for i, gcat in enumerate(response_json):
+    for i, gcat in enumerate(categories):
         assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
@@ -404,5 +407,5 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
             # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
             # from a single member, so it's not a good idea
             assert gcat['collection_members_count'] > 0
-            if i + 1 < len(response_json) and response_json[i + 1]['type'] != 'related':
+            if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
                 last_related_flag = True
