@@ -364,6 +364,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
 
 
+@pytest.mark.integration_test
 @pytest.mark.parametrize(
     "name, metadata, n_suggestions, response_code",
     [
@@ -398,5 +399,10 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
         # assert related are after one another
         if gcat['type'] == 'related':
             assert not last_related_flag
+            assert {'type', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                   == set(gcat.keys())
+            # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+            # from a single member, so it's not a good idea
+            assert gcat['collection_members_count'] > 0
             if i + 1 < len(response_json) and response_json[i + 1]['type'] != 'related':
                 last_related_flag = True
