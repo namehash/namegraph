@@ -103,6 +103,7 @@ from models import (
     SampleCollectionMembers,
     CollectionCategory,
     OtherCategory,
+    GroupedSuggestions,
 )
 
 from collection_models import (
@@ -138,6 +139,7 @@ def convert_to_suggestion_format(
                 'pipeline_name': name.pipeline_name,
                 'collection_title': name.collection_title,
                 'collection_id': name.collection_id,
+                'collection_members_count': name.collection_members_count,
                 'grouping_category': name.grouping_category
             }
 
@@ -165,23 +167,34 @@ async def root(name: Name):
     return response
 
 
-def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
+def convert_to_grouped_suggestions_format(
+        names: List[GeneratedName],
+        include_metadata: bool = True
+) -> dict[ str, list[dict]]:
+
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
-    related_dict: dict[tuple[str, str], list] = defaultdict(list)
+    related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     category_types_order = []
     collection_categories_order = []
 
     for suggestion in ungrouped_response:
         grouping_category_type = suggestion['metadata']['grouping_category']
+
         if grouping_category_type == 'related':
-            collection_key = (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
+            collection_key = (
+                suggestion['metadata']['collection_title'],
+                suggestion['metadata']['collection_id'],
+                suggestion['metadata']['collection_members_count'],
+            )
             related_dict[collection_key].append(suggestion)
+
             if grouping_category_type not in category_types_order:
                 category_types_order.append(grouping_category_type)
             if collection_key not in collection_categories_order:
                 collection_categories_order.append(collection_key)
+
         elif grouping_category_type not in grouped_dict.keys():
             raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
         else:
@@ -199,7 +212,8 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
                     [{'name': s['name']} for s in related_dict[collection_key]],
                     'type': 'related',
                     'collection_title': collection_key[0],
-                    'collection_id': collection_key[1]
+                    'collection_id': collection_key[1],
+                    'collection_members_count': collection_key[2],
                 })
         else:
             grouped_response.append({
@@ -208,10 +222,11 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
                 'type': gcat,
             })
 
-    return grouped_response
+    response = {'categories': grouped_response}
+    return response
 
 
-@app.post("/grouped_by_category", response_model=list[CollectionCategory | OtherCategory])
+@app.post("/grouped_by_category", response_model=GroupedSuggestions)
 async def root(name: Name):
     seed_all(name.name)
     log_entry = LogEntry(generator.config)

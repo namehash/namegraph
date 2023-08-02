@@ -74,12 +74,20 @@ class CollectionCategory(GroupingCategory):
                                      description='in CollectionCategory category type is always set to \'related\'')
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
 
 
 class OtherCategory(GroupingCategory):
     type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
         Field(title='category type',
               description='category type depends on the generator the suggestions came from')
+
+
+class GroupedSuggestions(BaseModel):
+    categories: list[CollectionCategory | OtherCategory] = Field(
+        title='grouped suggestions',
+        description='list of suggestions grouped by category type'
+    )
 
 
 class SampleCollectionMembers(BaseModel):
