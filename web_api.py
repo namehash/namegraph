@@ -13,7 +13,7 @@ from pydantic_settings import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler
+from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
 from generator.xcollections.collection import Collection
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
@@ -90,6 +90,7 @@ inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
+generator_matcher = CollectionMatcherForGenerator(generator.config)
 other_collections_sampler = OtherCollectionsSampler(generator.config)
 labelhash_normalizer = NamehashNormalizer(generator.config)
 
@@ -99,6 +100,7 @@ categories = Categories(generator.config)
 from models import (
     Name,
     Suggestion,
+    SampleCollectionMembers,
     CollectionCategory,
     OtherCategory,
 )
@@ -115,8 +117,11 @@ from collection_models import (
 )
 
 
-def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[
-    dict[str, str | dict]]:
+def convert_to_suggestion_format(
+        names: List[GeneratedName],
+        include_metadata: bool = True
+) -> list[dict[str, str | dict]]:
+
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -224,6 +229,33 @@ async def root(name: Name):
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
+
+    return response
+
+
+@app.post("/sample_collection_members", response_model=list[Suggestion])
+async def sample_collection_members(sample_command: SampleCollectionMembers):
+    result,  es_response_metadata = generator_matcher.sample_members_from_collection(
+        sample_command.collection_id,
+        sample_command.seed,
+        sample_command.max_sample_size
+    )
+
+    sampled_members = []
+    for name in result['sampled_members']:
+        obj = GeneratedName(tokens=(name,),
+                            pipeline_name='sample_collection_members',
+                            collection_id=result['collection_id'],
+                            collection_title=result['collection_title'],
+                            grouping_category='related',
+                            applied_strategies=[])
+        obj.interpretation = []
+        sampled_members.append(obj)
+
+    from pprint import pprint
+    pprint(es_response_metadata)
+
+    response = convert_to_suggestion_format(sampled_members, include_metadata=True)
 
     return response
 
