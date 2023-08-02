@@ -396,14 +396,21 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     last_related_flag = False
 
     for i, gcat in enumerate(categories):
+        assert 'type' in gcat
         assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+
+        assert 'name' in gcat
+        if gcat['type'] != 'related':
+            assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
+
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
         # assert related are after one another
         if gcat['type'] == 'related':
             assert not last_related_flag
-            assert {'type', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+            assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
                    == set(gcat.keys())
+            assert gcat['name'] == gcat['collection_title']
             # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
             # from a single member, so it's not a good idea
             assert gcat['collection_members_count'] > 0
