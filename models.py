@@ -1,5 +1,6 @@
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 from web_api import generator
 
@@ -87,3 +88,13 @@ class GroupedSuggestions(BaseModel):
         title='grouped suggestions',
         description='list of suggestions grouped by category type'
     )
+
+
+class SampleCollectionMembers(BaseModel):
+    collection_id: str = Field(title='id of the collection to sample from')
+    max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
+                                 description='if the collection has less members than max_sample_size, '
+                                             'all the members will be returned')
+    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
+                      title='seed for random number generator',
+                      description='if not provided, random seed will be generated')
