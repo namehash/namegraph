@@ -91,10 +91,10 @@ class GroupedSuggestions(BaseModel):
 
 
 class SampleCollectionMembers(BaseModel):
-    collection_id: str = Field(title='id of the collection to sample from')
+    collection_id: str = Field(title='id of the collection to sample from', examples=['Q6615994'])
     max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
                                  description='if the collection has less members than max_sample_size, '
-                                             'all the members will be returned')
+                                             'all the members will be returned', examples=[5])
     seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
                       title='seed for random number generator',
-                      description='if not provided, random seed will be generated')
+                      description='if not provided (but can\'t be null), random seed will be generated')
