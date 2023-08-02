@@ -67,6 +67,8 @@ class Suggestion(BaseModel):
 
 class GroupingCategory(BaseModel):
     suggestions: list[Suggestion] = Field(title='generated suggestions belonging to the same category type')
+    name: str = Field(title='category\'s fancy name',
+                      description='for the related category it is the same as collection title')
 
 
 class CollectionCategory(GroupingCategory):

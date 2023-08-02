@@ -175,6 +175,14 @@ def convert_to_grouped_suggestions_format(
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
+    category_fancy_names = {
+        'wordplay': 'Word Play',
+        'alternates': 'Alternates',
+        'emojify': '😍 Emojify',
+        'community': 'Community',
+        'expand': 'Expand',
+        'gowild': 'Go Wild'
+    }
     related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     category_types_order = []
     collection_categories_order = []
@@ -211,6 +219,7 @@ def convert_to_grouped_suggestions_format(
                     'suggestions': related_dict[collection_key] if include_metadata else
                     [{'name': s['name']} for s in related_dict[collection_key]],
                     'type': 'related',
+                    'name': collection_key[0],
                     'collection_title': collection_key[0],
                     'collection_id': collection_key[1],
                     'collection_members_count': collection_key[2],
@@ -220,6 +229,7 @@ def convert_to_grouped_suggestions_format(
                 'suggestions': grouped_dict[gcat] if include_metadata else
                 [{'name': s['name']} for s in grouped_dict[gcat]],
                 'type': gcat,
+                'name': category_fancy_names[gcat],
             })
 
     response = {'categories': grouped_response}
@@ -266,9 +276,6 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
                             applied_strategies=[])
         obj.interpretation = []
         sampled_members.append(obj)
-
-    from pprint import pprint
-    pprint(es_response_metadata)
 
     response = convert_to_suggestion_format(sampled_members, include_metadata=True)
 
