@@ -54,7 +54,7 @@ python -m uvicorn web_api:app --reload
 
 Query with POST:
 ```
-curl -d '{"name":"fire"}' -H "Content-Type: application/json" -X POST http://localhost:8000
+curl -d '{"label":"fire"}' -H "Content-Type: application/json" -X POST http://localhost:8000
 ```
 
 # Tests
@@ -115,4 +115,4 @@ Authorize EC2 instance in ECR:
 
 Check if service works:
 
-`curl -d '{"name":"firestarter"}' -H "Content-Type: application/json" -X POST http://44.203.61.202`
+`curl -d '{"label":"firestarter"}' -H "Content-Type: application/json" -X POST http://44.203.61.202`

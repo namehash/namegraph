@@ -152,4 +152,4 @@ ngrams:
 collections:
   other_collections_path: data/collections_data/other_collections.json
   collections_limit: 3
-  suggestions_limit: 20  # per one collections
+  suggestions_limit: 10  # per one collections

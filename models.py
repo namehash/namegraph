@@ -1,5 +1,6 @@
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 from web_api import generator
 
@@ -13,8 +14,9 @@ class Params(BaseModel):
                       description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
 
 
-class Name(BaseModel):
-    name: str = Field(title='input name', examples=['zeus'])
+class NameRequest(BaseModel):
+    label: str = Field(title='input label', description='cannot contain dots (.)',
+                       pattern='^[^.]*$', examples=['zeus'])
     metadata: bool = Field(True, title='return all the metadata in response')
     sorter: str = Field('weighted-sampling', title='sorter algorithm',
                         pattern=r'^(round-robin|count|length|weighted-sampling)$')
@@ -66,6 +68,8 @@ class Suggestion(BaseModel):
 
 class GroupingCategory(BaseModel):
     suggestions: list[Suggestion] = Field(title='generated suggestions belonging to the same category type')
+    name: str = Field(title='category\'s fancy name',
+                      description='for the related category it is the same as collection title')
 
 
 class CollectionCategory(GroupingCategory):
@@ -73,9 +77,27 @@ class CollectionCategory(GroupingCategory):
                                      description='in CollectionCategory category type is always set to \'related\'')
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
 
 
 class OtherCategory(GroupingCategory):
     type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
         Field(title='category type',
               description='category type depends on the generator the suggestions came from')
+
+
+class GroupedSuggestions(BaseModel):
+    categories: list[CollectionCategory | OtherCategory] = Field(
+        title='grouped suggestions',
+        description='list of suggestions grouped by category type'
+    )
+
+
+class SampleCollectionMembers(BaseModel):
+    collection_id: str = Field(title='id of the collection to sample from', examples=['Q6615994'])
+    max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
+                                 description='if the collection has less members than max_sample_size, '
+                                             'all the members will be returned', examples=[5])
+    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
+                      title='seed for random number generator',
+                      description='if not provided (but can\'t be null), random seed will be generated')

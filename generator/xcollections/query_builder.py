@@ -156,7 +156,6 @@ class ElasticsearchQueryBuilder:
         else:
             raise ValueError(f"Unexpected boolean_clause value: '{boolean_clause}'")
 
-
     def add_rank_feature(self, field: str, boost: int = None) -> ElasticsearchQueryBuilder:
         """
         Adds a rank feature to the query builder
@@ -248,12 +247,20 @@ class ElasticsearchQueryBuilder:
         self._query['fields'].append(field)
         return self
 
-    def include_script_field(self, name: str, script: str) -> ElasticsearchQueryBuilder:
+    def include_script_field(
+            self,
+            name: str,
+            script: str,
+            lang: Optional[str] = None,
+            params: Optional[dict] = None
+    ) -> ElasticsearchQueryBuilder:
         """
         Adds a script field to the query builder
 
         :param name: name of the field
         :param script: script
+        :param lang: language of the script
+        :param params: parameters of the script
         :return: self
         """
         if 'script_fields' not in self._query:
@@ -264,6 +271,12 @@ class ElasticsearchQueryBuilder:
                 'source': script
             }
         }
+
+        if lang is not None:
+            self._query['script_fields'][name]['script']['lang'] = lang
+
+        if params is not None:
+            self._query['script_fields'][name]['script']['params'] = params
 
         return self
 

@@ -1,4 +1,5 @@
 from typing import Optional
+from time import perf_counter
 import logging
 
 from fastapi import HTTPException
@@ -77,3 +78,80 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [collections generator]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+    def sample_members_from_collection(
+            self,
+            collection_id: str,
+            seed: int,
+            max_sample_size: int = 10,
+    ) -> tuple[dict, dict]:
+
+        # FIXME do we need this?
+        # if not self.active:
+        #     return [], {}
+
+        fields = ['metadata.id', 'data.collection_name']
+
+        sampling_script = """
+            def number_of_names = params._source.data.names.size();
+            def random = new Random(params.seed);
+
+            if (number_of_names <= params.max_sample_size) {
+                return params._source.data.names.stream()
+                    .map(n -> n.normalized_name)
+                    .collect(Collectors.toList())
+            }
+
+            if (number_of_names <= 100 || params.max_sample_size * 2 >= number_of_names) {
+                Collections.shuffle(params._source.data.names, random);
+                return params._source.data.names.stream()
+                    .limit(params.max_sample_size)
+                    .map(n -> n.normalized_name)
+                    .collect(Collectors.toList());
+            }
+
+            def set = new HashSet();
+
+            while (set.size() < params.max_sample_size) {
+                def index = random.nextInt(number_of_names);
+                set.add(index);
+            }
+
+            return set.stream().map(i -> params._source.data.names[i].normalized_name).collect(Collectors.toList());
+        """
+
+        query_params = ElasticsearchQueryBuilder() \
+            .set_term('metadata.id.keyword', collection_id) \
+            .include_fields(fields) \
+            .set_source(False) \
+            .include_script_field(name='sampled_members',
+                                  script=sampling_script,
+                                  lang='painless',
+                                  params={'seed': seed, 'max_sample_size': max_sample_size}) \
+            .build_params()
+
+        try:
+            t_before = perf_counter()
+            response = self.elastic.search(index=self.index_name, **query_params)
+            time_elapsed = (perf_counter() - t_before) * 1000
+        except Exception as ex:
+            logger.error(f'Elasticsearch search failed [collection members sampling]', exc_info=True)
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+        try:
+            hit = response['hits']['hits'][0]
+            es_response_metadata = {
+                'n_total_hits': 1,
+                'took': response['took'],
+                'elasticsearch_communication_time': time_elapsed,
+            }
+        except IndexError as ex:
+            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+
+        result = {
+            'collection_id': hit['fields']['metadata.id'][0],
+            'collection_title': hit['fields']['data.collection_name'][0],
+            'sampled_members': hit['fields']['sampled_members']
+        }
+
+        return result, es_response_metadata
