@@ -41,6 +41,7 @@ class CollectionGenerator(NameGenerator):
         collections, _ = self.collection_matcher.search_for_generator(
             tokens,
             max_related_collections=self.collections_limit,
+            enable_learning_to_rank=name.params.get('enable_learning_to_rank', True)
         )
 
         for collection in collections:

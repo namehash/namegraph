@@ -12,6 +12,9 @@ class Params(BaseModel):
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
                       description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
+    enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
+                                            description='if true, the results will be sorted by '
+                                                        'learning to rank algorithm')
 
 
 class NameRequest(BaseModel):
