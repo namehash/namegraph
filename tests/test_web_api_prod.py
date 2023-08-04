@@ -30,14 +30,15 @@ def prod_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"name": "aaa.eth"})
+    client.post("/", json={"label": "aaa"})
     return client
 
 
-@pytest.mark.slow
+# skipped because dots are not allowed
+@pytest.mark.skip
 def test_namehash(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+    response = client.post("/", json={"label": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
                                       "metadata": True})
 
     assert response.status_code == 200
@@ -52,10 +53,11 @@ def test_namehash(prod_test_client):
         ])
 
 
-@pytest.mark.slow
+# skipped because dots are not allowed
+@pytest.mark.skip
 def test_namehash_only_primary(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+    response = client.post("/", json={"label": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
                                       "metadata": True, "min_primary_fraction": 1.0})
 
     assert response.status_code == 200
@@ -73,7 +75,7 @@ def test_namehash_only_primary(prod_test_client):
 @pytest.mark.slow
 def test_prod(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "fire", "metadata": False})
+    response = client.post("/", json={"label": "fire", "metadata": False})
 
     assert response.status_code == 200
 
@@ -86,7 +88,7 @@ def test_prod(prod_test_client):
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "a" * 40000, "metadata": False})
+    response = client.post("/", json={"label": "a" * 40000, "metadata": False})
 
     assert response.status_code == 200
 
@@ -95,9 +97,11 @@ def test_prod_long(prod_test_client):
 def test_generator_stress(prod_test_client):
     client = prod_test_client
     max_duration = 3
-    for name in generate_example_names(400):
+    for nname in generate_example_names(400):
+        # use left side of dot-split
+        name = nname.split('.')[0]
         start = get_time()
-        response = client.post('/', json={'name': name, "metadata": False})
+        response = client.post('/', json={"label": name, "metadata": False})
         duration = get_time() - start
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
@@ -105,7 +109,7 @@ def test_generator_stress(prod_test_client):
 
 def test_metadata(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "dogcat"})
+    response = client.post("/", json={"label": "dogcat"})
 
     assert response.status_code == 200
 
@@ -126,7 +130,7 @@ def test_metadata(prod_test_client):
 def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggestions: int, max_suggestions: int):
     client = prod_test_client
     response = client.post("/", json={
-        "name": name,
+        "label": name,
         "min_suggestions": min_suggestions,
         "max_suggestions": max_suggestions
     })
@@ -155,7 +159,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
                                          min_primary_fraction: float, response_code: int):
     client = prod_test_client
     response = client.post("/", json={
-        "name": name,
+        "label": name,
         "min_suggestions": suggestions,
         "max_suggestions": suggestions,
         "min_primary_fraction": min_primary_fraction
@@ -182,7 +186,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 #
 #         for name in names:
 #             response = prod_test_client.post("/", json={
-#                 "name": name,
+#                 "label": name,
 #                 "sorter": "weighted-sampling"
 #             })
 #
@@ -193,7 +197,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 def test_prod_leet(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000})
 
     assert response.status_code == 200
@@ -208,7 +212,7 @@ def test_prod_leet(prod_test_client):
 def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
                                    "country": 'pl'
                                }})
@@ -233,7 +237,7 @@ def test_prod_flag(prod_test_client):
 def test_prod_short_suggestions(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
                                    "country": 'pl'
                                }})
@@ -249,7 +253,7 @@ def test_prod_short_suggestions(prod_test_client):
 def test_instant_search(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": 'instant',
         },
@@ -267,7 +271,7 @@ def test_instant_search(prod_test_client):
 def test_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": "instant",
         },
@@ -285,7 +289,7 @@ def test_instant_search_temp(prod_test_client):
 def test_not_instant_search(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": 'full',
         },
@@ -303,7 +307,7 @@ def test_not_instant_search(prod_test_client):
 def test_not_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": "full",
         },
@@ -321,7 +325,7 @@ def test_not_instant_search_temp(prod_test_client):
 def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "😊😊😊", "metadata": True,
+                           json={"label": "😊😊😊", "metadata": True,
                                  "params": {
                                      "mode": "full",
                                      "country": 'pl'
@@ -353,7 +357,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
                    'shootingarrowatthesky']
     for input_name in input_names:
         response = client.post("/",
-                               json={"name": input_name, "min_suggestions": 50, "max_suggestions": 50,
+                               json={"label": input_name, "min_suggestions": 50, "max_suggestions": 50,
                                      "params": {
                                          "mode": "full"
                                      }})
@@ -379,7 +383,7 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     client = prod_test_client
 
     response = client.post("/grouped_by_category",
-                           json={"name": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
+                           json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
                                  "metadata": metadata,
                                  "params": {"mode": "full"}}
                            )

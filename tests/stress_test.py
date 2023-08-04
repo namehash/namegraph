@@ -22,12 +22,12 @@ def prod_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/?name=aaa")
     return client
 
 
 def request_generator(name):
-    return client.post('/', json={'name': name})
+    return client.post('/', json={'label': name})
 
 
 def verify_generator(name, json):
