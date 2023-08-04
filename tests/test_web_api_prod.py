@@ -368,6 +368,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
 
 
+@pytest.mark.integration_test
 @pytest.mark.parametrize(
     "name, metadata, n_suggestions, response_code",
     [
@@ -391,16 +392,60 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     response_json = response.json()
     print(response_json)
 
-    assert sum([len(gcat['suggestions']) for gcat in response_json]) == n_suggestions
+    assert 'categories' in response_json
+    categories = response_json['categories']
+
+    assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
 
     last_related_flag = False
 
-    for i, gcat in enumerate(response_json):
+    for i, gcat in enumerate(categories):
+        assert 'type' in gcat
         assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+
+        assert 'name' in gcat
+        if gcat['type'] != 'related':
+            assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
+
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
         # assert related are after one another
         if gcat['type'] == 'related':
             assert not last_related_flag
-            if i + 1 < len(response_json) and response_json[i + 1]['type'] != 'related':
+            assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                   == set(gcat.keys())
+            assert gcat['name'] == gcat['collection_title']
+            # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+            # from a single member, so it's not a good idea
+            assert gcat['collection_members_count'] > 0
+            if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
                 last_related_flag = True
+
+
+@pytest.mark.integration_test
+@pytest.mark.parametrize(
+    "collection_id, max_sample_size",
+    [
+        ("Q15102072", 5),
+        ("Q15102072", 20),
+        ("Q8377580", 4),  # collections has only 5 members, only unique names should be returned
+        ("Q8377580", 10),  # collections has only 5 members, all names should be returned
+    ]
+)
+def test_collection_members_sampling(prod_test_client, collection_id, max_sample_size):
+    client = prod_test_client
+
+    response = client.post("/sample_collection_members",
+                           json={"collection_id": collection_id, "max_sample_size": max_sample_size, "seed": 42})
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    assert len(response_json) <= max_sample_size
+    for name in response_json:
+        assert name['metadata']['pipeline_name'] == 'sample_collection_members'
+        assert name['metadata']['collection_id'] == collection_id
+
+    # uniqueness
+    names = [name['name'] for name in response_json]
+    assert len(names) == len(set(names))

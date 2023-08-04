@@ -55,7 +55,8 @@ class CollectionGenerator(NameGenerator):
         return (
             GeneratedName(tokenized_name, applied_strategies=[[self.__class__.__name__]],
                           grouping_category=self.get_grouping_category(output_name=''.join(tokenized_name)),
-                          collection_title=collection.title, collection_id=collection.collection_id)
+                          collection_title=collection.title, collection_id=collection.collection_id,
+                          collection_members_count=collection.number_of_names)
             for collection, tokenized_name in roundrobin(*collections_with_tuples)
             if tokenized_name != tokens
         )

@@ -13,7 +13,7 @@ from pydantic_settings import BaseSettings
 from generator.generated_name import GeneratedName
 from generator.utils.log import LogEntry
 from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler
+from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
 from generator.xcollections.collection import Collection
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
@@ -90,6 +90,7 @@ inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
+generator_matcher = CollectionMatcherForGenerator(generator.config)
 other_collections_sampler = OtherCollectionsSampler(generator.config)
 labelhash_normalizer = NamehashNormalizer(generator.config)
 
@@ -99,8 +100,10 @@ categories = Categories(generator.config)
 from models import (
     NameRequest,
     Suggestion,
+    SampleCollectionMembers,
     CollectionCategory,
     OtherCategory,
+    GroupedSuggestions,
 )
 
 from collection_models import (
@@ -115,8 +118,11 @@ from collection_models import (
 )
 
 
-def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: bool = True) -> list[
-    dict[str, str | dict]]:
+def convert_to_suggestion_format(
+        names: List[GeneratedName],
+        include_metadata: bool = True
+) -> list[dict[str, str | dict]]:
+
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -133,6 +139,7 @@ def convert_to_suggestion_format(names: List[GeneratedName], include_metadata: b
                 'pipeline_name': name.pipeline_name,
                 'collection_title': name.collection_title,
                 'collection_id': name.collection_id,
+                'collection_members_count': name.collection_members_count,
                 'grouping_category': name.grouping_category
             }
 
@@ -160,23 +167,42 @@ async def root(name: NameRequest):
     return response
 
 
-def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_metadata: bool = True) -> list[dict]:
+def convert_to_grouped_suggestions_format(
+        names: List[GeneratedName],
+        include_metadata: bool = True
+) -> dict[ str, list[dict]]:
+
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
-    related_dict: dict[tuple[str, str], list] = defaultdict(list)
+    category_fancy_names = {
+        'wordplay': 'Word Play',
+        'alternates': 'Alternates',
+        'emojify': '😍 Emojify',
+        'community': 'Community',
+        'expand': 'Expand',
+        'gowild': 'Go Wild'
+    }
+    related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     category_types_order = []
     collection_categories_order = []
 
     for suggestion in ungrouped_response:
         grouping_category_type = suggestion['metadata']['grouping_category']
+
         if grouping_category_type == 'related':
-            collection_key = (suggestion['metadata']['collection_title'], suggestion['metadata']['collection_id'])
+            collection_key = (
+                suggestion['metadata']['collection_title'],
+                suggestion['metadata']['collection_id'],
+                suggestion['metadata']['collection_members_count'],
+            )
             related_dict[collection_key].append(suggestion)
+
             if grouping_category_type not in category_types_order:
                 category_types_order.append(grouping_category_type)
             if collection_key not in collection_categories_order:
                 collection_categories_order.append(collection_key)
+
         elif grouping_category_type not in grouped_dict.keys():
             raise ValueError(f'Unexpected grouping_category: {grouping_category_type}')
         else:
@@ -193,20 +219,24 @@ def convert_to_grouped_suggestions_format(names: List[GeneratedName], include_me
                     'suggestions': related_dict[collection_key] if include_metadata else
                     [{'name': s['name']} for s in related_dict[collection_key]],
                     'type': 'related',
+                    'name': collection_key[0],
                     'collection_title': collection_key[0],
-                    'collection_id': collection_key[1]
+                    'collection_id': collection_key[1],
+                    'collection_members_count': collection_key[2],
                 })
         else:
             grouped_response.append({
                 'suggestions': grouped_dict[gcat] if include_metadata else
                 [{'name': s['name']} for s in grouped_dict[gcat]],
                 'type': gcat,
+                'name': category_fancy_names[gcat],
             })
 
-    return grouped_response
+    response = {'categories': grouped_response}
+    return response
 
 
-@app.post("/grouped_by_category", response_model=list[CollectionCategory | OtherCategory])
+@app.post("/grouped_by_category", response_model=GroupedSuggestions)
 async def root(name: NameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
@@ -224,6 +254,30 @@ async def root(name: NameRequest):
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
+
+    return response
+
+
+@app.post("/sample_collection_members", response_model=list[Suggestion])
+async def sample_collection_members(sample_command: SampleCollectionMembers):
+    result,  es_response_metadata = generator_matcher.sample_members_from_collection(
+        sample_command.collection_id,
+        sample_command.seed,
+        sample_command.max_sample_size
+    )
+
+    sampled_members = []
+    for name in result['sampled_members']:
+        obj = GeneratedName(tokens=(name,),
+                            pipeline_name='sample_collection_members',
+                            collection_id=result['collection_id'],
+                            collection_title=result['collection_title'],
+                            grouping_category='related',
+                            applied_strategies=[])
+        obj.interpretation = []
+        sampled_members.append(obj)
+
+    response = convert_to_suggestion_format(sampled_members, include_metadata=True)
 
     return response
 
