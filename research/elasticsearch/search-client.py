@@ -78,9 +78,9 @@ def search_with_latency(
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='Search collections using collections API, test diversity algorithms')
     parser.add_argument('queries', nargs='+', help='queries')
-    parser.add_argument('--limit', type=int, default=10, help='limit')
+    parser.add_argument('--limit', type=int, default=10, help='limit related collections')
     parser.add_argument('--limit_names', type=int, default=50, help='limit names')
     parser.add_argument('--host', type=str, default='localhost', help='host')
     parser.add_argument('--port', type=int, default=8000, help='port')

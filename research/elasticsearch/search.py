@@ -144,7 +144,7 @@ def print_exlanation(hits):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='Search collections connecting to Elasticsearch')
     parser.add_argument('queries', nargs='+', help='queries')
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')

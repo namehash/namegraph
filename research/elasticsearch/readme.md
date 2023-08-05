@@ -1,9 +1,19 @@
 /etc/elasticsearch/elasticsearch.yml:
 http.max_content_length: 1000mb
 
-time python populate.py category_members_collections.jsonl3
-15m13,395s
-time python populate.py list_links_collections.jsonl3
-real	5m17,180s
 
-python search.py "apple" "apples" "bmw" "hulk" "marvel" "marvel characters" "fruit" "fruits" "britney spears" "bmw car models" "cars" "football players" "cristiano ronaldo" "planets" "countries" "france" "switzerland" "bmw vehicles" "greek gods" "zeus" "athena" > report.html
+### Presents suggestions for set of names only for collection generator.
+
+python generate-report-only-collections.py  --host http://54.89.196.85
+
+### Search collections connecting to Elasticsearch
+
+./search.sh > report.html
+
+### Search collections using collections API, test diversity algorithms
+
+./search_client.sh > report_limit.html
+
+### Search collections related to collection connecting to Elasticsearch
+
+search_related_collections.py

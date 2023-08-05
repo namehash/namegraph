@@ -205,7 +205,7 @@ def gen(path, limit):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description="Insert collections into Elasticsearch")
     parser.add_argument('input', help='input JSONL file with the collections to insert into ES')
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')
     parser.add_argument('--host', default='localhost', help='elasticsearch hostname')
