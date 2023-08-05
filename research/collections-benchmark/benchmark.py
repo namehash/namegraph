@@ -10,7 +10,6 @@ import numpy as np
 HOST = 'localhost'
 PORT = 8000
 
-
 QUERIES = [
     'apple', 'apples', 'bmw', 'hulk', 'marvel', 'characters', 'fruit', 'fruits', 'britney', 'spears',
     'car', 'models', 'cars', 'football', 'players', 'cristiano', 'ronaldo', 'planets', 'countries',
@@ -22,7 +21,7 @@ COLLECTION_IDS = [
     'Q8882867', 'Q8763100', 'Q925427', 'Q6946014',
 ]
 
-# TODO to change
+
 MEMBERS = [
     'apple', 'apples', 'bmw', 'hulk', 'marvel', 'characters', 'fruit', 'fruits', 'britney', 'spears',
     'ummagumma', 'atom', 'heart', 'football', 'players', 'cristiano', 'ronaldo', 'planets', 'countries',
@@ -154,8 +153,8 @@ def aggregate_stats(times: dict[str, dict[str, list[float]]]) -> dict[str, list[
 
 def collect_times(call_fn: Callable, queries: list[str], repeats: int) -> dict[str, dict[str, list[float]]]:
     times = {query: defaultdict(list) for query in queries}
-    for _ in tqdm.tqdm(range(repeats)):
-        for query in queries:
+    for _ in tqdm.tqdm(range(repeats), desc='repeats'):
+        for query in tqdm.tqdm(queries, desc='queries'):
             response = call_fn(query)
             extracted_times = extract_times(response)
             for key, value in extracted_times.items():
@@ -181,7 +180,7 @@ def benchmark_report(times: dict[str, dict[str, list[float]]]):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='Benchmark the NameGenerator collections search API')
     parser.add_argument('--host', type=str, default='localhost', help='host')
     parser.add_argument('--port', type=int, default=8000, help='port')
     parser.add_argument('--repeats', type=int, default=15, help='repeats')
