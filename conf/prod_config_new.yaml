@@ -26,6 +26,14 @@ app:
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
+# if present, env variables will override values below
+elasticsearch:
+  scheme: ${oc.env:ES_SCHEME,https}
+  host: ${oc.env:ES_HOST,localhost}
+  port: ${oc.decode:${oc.env:ES_PORT,9243}}
+  username: ${oc.env:ES_USERNAME,elastic}
+  password: ${oc.env:ES_PASSWORD,password}
+  index: ${oc.env:ES_INDEX,collection-templates-1}
 filtering:
   # List of already registered domains
 #  domains: data/primary.csv
@@ -57,6 +65,39 @@ generation:
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: data/wikipedia2vec.pkl
   person_name_affixes_path: data/person_name_affixes.json
+  suffix2rhymes_path: data/suffix2rhymes.json
+  grouping_categories:
+    related:
+      - CollectionGenerator
+    wordplay:
+      - AbbreviationGenerator
+      - PermuteGenerator
+      - HyphenGenerator
+    alternates:
+      - Wikipedia2VGenerator
+      - W2VGenerator
+      - WordnetSynonymsGenerator
+    emojify:
+      - EmojiGenerator
+      - FlagAffixGenerator
+      - KeycapGenerator
+      - SymbolGenerator
+    community:
+      - SubstringMatchGenerator
+      - OnSaleMatchGenerator
+      - CategoriesGenerator
+    expand:
+      - PrefixGenerator
+      - SuffixGenerator
+      - SpecialCharacterAffixGenerator
+      - RhymesGenerator
+    gowild:
+      - LeetGenerator
+      - RandomAvailableNameGenerator
+      - EasterEggGenerator
+      - ReverseGenerator
+    dynamic_:  # generator needs to implement get_grouping_category(output_name: str) method
+      - PersonNameGenerator
 sorting:
   weighted_sampling:
     weights:
@@ -77,6 +118,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   generator: RandomAvailableNameGenerator
@@ -93,9 +135,14 @@ person_names:
   lastnames_path: data/person_names_lastnames.json
   other_path: data/person_names_other.json
   country_stats_path: data/person_names_country_stats.json
+  country2langs_path: data/country2langs.json
 ngrams:
   lazy_loading: true
   unigrams: data/ngrams/unigram_freq.csv
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000
+collections:
+  other_collections_path: data/collections_data/other_collections.json
+  collections_limit: 3
+  suggestions_limit: 10  # per one collections

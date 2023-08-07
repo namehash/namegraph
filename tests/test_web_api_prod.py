@@ -5,8 +5,12 @@ from time import time as get_time
 import pytest
 from fastapi.testclient import TestClient
 from hydra import initialize, compose
+from ens_normalize import is_ens_normalized, ens_cure
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
+from generator.xcollections.api_matcher import CollectionMatcherForAPI
+from generator.xcollections.generator_matcher import CollectionMatcherForGenerator
 
 from helpers import check_generator_response, generate_example_names
 
@@ -14,6 +18,9 @@ from helpers import check_generator_response, generate_example_names
 @pytest.fixture(scope="module")
 def prod_test_client():
     Domains.remove_self()
+    Categories.remove_self()
+    CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     # TODO override 'generation.wikipedia2vec_path=tests/data/wikipedia2vec.pkl'
     os.environ['CONFIG_NAME'] = 'prod_config_new'
     if 'web_api' not in sys.modules:
@@ -23,14 +30,15 @@ def prod_test_client():
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.post("/", json={"name": "aaa.eth"})
+    client.post("/", json={"label": "aaa"})
     return client
 
 
-@pytest.mark.slow
+# skipped because dots are not allowed
+@pytest.mark.skip
 def test_namehash(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+    response = client.post("/", json={"label": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
                                       "metadata": True})
 
     assert response.status_code == 200
@@ -45,10 +53,11 @@ def test_namehash(prod_test_client):
         ])
 
 
-@pytest.mark.slow
+# skipped because dots are not allowed
+@pytest.mark.skip
 def test_namehash_only_primary(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
+    response = client.post("/", json={"label": "[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91].eth",
                                       "metadata": True, "min_primary_fraction": 1.0})
 
     assert response.status_code == 200
@@ -66,7 +75,7 @@ def test_namehash_only_primary(prod_test_client):
 @pytest.mark.slow
 def test_prod(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "fire", "metadata": False})
+    response = client.post("/", json={"label": "fire", "metadata": False})
 
     assert response.status_code == 200
 
@@ -79,7 +88,7 @@ def test_prod(prod_test_client):
 @pytest.mark.slow
 def test_prod_long(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "a" * 40000, "metadata": False})
+    response = client.post("/", json={"label": "a" * 40000, "metadata": False})
 
     assert response.status_code == 200
 
@@ -88,9 +97,11 @@ def test_prod_long(prod_test_client):
 def test_generator_stress(prod_test_client):
     client = prod_test_client
     max_duration = 3
-    for name in generate_example_names(400):
+    for nname in generate_example_names(400):
+        # use left side of dot-split
+        name = nname.split('.')[0]
         start = get_time()
-        response = client.post('/', json={'name': name, "metadata": False})
+        response = client.post('/', json={"label": name, "metadata": False})
         duration = get_time() - start
         assert response.status_code == 200, f'{name} failed with {response.status_code}'
         assert duration < max_duration, f'Time exceeded on {name}'
@@ -98,7 +109,7 @@ def test_generator_stress(prod_test_client):
 
 def test_metadata(prod_test_client):
     client = prod_test_client
-    response = client.post("/", json={"name": "dogcat"})
+    response = client.post("/", json={"label": "dogcat"})
 
     assert response.status_code == 200
 
@@ -119,7 +130,7 @@ def test_metadata(prod_test_client):
 def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggestions: int, max_suggestions: int):
     client = prod_test_client
     response = client.post("/", json={
-        "name": name,
+        "label": name,
         "min_suggestions": min_suggestions,
         "max_suggestions": max_suggestions
     })
@@ -148,7 +159,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
                                          min_primary_fraction: float, response_code: int):
     client = prod_test_client
     response = client.post("/", json={
-        "name": name,
+        "label": name,
         "min_suggestions": suggestions,
         "max_suggestions": suggestions,
         "min_primary_fraction": min_primary_fraction
@@ -175,7 +186,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 #
 #         for name in names:
 #             response = prod_test_client.post("/", json={
-#                 "name": name,
+#                 "label": name,
 #                 "sorter": "weighted-sampling"
 #             })
 #
@@ -186,7 +197,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 def test_prod_leet(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "hacker", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000})
 
     assert response.status_code == 200
@@ -201,7 +212,7 @@ def test_prod_leet(prod_test_client):
 def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
                                    "country": 'pl'
                                }})
@@ -226,7 +237,7 @@ def test_prod_flag(prod_test_client):
 def test_prod_short_suggestions(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "😊😊😊", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
                                    "country": 'pl'
                                }})
@@ -242,7 +253,7 @@ def test_prod_short_suggestions(prod_test_client):
 def test_instant_search(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": 'instant',
         },
@@ -256,10 +267,11 @@ def test_instant_search(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 def test_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": "instant",
         },
@@ -273,10 +285,11 @@ def test_instant_search_temp(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 def test_not_instant_search(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": 'full',
         },
@@ -290,10 +303,11 @@ def test_not_instant_search(prod_test_client):
         for strategy in name['metadata']['applied_strategies']
     ])
 
+
 def test_not_instant_search_temp(prod_test_client):
     client = prod_test_client
     response = client.post("/", json={
-        "name": "firepower",
+        "label": "firepower",
         "params": {
             "mode": "full",
         },
@@ -311,7 +325,7 @@ def test_not_instant_search_temp(prod_test_client):
 def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"name": "😊😊😊", "metadata": True,
+                           json={"label": "😊😊😊", "metadata": True,
                                  "params": {
                                      "mode": "full",
                                      "country": 'pl'
@@ -322,3 +336,116 @@ def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     json = response.json()
 
     assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])
+
+
+@pytest.mark.slow
+def test_prod_normalization_with_ens_normalize(prod_test_client):
+    client = prod_test_client
+    input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+                   'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
+                   'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
+                   'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
+                   'prayforukraine', 'krakowdragon', 'fiftysix', 'あかまい', '💛', 'asd', 'bartek', 'hongkong',
+                   'hongkonger', 'tyler', 'asdfasdfasdf3453212345', 'nineinchnails', 'krakow', 'joebiden',
+                   'europeanunion', 'rogerfederer', 'suzuki', 'pirates', 'doge', 'ethcorner', 'google', 'apple', '001',
+                   'stop-doing-fake-bids-its-honestly-lame-my-guy', 'kfcsogood', 'wallet', 'الأبيض', 'porno', 'sex',
+                   'slutwife', 'god', 'imexpensive', 'htaccess', 'nike', '€80000', 'starbucks', 'ukraine', '٠٠٩',
+                   'sony', 'kevin', 'discord', 'monaco', 'market', 'sportsbet', 'volodymyrzelensky', 'coffee', 'gold',
+                   'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
+                   'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
+                   'happypeople', 'muscle', 'billybob', 'quo', 'circleci', 'bitcoinmine', 'poweroutage',
+                   'shootingarrowatthesky']
+    for input_name in input_names:
+        response = client.post("/",
+                               json={"label": input_name, "min_suggestions": 50, "max_suggestions": 50,
+                                     "params": {
+                                         "mode": "full"
+                                     }})
+
+        assert response.status_code == 200
+        str_names = [name["name"] for name in response.json()]
+        for name in str_names:
+            assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
+
+
+@pytest.mark.integration_test
+@pytest.mark.parametrize(
+    "name, metadata, n_suggestions, response_code",
+    [
+        ("jamesbond", True, 50, 200),
+        ("longboard", True, 50, 200),
+        ("soundgarden", True, 50, 200),
+        ("aligator", True, 50, 200),
+        ("burdenofdreams", False, 50, 200)
+    ]
+)
+def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestions, response_code):
+    client = prod_test_client
+
+    response = client.post("/grouped_by_category",
+                           json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
+                                 "metadata": metadata,
+                                 "params": {"mode": "full"}}
+                           )
+
+    assert response.status_code == response_code
+    response_json = response.json()
+    print(response_json)
+
+    assert 'categories' in response_json
+    categories = response_json['categories']
+
+    assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
+
+    last_related_flag = False
+
+    for i, gcat in enumerate(categories):
+        assert 'type' in gcat
+        assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+
+        assert 'name' in gcat
+        if gcat['type'] != 'related':
+            assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
+
+        assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+
+        # assert related are after one another
+        if gcat['type'] == 'related':
+            assert not last_related_flag
+            assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                   == set(gcat.keys())
+            assert gcat['name'] == gcat['collection_title']
+            # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+            # from a single member, so it's not a good idea
+            assert gcat['collection_members_count'] > 0
+            if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
+                last_related_flag = True
+
+
+@pytest.mark.integration_test
+@pytest.mark.parametrize(
+    "collection_id, max_sample_size",
+    [
+        ("Q15102072", 5),
+        ("Q15102072", 20),
+        ("Q8377580", 4),  # collections has only 5 members, only unique names should be returned
+        ("Q8377580", 10),  # collections has only 5 members, all names should be returned
+    ]
+)
+def test_collection_members_sampling(prod_test_client, collection_id, max_sample_size):
+    client = prod_test_client
+
+    response = client.post("/sample_collection_members",
+                           json={"collection_id": collection_id, "max_sample_size": max_sample_size, "seed": 42})
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    assert len(response_json) <= max_sample_size
+    for name in response_json:
+        assert name['metadata']['pipeline_name'] == 'sample_collection_members'
+        assert name['metadata']['collection_id'] == collection_id
+
+    # uniqueness
+    names = [name['name'] for name in response_json]
+    assert len(names) == len(set(names))

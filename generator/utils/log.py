@@ -24,7 +24,7 @@ class LogEntry:
             'type': 'Request&Response',
             'schema_version': 0.2,
             'request': request,
-            'input_name': {'status': self.domains.get_name_status(request['name']),  # TODO strip .eth?
+            'input_name': {'status': self.domains.get_name_status(request['label']),  # TODO strip .eth?
                            'price': 1.2345,  # dummy
                            'real_status': 'available',  # dummy
                            'name_guard': 'green'  # dummy

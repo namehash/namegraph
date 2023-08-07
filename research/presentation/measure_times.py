@@ -22,13 +22,13 @@ def prod_test_client(config):
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/?name=aaa")
     return client
 
 
 def request_generator_client(name, override=None):
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,
@@ -48,7 +48,7 @@ import requests
 def request_generator_http(host, name, override=None):
     # time.sleep(0.1)
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,

@@ -3,7 +3,7 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.generation.categories_generator import MultiTokenCategoriesGenerator
+from generator.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
 from generator.preprocessor import Preprocessor
 from generator.generation import (
     HyphenGenerator,
@@ -25,6 +25,10 @@ from generator.generation import (
     KeycapGenerator,
     PersonNameGenerator,
     SymbolGenerator,
+    EasterEggGenerator,
+    CollectionGenerator,
+    ReverseGenerator,
+    RhymesGenerator,
 )
 from generator.generated_name import GeneratedName
 
@@ -34,6 +38,7 @@ from generator.domains import Domains
 from generator.input_name import InputName
 
 from generator.utils.suffixtree import HAS_SUFFIX_TREE
+from generator.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
@@ -41,6 +46,9 @@ needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree 
 @pytest.fixture(autouse=True)
 def run_around_tests():
     Domains.remove_self()
+    Categories.remove_self()
+    CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     yield
 
 
@@ -327,6 +335,7 @@ def test_emoji_generator_long():
         generated_names = list(strategy.generate(tokenized_name))
 
 
+@pytest.mark.skip(reason='CategoriesGenerator no longer returns deterministic results')
 def test_categories():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -335,6 +344,17 @@ def test_categories():
         generated_names = list(strategy.generate(tokenized_name))
 
         assert generated_names.index(('lion',)) < generated_names.index(('cheetah',))
+
+
+def test_single_token_categories_randomization():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config_new")
+        strategy = CategoriesGenerator(config)
+        tokenized_name = ('pikachu',)
+
+        generated_names_a = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
+        generated_names_b = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
+        assert generated_names_a != generated_names_b
 
 
 def test_multi_categories():
@@ -375,8 +395,6 @@ def test_single_token_categories():
         generated_names = list(strategy.generate(tokenized_name))
         assert ('0x1',) in generated_names
         assert ('0x2',) in generated_names
-
-
 
 
 @mark.parametrize(
@@ -562,6 +580,7 @@ def test_keycap_generator():
         generated_names = list(strategy.generate(tokenized_name))
         assert not generated_names
 
+
 def test_person_name():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -569,3 +588,70 @@ def test_person_name():
         tokenized_name = ('chris',)
         generated_names = list(strategy.generate(tokenized_name))
         assert ('iam', 'chris') in generated_names
+
+
+def test_easteregg_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = EasterEggGenerator(config)
+
+        tokenized_name = ('byczong',)
+        generated_names = list(map(lambda x: x[0], list(strategy.generate(tokenized_name))))
+        assert all(['byczong' in name or
+                    name in (
+                        'i-am-so-tired-of-making-suggestions',
+                        'please-stop-typing-so-fast',
+                        'you-hurting-me'
+                    ) for name in generated_names])
+
+
+@pytest.mark.integration_test
+def test_collection_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config_new")
+        strategy = CollectionGenerator(config)
+        tokenized_name = ('pink', 'floyd')
+        generated_names = list(strategy.generate(tokenized_name))
+        assert ('wish', 'you', 'were', 'here') in generated_names
+
+
+def test_reverse_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = ReverseGenerator(config)
+        tokenized_name = ('piotrus',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert len(generated_names) == 1
+        assert generated_names[0] == ('surtoip',)
+
+
+def test_rhymes_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = RhymesGenerator(config)
+
+        tokenized_name = ('caravan',)
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: x[0], list(gen)))
+        expected_names = map(lambda s: tokenized_name[0] + s, (
+            "van", "fan", "sullivan", "ivan", "stefan", "evan",
+            "ativan", "donovan", "stephan", "orphan", "minivan", "sylvan")
+                             )
+        assert all([name in generated_names for name in expected_names])
+
+        tokenized_name = ('van', 'fan', 'sullivan')
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: x[0], list(gen)))
+        discarded_names = map(lambda s: ''.join(tokenized_name) + s,
+                              ("van", "fan", "sullivan"))
+        assert all([name not in generated_names for name in discarded_names])
+
+
+def test_person_name_dynamic_grouping_category():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameGenerator(config)
+        assert pn.get_grouping_category(output_name=None) == 'expand'
+        assert pn.get_grouping_category(output_name='piotrbyczong') == 'expand'
+        assert pn.get_grouping_category(output_name='piotr🐂byczong') == 'emojify'
+        assert pn.get_grouping_category(output_name='piotrbyczońg') == 'emojify'  # non-ascii -> emojify

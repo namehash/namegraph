@@ -196,7 +196,7 @@ def test_weighted_sampling_sorter_stress():
         config = compose(config_name="test_config_new", overrides=["app.suggestions=100"])
 
         with open('data/top_internet_names.csv', 'r', encoding='utf-8') as f:
-            words = [str(i) + d for i, d in enumerate(itertools.islice(iter(f), 49999))] + ['pumpkins']
+            words = [str(i) + d.strip() for i, d in enumerate(itertools.islice(iter(f), 49999))] + ['pumpkins']
 
         generated_names = []
         for (from_idx, to_idx), pipeline_name, generator_name in [((0, 10000), 'permute', 'PermuteGenerator'),

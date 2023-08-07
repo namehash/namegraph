@@ -9,14 +9,18 @@ import regex
 from tqdm import tqdm
 
 from generator.domains import Domains
+from generator.generation.categories_generator import Categories
+from generator.xcollections import CollectionMatcherForAPI
 from fastapi.testclient import TestClient
 
 
 # TODO position of first appearance
-# TODO 
+# TODO
 
 def prod_test_client(config):
     Domains.remove_self()
+    Categories.remove_self()
+    CollectionMatcherForAPI.remove_self()
     os.environ['CONFIG_NAME'] = config
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:
@@ -26,13 +30,13 @@ def prod_test_client(config):
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/?name=aaa")
     return client
 
 
 def request_generator_client(name, override=None):
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,
@@ -51,7 +55,7 @@ import requests
 
 def request_generator_http(host, name, override=None):
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,
@@ -128,7 +132,7 @@ if __name__ == "__main__":
                    'hodl', 'yeezy', 'brantly', 'jeezy', 'vitalik', 'exampleregistration', 'pyme', 'avalanche', 'messy',
                    'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
                    'happypeople', 'muscle', 'billybob', 'quo', 'circleci', 'bitcoinmine', 'poweroutage',
-                   'shootingarrowatthesky']
+                   'shootingarrowatthesky', 'pinkfloyd']
 
     # 'happypeople', 'muscle', 'billybob' (2 leet in instant), 'quo' (instant 2 flag suggestions)
 
