@@ -153,3 +153,5 @@ collections:
   other_collections_path: data/collections_data/other_collections.json
   collections_limit: 3
   suggestions_limit: 10  # per one collections
+  name_diversity_ratio: 0.5
+  max_per_type: 2
