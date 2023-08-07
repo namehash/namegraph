@@ -7,11 +7,23 @@ from web_api import generator
 
 class Params(BaseModel):
     country: Optional[str] = Field(None, title='user county code',
-                                   description="A two-character ISO 3166-1 country code for the country associated with the location of the requester's public IP address; might be null",
+                                   description="A two-character ISO 3166-1 country code for the country associated "
+                                               "with the location of the requester's public IP address; might be null",
                                    examples=['us'])
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
                       description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
+    enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
+                                          description='if true, the results will be sorted by '
+                                                      'learning to rank algorithm')
+    name_diversity_ratio: Optional[float] = \
+        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
+              description='adds penalty to collections with similar names to other collections\n'
+                          'if null, then no penalty will be added')
+    max_per_type: Optional[int] = \
+        Field(2, examples=[2], ge=1, title='collection diversity parameter based on collection types',
+              description='adds penalty to collections with the same type as other collections\n'
+                          'if null, then no penalty will be added')
 
 
 class NameRequest(BaseModel):

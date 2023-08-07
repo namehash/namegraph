@@ -17,7 +17,7 @@ class Collection:
             tokenized_names: Optional[list[tuple[str]]],
             name_types: list[str],
             modified_timestamp: int,
-            avatar_emoji: str,
+            avatar_emoji: Optional[str],
             avatar_image: Optional[str],
             # TODO do we need those above? and do we need anything else?
     ):
@@ -58,7 +58,7 @@ class Collection:
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
-            avatar_emoji=fields['data.avatar_emoji'][0],
+            avatar_emoji=fields['data.avatar_emoji'][0] if 'data.avatar_emoji' in fields else None,
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None
         )
 

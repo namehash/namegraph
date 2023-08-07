@@ -280,6 +280,61 @@ class ElasticsearchQueryBuilder:
 
         return self
 
+    def rescore(self, window_size: int, query: dict) -> ElasticsearchQueryBuilder:
+        """
+        Adds a rescore to the query builder
+
+        :param window_size: window size
+        :param query: query
+        :return: self
+        """
+        self._query['rescore'] = {
+            'window_size': window_size,
+            'query': query
+        }
+        return self
+
+    def rescore_with_learning_to_rank(
+            self,
+            query: str,
+            window_size: int,
+            model_name: str,
+            feature_set: str,
+            feature_store: str,
+            query_weight: float = 0.0,
+            rescore_query_weight: float = 1.0,
+    ) -> ElasticsearchQueryBuilder:
+        """
+        Adds a learning to rank rescore to the query builder
+
+        :param query: query
+        :param window_size: window size
+        :param model_name: model name
+        :param feature_set: feature set
+        :param feature_store: feature store
+        :param query_weight: query weight
+        :param rescore_query_weight: rescore query weight
+        :return: self
+        """
+
+        query = {
+            "rescore_query": {
+                "sltr": {
+                    "_name":"logged_featureset",
+                    "store": feature_store,
+                    "featureset": feature_set,
+                    "model": model_name,
+                    "params": {
+                        "keywords": query
+                    }
+                }
+            },
+            "query_weight": query_weight,
+            "rescore_query_weight": rescore_query_weight
+        }
+
+        return self.rescore(window_size, query)
+
     def build_body(self):
         """For use as a `body` parameter in elasticsearch query."""
         return deepcopy(self._query)

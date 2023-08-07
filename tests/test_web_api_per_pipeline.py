@@ -223,6 +223,10 @@ def collection_test_pipelines():
     del os.environ['CONFIG_OVERRIDES']
 
 
+def _extract_titles(json_obj: list[dict]) -> list[str]:
+    return [name["metadata"]["collection_title"] for name in json_obj]
+
+
 @mark.usefixtures("collection_test_pipelines")
 @mark.integration_test
 class TestCollections:
@@ -230,5 +234,49 @@ class TestCollections:
         response = test_client.post("/", json={"label": "pinkfloyd"})
         assert response.status_code == 200
         json = response.json()
-        collection_names = [name["metadata"]["collection_title"] for name in json]
-        assert "Pink Floyd albums" in collection_names
+        collection_names = _extract_titles(json)
+        assert "Songs recorded by Pink Floyd" in collection_names
+
+    def test_enabling_learning_to_rank(self, test_client):
+        # at least for one of the labels results should be different
+        for label in ['pinkfloyd', 'spears', 'kyiv']:
+            titles = []
+            for enable_ltr in [True, False]:
+                response = test_client.post("/", json={
+                    "label": label,
+                    "params": {"enable_learning_to_rank": enable_ltr}
+                })
+                assert response.status_code == 200
+                json = response.json()
+                collection_names = _extract_titles(json)
+                titles.append(collection_names)
+
+            for el in titles:
+                if el != titles[0]:
+                    return
+
+        assert False, "Results are the same for both enable_learning_to_rank=True and enable_learning_to_rank=False"
+
+    def test_diversity_parameters(self, test_client):
+        # at least for one of the labels results should be different
+        for label in ['pinkfloyd', 'spears', 'kyiv']:
+            titles = []
+            for diversity_parameters in [
+                {'name_diversity_ratio': 1.0, 'max_per_type': 1},
+                {'name_diversity_ratio': 0.5, 'max_per_type': 2},
+                {'name_diversity_ratio': None, 'max_per_type': None},
+            ]:
+                response = test_client.post("/", json={
+                    "label": label,
+                    "params": diversity_parameters
+                })
+                assert response.status_code == 200
+                json = response.json()
+                collection_names = _extract_titles(json)
+                titles.append(collection_names)
+
+            for el in titles:
+                if el != titles[0]:
+                    return
+
+        assert False, "Results are the same for all diversity parameters"

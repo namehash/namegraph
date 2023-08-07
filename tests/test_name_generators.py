@@ -612,7 +612,7 @@ def test_collection_generator():
         strategy = CollectionGenerator(config)
         tokenized_name = ('pink', 'floyd')
         generated_names = list(strategy.generate(tokenized_name))
-        assert ('wish', 'you', 'were', 'here') in generated_names
+        assert ('us', 'and', 'them') in generated_names
 
 
 def test_reverse_generator():

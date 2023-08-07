@@ -30,23 +30,64 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'
 
-        fields = [
+        include_fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
+        query_fields = [
+            'data.collection_name^3', 'data.collection_name.exact^3', 'data.collection_description',
+            'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
+        ]
+
+        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        query_builder = ElasticsearchQueryBuilder() \
+            .add_filter('term', {'data.public': True}) \
+            .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
+            .add_offset(offset) \
+            .add_rank_feature('template.collection_rank', boost=100) \
+            .set_source(False) \
+            .include_fields(include_fields)
+
+        if sort_order == 'AI':
+            window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
+
+            query_params = query_builder \
+                .add_query(query, fields=query_fields, type_='most_fields') \
+                .add_rank_feature('metadata.members_rank_mean', boost=1) \
+                .add_rank_feature('metadata.members_rank_median', boost=1) \
+                .add_rank_feature('template.members_system_interesting_score_mean', boost=1) \
+                .add_rank_feature('template.members_system_interesting_score_median', boost=1) \
+                .add_rank_feature('template.valid_members_count', boost=1) \
+                .add_rank_feature('template.invalid_members_count', boost=1) \
+                .add_rank_feature('template.valid_members_ratio', boost=1) \
+                .add_rank_feature('template.nonavailable_members_count', boost=1) \
+                .add_rank_feature('template.nonavailable_members_ratio', boost=1) \
+                .rescore_with_learning_to_rank(query,
+                                               window_size=window_size,
+                                               model_name=self.ltr_model_name,
+                                               feature_set=self.ltr_feature_set,
+                                               feature_store=self.ltr_feature_store,
+                                               query_weight=0.001,
+                                               rescore_query_weight=1000) \
+                .build_params()
+        else:
+            query_params = query_builder \
+                .add_query(query, fields=query_fields, type_='cross_fields') \
+                .add_rank_feature('metadata.members_count') \
+                .set_sort_order(sort_order, field='data.collection_name.raw') \
+                .build_params()
+
         try:
-            return self._search_related(
-                query=query,
-                max_limit=max_related_collections,
-                fields=fields,
-                offset=offset,
-                sort_order=sort_order,
-                name_diversity_ratio=name_diversity_ratio,
-                max_per_type=max_per_type,
-                limit_names=limit_names,
-            )
+            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+
+            if not apply_diversity:
+                return collections[:max_related_collections], es_response_metadata
+
+            diversified = self._apply_diversity(collections, max_related_collections,
+                                                name_diversity_ratio, max_per_type)
+            return diversified, es_response_metadata
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
@@ -57,8 +98,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'
 
+        query_fields = [
+            'data.collection_name^3', 'data.collection_name.exact^3', 'data.collection_description',
+            'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
+        ]
+
         query_params = ElasticsearchQueryBuilder() \
-            .add_query(query) \
+            .add_query(query, fields=query_fields, type_='cross_fields') \
             .add_filter('term', {'data.public': True}) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .add_rank_feature('metadata.members_count') \

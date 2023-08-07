@@ -10,6 +10,7 @@ data/*.npy
 .DS_Store
 .coverage
 /data/cache/
+data/person_names_*.json
 *.pclprof
 profiler.py
 *.bin
@@ -19,7 +20,6 @@ research/emoji/emoji_w2v/corpus.txt
 research/emoji/emoji_w2v/*.bin
 research/emoji/emoji_w2v/*.zip
 !research/emoji/emoji_w2v/*.ipynb
-data/person_names_*.json
 research/symbol/*.xlsx
 !research/symbol/*.ipynb
 !research/clustering-collections/*.ipynb
