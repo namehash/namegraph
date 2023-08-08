@@ -277,7 +277,7 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
         obj.interpretation = []
         sampled_members.append(obj)
 
-    response = convert_to_suggestion_format(sampled_members, include_metadata=True)
+    response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
 
     return response
 
