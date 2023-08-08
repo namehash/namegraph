@@ -107,6 +107,7 @@ class GroupedSuggestions(BaseModel):
 
 class SampleCollectionMembers(BaseModel):
     collection_id: str = Field(title='id of the collection to sample from', examples=['Q6615994'])
+    metadata: bool = Field(True, title='return all the metadata in response')
     max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
                                  description='if the collection has less members than max_sample_size, '
                                              'all the members will be returned', examples=[5])
