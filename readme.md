@@ -116,3 +116,7 @@ Authorize EC2 instance in ECR:
 Check if service works:
 
 `curl -d '{"label":"firestarter"}' -H "Content-Type: application/json" -X POST http://44.203.61.202`
+
+## Learning-To-Rank
+
+To access the LTR features, you need to configure it in the Elasticsearch instance (see [here](https://github.com/namehash/collection-templates/tree/master/research/learning-to-rank/readme.md) for more details).
