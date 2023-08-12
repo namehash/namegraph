@@ -344,8 +344,8 @@
     instant: 0
     domain_detail: 0
     full: 0
-    grouped_instant: 1
-    grouped_domain_detail: 1
+    grouped_instant: 0.33
+    grouped_domain_detail: 0.33
     grouped_full: 0.33
 -
   name: easteregg
