@@ -26,6 +26,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             return [], {}
 
         tokenized_query = ' '.join(tokens)
+        if len(tokens) > 1:
+            tokenized_query = ''.join(tokens) + ' ' + tokenized_query
 
         include_fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank',

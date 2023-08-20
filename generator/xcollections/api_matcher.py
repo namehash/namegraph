@@ -26,9 +26,11 @@ class CollectionMatcherForAPI(CollectionMatcher):
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
-        tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
-        if tokenized_query != query:
-            query = f'{query} {tokenized_query}'
+        query = query.strip()
+        if ' ' not in query:
+            tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
+            if tokenized_query != query:
+                query = f'{query} {tokenized_query}'
 
         include_fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
