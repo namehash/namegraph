@@ -385,7 +385,7 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     response = client.post("/grouped_by_category",
                            json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
                                  "metadata": metadata,
-                                 "params": {"mode": "full"}}
+                                 "params": {"mode": "instant"}}
                            )
 
     assert response.status_code == response_code
@@ -408,6 +408,11 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
             assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
 
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+
+        # assert no easteregg
+        if gcat['type'] == 'gowild':
+            assert all(['EasterEggGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
+                        if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
 
         # assert related are after one another
         if gcat['type'] == 'related':
