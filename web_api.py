@@ -189,7 +189,7 @@ def convert_to_grouped_suggestions_format(
     for suggestion in ungrouped_response:
         grouping_category_type = suggestion['metadata']['grouping_category']
 
-        if grouping_category_type == 'related':  # todo: all related at the beginning
+        if grouping_category_type == 'related':
             collection_key = (
                 suggestion['metadata']['collection_title'],
                 suggestion['metadata']['collection_id'],
