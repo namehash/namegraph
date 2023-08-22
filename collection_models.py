@@ -2,6 +2,8 @@ from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 
+from models import UserInfo
+
 
 class CollectionName(BaseModel):
     name: str = Field(title='name with `.eth`')
@@ -41,7 +43,11 @@ class BaseCollectionQueryResponse(BaseModel):
 
 # ======== Collection Search ========
 
-class BaseCollectionSearchLimitOffsetSort(BaseModel):
+class BaseCollectionRequest(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+
+
+class BaseCollectionSearchLimitOffsetSort(BaseCollectionRequest):
     limit_names: int = Field(10, ge=0, le=10, title='the number of names returned in each collection',
                              description='can not be greater than 10')
     offset: int = Field(0,
@@ -114,7 +120,7 @@ class CollectionSearchResponse(BaseCollectionQueryResponse):
     other_collections: list[Collection] = Field(title='list of other collections (if not enough related collections)')
 
 
-class CollectionCountByStringRequest(BaseModel):
+class CollectionCountByStringRequest(BaseCollectionRequest):
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
                        description='can not contain dots (.)',
                        pattern='^[^.]+$', examples=['zeus god'])
@@ -122,7 +128,7 @@ class CollectionCountByStringRequest(BaseModel):
 
 # ======== Collection Membership ========
 
-class CollectionsContainingNameCountRequest(BaseModel):
+class CollectionsContainingNameCountRequest(BaseCollectionRequest):
     label: str = Field(title='label for which collection membership will be checked', examples=['zeus'])
 
 
