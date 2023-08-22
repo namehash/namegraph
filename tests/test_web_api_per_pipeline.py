@@ -280,3 +280,12 @@ class TestCollections:
                     return
 
         assert False, "Results are the same for all diversity parameters"
+
+    def test_metadata_collection_field2(self, test_client):
+        response = test_client.post("/", json={"label": "virgil abloh"})
+        assert response.status_code == 200
+        json = response.json()
+        collection_names = _extract_titles(json)
+        assert "Industrial designers" in collection_names
+        assert "Yu-Gi-Oh! video games" not in collection_names
+        assert "Oh Yeon-seo filmography" not in collection_names
