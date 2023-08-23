@@ -1,11 +1,22 @@
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
+from pydantic.networks import IPvAnyAddress
 from datetime import datetime
 
 from web_api import generator
 
 
+
+class UserInfo(BaseModel):
+    user_wallet_addr: Optional[str] = Field(None, title='wallet (public) address of the user',
+                                            description='might be null')
+    user_ip_addr: Optional[IPvAnyAddress] = Field(None, title='IP address of the user',
+                                                  description='either IPv4 or IPv6; might be null')
+    session_id: Optional[str] = Field(None, title='', description='might be null')
+
+
 class Params(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     country: Optional[str] = Field(None, title='user county code',
                                    description="A two-character ISO 3166-1 country code for the country associated "
                                                "with the location of the requester's public IP address; might be null",
@@ -106,6 +117,7 @@ class GroupedSuggestions(BaseModel):
 
 
 class SampleCollectionMembers(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     collection_id: str = Field(title='id of the collection to sample from', examples=['Q6615994'])
     metadata: bool = Field(True, title='return all the metadata in response')
     max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,

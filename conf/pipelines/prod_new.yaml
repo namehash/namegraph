@@ -368,6 +368,9 @@
     instant: 1
     domain_detail: 0
     full: 0
+    grouped_instant: 0
+    grouped_domain_detail: 0
+    grouped_full: 0
 -
   name: reverse
   generator: ReverseGenerator

@@ -385,7 +385,7 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     response = client.post("/grouped_by_category",
                            json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
                                  "metadata": metadata,
-                                 "params": {"mode": "full"}}
+                                 "params": {"mode": "instant"}}
                            )
 
     assert response.status_code == response_code
@@ -398,16 +398,24 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
 
     last_related_flag = False
+    actual_type_order = []
 
     for i, gcat in enumerate(categories):
         assert 'type' in gcat
         assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+        if gcat['type'] not in actual_type_order:
+            actual_type_order.append(gcat['type'])
 
         assert 'name' in gcat
         if gcat['type'] != 'related':
             assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
 
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+
+        # assert no easteregg
+        if gcat['type'] == 'gowild':
+            assert all(['EasterEggGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
+                        if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
 
         # assert related are after one another
         if gcat['type'] == 'related':
@@ -420,6 +428,11 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
             assert gcat['collection_members_count'] > 0
             if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
                 last_related_flag = True
+
+    # ensure the correct order of types (allow skipping types)
+    expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
+                                                  'community', 'expand', 'gowild'] if gcat_type in actual_type_order]
+    assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
 
 
 @pytest.mark.integration_test

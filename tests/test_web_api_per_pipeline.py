@@ -286,6 +286,27 @@ class TestCollections:
         assert response.status_code == 200
         json = response.json()
         collection_names = _extract_titles(json)
+        print(collection_names)
         assert "Industrial designers" in collection_names
         assert "Yu-Gi-Oh! video games" not in collection_names
         assert "Oh Yeon-seo filmography" not in collection_names
+
+    def test_prod_grouped_by_category(self, test_client):
+        client = test_client
+
+        response = client.post("/grouped_by_category",
+                               json={"label": "virgil abloh", "min_suggestions": 100, "max_suggestions": 100,
+                                     "metadata": True,
+                                     "params": {"mode": "full"}}
+                               )
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+
+        collection_titles = [gcat['collection_title'] for gcat in categories if gcat['type'] == 'related']
+        print(collection_titles)
+        assert 'Yu-Gi-Oh! characters' not in collection_titles
