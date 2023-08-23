@@ -158,7 +158,7 @@ For each pair of type and language, probabilities of each pipeline are computed.
 1. If there is enough suggestions then break.
 2. If all pipeline probabilities for every pair of type nad language are 0 then break.
 3. Sample type and language, then sample interpretation within this type and language.
-4. Sample a pipeline for the sampled interpretation.
+4. Sample a pipeline for the sampled interpretation. The first pass of sampling is without replacement to increase diversity in top suggestions. 
 5. If the pipeline exceeds its global limit then go to 4.
 6. Get a suggestion from the pipeline. (The generator is executed here). If there is no more suggestions then go to 4.
 7. If the suggestion have been already sampled then go to 6.
@@ -167,3 +167,29 @@ For each pair of type and language, probabilities of each pipeline are computed.
 10. Go to 1.
 
 Exhausted pipelines are removed from sampling.
+
+### Grouped by category
+
+Parameters:
+* `mode`
+* `min_available_fraction`
+* max number of categories
+* max number of suggestions per category
+* max related categories
+* min total categories?
+* max total categories?
+
+Requirements:
+* order of categories is fixed
+* which categories should be removed?
+  * always keep related?
+  * sample with weights? or use fixed order? or remove with the least of suggestions?
+
+* every generator must be mapped to only one category, so PersonAffixGenerator must be split
+* if there is not enough names in generators then it is preferred to use CollectionGenerator than RandomAvailableNameGenerator?
+  * should it be a second search by Elastic? or the first search should ask for more collections?
+  * or we can use unrelated collections (like in writers block) - this not change latency
+
+* still there might be categories with small number of names - what then?
+* flag generator suggestion should appear in 10% of suggestions - maybe we should detect if it is first search by a user
+* 
