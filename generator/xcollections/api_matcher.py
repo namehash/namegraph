@@ -9,8 +9,9 @@ from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
 from .utils import get_names_script, get_namehashes_script
 
-
 logger = logging.getLogger('generator')
+
+BOOST = 3
 
 
 class CollectionMatcherForAPI(CollectionMatcher):
@@ -30,7 +31,11 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if ' ' not in query:
             tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
             if tokenized_query != query:
-                query = f'{query} {tokenized_query}'
+                query = f'{query}^{BOOST} {tokenized_query}'
+        else:
+            wo_spaces = query.replace(' ', '')
+            tokenized_query = ' '.join([f"{token}^{BOOST}" for token in query.split(' ')])
+            query = f'{tokenized_query} {wo_spaces}'
 
         include_fields = [
             'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
@@ -56,7 +61,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
 
             query_params = query_builder \
-                .add_query(query, fields=query_fields, type_='most_fields') \
+                .add_query(query, fields=query_fields, type_='most_fields', type2='query_string') \
                 .add_rank_feature('metadata.members_rank_mean', boost=1) \
                 .add_rank_feature('metadata.members_rank_median', boost=1) \
                 .add_rank_feature('template.members_system_interesting_score_mean', boost=1) \
@@ -76,12 +81,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 .build_params()
         else:
             query_params = query_builder \
-                .add_query(query, fields=query_fields, type_='cross_fields') \
+                .add_query(query, fields=query_fields, type_='cross_fields', type2='query_string') \
                 .add_rank_feature('metadata.members_count') \
                 .set_sort_order(sort_order, field='data.collection_name.raw') \
                 .build_params()
 
         try:
+            print(query_params)
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
 
             if not apply_diversity:
