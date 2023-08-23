@@ -380,6 +380,9 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
     ]
 )
 def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestions, response_code):
+
+    # todo: chop this test into smaller tests
+
     client = prod_test_client
 
     response = client.post("/grouped_by_category",
@@ -409,9 +412,12 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
 
         assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
-        # assert no easteregg
+        # assert no EasterEggGenerator and CategoryGenerator
         if gcat['type'] == 'gowild':
             assert all(['EasterEggGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
+                        if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
+        elif gcat['type'] == 'community':
+            assert all(['CategoryGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
                         if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
 
         # assert related are after one another
