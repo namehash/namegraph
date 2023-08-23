@@ -507,6 +507,39 @@ class TestCorrectConfiguration:
         assert len(response_json['collections']) == 0
 
 
+    @pytest.mark.integration_test
+    def test_elasticsearch_template_collections_search_tokenization(self, test_test_client):
+        response = test_test_client.post("/find_collections_by_string", json={
+            "query": "virgilabloh",
+            "mode": "instant",
+            "max_related_collections": 5,
+            "max_total_collections": 5
+        })
+
+        assert response.status_code == 200
+        titles = [collection['title'] for collection in response.json()['related_collections']]
+        print(titles)
+        assert 'Fashion designers' in titles
+        # assert 'Yu-Gi-Oh! video games' not in titles
+        # assert 'Oh Yeon-seo filmography' not in titles
+
+    @pytest.mark.integration_test
+    def test_elasticsearch_template_collections_search_tokenization_with_spaces(self, test_test_client):
+        response = test_test_client.post("/find_collections_by_string", json={
+            "query": "virgil abloh",
+            "mode": "instant",
+            "max_related_collections": 5,
+            "max_total_collections": 5
+        })
+
+        assert response.status_code == 200
+        titles = [collection['title'] for collection in response.json()['related_collections']]
+        print(titles)
+        # assert 'Fashion designers' in titles
+        assert 'Industrial designers' in titles
+        assert 'Yu-Gi-Oh! video games' not in titles
+        assert 'Oh Yeon-seo filmography' not in titles
+
 @mark.usefixtures("unavailable_configuration")
 class TestCollectionApiUnavailable:
     @mark.integration_test
