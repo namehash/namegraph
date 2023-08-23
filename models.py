@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from pydantic.networks import IPvAnyAddress
 from datetime import datetime
 
@@ -13,6 +13,10 @@ class UserInfo(BaseModel):
     user_ip_addr: Optional[IPvAnyAddress] = Field(None, title='IP address of the user',
                                                   description='either IPv4 or IPv6; might be null')
     session_id: Optional[str] = Field(None, title='', description='might be null')
+
+    @field_serializer('user_ip_addr')
+    def serialize_user_ip_addr(self, user_ip_addr: IPvAnyAddress, _info) -> str:
+        return str(user_ip_addr)
 
 
 class Params(BaseModel):
