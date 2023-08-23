@@ -390,9 +390,7 @@ class TestGroupedSuggestions:
 
         response = client.post("/grouped_by_category",
                                json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
-                                     "metadata": metadata,
-                                     "params": {"mode": "instant"}}
-                               )
+                                     "metadata": metadata, "params": {"mode": "instant"}})
 
         assert response.status_code == response_code
         response_json = response.json()
@@ -450,9 +448,7 @@ class TestGroupedSuggestions:
 
         response = client.post("/grouped_by_category",
                                json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
-                                     "metadata": metadata,
-                                     "params": {"mode": "instant"}}
-                               )
+                                     "metadata": metadata, "params": {"mode": "instant"}})
 
         assert response.status_code == response_code
         response_json = response.json()
