@@ -192,4 +192,8 @@ Requirements:
 
 * still there might be categories with small number of names - what then?
 * flag generator suggestion should appear in 10% of suggestions - maybe we should detect if it is first search by a user
-* 
+  * should we remove first pass of sampling with every generator?
+
+1. Shuffle order of categories (using weights?) if min number of categories is smaller than all categories. If some category does not return suggestions then we take the next one.
+2. For each category create sampler with pipelines. In parallel?
+3. Sample `max number of suggestions per category`. How handle `min_available_fraction`?
