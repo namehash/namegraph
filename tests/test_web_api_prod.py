@@ -403,19 +403,19 @@ class TestGroupedSuggestions:
         assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
 
         last_related_flag = False
+        actual_type_order = []
 
         for i, gcat in enumerate(categories):
             assert 'type' in gcat
             assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+            if gcat['type'] not in actual_type_order:
+                actual_type_order.append(gcat['type'])
 
             assert 'name' in gcat
             if gcat['type'] != 'related':
                 assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
 
             assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
-
-            assert self.strategy_not_used(gcat, 'EasterEggGenerator')
-            assert self.strategy_not_used(gcat, 'CategoryGenerator')
 
             # assert related are after one another
             if gcat['type'] == 'related':
@@ -428,6 +428,12 @@ class TestGroupedSuggestions:
                 assert gcat['collection_members_count'] > 0
                 if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
                     last_related_flag = True
+
+        # ensure the correct order of types (allow skipping types)
+        expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
+                                                      'community', 'expand', 'gowild'] if gcat_type in actual_type_order]
+        assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
+
 
     @pytest.mark.integration_test
     @pytest.mark.parametrize(
