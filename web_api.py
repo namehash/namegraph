@@ -1,5 +1,6 @@
 import gc
 import logging, random, hashlib, json
+import sys
 from typing import List, Optional
 from collections import defaultdict
 from time import perf_counter
@@ -206,7 +207,7 @@ def convert_to_grouped_suggestions_format(
 
     grouped_response: list[dict] = []
 
-    for gcat in ['related', 'alternates', 'wordplay', 'emojify', 'community', 'expand', 'gowild']:
+    for gcat in generator.config.generation.grouping_categories_order:
         if gcat == 'related' and related_dict.keys():
             for collection_key in collection_categories_order:
                 grouped_response.append({
