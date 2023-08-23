@@ -15,6 +15,7 @@ class WordNinjaTokenizer(Tokenizer):
 
     def __init__(self, config):
         super().__init__()
+        wordninja.DEFAULT_LANGUAGE_MODEL = wordninja.LanguageModel(config.tokenization.wordninja_dictionary)
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
         return _tokenizer(name)
