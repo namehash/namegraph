@@ -6,7 +6,7 @@ from generator.tokenization.all_tokenizer import AllTokenizer
 
 def test_ngrams():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
         ngrams = Ngrams(config)
         assert ngrams.unigram_count('the') > ngrams.unigram_count('cat')
         assert ngrams.word_probability('the') > ngrams.word_probability('cat')
@@ -32,7 +32,7 @@ def test_ngrams():
 
 def test_gap_prob():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
         ngrams = Ngrams(config)
         tokenizer = AllTokenizer(config)
 
