@@ -368,69 +368,98 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
 
 
-@pytest.mark.integration_test
-@pytest.mark.parametrize(
-    "name, metadata, n_suggestions, response_code",
-    [
-        ("jamesbond", True, 50, 200),
-        ("longboard", True, 50, 200),
-        ("soundgarden", True, 50, 200),
-        ("aligator", True, 50, 200),
-        ("burdenofdreams", False, 50, 200)
-    ]
-)
-def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestions, response_code):
+class TestGroupedSuggestions:
 
-    # todo: chop this test into smaller tests
+    @staticmethod
+    def strategy_not_used(gcat_dict: dict, strategy: str) -> bool:
+        return all([strategy not in s['metadata']['applied_strategies'][0] for s in gcat_dict['suggestions']
+                    if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
 
-    client = prod_test_client
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize(
+        "name, metadata, n_suggestions, response_code",
+        [
+            ("jamesbond", True, 50, 200),
+            ("soundgarden", True, 50, 200),
+            ("aligator", True, 50, 200),
+            ("burdenofdreams", False, 50, 200)
+        ]
+    )
+    def test_prod_order(self, prod_test_client, name, metadata, n_suggestions, response_code):
+        client = prod_test_client
 
-    response = client.post("/grouped_by_category",
-                           json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
-                                 "metadata": metadata,
-                                 "params": {"mode": "instant"}}
-                           )
+        response = client.post("/grouped_by_category",
+                               json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
+                                     "metadata": metadata,
+                                     "params": {"mode": "instant"}}
+                               )
 
-    assert response.status_code == response_code
-    response_json = response.json()
-    print(response_json)
+        assert response.status_code == response_code
+        response_json = response.json()
+        print(response_json)
 
-    assert 'categories' in response_json
-    categories = response_json['categories']
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
 
-    assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
+        last_related_flag = False
 
-    last_related_flag = False
+        for i, gcat in enumerate(categories):
+            assert 'type' in gcat
+            assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
 
-    for i, gcat in enumerate(categories):
-        assert 'type' in gcat
-        assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+            assert 'name' in gcat
+            if gcat['type'] != 'related':
+                assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
 
-        assert 'name' in gcat
-        if gcat['type'] != 'related':
-            assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
+            assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
-        assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+            assert self.strategy_not_used(gcat, 'EasterEggGenerator')
+            assert self.strategy_not_used(gcat, 'CategoryGenerator')
 
-        # assert no EasterEggGenerator and CategoryGenerator
-        if gcat['type'] == 'gowild':
-            assert all(['EasterEggGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
-                        if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
-        elif gcat['type'] == 'community':
-            assert all(['CategoryGenerator' not in s['metadata']['applied_strategies'][0] for s in gcat['suggestions']
-                        if 'metadata' in s and s['metadata'] and s['metadata']['applied_strategies']])
+            # assert related are after one another
+            if gcat['type'] == 'related':
+                assert not last_related_flag
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                       == set(gcat.keys())
+                assert gcat['name'] == gcat['collection_title']
+                # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+                # from a single member, so it's not a good idea
+                assert gcat['collection_members_count'] > 0
+                if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
+                    last_related_flag = True
 
-        # assert related are after one another
-        if gcat['type'] == 'related':
-            assert not last_related_flag
-            assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
-                   == set(gcat.keys())
-            assert gcat['name'] == gcat['collection_title']
-            # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
-            # from a single member, so it's not a good idea
-            assert gcat['collection_members_count'] > 0
-            if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
-                last_related_flag = True
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize(
+        "name, metadata, n_suggestions, response_code",
+        [
+            ("vesperlynd", True, 50, 200),
+            ("aliceinchains", True, 50, 200),
+            ("saltwatercrocodile", True, 50, 200),
+            ("sleepwalker", False, 50, 200)
+        ]
+    )
+    def test_prod_disabled_strategies(self, prod_test_client, name, metadata, n_suggestions, response_code):
+        client = prod_test_client
+
+        response = client.post("/grouped_by_category",
+                               json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
+                                     "metadata": metadata,
+                                     "params": {"mode": "instant"}}
+                               )
+
+        assert response.status_code == response_code
+        response_json = response.json()
+        print(response_json)
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        assert sum([len(gcat['suggestions']) for gcat in categories]) == n_suggestions
+
+        for i, gcat in enumerate(categories):
+            assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
+            assert self.strategy_not_used(gcat, 'EasterEggGenerator')
+            assert self.strategy_not_used(gcat, 'CategoryGenerator')
 
 
 @pytest.mark.integration_test
