@@ -432,7 +432,7 @@ def test_prod_grouped_by_category(prod_test_client, name, metadata, n_suggestion
     # ensure the correct order of types (allow skipping types)
     expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
                                                   'community', 'expand', 'gowild'] if gcat_type in actual_type_order]
-    assert actual_type_order == expected_order
+    assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
 
 
 @pytest.mark.integration_test
