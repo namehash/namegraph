@@ -1,6 +1,5 @@
 import gc
 import logging, random, hashlib, json
-import sys
 from typing import List, Optional
 from collections import defaultdict
 from time import perf_counter
