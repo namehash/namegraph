@@ -25,7 +25,6 @@ logger = logging.getLogger('generator')
 # gc.set_debug(gc.DEBUG_STATS)
 
 class Settings(BaseSettings):
-    # config_name: str = "test_config"
     config_name: str = "prod_config_new"
     config_overrides: Optional[list[str]] = None
 

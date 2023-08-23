@@ -176,7 +176,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 # @pytest.mark.slow
 # def test_weighted_sampling_sorter_stress(prod_test_client):
 #     with initialize(version_base=None, config_path="../conf/"):
-#         config = compose(config_name="prod_config")
+#         config = compose(config_name="prod_config_new")
 #         domains = Domains(config)
 #
 #         names = list(domains.registered)[:100] \
