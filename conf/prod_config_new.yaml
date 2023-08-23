@@ -105,6 +105,14 @@ generation:
       - ReverseGenerator
     dynamic_:  # generator needs to implement get_grouping_category(output_name: str) method
       - PersonNameGenerator
+  grouping_categories_order:
+    - related
+    - alternates
+    - wordplay
+    - emojify
+    - community
+    - expand
+    - gowild
 sorting:
   weighted_sampling:
     weights:
