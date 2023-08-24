@@ -352,7 +352,7 @@ def test_no_joined_input_as_suggestion(prod_test_client, input_label: str, joine
     response = client.post("/", json={"label": input_label, "metadata": True, "params": {"mode": "full"}})
 
     assert response.status_code == 200
-    assert joined_label not in [name["name"] for name in response.json()]
+    assert joined_label + '.eth' not in [name["name"] for name in response.json()]
 
 
 @pytest.mark.slow
