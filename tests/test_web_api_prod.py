@@ -368,6 +368,31 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
 
 
+@pytest.mark.parametrize(
+    "ip_addr, response_code",
+    [
+        ("215.13.137.21", 200),
+        ("2001:db8::ff00:42:8329", 200),
+        ("256.0.0.1", 422),  # not an ipv4 address
+    ]
+)
+def test_prod_user_info_ip(prod_test_client, ip_addr, response_code):
+    client = prod_test_client
+    response = client.post("/",
+                           json={"label": "whatever", "min_suggestions": 50, "max_suggestions": 50,
+                                 "params": {
+                                     "mode": "full",
+                                     "user_info": {
+                                         "user_wallet_addr": 'abc123',
+                                         "user_ip_addr": ip_addr,
+                                         "session_id": 'h98732hr59hwh'
+                                     }
+                                 }})
+    assert response.status_code == response_code
+    response_json = response.json()
+    print(response_json)
+
+
 class TestGroupedSuggestions:
 
     @staticmethod

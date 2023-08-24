@@ -1,18 +1,22 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from pydantic.networks import IPvAnyAddress
 from datetime import datetime
 
 from web_api import generator
 
 
-
 class UserInfo(BaseModel):
     user_wallet_addr: Optional[str] = Field(None, title='wallet (public) address of the user',
-                                            description='might be null')
+                                            description='might be null', examples=['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'])
     user_ip_addr: Optional[IPvAnyAddress] = Field(None, title='IP address of the user',
-                                                  description='either IPv4 or IPv6; might be null')
-    session_id: Optional[str] = Field(None, title='', description='might be null')
+                                            description='either IPv4 or IPv6; might be null', examples=['192.168.0.1'])
+    session_id: Optional[str] = Field(None, title='', description='might be null',
+                                      examples=['d6374908-94c3-420f-b2aa-6dd41989baef'])
+
+    @field_serializer('user_ip_addr')
+    def serialize_user_ip_addr(self, user_ip_addr: IPvAnyAddress, _info) -> str:
+        return str(user_ip_addr)
 
 
 class Params(BaseModel):
