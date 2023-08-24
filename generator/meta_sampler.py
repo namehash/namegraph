@@ -103,7 +103,7 @@ class MetaSampler:
 
         all_suggestions = []
         all_suggestions_str = set()
-        joined_input_name = ''.join(name.input_name.strip().split())
+        joined_input_name = name.input_name.replace(' ', '')
 
         while True:
             if len(all_suggestions) >= max_suggestions or not types_lang_weights:
