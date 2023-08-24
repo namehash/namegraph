@@ -39,7 +39,11 @@ class CollectionGenerator(NameGenerator):
         self.max_per_type = config.collections.max_per_type
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
-        tokens = interpretation.tokenization
+        if ' ' in name.strip_eth_namehash_unicode_long_name:
+            tokens = name.strip_eth_namehash_unicode_long_name.strip().split(' ')
+        else:
+            tokens = interpretation.tokenization
+        
         params = name.params if name.params is not None else dict()
         collections, _ = self.collection_matcher.search_for_generator(
             tokens,
@@ -84,4 +88,7 @@ class CollectionGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': interpretation.tokenization}
+        if ' ' in name.strip_eth_namehash_unicode_long_name:
+            return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        else:
+            return {'tokens': interpretation.tokenization}

@@ -18,7 +18,7 @@ from generator.tokenization.none_tokenizer import NoneTokenizer
 
 def test_two_word_wordnet_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         tokenizer = BigramWordnetTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
         assert ('repeatable',) in tokenized_names
@@ -28,7 +28,7 @@ def test_two_word_wordnet_tokenizer():
 
 def test_two_word_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         tokenizer = BigramDictionaryTokenizer(config)
         tokenized_names = tokenizer.tokenize('repeatable')
         assert ('repeatable',) in tokenized_names
@@ -43,7 +43,7 @@ def test_two_word_tokenizer():
 
 def test_word_ninja_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('braverest')
         assert ('brave', 'rest') in tokenized_names
@@ -51,7 +51,7 @@ def test_word_ninja_tokenizer():
 
 def test_word_ninja_tokenizer2():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         tokenizer = WordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert ('york', 'newyork', '123') in tokenized_names
@@ -59,7 +59,7 @@ def test_word_ninja_tokenizer2():
 
 def test_none_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config")
+        config = compose(config_name="test_config_new")
         tokenizer = NoneTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert [('yorknewyork123',)] == tokenized_names
@@ -74,7 +74,7 @@ def test_none_tokenizer():
 )
 def test_all_tokenizer(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 455 tokenizations
         assert ('york', 'new', 'Ł', 'york', '123',) in tokenized_names
@@ -91,7 +91,7 @@ def test_all_tokenizer(overrides: List[str]):
 )
 def test_all_tokenizer_skip_one_letter_words(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 63 tokenizations
 
@@ -108,7 +108,7 @@ def test_all_tokenizer_skip_one_letter_words(overrides: List[str]):
 )
 def test_all_tokenizer_skip_non_words(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('yorknewŁyork123')  # 0 tokenizations
         assert list(tokenized_names) == []
@@ -127,7 +127,7 @@ def test_all_tokenizer_skip_non_words(overrides: List[str]):
 )
 def test_all_tokenizer_skip_one_letter_words_and_non_words(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('laptop')  # 2 tokenizations
 
@@ -149,7 +149,7 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words(overrides: List[str])
 )
 def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('laptop')  # 2 tokenizations
 
@@ -172,7 +172,7 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias(overrides: Lis
 )
 def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('lapŁtop')
 
@@ -191,7 +191,7 @@ def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps(over
 )
 def test_all_tokenizer_time(overrides):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
         tokenizer = AllTokenizer(config)
         tokenized_names = tokenizer.tokenize('miinibaashkiminasiganibiitoosijiganibadagwiingweshiganibakwezhigan')
 
@@ -206,7 +206,7 @@ def test_all_tokenizer_time(overrides):
 )
 def test_all_tokenizer_skip_one_letter_words_and_non_words_no_ias_with_gaps23(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config", overrides=overrides)
+        config = compose(config_name="test_config_new", overrides=overrides)
         tokenizer = AllTokenizer(config)
         tokenized_names = list(tokenizer.tokenize('laptop😀ą'))
         print(tokenized_names)

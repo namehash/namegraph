@@ -121,15 +121,17 @@ class ElasticsearchQueryBuilder:
             query: str,
             boolean_clause: Literal['must', 'should'] = 'must',
             type_: str = 'cross_fields',
-            fields: list[str] = None
+            fields: list[str] = None,
+            type2: str = 'multi_match',
     ) -> ElasticsearchQueryBuilder:
         """
         Adds a query to the query builder
 
         :param query: query string
         :param boolean_clause: boolean_clause used with this query (must, should...)
-        :param type_: type of query
+        :param type_: type of query, e.g. cross_fields, most_fields
         :param fields: fields to search in, if None, default fields will be used
+        :param type2: type of query, e.g. multi_match, query_string
         :return: self
         """
         if fields is None:
@@ -142,13 +144,13 @@ class ElasticsearchQueryBuilder:
             ]
 
         if boolean_clause == 'must':
-            return self.add_must('multi_match', {
+            return self.add_must(type2, {
                 'query': query,
                 'fields': fields,
                 'type': type_,
             })
         elif boolean_clause == 'should':
-            return self.add_should('multi_match', {
+            return self.add_should(type2, {
                 'query': query,
                 'fields': fields,
                 'type': type_,
