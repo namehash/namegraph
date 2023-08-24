@@ -338,6 +338,23 @@ def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     assert all([name['metadata']['pipeline_name'] in ('substring', 'random') for name in json])
 
 
+@pytest.mark.parametrize(
+    "input_label, joined_label",
+    [
+        ('marvel sky', 'marvelsky'),
+        ('crab rave', 'crabrave'),
+        ('i love bilbao', 'ilovebilbao'),
+        (' a  sequence of   words  ', 'asequenceofwords')
+    ]
+)
+def test_no_joined_input_as_suggestion(prod_test_client, input_label: str, joined_label: str):
+    client = prod_test_client
+    response = client.post("/", json={"label": input_label, "metadata": True, "params": {"mode": "full"}})
+
+    assert response.status_code == 200
+    assert joined_label not in [name["name"] for name in response.json()]
+
+
 @pytest.mark.slow
 def test_prod_normalization_with_ens_normalize(prod_test_client):
     client = prod_test_client

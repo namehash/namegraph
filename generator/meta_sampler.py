@@ -103,6 +103,8 @@ class MetaSampler:
 
         all_suggestions = []
         all_suggestions_str = set()
+        joined_input_name = ''.join(name.input_name.strip().split())
+
         while True:
             if len(all_suggestions) >= max_suggestions or not types_lang_weights:
                 break
@@ -141,7 +143,7 @@ class MetaSampler:
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
                         while True:
-                            while str(suggestion) in all_suggestions_str \
+                            while str(suggestion) in all_suggestions_str or str(suggestion) == joined_input_name \
                                     or (suggestion.status != Domains.AVAILABLE
                                         and available_added + slots_left <= min_available_required):
                                 suggestion = next(suggestions)
