@@ -195,5 +195,6 @@ Requirements:
   * should we remove first pass of sampling with every generator?
 
 1. Shuffle order of categories (using weights?) if min number of categories is smaller than all categories. If some category does not return suggestions then we take the next one.
-2. For each category create sampler with pipelines. In parallel?
+2. Within each category: sample type and lang of interpretation, sample interpretaion with this type and lang. Sample pipeline (weights of pipelines depends on type and language. Do it in parallel?
 3. Sample `max number of suggestions per category`. How handle `min_available_fraction`?
+
