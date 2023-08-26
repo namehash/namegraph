@@ -100,9 +100,8 @@ from models import (
     NameRequest,
     Suggestion,
     SampleCollectionMembers,
-    CollectionCategory,
-    OtherCategory,
     GroupedSuggestions,
+    Top10CollectionMembersRequest,
 )
 
 from collection_models import (
@@ -271,6 +270,31 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
         sampled_members.append(obj)
 
     response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
+
+    return response
+
+
+@app.post("/fetch_top_collection_members", response_model=list[Suggestion])
+async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembersRequest):
+    """
+    * this endpoint returns top 10 members from the collection specified by collection_id
+    """
+    result,  es_response_metadata = generator_matcher.fetch_top10_members_from_collection(
+        fetch_top10_command.collection_id
+    )
+
+    top_members = []
+    for name in result['top_members']:
+        obj = GeneratedName(tokens=(name,),
+                            pipeline_name='fetch_top_collection_members',
+                            collection_id=result['collection_id'],
+                            collection_title=result['collection_title'],
+                            grouping_category='related',
+                            applied_strategies=[])
+        obj.interpretation = []
+        top_members.append(obj)
+
+    response = convert_to_suggestion_format(top_members, include_metadata=fetch_top10_command.metadata)
 
     return response
 
