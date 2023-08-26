@@ -533,3 +533,19 @@ def test_collection_members_sampling(prod_test_client, collection_id, max_sample
     # uniqueness
     names = [name['name'] for name in response_json]
     assert len(names) == len(set(names))
+
+
+def test_fetching_top_collection_members(prod_test_client):
+    client = prod_test_client
+    collection_id = 'Q15102072'
+
+    response = client.post("/fetch_top_collection_members",
+                           json={"collection_id": collection_id})
+
+    assert response.status_code == 200
+    response_json = response.json()
+    assert len(response_json) <= 10
+
+    for name in response_json:
+        assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
+        assert name['metadata']['collection_id'] == collection_id
