@@ -130,3 +130,8 @@ class SampleCollectionMembers(BaseModel):
     seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
                       title='seed for random number generator',
                       description='if not provided (but can\'t be null), random seed will be generated')
+
+class Top10CollectionMembersRequest(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to fetch names from', examples=['Q6607079'])
+    metadata: bool = Field(True, title='return all the metadata in response')
