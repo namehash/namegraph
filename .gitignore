@@ -29,3 +29,4 @@ research/elasticsearch/*diver*.html
 research/collections-benchmark/*.html
 research/avatars/*.csv
 research/avatars/*.xlsx
+!research/token-scramble/*.ipynb
