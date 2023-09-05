@@ -76,7 +76,36 @@ class GroupedNameRequest(BaseModel):
     other_categories_params: dict[
         Literal[
             'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'], OtherCategoriesParams] = Field(
-        title='controls the results of other categories than related (except for "Other Names")')
+        title='controls the results of other categories than related (except for "Other Names")', examples=[{
+            "wordplay": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "alternates": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "emojify": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "community": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "expand": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "gowild": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            },
+            "other": {
+                "min_suggestions": 10,
+                "max_suggestions": 20
+            }
+        }])
     min_total_suggestions: int = Field(50, ge=0, le=100,
                                        title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"')
 
@@ -154,7 +183,7 @@ class CollectionCategory(GroupingCategory):
 
 
 class OtherCategory(GroupingCategory):
-    type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild'] = \
+    type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'] = \
         Field(title='category type',
               description='category type depends on the generator the suggestions came from')
 
