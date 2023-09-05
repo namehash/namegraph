@@ -176,6 +176,7 @@ class Generator:
                 min_suggestions = 0
                 max_suggestions = 30
             
+            #TODO should they use the same set of suggestions (for deduplications)
             suggestions = meta_sampler.sample(name, 'weighted-sampling',
                                                   min_suggestions=min_suggestions,
                                                   max_suggestions=max_suggestions,
