@@ -286,5 +286,8 @@ class FlagAffixGenerator(NameGenerator):
         try:
             country = name.params['country'].upper()
         except:
-            country = None
+            try:
+                country = name.params.user_info.user_ip_country.upper()
+            except:
+                country = None
         return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'country': country}
