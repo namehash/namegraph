@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-app = FastAPI()
+app = FastAPI(title="NameGenerator API") #TODO add version
 
 
 def init():
@@ -259,14 +259,14 @@ async def root(name: GroupedNameRequest):
 
     generator.clear_cache()
     result = generator.generate_grouped_names(name.label,
-                                              max_related_collections=name.max_related_collections,
-                                              max_names_per_related_collection=name.max_names_per_related_collection,
-                                              max_recursive_related_collections=name.max_recursive_related_collections,
-                                              other_categories_params=name.other_categories_params,
-                                              min_total_suggestions=name.min_total_suggestions,
+                                              max_related_collections=name.categories.related.max_related_collections,
+                                              max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
+                                              max_recursive_related_collections=name.categories.related.max_recursive_related_collections,
+                                              categories_params=name.categories,
+                                              min_total_suggestions=name.categories.other.min_total_suggestions,
                                               params=params)
 
-    response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
+    response = convert_to_grouped_suggestions_format(result, include_metadata=name.params.metadata)
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return response

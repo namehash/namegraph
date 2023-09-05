@@ -98,14 +98,14 @@ class RelatedCategoryParams(BaseModel):
 
 
 class CategoriesParams(BaseModel):
-    related: Optional[RelatedCategoryParams] = Field(None, title='related category parameters')
-    wordplay: Optional[OtherCategoriesParams] = Field(None, title='wordplay category parameters')
-    alternates: Optional[OtherCategoriesParams] = Field(None, title='alternates category parameters')
-    emojify: Optional[OtherCategoriesParams] = Field(None, title='emojify category parameters')
-    community: Optional[OtherCategoriesParams] = Field(None, title='community category parameters')
-    expand: Optional[OtherCategoriesParams] = Field(None, title='expand category parameters')
-    gowild: Optional[OtherCategoriesParams] = Field(None, title='gowild category parameters')
-    other: Optional[OtherCategoryParams] = Field(None, title='other category parameters')
+    related: RelatedCategoryParams = Field(RelatedCategoryParams(), title='related category parameters')
+    wordplay: OtherCategoriesParams = Field(OtherCategoriesParams(), title='wordplay category parameters')
+    alternates: OtherCategoriesParams = Field(OtherCategoriesParams(), title='alternates category parameters')
+    emojify: OtherCategoriesParams = Field(OtherCategoriesParams(), title='emojify category parameters')
+    community: OtherCategoriesParams = Field(OtherCategoriesParams(), title='community category parameters')
+    expand: OtherCategoriesParams = Field(OtherCategoriesParams(), title='expand category parameters')
+    gowild: OtherCategoriesParams = Field(OtherCategoriesParams(), title='gowild category parameters')
+    other: OtherCategoryParams = Field(OtherCategoryParams(), title='other category parameters')
 
 
 class GroupedNameRequest(BaseModel):
