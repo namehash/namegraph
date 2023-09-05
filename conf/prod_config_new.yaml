@@ -104,9 +104,10 @@ generation:
       - PersonNameExpandGenerator
     gowild:
       - LeetGenerator
-      - RandomAvailableNameGenerator
       - EasterEggGenerator
       - ReverseGenerator
+    other:
+      - RandomAvailableNameGenerator
   grouping_categories_order:
     - related
     - alternates
@@ -115,6 +116,7 @@ generation:
     - community
     - expand
     - gowild
+    - other
 sorting:
   weighted_sampling:
     weights:
