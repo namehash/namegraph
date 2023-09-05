@@ -154,6 +154,10 @@ class Generator:
         params['categories_params'] = categories_params
         params['min_total_suggestions'] = min_total_suggestions
         params['max_suggestions'] = 200 # TODO used to limit generators
+        params['name_diversity_ratio'] = categories_params.related.name_diversity_ratio
+        params['max_per_type'] = categories_params.related.max_per_type
+        params['enable_learning_to_rank'] = categories_params.related.enable_learning_to_rank
+        
         min_available_fraction = 0.0
 
         name = InputName(name, params)
@@ -170,8 +174,8 @@ class Generator:
         all_suggestions = []
         for category, meta_sampler in self.grouped_metasamplers.items(): #TODO: without other, for related set other values
             print(category)
+            category_params = getattr(categories_params, category)
             try:
-                category_params = getattr(categories_params, category)
                 min_suggestions = category_params.min_suggestions
                 max_suggestions = category_params.max_suggestions
             except AttributeError: #RelatedCategoryParams

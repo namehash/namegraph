@@ -256,6 +256,7 @@ async def root(name: GroupedNameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
+    
 
     generator.clear_cache()
     result = generator.generate_grouped_names(name.label,
