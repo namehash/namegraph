@@ -101,7 +101,7 @@ from models import (
     Suggestion,
     SampleCollectionMembers,
     GroupedSuggestions,
-    Top10CollectionMembersRequest,
+    Top10CollectionMembersRequest, GroupedNameRequest,
 )
 
 from collection_models import (
@@ -228,7 +228,7 @@ def convert_to_grouped_suggestions_format(
     return response
 
 
-@app.post("/grouped_by_category", response_model=GroupedSuggestions)
+@app.post("/grouped_by_category_old", response_model=GroupedSuggestions)
 async def root(name: NameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
@@ -249,6 +249,26 @@ async def root(name: NameRequest):
 
     return response
 
+@app.post("/grouped_by_category", response_model=GroupedSuggestions)
+async def root(name: GroupedNameRequest):
+    seed_all(name.label)
+    log_entry = LogEntry(generator.config)
+    logger.debug(f'Request received: {name.label}')
+    params = name.params.model_dump() if name.params is not None else dict()
+    params['mode'] = 'grouped_' + params['mode']
+
+    generator.clear_cache()
+    result = generator.generate_names(name.label,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions,
+                                      min_available_fraction=name.min_primary_fraction,
+                                      params=params)
+
+    response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
+    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
+
+    return response
 
 @app.post("/sample_collection_members", response_model=list[Suggestion])
 async def sample_collection_members(sample_command: SampleCollectionMembers):

@@ -8,9 +8,11 @@ from web_api import generator
 
 class UserInfo(BaseModel):
     user_wallet_addr: Optional[str] = Field(None, title='wallet (public) address of the user',
-                                            description='might be null', examples=['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'])
+                                            description='might be null',
+                                            examples=['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'])
     user_ip_addr: Optional[IPvAnyAddress] = Field(None, title='IP address of the user',
-                                            description='either IPv4 or IPv6; might be null', examples=['192.168.0.1'])
+                                                  description='either IPv4 or IPv6; might be null',
+                                                  examples=['192.168.0.1'])
     session_id: Optional[str] = Field(None, title='', description='might be null',
                                       examples=['d6374908-94c3-420f-b2aa-6dd41989baef'])
 
@@ -41,6 +43,50 @@ class Params(BaseModel):
                           'if null, then no penalty will be added')
 
 
+class OtherCategoriesParams(BaseModel):
+    min_suggestions: int = Field(10, ge=0, le=30,
+                                 title='minimal number of suggestions to generate in one specific category. '
+                                       'If the number of suggestions generated for this category is below '
+                                       'min_suggestions then the entire category should be filtered out from the response.')
+    max_suggestions: int = Field(20, ge=0, le=30,
+                                 title='maximal number of suggestions to generate in one specific category')
+
+
+class GroupedNameRequest(BaseModel):
+    label: str = Field(title='input label', description='cannot contain dots (.)',
+                       pattern='^[^.]*$', examples=['zeus'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
+    #                                     ge=0.0, le=1.0,
+    #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
+    #                                                 'primary names will be generated')
+    params: Optional[Params] = Field(None, title='pipeline parameters',
+                                     description='includes all the parameters for all nodes of the pipeline')
+    max_related_collections: int = Field(5, ge=0, le=10,
+                                         title='max number of related collections returned. '
+                                               'If 0 it effectively turns off any related collection search.')
+    max_names_per_related_collection: int = Field(5, ge=1, le=10,
+                                                  title='max number of names returned in any related collection')
+    max_recursive_related_collections: int = Field(5, ge=0, le=10,
+                                                   title='Set to 0 to disable the "recursive related collection search". '
+                                                         'When set to a value between 1 and 10, '
+                                                         'for each related collection we find, '
+                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
+                                                         'to the related collection.')
+    other_categories_params: dict[
+        Literal[
+            'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'], OtherCategoriesParams] = Field(
+        title='controls the results of other categories than related (except for "Other Names")')
+    min_total_suggestions: int = Field(50, ge=0, le=100,
+                                       title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"')
+
+
+class RecursiveRelatedCollection(BaseModel):
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
+
+
 class NameRequest(BaseModel):
     label: str = Field(title='input label', description='cannot contain dots (.)',
                        pattern='^[^.]*$', examples=['zeus'])
@@ -63,14 +109,14 @@ class Metadata(BaseModel):
     pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
     interpretation: list[str | None] = Field(title='interpretation tags',
                                              description='list of interpretation tags based on which the '
-                                                  'suggestion has been generated')
+                                                         'suggestion has been generated')
     cached_status: str = Field(title='cached status',
                                description='name\'s status cached at the time of application startup')
     categories: list[str] = Field(title='domain category',
                                   description='can be either available, taken, recently released or on sale')
     cached_interesting_score: Optional[float] = Field(title='cached interesting score',
-                                            description='name\'s interesting score cached at the time of '
-                                                        'application startup')
+                                                      description='name\'s interesting score cached at the time of '
+                                                                  'application startup')
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
     )
@@ -130,6 +176,7 @@ class SampleCollectionMembers(BaseModel):
     seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
                       title='seed for random number generator',
                       description='if not provided (but can\'t be null), random seed will be generated')
+
 
 class Top10CollectionMembersRequest(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')

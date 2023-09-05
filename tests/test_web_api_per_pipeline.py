@@ -291,10 +291,10 @@ class TestCollections:
         assert "Yu-Gi-Oh! video games" not in collection_names
         assert "Oh Yeon-seo filmography" not in collection_names
 
-    def test_prod_grouped_by_category(self, test_client):
+    def test_prod_grouped_by_category_old(self, test_client):
         client = test_client
 
-        response = client.post("/grouped_by_category",
+        response = client.post("/grouped_by_category_old",
                                json={"label": "virgil abloh", "min_suggestions": 100, "max_suggestions": 100,
                                      "metadata": True,
                                      "params": {"mode": "full"}}
