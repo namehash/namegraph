@@ -430,7 +430,7 @@ class TestGroupedSuggestions:
     def test_prod_order(self, prod_test_client, name, metadata, n_suggestions, response_code):
         client = prod_test_client
 
-        response = client.post("/grouped_by_category_old",
+        response = client.post("/grouped_by_category",
                                json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
                                      "metadata": metadata, "params": {"mode": "instant"}})
 
@@ -488,7 +488,7 @@ class TestGroupedSuggestions:
     def test_prod_disabled_strategies(self, prod_test_client, name, metadata, n_suggestions, response_code):
         client = prod_test_client
 
-        response = client.post("/grouped_by_category_old",
+        response = client.post("/grouped_by_category",
                                json={"label": name, "min_suggestions": n_suggestions, "max_suggestions": n_suggestions,
                                      "metadata": metadata, "params": {"mode": "instant"}})
 

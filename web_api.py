@@ -227,7 +227,7 @@ def convert_to_grouped_suggestions_format(
     return response
 
 
-@app.post("/grouped_by_category_old", response_model=GroupedSuggestions)
+@app.post("/grouped_by_category", response_model=GroupedSuggestions)
 async def root(name: NameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
@@ -249,7 +249,7 @@ async def root(name: NameRequest):
     return response
 
 
-@app.post("/grouped_by_category", response_model=GroupedSuggestions)
+@app.post("/suggestions_by_category", response_model=GroupedSuggestions)
 async def root(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
