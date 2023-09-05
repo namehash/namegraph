@@ -299,7 +299,7 @@ class TestCollections:
     def test_prod_grouped_by_category_old(self, test_client):
         client = test_client
 
-        response = client.post("/suggestions_by_category",
+        response = client.post("/grouped_by_category",
                                json={"label": "virgil abloh", "min_suggestions": 100, "max_suggestions": 100,
                                      "metadata": True,
                                      "params": {"mode": "full"}}
