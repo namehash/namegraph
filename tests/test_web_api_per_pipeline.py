@@ -324,9 +324,8 @@ class TestGrouped:
 
         response = client.post("/suggestions_by_category",
                                json={"label": "virgil abloh", 
-                                     "metadata": True,
-                                     "params": {"mode": "full"},
-                                     "other_categories_params": {}}
+                                     "params": {"mode": "full", "metadata": True,},
+                                     "categories": {}}
                                )
         print(response.json())
         assert response.status_code == 200

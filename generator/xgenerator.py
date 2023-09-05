@@ -141,17 +141,17 @@ class Generator:
             max_related_collections: int = 5,
             max_names_per_related_collection: int = 5,
             max_recursive_related_collections: int = 5,
-            other_categories_params: dict[str, Any] = None,
+            categories_params = None,
             min_total_suggestions: float = 50,
             params: dict[str, Any] = None
     ) -> list[GeneratedName]:
         params = params or {}
-        other_categories_params = other_categories_params or {}
+        categories_params = categories_params or {}
 
         params['max_related_collections'] = max_related_collections
         params['max_names_per_related_collection'] = max_names_per_related_collection
         params['max_recursive_related_collections'] = max_recursive_related_collections
-        params['other_categories_params'] = other_categories_params
+        params['categories_params'] = categories_params
         params['min_total_suggestions'] = min_total_suggestions
         params['max_suggestions'] = 200 # TODO used to limit generators
         min_available_fraction = 0.0
@@ -168,13 +168,15 @@ class Generator:
         logger.info('Start sampling')
  
         all_suggestions = []
-        for category, meta_sampler in self.grouped_metasamplers.items():
+        for category, meta_sampler in self.grouped_metasamplers.items(): #TODO: without other, for related set other values
+            print(category)
             try:
-                min_suggestions = other_categories_params[category].min_suggestions
-                max_suggestions = other_categories_params[category].max_suggestions
-            except KeyError:
+                category_params = getattr(categories_params, category)
+                min_suggestions = category_params.min_suggestions
+                max_suggestions = category_params.max_suggestions
+            except AttributeError: #RelatedCategoryParams
                 min_suggestions = 0
-                max_suggestions = 30
+                max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
             
             #TODO should they use the same set of suggestions (for deduplications)
             suggestions = meta_sampler.sample(name, 'weighted-sampling',
