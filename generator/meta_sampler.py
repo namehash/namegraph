@@ -180,3 +180,122 @@ class MetaSampler:
                     break
 
         return all_suggestions
+
+    def sample_grouped(self, name: InputName, sorter_name: str, min_suggestions: int, max_suggestions: int,
+               min_available_fraction: float) -> list[GeneratedName]:
+        min_available_required = int(min_suggestions * min_available_fraction)
+
+        mode = name.params.get('mode', 'full')
+
+        types_lang_weights = {}
+        interpretation_weights = {}
+        for type_lang, weight in name.types_probabilities.items():
+            if weight > 0:
+                types_lang_weights[type_lang] = weight
+                interpretation_weights[type_lang] = {}
+                for interpretation in name.interpretations[type_lang]:
+                    interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
+
+        global_limits = self.get_global_limits(mode, max_suggestions)
+        print('global_limits', global_limits)
+
+        sorters = {}
+        for (interpretation_type, lang), interpretations in name.interpretations.items():
+            for interpretation in interpretations:
+                weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang, mode)
+                # logger.info(f'weights {weights}')
+                sorters[interpretation] \
+                    = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
+
+        available_added = 0
+
+        all_suggestions = []
+        all_suggestions_str = set()
+        joined_input_name = name.input_name.replace(' ', '')
+
+
+        print(types_lang_weights)
+        print(interpretation_weights)
+        print(sorters)
+        while True:
+            if len(all_suggestions) >= max_suggestions or not types_lang_weights:
+                break
+
+            # sample interpretation
+            sampled_type_lang = random.choices(
+                list(types_lang_weights.keys()),
+                weights=list(types_lang_weights.values())
+            )[0]
+
+            sampled_interpretation = random.choices(
+                list(interpretation_weights[sampled_type_lang].keys()),
+                weights=list(interpretation_weights[sampled_type_lang].values())
+            )[0]
+            print(sampled_type_lang, sampled_interpretation)
+            while True:
+                try:
+                    slots_left = max_suggestions - len(all_suggestions)
+                    if slots_left <= 0:
+                        break
+
+                    # sample and run pipeline
+                    sampled_pipeline = next(sorters[sampled_interpretation])
+                    print('sampled_pipeline', sampled_pipeline)
+
+                    # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
+                    if global_limits[sampled_pipeline.pipeline_name] is not None and \
+                            global_limits[sampled_pipeline.pipeline_name] == 0:
+                        sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                        print('global limit reached')
+                        continue
+
+                    suggestions = sampled_pipeline.apply(name, sampled_interpretation)
+
+                    try:
+                        suggestion = next(suggestions)
+                        print('-', suggestion)
+                        suggestion.status = self.domains.get_name_status(str(suggestion))
+                        # skip until it is not a duplicate and until it is "available" in case there are
+                        # just enough free slots left to fulfill minimal available number of suggestions requirement
+                        while True:
+                            while str(suggestion) in all_suggestions_str or str(suggestion) == joined_input_name \
+                                    or (suggestion.status != Domains.AVAILABLE
+                                        and available_added + slots_left <= min_available_required):
+                                suggestion = next(suggestions)
+                                print('-', suggestion)
+                                suggestion.status = self.domains.get_name_status(str(suggestion))
+                            if not is_ens_normalized(str(suggestion)):
+                                # log suggestions which are not ens normalized
+                                logger.warning(f"suggestion not ens-normalized: '{str(suggestion)}'; "
+                                               f"metadata: {suggestion.dict()}")
+                                suggestion = next(suggestions)
+                                suggestion.status = self.domains.get_name_status(str(suggestion))
+                            else:
+                                break
+                    except StopIteration:
+                        # in case the suggestions have run out we simply mark the pipeline as empty
+                        # and proceed to sample another non-empty pipeline
+                        print('pipeline empty')
+                        sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                        continue
+
+                    # on the other hand, if the suggestion is alright, then we add it to the list
+                    # and update corresponding counters and variables
+                    if suggestion.status == Domains.AVAILABLE:
+                        available_added += 1
+
+                    all_suggestions.append(suggestion)
+                    all_suggestions_str.add(str(suggestion))
+                    if global_limits[sampled_pipeline.pipeline_name] is not None:
+                        global_limits[sampled_pipeline.pipeline_name] -= 1
+                    break
+
+                except StopIteration:
+                    # removes entries from the sampling population because they are emptied
+                    del interpretation_weights[sampled_type_lang][sampled_interpretation]
+                    if not interpretation_weights[sampled_type_lang]:
+                        del interpretation_weights[sampled_type_lang]
+                        del types_lang_weights[sampled_type_lang]
+                    break
+
+        return all_suggestions
