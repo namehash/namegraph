@@ -183,7 +183,7 @@ class Generator:
                 max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
             
             #TODO should they use the same set of suggestions (for deduplications)
-            suggestions = meta_sampler.sample(name, 'weighted-sampling',
+            suggestions = meta_sampler.sample_grouped(name, 'weighted-sampling',
                                                   min_suggestions=min_suggestions,
                                                   max_suggestions=max_suggestions,
                                                   min_available_fraction=min_available_fraction)
@@ -199,6 +199,8 @@ class Generator:
             #                                           min_available_fraction=min_available_fraction)
 
         logger.info(f'Generated suggestions: {len(all_suggestions)}')
+
+        #TODO remove categories with less than min_suggestions suggestions
 
         if len(all_suggestions) < min_total_suggestions:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
