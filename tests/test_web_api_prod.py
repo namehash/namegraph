@@ -447,13 +447,13 @@ class TestGroupedSuggestions:
 
         for i, gcat in enumerate(categories):
             assert 'type' in gcat
-            assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild')
+            assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other')
             if gcat['type'] not in actual_type_order:
                 actual_type_order.append(gcat['type'])
 
             assert 'name' in gcat
             if gcat['type'] != 'related':
-                assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild')
+                assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild', 'Other Names')
 
             assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
@@ -471,7 +471,7 @@ class TestGroupedSuggestions:
 
         # ensure the correct order of types (allow skipping types)
         expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
-                                                      'community', 'expand', 'gowild'] if gcat_type in actual_type_order]
+                                                      'community', 'expand', 'gowild', 'other'] if gcat_type in actual_type_order]
         assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
 
 
