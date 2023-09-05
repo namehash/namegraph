@@ -72,10 +72,8 @@ class MetaSampler:
             global_limits[pipeline.pipeline_name] = limit
         return global_limits
 
-    def sample(self, name: InputName, sorter_name: str) -> list[GeneratedName]:
-        min_suggestions = name.params['min_suggestions']
-        max_suggestions = name.params['max_suggestions']
-        min_available_fraction = name.params['min_available_fraction']
+    def sample(self, name: InputName, sorter_name: str, min_suggestions: int, max_suggestions: int,
+               min_available_fraction: float) -> list[GeneratedName]:
         min_available_required = int(min_suggestions * min_available_fraction)
 
         mode = name.params.get('mode', 'full')

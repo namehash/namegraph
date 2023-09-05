@@ -222,6 +222,11 @@ def collection_test_pipelines():
     yield
     del os.environ['CONFIG_OVERRIDES']
 
+@pytest.fixture(scope='class')
+def grouped_test_pipelines():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_grouped_fast'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
 
 def _extract_titles(json_obj: list[dict]) -> list[str]:
     return [name["metadata"]["collection_title"] for name in json_obj]
@@ -310,3 +315,27 @@ class TestCollections:
         collection_titles = [gcat['collection_title'] for gcat in categories if gcat['type'] == 'related']
         print(collection_titles)
         assert 'Yu-Gi-Oh! characters' not in collection_titles
+
+@mark.usefixtures("grouped_test_pipelines")
+@mark.integration_test
+class TestGrouped:
+    def test_prod_grouped_by_category(self, test_client):
+        client = test_client
+
+        response = client.post("/grouped_by_category",
+                               json={"label": "virgil abloh", 
+                                     "metadata": True,
+                                     "params": {"mode": "full"},
+                                     "other_categories_params": {}}
+                               )
+        print(response.json())
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+        # assert 'categories' in response_json
+        # categories = response_json['categories']
+        # 
+        # collection_titles = [gcat['collection_title'] for gcat in categories if gcat['type'] == 'related']
+        # print(collection_titles)
+        # assert 'Yu-Gi-Oh! characters' not in collection_titles
