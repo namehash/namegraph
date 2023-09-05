@@ -15,7 +15,10 @@ class UserInfo(BaseModel):
                                                   examples=['192.168.0.1'])
     session_id: Optional[str] = Field(None, title='', description='might be null',
                                       examples=['d6374908-94c3-420f-b2aa-6dd41989baef'])
-
+    user_ip_country: Optional[str] = Field(None, title='user country code',
+                                   description="A two-character ISO 3166-1 country code for the country associated "
+                                               "with the location of the requester's public IP address; might be null",
+                                   examples=['us'])
     @field_serializer('user_ip_addr')
     def serialize_user_ip_addr(self, user_ip_addr: IPvAnyAddress, _info) -> str:
         return str(user_ip_addr)
@@ -23,7 +26,7 @@ class UserInfo(BaseModel):
 
 class Params(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    country: Optional[str] = Field(None, title='user county code',
+    country: Optional[str] = Field(None, title='user country code',
                                    description="A two-character ISO 3166-1 country code for the country associated "
                                                "with the location of the requester's public IP address; might be null",
                                    examples=['us'])
@@ -42,72 +45,82 @@ class Params(BaseModel):
               description='adds penalty to collections with the same type as other collections\n'
                           'if null, then no penalty will be added')
 
+class GroupedParams(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    mode: str = Field('full', title='request mode: instant, domain_detail, full',
+                      pattern=r'^(instant|domain_detail|full)$',
+                      description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
+    metadata: bool = Field(True, title='return all the metadata in response')
 
 class OtherCategoriesParams(BaseModel):
-    min_suggestions: int = Field(10, ge=0, le=30,
+    min_suggestions: int = Field(2, ge=0, le=30,
                                  title='minimal number of suggestions to generate in one specific category. '
                                        'If the number of suggestions generated for this category is below '
                                        'min_suggestions then the entire category should be filtered out from the response.')
-    max_suggestions: int = Field(20, ge=0, le=30,
+    max_suggestions: int = Field(10, ge=0, le=30,
                                  title='maximal number of suggestions to generate in one specific category')
 
 
-class GroupedNameRequest(BaseModel):
-    label: str = Field(title='input label', description='cannot contain dots (.)',
-                       pattern='^[^.]*$', examples=['zeus'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
-    #                                     ge=0.0, le=1.0,
-    #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
-    #                                                 'primary names will be generated')
-    params: Optional[Params] = Field(None, title='pipeline parameters',
-                                     description='includes all the parameters for all nodes of the pipeline')
-    max_related_collections: int = Field(5, ge=0, le=10,
+class OtherCategoryParams(BaseModel):
+    min_suggestions: int = Field(6, ge=0, le=30,
+                                 title='minimal number of suggestions to generate in one specific category. '
+                                       'If the number of suggestions generated for this category is below '
+                                       'min_suggestions then the entire category should be filtered out from the response.')
+    max_suggestions: int = Field(10, ge=0, le=30,
+                                 title='maximal number of suggestions to generate in one specific category')
+    min_total_suggestions: int = Field(50, ge=0, le=100,
+                                       title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"')
+
+
+class RelatedCategoryParams(BaseModel):
+    max_related_collections: int = Field(6, ge=0, le=10,
                                          title='max number of related collections returned. '
                                                'If 0 it effectively turns off any related collection search.')
-    max_names_per_related_collection: int = Field(5, ge=1, le=10,
+    max_names_per_related_collection: int = Field(10, ge=1, le=10,
                                                   title='max number of names returned in any related collection')
-    max_recursive_related_collections: int = Field(5, ge=0, le=10,
+    max_recursive_related_collections: int = Field(3, ge=0, le=10,
                                                    title='Set to 0 to disable the "recursive related collection search". '
                                                          'When set to a value between 1 and 10, '
                                                          'for each related collection we find, '
                                                          'we also do a (depth 1 recursive) lookup for this many related collections '
                                                          'to the related collection.')
-    other_categories_params: dict[
-        Literal[
-            'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'], OtherCategoriesParams] = Field(
-        title='controls the results of other categories than related (except for "Other Names")', examples=[{
-            "wordplay": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "alternates": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "emojify": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "community": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "expand": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "gowild": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            },
-            "other": {
-                "min_suggestions": 10,
-                "max_suggestions": 20
-            }
-        }])
-    min_total_suggestions: int = Field(50, ge=0, le=100,
-                                       title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"')
+    enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
+                                          description='if true, the results will be sorted by '
+                                                      'learning to rank algorithm')
+    name_diversity_ratio: Optional[float] = \
+        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
+              description='adds penalty to collections with similar names to other collections\n'
+                          'if null, then no penalty will be added')
+    max_per_type: Optional[int] = \
+        Field(2, examples=[2], ge=1, title='collection diversity parameter based on collection types',
+              description='adds penalty to collections with the same type as other collections\n'
+                          'if null, then no penalty will be added')
+
+
+class CategoriesParams(BaseModel):
+    related: Optional[RelatedCategoryParams] = Field(None, title='related category parameters')
+    wordplay: Optional[OtherCategoriesParams] = Field(None, title='wordplay category parameters')
+    alternates: Optional[OtherCategoriesParams] = Field(None, title='alternates category parameters')
+    emojify: Optional[OtherCategoriesParams] = Field(None, title='emojify category parameters')
+    community: Optional[OtherCategoriesParams] = Field(None, title='community category parameters')
+    expand: Optional[OtherCategoriesParams] = Field(None, title='expand category parameters')
+    gowild: Optional[OtherCategoriesParams] = Field(None, title='gowild category parameters')
+    other: Optional[OtherCategoryParams] = Field(None, title='other category parameters')
+
+
+class GroupedNameRequest(BaseModel):
+    label: str = Field(title='input label', description='cannot contain dots (.)',
+                       pattern='^[^.]*$', examples=['zeus'])
+    
+    # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
+    #                                     ge=0.0, le=1.0,
+    #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
+    #                                                 'primary names will be generated')
+    params: Optional[GroupedParams] = Field(None, title='pipeline parameters',
+                                     description='includes all the parameters for all nodes of the pipeline')
+
+    categories: CategoriesParams = Field(
+        title='controls the results of other categories than related (except for "Other Names")')
 
 
 class RecursiveRelatedCollection(BaseModel):
