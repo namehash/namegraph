@@ -94,6 +94,7 @@ generation:
       - FlagAffixGenerator
       - KeycapGenerator
       - SymbolGenerator
+      - PersonNameEmojifyGenerator
     community:
       - SubstringMatchGenerator
       - OnSaleMatchGenerator
@@ -103,13 +104,12 @@ generation:
       - SuffixGenerator
       - SpecialCharacterAffixGenerator
       - RhymesGenerator
+      - PersonNameExpandGenerator
     gowild:
       - LeetGenerator
       - RandomAvailableNameGenerator
       - EasterEggGenerator
       - ReverseGenerator
-    dynamic_:  # generator needs to implement get_grouping_category(output_name: str) method
-      - PersonNameGenerator
   grouping_categories_order:
     - related
     - alternates

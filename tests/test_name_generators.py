@@ -649,6 +649,7 @@ def test_rhymes_generator():
         assert all([name not in generated_names for name in discarded_names])
 
 
+@mark.skip(reason="not using dynamic grouping category anymore (PersonNameGenerator)")
 def test_person_name_dynamic_grouping_category():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
@@ -671,6 +672,8 @@ def test_person_name_emojify_generator(tokens: tuple[str, ...], gender: str):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pn = PersonNameEmojifyGenerator(config)
+        assert pn.get_grouping_category() == 'emojify'
+
         generated_names = list(pn.generate(tokens, gender))
         for name_tokens in generated_names:
             name = ''.join(name_tokens)
@@ -689,6 +692,8 @@ def test_person_name_expand_generator(tokens: tuple[str, ...], gender: str):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pn = PersonNameExpandGenerator(config)
+        assert pn.get_grouping_category() == 'expand'
+
         generated_names = list(pn.generate(tokens, gender))
         for name_tokens in generated_names:
             name = ''.join(name_tokens)
