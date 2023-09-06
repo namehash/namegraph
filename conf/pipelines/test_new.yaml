@@ -170,8 +170,8 @@
     other:
       default: 0
 -
-  name: person-name
-  generator: PersonNameGenerator
+  name: person-name-emojify
+  generator: PersonNameEmojifyGenerator
   filters:
     - SubnameFilter
     - ValidNameLengthFilter
@@ -179,7 +179,20 @@
     ngram:
       default: 0
     person:
-      default: 5
+      default: 2
+    other:
+      default: 0
+-
+  name: person-name-expand
+  generator: PersonNameExpandGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 3
     other:
       default: 0
 -
