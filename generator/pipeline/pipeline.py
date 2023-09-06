@@ -58,6 +58,11 @@ class Pipeline:
         except ConfigAttributeError:
             self.global_limits = {}
 
+        try:  # copy to internal dict
+            self.category_limits = dictconfig_to_dict(definition.category_limits)
+        except ConfigAttributeError:
+            self.category_limits = {}
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
