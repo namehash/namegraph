@@ -60,13 +60,16 @@ class MetaSampler:
         self.domains = Domains(config)
         self.pipelines = pipelines
 
-    def get_global_limits(self, mode: str, min_suggestions: int):
+    def get_global_limits(self, mode: str, min_suggestions: int, category_limits=False):
         global_limits = {}
         for pipeline in self.pipelines:
-            limit = pipeline.global_limits.get(mode, None)
-            if limit is None and mode.startswith('grouped_'):
-                # use ungrouped mode limit as default limit (if key 'grouped_{mode}' does not exist)
-                limit = pipeline.global_limits.get(mode.removeprefix('grouped_'), None)
+            if category_limits:
+                limit = pipeline.category_limits.get(mode, None)
+            else:
+                limit = pipeline.global_limits.get(mode, None)
+                if limit is None and mode.startswith('grouped_'):
+                    # use ungrouped mode limit as default limit (if key 'grouped_{mode}' does not exist)
+                    limit = pipeline.global_limits.get(mode.removeprefix('grouped_'), None)
             if isinstance(limit, float):
                 limit = int(min_suggestions * limit)
             global_limits[pipeline.pipeline_name] = limit
@@ -196,7 +199,7 @@ class MetaSampler:
                 for interpretation in name.interpretations[type_lang]:
                     interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
-        global_limits = self.get_global_limits(mode, max_suggestions)
+        global_limits = self.get_global_limits(mode, max_suggestions, category_limits=True)
         logger.info(f'global_limits {global_limits}')
 
         sorters = {}
