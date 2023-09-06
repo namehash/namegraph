@@ -24,6 +24,8 @@ from generator.generation import (
     LeetGenerator,
     KeycapGenerator,
     PersonNameGenerator,
+    PersonNameEmojifyGenerator,
+    PersonNameExpandGenerator,
     SymbolGenerator,
     EasterEggGenerator,
     CollectionGenerator,
@@ -655,3 +657,39 @@ def test_person_name_dynamic_grouping_category():
         assert pn.get_grouping_category(output_name='piotrbyczong') == 'expand'
         assert pn.get_grouping_category(output_name='piotr🐂byczong') == 'emojify'
         assert pn.get_grouping_category(output_name='piotrbyczońg') == 'emojify'  # non-ascii -> emojify
+
+
+@mark.parametrize(
+    "tokens, gender",
+    [
+        (('david', 'gilmour'), 'M'),
+        (('amy', 'whinehouse'), 'F'),
+        (('pink', 'floyd'), None),
+    ]
+)
+def test_person_name_emojify_generator(tokens: tuple[str, ...], gender: str):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameEmojifyGenerator(config)
+        generated_names = list(pn.generate(tokens, gender))
+        for name_tokens in generated_names:
+            name = ''.join(name_tokens)
+            assert not name.isascii()
+
+
+@mark.parametrize(
+    "tokens, gender",
+    [
+        (('david', 'gilmour'), 'M'),
+        (('amy', 'whinehouse'), 'F'),
+        (('pink', 'floyd'), None),
+    ]
+)
+def test_person_name_expand_generator(tokens: tuple[str, ...], gender: str):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameExpandGenerator(config)
+        generated_names = list(pn.generate(tokens, gender))
+        for name_tokens in generated_names:
+            name = ''.join(name_tokens)
+            assert name.isascii()

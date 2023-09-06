@@ -535,6 +535,7 @@ def test_collection_members_sampling(prod_test_client, collection_id, max_sample
     assert len(names) == len(set(names))
 
 
+@pytest.mark.integration_test
 def test_fetching_top_collection_members(prod_test_client):
     client = prod_test_client
     collection_id = 'Q15102072'
