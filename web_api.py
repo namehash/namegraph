@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-app = FastAPI(title="NameGenerator API") #TODO add version
+app = FastAPI(title="NameGenerator API")  # TODO add version
 
 
 def init():
@@ -164,6 +164,52 @@ async def root(name: NameRequest):
     return response
 
 
+category_fancy_names = {
+    'wordplay': 'Word Play',
+    'alternates': 'Alternates',
+    'emojify': '😍 Emojify',
+    'community': 'Community',
+    'expand': 'Expand',
+    'gowild': 'Go Wild',
+    'other': 'Other Names'
+}
+
+
+def convert_grouped_to_grouped_suggestions_format(
+        related_suggestions: dict[str, list[GeneratedName]],
+        grouped_suggestions: dict[str, list[GeneratedName]],
+        include_metadata: bool = True
+) -> dict[str, list[dict]]:
+    for category, suggestions in related_suggestions.items():
+        related_suggestions[category] = convert_to_suggestion_format(suggestions, include_metadata=True)
+    for category, suggestions in grouped_suggestions.items():
+        grouped_suggestions[category] = convert_to_suggestion_format(suggestions, include_metadata=True)
+
+    grouped_response: list[dict] = []
+    for gcat in generator.config.generation.grouping_categories_order:
+        if gcat == 'related':
+            for collection_key in related_suggestions:
+                grouped_response.append({
+                    'suggestions': related_suggestions[collection_key] if include_metadata else
+                    [{'name': s['name']} for s in related_suggestions[collection_key]],
+                    'type': 'related',
+                    'name': collection_key[0],
+                    'collection_title': collection_key[0],
+                    'collection_id': collection_key[1],
+                    'collection_members_count': collection_key[2],
+                })
+        elif gcat in grouped_suggestions:
+            grouped_response.append({
+                'suggestions': grouped_suggestions[gcat] if include_metadata else
+                [{'name': s['name']} for s in grouped_suggestions[gcat]],
+                'type': gcat,
+                'name': category_fancy_names[gcat],
+            })
+
+    response = {'categories': grouped_response}
+    return response
+
+
 def convert_to_grouped_suggestions_format(
         names: List[GeneratedName],
         include_metadata: bool = True
@@ -171,15 +217,7 @@ def convert_to_grouped_suggestions_format(
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
         c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other']}
-    category_fancy_names = {
-        'wordplay': 'Word Play',
-        'alternates': 'Alternates',
-        'emojify': '😍 Emojify',
-        'community': 'Community',
-        'expand': 'Expand',
-        'gowild': 'Go Wild',
-        'other': 'Other Names'
-    }
+
     related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     collection_categories_order = []
 
@@ -256,19 +294,21 @@ async def root(name: GroupedNameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
-    
 
     generator.clear_cache()
-    result = generator.generate_grouped_names(name.label,
-                                              max_related_collections=name.categories.related.max_related_collections,
-                                              max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
-                                              max_recursive_related_collections=name.categories.related.max_recursive_related_collections,
-                                              categories_params=name.categories,
-                                              min_total_suggestions=name.categories.other.min_total_suggestions,
-                                              params=params)
+    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+        name.label,
+        max_related_collections=name.categories.related.max_related_collections,
+        max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
+        max_recursive_related_collections=name.categories.related.max_recursive_related_collections,
+        categories_params=name.categories,
+        min_total_suggestions=name.categories.other.min_total_suggestions,
+        params=params
+    )
 
-    response = convert_to_grouped_suggestions_format(result, include_metadata=name.params.metadata)
-    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
+    response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
+                                                             include_metadata=name.params.metadata)
+    # logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result))) #TODO
 
     return response
 

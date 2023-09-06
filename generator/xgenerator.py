@@ -1,4 +1,6 @@
+import collections
 import logging
+from itertools import islice
 from typing import List, Any
 
 import wordninja
@@ -79,8 +81,6 @@ class Generator:
                     self.pipelines_grouped[category] = []
                 self.pipelines_grouped[category].append(pipeline)
 
-        print(self.pipelines_grouped)
-
         # 2. Within each category: sample type and lang of interpretation, sample interpretaion with this type and lang. Sample pipeline (weights of pipelines depends on type and language. Do it in parallel?
         self.grouped_metasamplers = {}
         for category, pipelines in self.pipelines_grouped.items():
@@ -144,7 +144,7 @@ class Generator:
             categories_params = None,
             min_total_suggestions: float = 50,
             params: dict[str, Any] = None
-    ) -> list[GeneratedName]:
+    ) -> tuple[dict[str, list[GeneratedName]], dict[str, list[GeneratedName]]]:
         params = params or {}
         categories_params = categories_params or {}
 
@@ -153,11 +153,11 @@ class Generator:
         params['max_recursive_related_collections'] = max_recursive_related_collections
         params['categories_params'] = categories_params
         params['min_total_suggestions'] = min_total_suggestions
-        params['max_suggestions'] = 200 # TODO used to limit generators
+        params['max_suggestions'] = 200  # TODO used to limit generators
         params['name_diversity_ratio'] = categories_params.related.name_diversity_ratio
         params['max_per_type'] = categories_params.related.max_per_type
         params['enable_learning_to_rank'] = categories_params.related.enable_learning_to_rank
-        
+
         min_available_fraction = 0.0
 
         name = InputName(name, params)
@@ -170,45 +170,67 @@ class Generator:
         logger.info(str(name.types_probabilities))
 
         logger.info('Start sampling')
- 
-        all_suggestions = []
-        for category, meta_sampler in self.grouped_metasamplers.items(): #TODO: without other, for related set other values
-            print(category)
+
+        grouped_suggestions = {}
+        for category, meta_sampler in self.grouped_metasamplers.items():
             category_params = getattr(categories_params, category)
             try:
                 min_suggestions = category_params.min_suggestions
                 max_suggestions = category_params.max_suggestions
-            except AttributeError: #RelatedCategoryParams
+            except AttributeError:  # RelatedCategoryParams
                 min_suggestions = 0
                 max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
-            
-            #TODO should they use the same set of suggestions (for deduplications)
+
+            # TODO should they use the same set of suggestions (for deduplications)
             suggestions = meta_sampler.sample_grouped(name, 'weighted-sampling',
-                                                  min_suggestions=min_suggestions,
-                                                  max_suggestions=max_suggestions,
-                                                  min_available_fraction=min_available_fraction)
+                                                      min_suggestions=min_suggestions,
+                                                      max_suggestions=max_suggestions,
+                                                      min_available_fraction=min_available_fraction)
             logger.info(f'Generated suggestions: {len(suggestions)}')
-            all_suggestions.extend(suggestions)
+            grouped_suggestions[category] = suggestions
 
-        #agregate duplicates
-        all_suggestions = aggregate_duplicates(all_suggestions)
+        # split related
+        related_suggestions = collections.defaultdict(list)
+        for suggestion in grouped_suggestions['related']:
+            related_suggestions[
+                (suggestion.collection_title, suggestion.collection_id, suggestion.collection_members_count)].append(
+                suggestion)
+        del grouped_suggestions['related']
 
-            # all_suggestions = self.metasampler.sample(name, 'weighted-sampling',
-            #                                           min_suggestions=min_suggestions,
-            #                                           max_suggestions=max_suggestions,
-            #                                           min_available_fraction=min_available_fraction)
+        # TODO agregate duplicates
+        # all_suggestions = aggregate_duplicates(all_suggestions)
 
-        logger.info(f'Generated suggestions: {len(all_suggestions)}')
+        # remove categories with less than min_suggestions suggestions and cap to max_suggestions
+        for category, suggestions in list(grouped_suggestions.items()):
+            category_params = getattr(categories_params, category)
+            min_suggestions = category_params.min_suggestions
+            max_suggestions = category_params.max_suggestions
+            if len(suggestions) < min_suggestions:
+                del grouped_suggestions[category]
+            else:
+                grouped_suggestions[category] = suggestions[:max_suggestions]
 
-        #TODO remove categories with less than min_suggestions suggestions
+        category_params = getattr(categories_params, 'related')
+        for category, suggestions in related_suggestions.items():
+            max_suggestions = category_params.max_names_per_related_collection
+            related_suggestions[category] = suggestions[:max_suggestions]
 
-        if len(all_suggestions) < min_total_suggestions:
+        count_real_suggestions = sum(
+            [len(suggestions) for suggestions in grouped_suggestions.values()] + [len(suggestions) for suggestions in
+                                                                                  related_suggestions.values()])
+
+        logger.info(f'Generated suggestions: {count_real_suggestions}')
+
+        if count_real_suggestions < min_total_suggestions:
+            category_params = getattr(categories_params, 'other')
+            other_suggestions_number = max(
+                min((min_total_suggestions - count_real_suggestions), category_params.max_suggestions),
+                category_params.min_suggestions)
+            logger.info(f'Generated other suggestions: {other_suggestions_number}')
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
-            all_suggestions.extend(only_available_suggestions)  # TODO dodawaj do osiągnięcia limitu
-            logger.info(f'Generated suggestions after random: {len(all_suggestions)}')
-            all_suggestions = aggregate_duplicates(all_suggestions)
+            grouped_suggestions['other'] = list(islice(only_available_suggestions, other_suggestions_number))
 
-        return all_suggestions
+        return related_suggestions, grouped_suggestions
 
     def clear_cache(self) -> None:
         for pipeline in self.pipelines:
