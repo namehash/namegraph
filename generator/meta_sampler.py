@@ -197,7 +197,6 @@ class MetaSampler:
                     interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
         global_limits = self.get_global_limits(mode, max_suggestions)
-        print('global_limits', global_limits)
 
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
@@ -214,9 +213,6 @@ class MetaSampler:
         joined_input_name = name.input_name.replace(' ', '')
 
 
-        print(types_lang_weights)
-        print(interpretation_weights)
-        print(sorters)
         while True:
             if len(all_suggestions) >= max_suggestions or not types_lang_weights:
                 break
@@ -231,7 +227,6 @@ class MetaSampler:
                 list(interpretation_weights[sampled_type_lang].keys()),
                 weights=list(interpretation_weights[sampled_type_lang].values())
             )[0]
-            print(sampled_type_lang, sampled_interpretation)
             while True:
                 try:
                     slots_left = max_suggestions - len(all_suggestions)
@@ -240,20 +235,17 @@ class MetaSampler:
 
                     # sample and run pipeline
                     sampled_pipeline = next(sorters[sampled_interpretation])
-                    print('sampled_pipeline', sampled_pipeline)
 
                     # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
                     if global_limits[sampled_pipeline.pipeline_name] is not None and \
                             global_limits[sampled_pipeline.pipeline_name] == 0:
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
-                        print('global limit reached')
                         continue
 
                     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
 
                     try:
                         suggestion = next(suggestions)
-                        print('-', suggestion)
                         suggestion.status = self.domains.get_name_status(str(suggestion))
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
@@ -262,7 +254,6 @@ class MetaSampler:
                                     or (suggestion.status != Domains.AVAILABLE
                                         and available_added + slots_left <= min_available_required):
                                 suggestion = next(suggestions)
-                                print('-', suggestion)
                                 suggestion.status = self.domains.get_name_status(str(suggestion))
                             if not is_ens_normalized(str(suggestion)):
                                 # log suggestions which are not ens normalized
@@ -275,7 +266,6 @@ class MetaSampler:
                     except StopIteration:
                         # in case the suggestions have run out we simply mark the pipeline as empty
                         # and proceed to sample another non-empty pipeline
-                        print('pipeline empty')
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
                         continue
 
