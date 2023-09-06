@@ -180,18 +180,14 @@ def convert_grouped_to_grouped_suggestions_format(
         grouped_suggestions: dict[str, list[GeneratedName]],
         include_metadata: bool = True
 ) -> dict[str, list[dict]]:
-    for category, suggestions in related_suggestions.items():
-        related_suggestions[category] = convert_to_suggestion_format(suggestions, include_metadata=True)
-    for category, suggestions in grouped_suggestions.items():
-        grouped_suggestions[category] = convert_to_suggestion_format(suggestions, include_metadata=True)
-
     grouped_response: list[dict] = []
     for gcat in generator.config.generation.grouping_categories_order:
         if gcat == 'related':
-            for collection_key in related_suggestions:
+            for collection_key, suggestions in related_suggestions.items():
+                converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
                 grouped_response.append({
-                    'suggestions': related_suggestions[collection_key] if include_metadata else
-                    [{'name': s['name']} for s in related_suggestions[collection_key]],
+                    'suggestions': converted_suggestions if include_metadata else
+                    [{'name': s['name']} for s in converted_suggestions],
                     'type': 'related',
                     'name': collection_key[0],
                     'collection_title': collection_key[0],
@@ -199,9 +195,10 @@ def convert_grouped_to_grouped_suggestions_format(
                     'collection_members_count': collection_key[2],
                 })
         elif gcat in grouped_suggestions:
+            converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
             grouped_response.append({
-                'suggestions': grouped_suggestions[gcat] if include_metadata else
-                [{'name': s['name']} for s in grouped_suggestions[gcat]],
+                'suggestions': converted_suggestions if include_metadata else
+                [{'name': s['name']} for s in converted_suggestions],
                 'type': gcat,
                 'name': category_fancy_names[gcat],
             })
