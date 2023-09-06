@@ -293,7 +293,7 @@ async def root(name: GroupedNameRequest):
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
-    params['mode'] = 'grouped_' + params['mode']
+    # params['mode'] = 'grouped_' + params['mode']
 
     generator.clear_cache()
     related_suggestions, grouped_suggestions = generator.generate_grouped_names(

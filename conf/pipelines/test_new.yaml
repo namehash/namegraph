@@ -45,6 +45,10 @@
     grouped_instant: 0
     grouped_domain_detail: 0
     grouped_full: 0
+  category_limits:
+    instant: 0
+    domain_detail: 0
+    full: 0
 -
   name: prefix
   generator: PrefixGenerator
@@ -261,6 +265,10 @@
     instant: 1
     domain_detail: 1
     full: 1
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 1
 
 -
   name: rhymes
@@ -281,6 +289,10 @@
     domain_detail: 0.15
     full: 0.5
   global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
+  category_limits:
     instant: 1
     domain_detail: 1
     full: 0.2

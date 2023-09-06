@@ -143,7 +143,7 @@ class Generator:
             max_related_collections: int = 5,
             max_names_per_related_collection: int = 5,
             max_recursive_related_collections: int = 5,
-            categories_params = None,
+            categories_params=None,
             min_total_suggestions: float = 50,
             params: dict[str, Any] = None
     ) -> tuple[dict[str, list[GeneratedName]], dict[str, list[GeneratedName]]]:
@@ -173,12 +173,12 @@ class Generator:
 
         logger.info('Start sampling')
 
-        multithreading=True
+        multithreading = True
         grouped_suggestions = {}
         if not multithreading:
             for category, meta_sampler in self.grouped_metasamplers.items():
                 start_time = time.time()
-    
+
                 category_params = getattr(categories_params, category)
                 try:
                     min_suggestions = category_params.min_suggestions
@@ -186,23 +186,24 @@ class Generator:
                 except AttributeError:  # RelatedCategoryParams
                     min_suggestions = 0
                     max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
-    
+
                 # TODO should they use the same set of suggestions (for deduplications)
                 suggestions = meta_sampler.sample_grouped(name, 'weighted-sampling',
                                                           min_suggestions=min_suggestions,
                                                           max_suggestions=max_suggestions,
                                                           min_available_fraction=min_available_fraction)
-    
+
                 generator_time = 1000 * (time.time() - start_time)
-                logger.info(f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
+                logger.info(
+                    f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
                 grouped_suggestions[category] = suggestions
         else:
-            #multithreading using concurrent.futures
+            # multithreading using concurrent.futures
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.grouped_metasamplers)) as executor:
                 futures = {}
                 for category, meta_sampler in self.grouped_metasamplers.items():
                     start_time = time.time()
-        
+
                     category_params = getattr(categories_params, category)
                     try:
                         min_suggestions = category_params.min_suggestions
@@ -210,13 +211,16 @@ class Generator:
                     except AttributeError:  # RelatedCategoryParams
                         min_suggestions = 0
                         max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
-                    
-                    futures[executor.submit(meta_sampler.sample_grouped, name, 'weighted-sampling', min_suggestions=min_suggestions, max_suggestions=max_suggestions, min_available_fraction=min_available_fraction)]=category
+
+                    futures[executor.submit(meta_sampler.sample_grouped, name, 'weighted-sampling',
+                                            min_suggestions=min_suggestions, max_suggestions=max_suggestions,
+                                            min_available_fraction=min_available_fraction)] = category
                 for future in concurrent.futures.as_completed(futures):
                     category = futures[future]
                     suggestions = future.result()
                     generator_time = 1000 * (time.time() - start_time)
-                    logger.info(f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
+                    logger.info(
+                        f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
                     grouped_suggestions[category] = suggestions
 
         # split related
