@@ -18,6 +18,8 @@ from .substringmatch_generator import SubstringMatchGenerator
 from .leet_generator import LeetGenerator
 from .keycap_generator import KeycapGenerator
 from .person_name_generator import PersonNameGenerator
+from .person_name_emojify_generator import PersonNameEmojifyGenerator
+from .person_name_expand_generator import PersonNameExpandGenerator
 from .symbol_generator import SymbolGenerator
 from .collection_generator import CollectionGenerator
 from .easteregg_generator import EasterEggGenerator
