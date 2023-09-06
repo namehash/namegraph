@@ -64,7 +64,6 @@ class MetaSampler:
         global_limits = {}
         for pipeline in self.pipelines:
             if category_limits:
-                print('YYYYYYYYYY', pipeline.pipeline_name, mode, pipeline.category_limits)
                 limit = pipeline.category_limits.get(mode, None)
             else:
                 limit = pipeline.global_limits.get(mode, None)
@@ -74,7 +73,6 @@ class MetaSampler:
             if isinstance(limit, float):
                 limit = int(min_suggestions * limit)
             global_limits[pipeline.pipeline_name] = limit
-        print('ZZZZZZZZglobal_limits', global_limits)
         return global_limits
 
     def sample(self, name: InputName, sorter_name: str, min_suggestions: int, max_suggestions: int,

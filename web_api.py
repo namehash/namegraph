@@ -308,7 +308,7 @@ async def root(name: GroupedNameRequest):
 
     response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
                                                              include_metadata=name.params.metadata)
-    # logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result))) #TODO
+    logger.info(json.dumps(log_entry.create_grouped_log_entry(name.model_dump(),  {**related_suggestions, **grouped_suggestions})))
 
     return response
 
