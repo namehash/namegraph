@@ -69,7 +69,8 @@ class OtherCategoryParams(BaseModel):
     max_suggestions: int = Field(10, ge=0, le=30,
                                  title='maximal number of suggestions to generate in one specific category')
     min_total_suggestions: int = Field(50, ge=0, le=100,
-                                       title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"')
+                                       title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"'
+                                             'it may be not fulfilled because of `max_suggestions` limit')
 
 
 class RelatedCategoryParams(BaseModel):

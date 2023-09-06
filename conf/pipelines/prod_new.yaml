@@ -18,7 +18,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.33
+    full: 0.5
 -
   name: w2v
   controlflow:
@@ -45,7 +45,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.33
+    full: 0.5
 -
   name: categories-no-tokenizer
   generator: CategoriesGenerator
@@ -91,7 +91,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.5
 -
   name: on-sale
   generator: OnSaleMatchGenerator
@@ -114,7 +114,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: permute
   generator: PermuteGenerator
@@ -135,7 +135,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: prefix
   generator: PrefixGenerator
@@ -157,7 +157,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: suffix
   generator: SuffixGenerator
@@ -179,7 +179,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: substring
   generator: SubstringMatchGenerator
@@ -201,7 +201,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: hyphens
   generator: HyphenGenerator
@@ -222,7 +222,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: special-char-affix
   generator: SpecialCharacterAffixGenerator
@@ -243,7 +243,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: abbreviation
   generator: AbbreviationGenerator
@@ -264,7 +264,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: flag-affix
   generator: FlagAffixGenerator
@@ -287,7 +287,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: leet
   generator: LeetGenerator
@@ -305,10 +305,6 @@
     instant: 0
     domain_detail: 0
   global_limits:
-    instant: 1
-    domain_detail: 1
-    full: 2
-  category_limits:
     instant: 1
     domain_detail: 1
     full: 2
@@ -333,7 +329,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: emoji
   generator: EmojiGenerator
@@ -356,7 +352,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: person-name-emojify
   generator: PersonNameEmojifyGenerator
@@ -377,7 +373,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: person-name-expand
   generator: PersonNameExpandGenerator
@@ -398,7 +394,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.1
+    full: 0.6
 -
   name: symbol
   generator: SymbolGenerator
@@ -421,7 +417,7 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
 -
   name: collections
   generator: CollectionGenerator
@@ -443,10 +439,6 @@
     grouped_instant: 0.33
     grouped_domain_detail: 0.33
     grouped_full: 0.33
-  category_limits:
-    instant: 0.33
-    domain_detail: 0.33
-    full: 0.33
 -
   name: easteregg
   generator: EasterEggGenerator
@@ -524,4 +516,4 @@
   category_limits:
     instant: 1
     domain_detail: 1
-    full: 0.2
+    full: 0.6
