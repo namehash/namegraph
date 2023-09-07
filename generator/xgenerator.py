@@ -228,11 +228,12 @@ class Generator:
 
         # split related
         related_suggestions = collections.defaultdict(list)
-        for suggestion in grouped_suggestions['related']:
-            related_suggestions[
-                (suggestion.collection_title, suggestion.collection_id, suggestion.collection_members_count)].append(
-                suggestion)
-        del grouped_suggestions['related']
+        if 'related' in grouped_suggestions:
+            for suggestion in grouped_suggestions['related']:
+                related_suggestions[
+                    (suggestion.collection_title, suggestion.collection_id, suggestion.collection_members_count)].append(
+                    suggestion)
+            del grouped_suggestions['related']
 
         # TODO agregate duplicates
         # all_suggestions = aggregate_duplicates(all_suggestions)

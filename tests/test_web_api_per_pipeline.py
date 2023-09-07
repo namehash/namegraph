@@ -134,6 +134,26 @@ class TestFlagAffix:
         names: list[str] = [suggestion["name"] for suggestion in json]
         assert names
 
+    @mark.parametrize(
+        "name, country, expected_suffix",
+        [
+            ("metropolis", "ua", "🇺🇦"),
+            ("atlantis", "pl", "🇵🇱")
+        ]
+    )
+    def test_country_generator_grouped_parameter(self, test_client, name: str, country: str, expected_suffix: str):
+        client = test_client
+        response = client.post("/suggestions_by_category", json={
+            "label": name,
+            "params": {
+                "user_info": {"user_ip_country": country}
+            }
+        })
+        assert response.status_code == 200
+
+        json = response.json()
+        names=[suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
+        assert any(name.endswith(expected_suffix + '.eth') for name in names)
 
 @mark.usefixtures("emoji_pipeline")
 class TestEmoji:
