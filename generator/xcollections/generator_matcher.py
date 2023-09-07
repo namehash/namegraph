@@ -1,6 +1,7 @@
 from typing import Optional, Literal
 from time import perf_counter
 from itertools import cycle
+import concurrent.futures
 import logging
 
 from fastapi import HTTPException
@@ -142,22 +143,31 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             enable_learning_to_rank: bool = True,
     ) -> tuple[list[Collection], dict]:
 
-        related, es_response_metadata1 = self._search_for_generator(
-            tokens=tokens,
-            max_related_collections=max_related_collections,
-            name_diversity_ratio=name_diversity_ratio,
-            max_per_type=max_per_type,
-            limit_names=limit_names,
-            enable_learning_to_rank=enable_learning_to_rank
-        )
+        t_before = perf_counter()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            related_future = executor.submit(
+                self._search_for_generator,
+                tokens=tokens,
+                max_related_collections=max_related_collections,
+                name_diversity_ratio=name_diversity_ratio,
+                max_per_type=max_per_type,
+                limit_names=limit_names,
+                enable_learning_to_rank=enable_learning_to_rank
+            )
 
-        membership, es_response_metadata2 = self._search_by_membership(
-            name_label=''.join(tokens),
-            limit_names=limit_names,
-            sort_order='AI',
-            max_results=max_related_collections,
-            offset=0
-        )
+            membership_future = executor.submit(
+                self._search_by_membership,
+                name_label=''.join(tokens),
+                limit_names=limit_names,
+                sort_order='AI',
+                max_results=max_related_collections,
+                offset=0
+            )
+
+            related, es_response_metadata1 = related_future.result()
+            membership, es_response_metadata2 = membership_future.result()
+
+        time_elapsed = (perf_counter() - t_before) * 1000
 
         related_iter = iter(related)
         membership_iter = iter(membership)
@@ -187,8 +197,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         es_response_metadata = {
             'n_total_hits': n_total_hits,
             'took': es_response_metadata1['took'] + es_response_metadata2['took'],
-            'elasticsearch_communication_time': es_response_metadata1['elasticsearch_communication_time']
-                                              + es_response_metadata2['elasticsearch_communication_time'],
+            'elasticsearch_communication_time': time_elapsed,
         }
 
         return common[:max_related_collections], es_response_metadata
