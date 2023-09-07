@@ -6,8 +6,6 @@ import math
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
 
-LEETSPEAK_PATH = 'data/leetspeak.json'  # FIXME should it be here like that?
-
 
 def get_replacement_combinations(replacements: dict[str, list[tuple[float, str]]]) -> Iterable[
     dict[str, tuple[float, str]]]:
@@ -22,7 +20,7 @@ class LeetGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__(config)
 
-        with open(LEETSPEAK_PATH) as f:
+        with open(config.generation.leetspeak_path) as f:
             leetspeak = json.load(f)
 
         # probability of a full token substitution being used

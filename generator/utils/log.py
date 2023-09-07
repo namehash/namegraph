@@ -37,7 +37,7 @@ class LogEntry:
 
     def create_grouped_log_entry(self, request: dict, result: dict[str, list[GeneratedName]]) -> dict:
         entry = self.create_entry(request)
-        entry['response'] = {str(category): [self.convert_suggestion_to_log_entry(gn) for gn in gns] for category, gns in result.items()} #FIXME
+        entry['response'] = {str(category): [self.convert_suggestion_to_log_entry(gn) for gn in gns] for category, gns in result.items()} #FIXME better logging system
         return entry
     
     def create_log_entry(self, request: dict, result: list[GeneratedName]) -> dict:

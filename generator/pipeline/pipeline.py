@@ -113,7 +113,7 @@ class Pipeline:
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
                 # remove input name from suggestions
-                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
+                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash).replace(' ', '')  # TODO niewiadomo jaki jest input
                 suggestions = (s for s in suggestions if str(s) != input_word)
 
                 # suggestions = aggregate_duplicates(suggestions)
