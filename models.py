@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 from pydantic.networks import IPvAnyAddress
 from datetime import datetime
 
@@ -62,7 +62,7 @@ class OtherCategoriesParams(BaseModel):
                                        'min_suggestions then the entire category should be filtered out from the response.')
     max_suggestions: int = Field(10, ge=0, le=30,
                                  title='maximal number of suggestions to generate in one specific category')
-
+    model_config = ConfigDict(frozen=True)
 
 class OtherCategoryParams(BaseModel):
     min_suggestions: int = Field(6, ge=0, le=30,
@@ -74,7 +74,7 @@ class OtherCategoryParams(BaseModel):
     min_total_suggestions: int = Field(50, ge=0, le=100,
                                        title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"'
                                              'it may be not fulfilled because of `max_suggestions` limit')
-
+    model_config = ConfigDict(frozen=True)
 
 class RelatedCategoryParams(BaseModel):
     max_related_collections: int = Field(6, ge=0, le=10,
@@ -99,7 +99,7 @@ class RelatedCategoryParams(BaseModel):
         Field(2, examples=[2], ge=1, title='collection diversity parameter based on collection types',
               description='adds penalty to collections with the same type as other collections\n'
                           'if null, then no penalty will be added')
-
+    model_config = ConfigDict(frozen=True)
 
 class CategoriesParams(BaseModel):
     related: RelatedCategoryParams = Field(RelatedCategoryParams(), title='related category parameters')
@@ -110,7 +110,7 @@ class CategoriesParams(BaseModel):
     expand: OtherCategoriesParams = Field(OtherCategoriesParams(), title='expand category parameters')
     gowild: OtherCategoriesParams = Field(OtherCategoriesParams(), title='gowild category parameters')
     other: OtherCategoryParams = Field(OtherCategoryParams(), title='other category parameters')
-
+    model_config = ConfigDict(frozen=True)
 
 class GroupedNameRequest(BaseModel):
     label: str = Field(title='input label', description='cannot contain dots (.)',
