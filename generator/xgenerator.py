@@ -1,5 +1,5 @@
 import collections
-import concurrent
+import concurrent.futures
 import logging
 import time
 from itertools import islice
@@ -50,6 +50,7 @@ class Result:
 
 class Generator:
     def __init__(self, config: DictConfig):
+        self.domains = None
         self.config = config
 
         self.pipelines = []
@@ -144,7 +145,7 @@ class Generator:
             max_names_per_related_collection: int = 5,
             max_recursive_related_collections: int = 5,
             categories_params=None,
-            min_total_suggestions: float = 50,
+            min_total_suggestions: int = 50,
             params: dict[str, Any] = None
     ) -> tuple[dict[str, list[GeneratedName]], dict[str, list[GeneratedName]]]:
         params = params or {}
@@ -188,10 +189,11 @@ class Generator:
                     max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
 
                 # TODO should they use the same set of suggestions (for deduplications)
-                suggestions = meta_sampler.sample_grouped(name, 'weighted-sampling',
-                                                          min_suggestions=min_suggestions,
-                                                          max_suggestions=max_suggestions,
-                                                          min_available_fraction=min_available_fraction)
+                suggestions = meta_sampler.sample(name, 'weighted-sampling',
+                                                  min_suggestions=min_suggestions,
+                                                  max_suggestions=max_suggestions,
+                                                  min_available_fraction=min_available_fraction,
+                                                  category_endpoint=True)
 
                 generator_time = 1000 * (time.time() - start_time)
                 logger.info(
@@ -212,9 +214,10 @@ class Generator:
                         min_suggestions = 0
                         max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
 
-                    futures[executor.submit(meta_sampler.sample_grouped, name, 'weighted-sampling',
+                    futures[executor.submit(meta_sampler.sample, name, 'weighted-sampling',
                                             min_suggestions=min_suggestions, max_suggestions=max_suggestions,
-                                            min_available_fraction=min_available_fraction)] = category
+                                            min_available_fraction=min_available_fraction,
+                                            category_endpoint=True)] = category
                 for future in concurrent.futures.as_completed(futures):
                     category = futures[future]
                     suggestions = future.result()

@@ -84,7 +84,7 @@ class Pipeline:
         """Cache must be cleared before every request because index in pipeline results is saved."""
         self.cache.clear()
 
-    def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
+    def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
         """
         Generate suggestions, results are cached.
         """

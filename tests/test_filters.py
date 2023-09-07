@@ -1,9 +1,5 @@
 # from generator.filtering import DomainFilter, ValidNameFilter
-from hydra import compose, initialize_config_module, initialize
-
-import pytest
-from pytest import mark
-from typing import List
+from hydra import compose, initialize
 
 from generator.filtering.domain_filter import DomainFilter
 from generator.filtering.subname_filter import SubnameFilter
