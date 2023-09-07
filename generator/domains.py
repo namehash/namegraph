@@ -1,7 +1,7 @@
 import csv
 import logging
 from pathlib import Path
-from typing import Set, Dict, List, Tuple, Optional
+from typing import Set, Dict, Optional
 
 from generator.filtering.subname_filter import SubnameFilter
 from generator.filtering.valid_name_filter import ValidNameFilter

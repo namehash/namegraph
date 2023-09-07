@@ -1,8 +1,10 @@
-import gc
-import logging, random, hashlib, json
-from typing import List, Optional
+import hashlib
+import json
+import logging
+import random
 from collections import defaultdict
 from time import perf_counter
+from typing import List, Optional
 
 import numpy as np
 from fastapi import FastAPI
@@ -10,14 +12,14 @@ from fastapi.responses import Response
 from hydra import initialize, compose
 from pydantic_settings import BaseSettings
 
-from generator.generated_name import GeneratedName
-from generator.utils.log import LogEntry
-from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
-from generator.xcollections.collection import Collection
 from generator.domains import Domains
+from generator.generated_name import GeneratedName
 from generator.generation.categories_generator import Categories
 from generator.normalization.namehash_normalizer import NamehashNormalizer
+from generator.utils.log import LogEntry
+from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
+from generator.xcollections.collection import Collection
+from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
 
@@ -64,16 +66,6 @@ def init():
         return generator
 
 
-def init_inspector():
-    with initialize(version_base=None, config_path="conf/"):
-        config = compose(config_name=settings.config_name)
-        logger.setLevel(config.app.logging_level)
-        for handler in logger.handlers:
-            handler.setLevel(config.app.logging_level)
-
-        # return Inspector(config)
-
-
 def seed_all(seed: int | str):
     if isinstance(seed, str):
         hashed = hashlib.md5(seed.encode('utf-8')).digest()
@@ -85,7 +77,6 @@ def seed_all(seed: int | str):
 
 
 generator = init()
-inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
@@ -305,7 +296,8 @@ async def root(name: GroupedNameRequest):
 
     response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
                                                              include_metadata=name.params.metadata)
-    logger.info(json.dumps(log_entry.create_grouped_log_entry(name.model_dump(),  {**related_suggestions, **grouped_suggestions})))
+    logger.info(json.dumps(
+        log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
 
     return response
 

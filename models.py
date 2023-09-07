@@ -16,9 +16,10 @@ class UserInfo(BaseModel):
     session_id: Optional[str] = Field(None, title='', description='might be null',
                                       examples=['d6374908-94c3-420f-b2aa-6dd41989baef'])
     user_ip_country: Optional[str] = Field(None, title='user country code',
-                                   description="A two-character ISO 3166-1 country code for the country associated "
-                                               "with the location of the requester's public IP address; might be null",
-                                   examples=['us'])
+                                           description="A two-character ISO 3166-1 country code for the country associated "
+                                                       "with the location of the requester's public IP address; might be null",
+                                           examples=['us'])
+
     @field_serializer('user_ip_addr')
     def serialize_user_ip_addr(self, user_ip_addr: IPvAnyAddress, _info) -> str:
         return str(user_ip_addr)
@@ -45,12 +46,14 @@ class Params(BaseModel):
               description='adds penalty to collections with the same type as other collections\n'
                           'if null, then no penalty will be added')
 
+
 class GroupedParams(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
                       description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
     metadata: bool = Field(True, title='return all the metadata in response')
+
 
 class OtherCategoriesParams(BaseModel):
     min_suggestions: int = Field(2, ge=0, le=30,
@@ -112,13 +115,13 @@ class CategoriesParams(BaseModel):
 class GroupedNameRequest(BaseModel):
     label: str = Field(title='input label', description='cannot contain dots (.)',
                        pattern='^[^.]*$', examples=['zeus'])
-    
+
     # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
     #                                     ge=0.0, le=1.0,
     #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
     #                                                 'primary names will be generated')
     params: Optional[GroupedParams] = Field(None, title='pipeline parameters',
-                                     description='includes all the parameters for all nodes of the pipeline')
+                                            description='includes all the parameters for all nodes of the pipeline')
 
     categories: CategoriesParams = Field(
         title='controls the results of other categories than related (except for "Other Names")')
