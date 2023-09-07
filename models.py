@@ -123,7 +123,7 @@ class GroupedNameRequest(BaseModel):
     params: Optional[GroupedParams] = Field(None, title='pipeline parameters',
                                             description='includes all the parameters for all nodes of the pipeline')
 
-    categories: CategoriesParams = Field(
+    categories: CategoriesParams = Field(default=CategoriesParams(),
         title='controls the results of other categories than related (except for "Other Names")')
 
 
