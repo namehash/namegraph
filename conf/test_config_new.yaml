@@ -78,6 +78,7 @@ generation:
   person_name_emojify_affixes_path: data/person_name_emojify_affixes.json
   person_name_expand_affixes_path: data/person_name_expand_affixes.json
   suffix2rhymes_path: data/suffix2rhymes.json
+  leetspeak_path: data/leetspeak.json
   grouping_categories:
     related:
       - CollectionGenerator
