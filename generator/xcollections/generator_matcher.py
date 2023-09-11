@@ -313,3 +313,50 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         }
 
         return result, es_response_metadata
+
+
+    def scramble_tokens_from_collection(
+            self,
+            collection_id: str,
+            method: str,
+            n_top_members: int
+    ) -> tuple[dict, dict]:
+
+        # todo: query option with script_names and normal names
+
+        fields = ['metadata.id', 'data.collection_name', 'template.top10_names.normalized_name']
+
+        query_params = ElasticsearchQueryBuilder() \
+            .set_term('metadata.id.keyword', collection_id) \
+            .include_fields(fields) \
+            .set_source(False) \
+            .build_params()
+
+        try:
+            t_before = perf_counter()
+            response = self.elastic.search(index=self.index_name, **query_params)
+            time_elapsed = (perf_counter() - t_before) * 1000
+        except Exception as ex:
+            logger.error(f'Elasticsearch search failed [scramble tokens from collection]', exc_info=True)
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+        try:
+            hit = response['hits']['hits'][0]
+            es_response_metadata = {
+                'n_total_hits': 1,
+                'took': response['took'],
+                'elasticsearch_communication_time': time_elapsed,
+            }
+        except IndexError as ex:
+            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+
+
+        # todo: impl. token scramble
+
+        result = {
+            'collection_id': hit['fields']['metadata.id'][0],
+            'collection_title': hit['fields']['data.collection_name'][0],
+            'token_scramble_suggestions': hit['fields']['template.top10_names.normalized_name']  # todo
+        }
+
+        return result, es_response_metadata

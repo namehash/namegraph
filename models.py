@@ -228,3 +228,14 @@ class Top10CollectionMembersRequest(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     collection_id: str = Field(title='id of the collection to fetch names from', examples=['Q6607079'])
     metadata: bool = Field(True, title='return all the metadata in response')
+
+
+class ScrambleCollectionTokens(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to take tokens from', examples=['Q6607079'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    method: Literal['left-right-shuffle', 'left-right-shuffle-unigrams', 'full-shuffle'] = \
+        Field('left-right-shuffle-unigrams', title='method used to scramble tokens and generate new suggestions',
+              description='...')  # todo: description
+    n_top_members: int = Field(10, title='number of collection\'s top members to include in scrambling', ge=1)
+# todo: add seed?, add base model for the models above?
