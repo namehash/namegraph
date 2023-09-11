@@ -323,7 +323,7 @@ class TestCorrectConfiguration:
     @mark.integration_test
     def test_collection_api_find_collections_by_collection(self, test_test_client):
         response = test_test_client.post("/find_collections_by_collection", json={
-            "collection_id": "Q6607079",
+            "collection_id": "ri2QqxnAqZT7",  # Q6607079
             "max_related_collections": 10,
             "min_other_collections": 0,
             "max_other_collections": 0,
@@ -338,14 +338,14 @@ class TestCorrectConfiguration:
         response_json = response.json()
         print(response_json)
         assert 'Progressive rock artists' in [c['title'] for c in response_json['related_collections']]
-        assert 'Q6607079' not in [c['collection_id'] for c in response_json['related_collections']]
+        assert 'ri2QqxnAqZT7' not in [c['collection_id'] for c in response_json['related_collections']]
         assert len(response_json['related_collections']) == 10
 
 
     @mark.integration_test
     def test_collection_api_find_collections_by_collection_az(self, test_test_client):
         response = test_test_client.post("/find_collections_by_collection", json={
-            "collection_id": "Q6607079",
+            "collection_id": "ri2QqxnAqZT7",  # Q6607079
             "max_related_collections": 8,
             "min_other_collections": 0,
             "max_other_collections": 4,
@@ -375,7 +375,7 @@ class TestCorrectConfiguration:
     @mark.integration_test
     def test_collection_api_find_collections_by_collection_not_found(self, test_test_client):
         response = test_test_client.post("/find_collections_by_collection", json={
-            "collection_id": "NoSuChId",
+            "collection_id": "NoSuChId",  # minimal id length is 12
             "max_related_collections": 3,
             "min_other_collections": 0,
             "max_other_collections": 3,
@@ -519,7 +519,7 @@ class TestCorrectConfiguration:
         assert response.status_code == 200
         titles = [collection['title'] for collection in response.json()['related_collections']]
         print(titles)
-        assert 'Fashion designers' in titles
+        assert 'Industrial designers' in titles
         # assert 'Yu-Gi-Oh! video games' not in titles
         # assert 'Oh Yeon-seo filmography' not in titles
 
@@ -567,7 +567,7 @@ class TestCollectionApiUnavailable:
     @mark.integration_test
     def test_collection_api_unavailability_find_collections_by_collection(self, test_test_client):
         response = test_test_client.post("/find_collections_by_collection", json={
-            "collection_id": "Q6607079",
+            "collection_id": "ri2QqxnAqZT7",  # Q6607079
             "max_related_collections": 8,
             "min_other_collections": 0,
             "max_other_collections": 2,
