@@ -318,18 +318,17 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     def scramble_tokens_from_collection(
             self,
             collection_id: str,
-            method: str,
+            method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
             n_top_members: int
     ) -> tuple[dict, dict]:
 
-        # todo: query option with script_names and normal names
-
-        fields = ['metadata.id', 'data.collection_name', 'template.top10_names.normalized_name']
+        fields = ['metadata.id', 'data.collection_name']
 
         query_params = ElasticsearchQueryBuilder() \
             .set_term('metadata.id.keyword', collection_id) \
             .include_fields(fields) \
-            .set_source(False) \
+            .include_script_field('names_with_tokens', script="params['_source'].data.names.stream()"
+                                                              f".limit({n_top_members}).collect(Collectors.toList())") \
             .build_params()
 
         try:
@@ -350,13 +349,63 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         except IndexError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
-
-        # todo: impl. token scramble
+        name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
+        token_scramble_suggestions = self.get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
 
         result = {
             'collection_id': hit['fields']['metadata.id'][0],
             'collection_title': hit['fields']['data.collection_name'][0],
-            'token_scramble_suggestions': hit['fields']['template.top10_names.normalized_name']  # todo
+            'token_scramble_suggestions': token_scramble_suggestions
         }
 
         return result, es_response_metadata
+
+
+    # todo: should the methods below be here?
+
+
+    def name_tokens_tuples_to_bigrams_and_unigrams(
+            self,
+            name_tokens_tuples: list[tuple[str, list[str]]]
+    ) -> tuple[list[str], list[str], list[str]]:
+        left_names = []
+        right_names = []
+        unigrams = []
+        for name, tokenized_name in name_tokens_tuples:
+            if len(tokenized_name) == 1:
+                further_tokenized_name = self.bigram_longest_tokenizer.get_tokenization(name)
+                if further_tokenized_name is None or further_tokenized_name == (name, ''):
+                    unigrams.append(name)
+                else:
+                    left_names.append(further_tokenized_name[0])
+                    right_names.append(further_tokenized_name[1])
+            elif len(tokenized_name) == 2:
+                left_names.append(tokenized_name[0])
+                right_names.append(tokenized_name[1])
+            elif len(tokenized_name) > 2:
+                left_names.append(tokenized_name[0])
+                right_names.append(''.join(tokenized_name[1:]))  # todo: there might be a better approach
+        return left_names, right_names, unigrams
+
+
+    def get_suggestions_by_scrambling_tokens(
+            self,
+            name_tokens_tuples: list[tuple[str, list[str]]],
+            method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
+            swap_to_unigram_probability=0.3
+    ) -> list[str]:
+        left_tokens, right_tokens, unigrams = self.name_tokens_tuples_to_bigrams_and_unigrams(name_tokens_tuples)
+
+        # todo: implement methods
+
+        def shuffle_right():
+            ...
+
+        if method == 'left-right-shuffle':
+            pass
+        elif method == 'left-right-shuffle-with-unigrams':
+            pass
+        else:
+            pass
+
+        return []

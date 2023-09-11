@@ -10,7 +10,7 @@ import elastic_transport
 import elasticsearch
 from omegaconf import DictConfig
 
-from generator.tokenization import WordNinjaTokenizer
+from generator.tokenization import WordNinjaTokenizer, BigramLongestTokenizer
 from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
 from generator.utils.elastic import connect_to_elasticsearch, index_exists
@@ -23,6 +23,7 @@ class CollectionMatcher(metaclass=Singleton):
     def __init__(self, config: DictConfig):
         self.config = config
         self.tokenizer = WordNinjaTokenizer(config)
+        self.bigram_longest_tokenizer = BigramLongestTokenizer(config)
         self.index_name = config.elasticsearch.index
 
         self.ltr_feature_store = config.elasticsearch.ltr.feature_store
