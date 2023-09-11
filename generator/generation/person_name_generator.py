@@ -16,17 +16,20 @@ def standardize(a):
 
 class PersonNameGenerator(NameGenerator):
     """
-
+    Person name generator that uses affixes.
     """
 
     def __init__(self, config):
         super().__init__(config)
         self.affixes = json.load(open(config.generation.person_name_affixes_path))
+        self._prepare_affixes(self.affixes)
+
+    def _prepare_affixes(self, affixes: dict[dict[str, int]]) -> None:
         self.male = collections.defaultdict(int)
         self.female = collections.defaultdict(int)
         self.both = collections.defaultdict(int)
 
-        for key, d in self.affixes.items():
+        for key, d in affixes.items():
             for affix, count in d.items():
                 if key == 'm_prefixes':
                     self.both[(affix, 'prefix')] += count

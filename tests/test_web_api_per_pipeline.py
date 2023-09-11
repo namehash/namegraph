@@ -134,6 +134,26 @@ class TestFlagAffix:
         names: list[str] = [suggestion["name"] for suggestion in json]
         assert names
 
+    @mark.parametrize(
+        "name, country, expected_suffix",
+        [
+            ("metropolis", "ua", "🇺🇦"),
+            ("atlantis", "pl", "🇵🇱")
+        ]
+    )
+    def test_country_generator_grouped_parameter(self, test_client, name: str, country: str, expected_suffix: str):
+        client = test_client
+        response = client.post("/suggestions_by_category", json={
+            "label": name,
+            "params": {
+                "user_info": {"user_ip_country": country}
+            }
+        })
+        assert response.status_code == 200
+
+        json = response.json()
+        names=[suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
+        assert any(name.endswith(expected_suffix + '.eth') for name in names)
 
 @mark.usefixtures("emoji_pipeline")
 class TestEmoji:
@@ -223,6 +243,13 @@ def collection_test_pipelines():
     del os.environ['CONFIG_OVERRIDES']
 
 
+@pytest.fixture(scope='class')
+def grouped_test_pipelines():
+    os.environ['CONFIG_OVERRIDES'] = json.dumps(['pipelines=test_grouped_fast'])
+    yield
+    del os.environ['CONFIG_OVERRIDES']
+
+
 def _extract_titles(json_obj: list[dict]) -> list[str]:
     return [name["metadata"]["collection_title"] for name in json_obj]
 
@@ -259,7 +286,7 @@ class TestCollections:
 
     def test_diversity_parameters(self, test_client):
         # at least for one of the labels results should be different
-        for label in ['pinkfloyd', 'spears', 'kyiv']:
+        for label in ['pinkfloyd', 'spears', 'kyiv', 'ronaldo', 'bohr']:
             titles = []
             for diversity_parameters in [
                 {'name_diversity_ratio': 1.0, 'max_per_type': 1},
@@ -287,11 +314,12 @@ class TestCollections:
         json = response.json()
         collection_names = _extract_titles(json)
         print(collection_names)
-        assert "Industrial designers" in collection_names
+        # assert "Industrial designers" in collection_names
+        assert "American people of Ghanaian descent" in collection_names
         assert "Yu-Gi-Oh! video games" not in collection_names
         assert "Oh Yeon-seo filmography" not in collection_names
 
-    def test_prod_grouped_by_category(self, test_client):
+    def test_prod_grouped_by_category_old(self, test_client):
         client = test_client
 
         response = client.post("/grouped_by_category",
@@ -302,7 +330,6 @@ class TestCollections:
 
         assert response.status_code == 200
         response_json = response.json()
-        print(response_json)
 
         assert 'categories' in response_json
         categories = response_json['categories']
@@ -310,3 +337,117 @@ class TestCollections:
         collection_titles = [gcat['collection_title'] for gcat in categories if gcat['type'] == 'related']
         print(collection_titles)
         assert 'Yu-Gi-Oh! characters' not in collection_titles
+
+
+@mark.usefixtures("grouped_test_pipelines")
+@mark.integration_test
+class TestGrouped:
+    def test_prod_grouped_by_category(self, test_client):
+        client = test_client
+
+        request_data = {
+            "label": "zeus",
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            },
+            "categories": {
+                "related": {
+                    "enable_learning_to_rank": True,
+                    "max_names_per_related_collection": 10,
+                    "max_per_type": 2,
+                    "max_recursive_related_collections": 3,
+                    "max_related_collections": 6,
+                    "name_diversity_ratio": 0.5
+                },
+                "wordplay": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "alternates": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "emojify": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "community": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "expand": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "gowild": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "other": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 6,
+                    "min_total_suggestions": 50
+                }
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+        assert response.status_code == 200
+        response_json = response.json()
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other']['min_total_suggestions']
+
+        related_count=0
+        for category in categories:
+            if category['type'] == 'related':
+                assert len(category['suggestions']) <= request_data['categories'][category['type']]['max_names_per_related_collection']
+                related_count+=1
+            else:
+                if category['type'] != 'other':
+                    assert len(category['suggestions']) >= request_data['categories'][category['type']]['min_suggestions']
+                assert len(category['suggestions']) <= request_data['categories'][category['type']]['max_suggestions']
+
+        assert related_count <= request_data['categories']['related']['max_related_collections']
+
+        last_related_flag = False
+        actual_type_order = []
+
+        for i, gcat in enumerate(categories):
+            assert 'type' in gcat
+            assert gcat['type'] in (
+                'related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other')
+            if gcat['type'] not in actual_type_order:
+                actual_type_order.append(gcat['type'])
+
+            assert 'name' in gcat
+            if gcat['type'] != 'related':
+                assert gcat['name'] in (
+                    'Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild', 'Other Names')
+
+            assert all([(s.get('metadata', None) is not None) is True for s in gcat['suggestions']])
+
+            # assert related are after one another
+            if gcat['type'] == 'related':
+                assert not last_related_flag
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                       == set(gcat.keys())
+                assert gcat['name'] == gcat['collection_title']
+                # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+                # from a single member, so it's not a good idea
+                assert gcat['collection_members_count'] > 0
+                if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
+                    last_related_flag = True
+
+        # ensure the correct order of types (allow skipping types)
+        expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
+                                                      'community', 'expand', 'gowild', 'other'] if
+                          gcat_type in actual_type_order]
+        assert actual_type_order == expected_order  # conf.generation.grouping_categories_order

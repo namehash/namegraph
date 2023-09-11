@@ -144,7 +144,9 @@ def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expe
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'round-robin')
+        all_suggestions = metasampler.sample(input_name, 'round-robin', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
         sorted_expected_strings = sorted([str(gn) for gn in expected])
@@ -182,7 +184,9 @@ def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]]
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
         sorted_expected_strings = sorted([str(gn) for gn in expected])
@@ -221,7 +225,9 @@ def test_weighted_sampling_sorter_stress():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
 
 
@@ -261,7 +267,9 @@ def test_weighted_sampling_sorter_weights():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
 
         print(all_suggestions[:30])
@@ -324,7 +332,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 
@@ -396,7 +406,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 
@@ -508,7 +520,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 

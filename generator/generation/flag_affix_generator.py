@@ -285,6 +285,9 @@ class FlagAffixGenerator(NameGenerator):
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         try:
             country = name.params['country'].upper()
-        except:
-            country = None
+        except (KeyError, AttributeError):
+            try:
+                country = name.params['user_info']['user_ip_country'].upper()
+            except (KeyError, AttributeError, TypeError):
+                country = None
         return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'country': country}

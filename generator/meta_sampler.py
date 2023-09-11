@@ -60,22 +60,27 @@ class MetaSampler:
         self.domains = Domains(config)
         self.pipelines = pipelines
 
-    def get_global_limits(self, mode: str, min_suggestions: int):
+    def get_global_limits(self, mode: str, min_suggestions: int, category_limits: bool = False) -> dict[str, int]:
+        """
+        Return global limits for pipelines based on pipeline config. If category_limits is True, then
+        category_limits are returned instead of global_limits.
+        """
         global_limits = {}
         for pipeline in self.pipelines:
-            limit = pipeline.global_limits.get(mode, None)
-            if limit is None and mode.startswith('grouped_'):
-                # use ungrouped mode limit as default limit (if key 'grouped_{mode}' does not exist)
-                limit = pipeline.global_limits.get(mode.removeprefix('grouped_'), None)
+            if category_limits:
+                limit = pipeline.category_limits.get(mode, None)
+            else:
+                limit = pipeline.global_limits.get(mode, None)
+                if limit is None and mode.startswith('grouped_'):
+                    # use ungrouped mode limit as default limit (if key 'grouped_{mode}' does not exist)
+                    limit = pipeline.global_limits.get(mode.removeprefix('grouped_'), None)
             if isinstance(limit, float):
                 limit = int(min_suggestions * limit)
             global_limits[pipeline.pipeline_name] = limit
         return global_limits
 
-    def sample(self, name: InputName, sorter_name: str) -> list[GeneratedName]:
-        min_suggestions = name.params['min_suggestions']
-        max_suggestions = name.params['max_suggestions']
-        min_available_fraction = name.params['min_available_fraction']
+    def sample(self, name: InputName, sorter_name: str, min_suggestions: int, max_suggestions: int,
+               min_available_fraction: float, category_endpoint: bool = False) -> list[GeneratedName]:
         min_available_required = int(min_suggestions * min_available_fraction)
 
         mode = name.params.get('mode', 'full')
@@ -89,7 +94,11 @@ class MetaSampler:
                 for interpretation in name.interpretations[type_lang]:
                     interpretation_weights[type_lang][interpretation] = interpretation.in_type_probability
 
-        global_limits = self.get_global_limits(mode, min_suggestions)
+        if category_endpoint:
+            global_limits = self.get_global_limits(mode, max_suggestions, category_limits=True)
+        else:
+            global_limits = self.get_global_limits(mode, min_suggestions)
+        logger.info(f'global_limits {global_limits}')
 
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
@@ -120,6 +129,8 @@ class MetaSampler:
                 weights=list(interpretation_weights[sampled_type_lang].values())
             )[0]
 
+            logger.info(f'sampled_type_lang {sampled_type_lang} sampled_interpretation {sampled_interpretation}')
+
             while True:
                 try:
                     slots_left = max_suggestions - len(all_suggestions)
@@ -128,11 +139,13 @@ class MetaSampler:
 
                     # sample and run pipeline
                     sampled_pipeline = next(sorters[sampled_interpretation])
+                    logger.info(f'sampled_pipeline {sampled_pipeline.pipeline_name}')
 
                     # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
                     if global_limits[sampled_pipeline.pipeline_name] is not None and \
                             global_limits[sampled_pipeline.pipeline_name] == 0:
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
+                        logger.info(f'global_limits reached by {sampled_pipeline.pipeline_name}')
                         continue
 
                     suggestions = sampled_pipeline.apply(name, sampled_interpretation)
@@ -140,25 +153,34 @@ class MetaSampler:
                     try:
                         suggestion = next(suggestions)
                         suggestion.status = self.domains.get_name_status(str(suggestion))
+                        logger.info(f'Pipeline: {sampled_pipeline.pipeline_name} sampled suggestion: {suggestion}')
+
                         # skip until it is not a duplicate and until it is "available" in case there are
                         # just enough free slots left to fulfill minimal available number of suggestions requirement
                         while True:
                             while str(suggestion) in all_suggestions_str or str(suggestion) == joined_input_name \
                                     or (suggestion.status != Domains.AVAILABLE
                                         and available_added + slots_left <= min_available_required):
+                                logger.info(
+                                    f'suggestion is duplicated or the same as input (or unavailable): {suggestion}')
                                 suggestion = next(suggestions)
+                                logger.info(
+                                    f'Pipeline: {sampled_pipeline.pipeline_name} sampled suggestion: {suggestion}')
                                 suggestion.status = self.domains.get_name_status(str(suggestion))
                             if not is_ens_normalized(str(suggestion)):
                                 # log suggestions which are not ens normalized
                                 logger.warning(f"suggestion not ens-normalized: '{str(suggestion)}'; "
                                                f"metadata: {suggestion.dict()}")
                                 suggestion = next(suggestions)
+                                logger.info(
+                                    f'Pipeline: {sampled_pipeline.pipeline_name} sampled suggestion: {suggestion}')
                                 suggestion.status = self.domains.get_name_status(str(suggestion))
                             else:
                                 break
                     except StopIteration:
                         # in case the suggestions have run out we simply mark the pipeline as empty
                         # and proceed to sample another non-empty pipeline
+                        logger.info(f'pipeline {sampled_pipeline.pipeline_name} is empty')
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)
                         continue
 
@@ -175,6 +197,7 @@ class MetaSampler:
 
                 except StopIteration:
                     # removes entries from the sampling population because they are emptied
+                    logger.info(f'removing interpretation')
                     del interpretation_weights[sampled_type_lang][sampled_interpretation]
                     if not interpretation_weights[sampled_type_lang]:
                         del interpretation_weights[sampled_type_lang]

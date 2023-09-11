@@ -58,6 +58,11 @@ class Pipeline:
         except ConfigAttributeError:
             self.global_limits = {}
 
+        try:  # copy to internal dict
+            self.category_limits = dictconfig_to_dict(definition.category_limits)
+        except ConfigAttributeError:
+            self.category_limits = {}
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
@@ -79,7 +84,7 @@ class Pipeline:
         """Cache must be cleared before every request because index in pipeline results is saved."""
         self.cache.clear()
 
-    def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
+    def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
         """
         Generate suggestions, results are cached.
         """
@@ -108,7 +113,7 @@ class Pipeline:
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
                 # remove input name from suggestions
-                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
+                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash).replace(' ', '')  # TODO niewiadomo jaki jest input
                 suggestions = (s for s in suggestions if str(s) != input_word)
 
                 # suggestions = aggregate_duplicates(suggestions)

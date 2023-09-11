@@ -75,7 +75,10 @@ generation:
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
   person_name_affixes_path: data/person_name_affixes.json
+  person_name_emojify_affixes_path: data/person_name_emojify_affixes.json
+  person_name_expand_affixes_path: data/person_name_expand_affixes.json
   suffix2rhymes_path: data/suffix2rhymes.json
+  leetspeak_path: data/leetspeak.json
   grouping_categories:
     related:
       - CollectionGenerator
@@ -92,6 +95,7 @@ generation:
       - FlagAffixGenerator
       - KeycapGenerator
       - SymbolGenerator
+      - PersonNameEmojifyGenerator
     community:
       - SubstringMatchGenerator
       - OnSaleMatchGenerator
@@ -101,13 +105,13 @@ generation:
       - SuffixGenerator
       - SpecialCharacterAffixGenerator
       - RhymesGenerator
+      - PersonNameExpandGenerator
     gowild:
       - LeetGenerator
-      - RandomAvailableNameGenerator
       - EasterEggGenerator
       - ReverseGenerator
-    dynamic_:  # generator needs to implement get_grouping_category(output_name: str) method
-      - PersonNameGenerator
+    other:
+      - RandomAvailableNameGenerator
   grouping_categories_order:
     - related
     - alternates
@@ -116,6 +120,7 @@ generation:
     - community
     - expand
     - gowild
+    - other
 sorting:
   weighted_sampling:
     weights:

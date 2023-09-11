@@ -1,8 +1,10 @@
-import gc
-import logging, random, hashlib, json
-from typing import List, Optional
+import hashlib
+import json
+import logging
+import random
 from collections import defaultdict
 from time import perf_counter
+from typing import List, Optional
 
 import numpy as np
 from fastapi import FastAPI
@@ -10,14 +12,14 @@ from fastapi.responses import Response
 from hydra import initialize, compose
 from pydantic_settings import BaseSettings
 
-from generator.generated_name import GeneratedName
-from generator.utils.log import LogEntry
-from generator.xgenerator import Generator
-from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
-from generator.xcollections.collection import Collection
 from generator.domains import Domains
+from generator.generated_name import GeneratedName
 from generator.generation.categories_generator import Categories
 from generator.normalization.namehash_normalizer import NamehashNormalizer
+from generator.utils.log import LogEntry
+from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
+from generator.xcollections.collection import Collection
+from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
 
@@ -36,7 +38,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-app = FastAPI()
+app = FastAPI(title="NameGenerator API")  # TODO add version
 
 
 def init():
@@ -64,16 +66,6 @@ def init():
         return generator
 
 
-def init_inspector():
-    with initialize(version_base=None, config_path="conf/"):
-        config = compose(config_name=settings.config_name)
-        logger.setLevel(config.app.logging_level)
-        for handler in logger.handlers:
-            handler.setLevel(config.app.logging_level)
-
-        # return Inspector(config)
-
-
 def seed_all(seed: int | str):
     if isinstance(seed, str):
         hashed = hashlib.md5(seed.encode('utf-8')).digest()
@@ -85,7 +77,6 @@ def seed_all(seed: int | str):
 
 
 generator = init()
-inspector = init_inspector()
 
 # TODO move this elsewhere, temporary for now
 collections_matcher = CollectionMatcherForAPI(generator.config)
@@ -101,7 +92,7 @@ from models import (
     Suggestion,
     SampleCollectionMembers,
     GroupedSuggestions,
-    Top10CollectionMembersRequest,
+    Top10CollectionMembersRequest, GroupedNameRequest,
 )
 
 from collection_models import (
@@ -120,7 +111,6 @@ def convert_to_suggestion_format(
         names: List[GeneratedName],
         include_metadata: bool = True
 ) -> list[dict[str, str | dict]]:
-
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
@@ -165,22 +155,57 @@ async def root(name: NameRequest):
     return response
 
 
+category_fancy_names = {
+    'wordplay': 'Word Play',
+    'alternates': 'Alternates',
+    'emojify': '😍 Emojify',
+    'community': 'Community',
+    'expand': 'Expand',
+    'gowild': 'Go Wild',
+    'other': 'Other Names'
+}
+
+
+def convert_grouped_to_grouped_suggestions_format(
+        related_suggestions: dict[str, list[GeneratedName]],
+        grouped_suggestions: dict[str, list[GeneratedName]],
+        include_metadata: bool = True
+) -> dict[str, list[dict]]:
+    grouped_response: list[dict] = []
+    for gcat in generator.config.generation.grouping_categories_order:
+        if gcat == 'related':
+            for collection_key, suggestions in related_suggestions.items():
+                converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
+                grouped_response.append({
+                    'suggestions': converted_suggestions if include_metadata else
+                    [{'name': s['name']} for s in converted_suggestions],
+                    'type': 'related',
+                    'name': collection_key[0],
+                    'collection_title': collection_key[0],
+                    'collection_id': collection_key[1],
+                    'collection_members_count': collection_key[2],
+                })
+        elif gcat in grouped_suggestions:
+            converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
+            grouped_response.append({
+                'suggestions': converted_suggestions if include_metadata else
+                [{'name': s['name']} for s in converted_suggestions],
+                'type': gcat,
+                'name': category_fancy_names[gcat],
+            })
+
+    response = {'categories': grouped_response}
+    return response
+
+
 def convert_to_grouped_suggestions_format(
         names: List[GeneratedName],
         include_metadata: bool = True
-) -> dict[ str, list[dict]]:
-
+) -> dict[str, list[dict]]:
     ungrouped_response = convert_to_suggestion_format(names, include_metadata=True)
     grouped_dict: dict[str, list] = {
-        c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild']}
-    category_fancy_names = {
-        'wordplay': 'Word Play',
-        'alternates': 'Alternates',
-        'emojify': '😍 Emojify',
-        'community': 'Community',
-        'expand': 'Expand',
-        'gowild': 'Go Wild'
-    }
+        c: [] for c in ['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other']}
+
     related_dict: dict[tuple[str, str, int], list] = defaultdict(list)
     collection_categories_order = []
 
@@ -205,7 +230,7 @@ def convert_to_grouped_suggestions_format(
     grouped_response: list[dict] = []
 
     for gcat in generator.config.generation.grouping_categories_order:
-        if gcat == 'related' and related_dict.keys():
+        if gcat == 'related':
             for collection_key in collection_categories_order:
                 grouped_response.append({
                     'suggestions': related_dict[collection_key] if include_metadata else
@@ -250,9 +275,36 @@ async def root(name: NameRequest):
     return response
 
 
+@app.post("/suggestions_by_category", response_model=GroupedSuggestions)
+async def root(name: GroupedNameRequest):
+    seed_all(name.label)
+    log_entry = LogEntry(generator.config)
+    logger.debug(f'Request received: {name.label}')
+    params = name.params.model_dump() if name.params is not None else dict()
+    # params['mode'] = 'grouped_' + params['mode']
+
+    generator.clear_cache()
+    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+        name.label,
+        max_related_collections=name.categories.related.max_related_collections,
+        max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
+        max_recursive_related_collections=name.categories.related.max_recursive_related_collections,
+        categories_params=name.categories,
+        min_total_suggestions=name.categories.other.min_total_suggestions,
+        params=params
+    )
+
+    response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
+                                                             include_metadata=name.params.metadata)
+    logger.info(json.dumps(
+        log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
+
+    return response
+
+
 @app.post("/sample_collection_members", response_model=list[Suggestion])
 async def sample_collection_members(sample_command: SampleCollectionMembers):
-    result,  es_response_metadata = generator_matcher.sample_members_from_collection(
+    result, es_response_metadata = generator_matcher.sample_members_from_collection(
         sample_command.collection_id,
         sample_command.seed,
         sample_command.max_sample_size
@@ -279,7 +331,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     """
     * this endpoint returns top 10 members from the collection specified by collection_id
     """
-    result,  es_response_metadata = generator_matcher.fetch_top10_members_from_collection(
+    result, es_response_metadata = generator_matcher.fetch_top10_members_from_collection(
         fetch_top10_command.collection_id
     )
 

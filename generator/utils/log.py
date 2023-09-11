@@ -15,7 +15,7 @@ class LogEntry:
         self.domains: Domains = Domains(config)
         self.categories: Categories = Categories(config)
 
-    def create_log_entry(self, request: dict, result: list[GeneratedName]) -> dict:
+    def create_entry(self, request: dict) -> dict:
         request.update({
             'user': '0x35b3ab43ebe7709f4aef1a9c3e6d1f99be343128',  # dummy
             'session': 'RudderEncrypt%3A123123123132132132132'  # dummy
@@ -32,11 +32,21 @@ class LogEntry:
             'start_time': self.start_time,
             'end_time': time.time(),
             'user_currency': 'USD',  # dummy
-            'response': [self.convert_suggestion_to_log_entry(gn) for gn in result],
         }
         return entry
 
+    def create_grouped_log_entry(self, request: dict, result: dict[str, list[GeneratedName]]) -> dict:
+        entry = self.create_entry(request)
+        entry['response'] = {str(category): [self.convert_suggestion_to_log_entry(gn) for gn in gns] for category, gns in result.items()} #FIXME better logging system
+        return entry
+    
+    def create_log_entry(self, request: dict, result: list[GeneratedName]) -> dict:
+        entry = self.create_entry(request)
+        entry['response'] = [self.convert_suggestion_to_log_entry(gn) for gn in result]
+        return entry
+
     def convert_suggestion_to_log_entry(self, suggestion: GeneratedName) -> dict:
+        #TODO missing collection data
         return {
             'name': str(suggestion),
             'tokens': suggestion.tokens,

@@ -7,6 +7,7 @@ import sys
 import hydra
 from omegaconf import DictConfig
 
+from generator.generated_name import GeneratedName
 from generator.xgenerator import Generator
 
 logger = logging.getLogger('generator')
@@ -19,7 +20,7 @@ def generate_from_file(file):
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> List[Dict[str, List[str]]]:
+def generate(config: DictConfig) -> list[list[GeneratedName]]:
     logger.setLevel(config.app.logging_level)
     for handler in logger.handlers:
         handler.setLevel(config.app.logging_level)
@@ -44,7 +45,7 @@ def generate(config: DictConfig) -> List[Dict[str, List[str]]]:
         all_suggestions.append(suggestions)
         logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
         print(suggestions)
-        
+
     return all_suggestions
 
 
