@@ -510,10 +510,10 @@ class TestGroupedSuggestions:
 @pytest.mark.parametrize(
     "collection_id, max_sample_size",
     [
-        ("Q15102072", 5),
-        ("Q15102072", 20),
-        ("Q8377580", 4),  # collections has only 5 members, only unique names should be returned
-        ("Q8377580", 10),  # collections has only 5 members, all names should be returned
+        ("JCzsKPv4HQ2N", 5),  # Q15102072
+        ("JCzsKPv4HQ2N", 20),  # Q15102072
+        ("xEvCGnUB3syi", 4),  # Q8377580 - collection has only 5 members, only unique names should be returned
+        ("xEvCGnUB3syi", 10),  # Q8377580 - collection has only 5 members, all names should be returned
     ]
 )
 def test_collection_members_sampling(prod_test_client, collection_id, max_sample_size):
@@ -538,7 +538,7 @@ def test_collection_members_sampling(prod_test_client, collection_id, max_sample
 @pytest.mark.integration_test
 def test_fetching_top_collection_members(prod_test_client):
     client = prod_test_client
-    collection_id = 'Q15102072'
+    collection_id = 'JCzsKPv4HQ2N'  # Q15102072
 
     response = client.post("/fetch_top_collection_members",
                            json={"collection_id": collection_id})

@@ -4,6 +4,7 @@ from itertools import cycle
 import concurrent.futures
 import logging
 
+import elasticsearch.exceptions
 from fastapi import HTTPException
 
 from generator.xcollections.matcher import CollectionMatcher
@@ -209,10 +210,6 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_sample_size: int = 10,
     ) -> tuple[dict, dict]:
 
-        # FIXME do we need this?
-        # if not self.active:
-        #     return [], {}
-
         fields = ['metadata.id', 'data.collection_name']
 
         sampling_script = """
@@ -244,7 +241,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         """
 
         query_params = ElasticsearchQueryBuilder() \
-            .set_term('metadata.id.keyword', collection_id) \
+            .set_term('_id', collection_id) \
             .include_fields(fields) \
             .set_source(False) \
             .include_script_field(name='sampled_members',
@@ -272,7 +269,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         result = {
-            'collection_id': hit['fields']['metadata.id'][0],
+            'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
             'sampled_members': hit['fields']['sampled_members']
         }
@@ -282,34 +279,25 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     def fetch_top10_members_from_collection(self, collection_id: str) -> tuple[dict, dict]:
         fields = ['metadata.id', 'data.collection_name', 'template.top10_names.normalized_name']
 
-        query_params = ElasticsearchQueryBuilder() \
-            .set_term('metadata.id.keyword', collection_id) \
-            .include_fields(fields) \
-            .set_source(False) \
-            .build_params()
-
         try:
             t_before = perf_counter()
-            response = self.elastic.search(index=self.index_name, **query_params)
+            response = self.elastic.get(index=self.index_name, id=collection_id, _source_includes=fields)
             time_elapsed = (perf_counter() - t_before) * 1000
+        except elasticsearch.exceptions.NotFoundError as ex:
+            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        try:
-            hit = response['hits']['hits'][0]
-            es_response_metadata = {
-                'n_total_hits': 1,
-                'took': response['took'],
-                'elasticsearch_communication_time': time_elapsed,
-            }
-        except IndexError as ex:
-            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+        es_response_metadata = {
+            'n_total_hits': 1,
+            'elasticsearch_communication_time': time_elapsed,
+        }
 
         result = {
-            'collection_id': hit['fields']['metadata.id'][0],
-            'collection_title': hit['fields']['data.collection_name'][0],
-            'top_members': hit['fields']['template.top10_names.normalized_name']
+            'collection_id': response['_id'],
+            'collection_title': response['_source']['data']['collection_name'],
+            'top_members': [item['normalized_name'] for item in response['_source']['template']['top10_names']]
         }
 
         return result, es_response_metadata

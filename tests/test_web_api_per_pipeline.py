@@ -284,30 +284,6 @@ class TestCollections:
 
         assert False, "Results are the same for both enable_learning_to_rank=True and enable_learning_to_rank=False"
 
-    def test_diversity_parameters(self, test_client):
-        # at least for one of the labels results should be different
-        for label in ['pinkfloyd', 'spears', 'kyiv', 'ronaldo', 'bohr']:
-            titles = []
-            for diversity_parameters in [
-                {'name_diversity_ratio': 1.0, 'max_per_type': 1},
-                {'name_diversity_ratio': 0.5, 'max_per_type': 2},
-                {'name_diversity_ratio': None, 'max_per_type': None},
-            ]:
-                response = test_client.post("/", json={
-                    "label": label,
-                    "params": diversity_parameters
-                })
-                assert response.status_code == 200
-                json = response.json()
-                collection_names = _extract_titles(json)
-                titles.append(collection_names)
-
-            for el in titles:
-                if el != titles[0]:
-                    return
-
-        assert False, "Results are the same for all diversity parameters"
-
     def test_metadata_collection_field2(self, test_client):
         response = test_client.post("/", json={"label": "virgil abloh"})
         assert response.status_code == 200
@@ -342,6 +318,38 @@ class TestCollections:
 @mark.usefixtures("grouped_test_pipelines")
 @mark.integration_test
 class TestGrouped:
+    def test_diversity_parameters(self, test_client):
+        # at least for one of the labels results should be different
+        for label in ['pinkfloyd', 'spears', 'kyiv', 'ronaldo', 'bohr', 'buildings', 'births', 'deaths']:
+            titles = []
+            for diversity_parameters in [
+                {'name_diversity_ratio': 1.0, 'max_per_type': 1},
+                {'name_diversity_ratio': 0.5, 'max_per_type': 2},
+                {'name_diversity_ratio': None, 'max_per_type': None},
+            ]:
+                response = test_client.post("/suggestions_by_category", json={
+                    "label": label,
+                    "categories": {
+                        "related": {
+                            "enable_learning_to_rank": True,
+                            "max_names_per_related_collection": 10,
+                            "max_recursive_related_collections": 0,
+                            "max_related_collections": 10,
+                        } | diversity_parameters,
+                    }
+                })
+
+                assert response.status_code == 200
+                categories = response.json()['categories']
+                collection_names = [c['collection_title'] for c in categories if c['type'] == 'related']
+                titles.append(collection_names)
+
+            for el in titles:
+                if el != titles[0]:
+                    return
+
+        assert False, "Results are the same for all diversity parameters"
+
     def test_prod_grouped_by_category(self, test_client):
         client = test_client
 
@@ -451,3 +459,26 @@ class TestGrouped:
                                                       'community', 'expand', 'gowild', 'other'] if
                           gcat_type in actual_type_order]
         assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
+
+    @pytest.mark.parametrize("label", ["pinkfloyd", "kyiv", "bohr"])
+    def test_returned_collection_ids(self, test_client, label):
+        response = test_client.post("/suggestions_by_category", json={
+            "label": label,
+            "categories": {
+                "related": {
+                    "max_recursive_related_collections": 0,
+                    "max_related_collections": 10,
+                }
+            }
+        })
+
+        assert response.status_code == 200
+        categories = response.json()['categories']
+        for category in categories:
+            if category['type'] != 'related':
+                continue
+
+            collection_id = category['collection_id']
+            # most wikidata ids are no longer than 12 symbols
+            # instead our generated ids are 12 symbols long
+            assert len(collection_id) >= 12
