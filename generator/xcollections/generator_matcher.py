@@ -352,7 +352,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
-        token_scramble_suggestions = self.get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
+        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
 
         result = {
             'collection_id': hit['fields']['metadata.id'][0],
@@ -363,15 +363,15 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         return result, es_response_metadata
 
 
-    # todo: should the methods below be here?
-
-
-    def name_tokens_tuples_to_bigrams_and_unigrams(
+    def _get_suggestions_by_scrambling_tokens(
             self,
-            name_tokens_tuples: list[tuple[str, list[str]]]
-    ) -> tuple[list[str], list[str], list[str]]:
-        left_names = []
-        right_names = []
+            name_tokens_tuples: list[tuple[str, list[str]]],
+            method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
+            swap_to_unigram_probability=0.3
+    ) -> list[str]:
+
+        left_tokens = []
+        right_tokens = []
         unigrams = []
         for name, tokenized_name in name_tokens_tuples:
             if len(tokenized_name) == 1:
@@ -379,24 +379,16 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 if further_tokenized_name is None or further_tokenized_name == (name, ''):
                     unigrams.append(name)
                 else:
-                    left_names.append(further_tokenized_name[0])
-                    right_names.append(further_tokenized_name[1])
+                    left_tokens.append(further_tokenized_name[0])
+                    right_tokens.append(further_tokenized_name[1])
             elif len(tokenized_name) == 2:
-                left_names.append(tokenized_name[0])
-                right_names.append(tokenized_name[1])
+                left_tokens.append(tokenized_name[0])
+                right_tokens.append(tokenized_name[1])
             elif len(tokenized_name) > 2:
-                left_names.append(tokenized_name[0])
-                right_names.append(''.join(tokenized_name[1:]))  # todo: there might be a better approach
-        return left_names, right_names, unigrams
+                left_tokens.append(tokenized_name[0])
+                # todo: there might be a better approach (if more than 2 tokens, cut in the center?)
+                right_tokens.append(''.join(tokenized_name[1:]))
 
-
-    def get_suggestions_by_scrambling_tokens(
-            self,
-            name_tokens_tuples: list[tuple[str, list[str]]],
-            method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
-            swap_to_unigram_probability=0.3
-    ) -> list[str]:
-        left_tokens, right_tokens, unigrams = self.name_tokens_tuples_to_bigrams_and_unigrams(name_tokens_tuples)
         original_names = {t[0] for t in name_tokens_tuples}
         original_right_tokens = copy(right_tokens)
 
