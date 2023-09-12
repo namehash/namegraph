@@ -1,3 +1,5 @@
+from copy import copy
+import random
 from typing import Optional, Literal
 from time import perf_counter
 from itertools import cycle
@@ -395,17 +397,39 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             swap_to_unigram_probability=0.3
     ) -> list[str]:
         left_tokens, right_tokens, unigrams = self.name_tokens_tuples_to_bigrams_and_unigrams(name_tokens_tuples)
+        original_names = {t[0] for t in name_tokens_tuples}
+        original_right_tokens = copy(right_tokens)
 
-        # todo: implement methods
-
-        def shuffle_right():
-            ...
+        def shuffle_right(max_shuffles=10):
+            nonlocal right_tokens, original_right_tokens
+            shuffle_count = 0
+            while any([right_tokens[i] == o for i, o in enumerate(original_right_tokens)]) \
+                    and shuffle_count < max_shuffles:
+                random.shuffle(right_tokens)
+                shuffle_count += 1
 
         if method == 'left-right-shuffle':
-            pass
+            shuffle_right()
+            suggestions = [l + r for l, r in zip(left_tokens, right_tokens)]
         elif method == 'left-right-shuffle-with-unigrams':
-            pass
+            shuffle_right()
+            for i in range(len(left_tokens)):
+                if not unigrams:
+                    break
+                if random.random() < swap_to_unigram_probability:
+                    if random.random() < 0.5:
+                        left_tokens[i] = unigrams.pop(0)
+                    else:
+                        right_tokens[i] = unigrams.pop(0)
+            suggestions = [l + r for l, r in zip(left_tokens, right_tokens)]
+        elif method == 'full-shuffle':
+            all_unigrams = left_tokens + right_tokens + unigrams
+            random.shuffle(all_unigrams)
+            suggestions = [l + r for l, r in zip(all_unigrams[::2], all_unigrams[1::2])]
         else:
-            pass
+            raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
 
-        return []
+        # todo: filter double tokens e.g. 'thethe' ?
+        suggestions = list(set(suggestions) - original_names)
+
+        return suggestions
