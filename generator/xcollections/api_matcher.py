@@ -38,7 +38,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             query = f'{tokenized_query} {wo_spaces}'
 
         include_fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
@@ -146,7 +146,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             sort_order = 'ES'
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
@@ -248,7 +248,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
@@ -280,14 +280,14 @@ class CollectionMatcherForAPI(CollectionMatcher):
     def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         try:
             query_params = (ElasticsearchQueryBuilder()
-                            .set_terms('metadata.id.keyword', id_list)
+                            .add_ids(id_list)
                             .include_fields(fields)
                             .add_limit(len(id_list))
                             .build_params())

@@ -33,7 +33,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             tokenized_query = ''.join(tokens) + ' ' + tokenized_query
 
         include_fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'data.collection_name', 'template.collection_rank',
             'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
             'template.collection_types', 'metadata.modified',
         ]
@@ -105,7 +105,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank',
+            'data.collection_name', 'template.collection_rank',
             'metadata.owner', 'metadata.members_count', 'template.top10_names.normalized_name',
             'template.collection_types', 'metadata.modified',
         ]
@@ -210,7 +210,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_sample_size: int = 10,
     ) -> tuple[dict, dict]:
 
-        fields = ['metadata.id', 'data.collection_name']
+        fields = ['data.collection_name']
 
         sampling_script = """
             def number_of_names = params._source.data.names.size();
@@ -277,7 +277,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         return result, es_response_metadata
 
     def fetch_top10_members_from_collection(self, collection_id: str) -> tuple[dict, dict]:
-        fields = ['metadata.id', 'data.collection_name', 'template.top10_names.normalized_name']
+        fields = ['data.collection_name', 'template.top10_names.normalized_name']
 
         try:
             t_before = perf_counter()
