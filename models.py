@@ -239,4 +239,4 @@ class ScrambleCollectionTokens(BaseModel):
   description='* left-right-shuffle - tokenize names as bigrams and shuffle the right-side tokens (do not use unigrams)'
               '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
               '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
-    n_top_members: int = Field(10, title='number of collection\'s top members to include in scrambling', ge=1)
+    n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)

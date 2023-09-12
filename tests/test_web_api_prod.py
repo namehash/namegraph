@@ -550,3 +550,30 @@ def test_fetching_top_collection_members(prod_test_client):
     for name in response_json:
         assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
         assert name['metadata']['collection_id'] == collection_id
+
+
+@pytest.mark.integration_test
+def test_scrambling_collection_tokens(prod_test_client):
+    client = prod_test_client
+    collection_id = 'Q46111985'
+
+    response = client.post("/scramble_collection_tokens",
+                           json={
+                               "collection_id": collection_id,
+                               "method": 'left-right-shuffle-with-unigrams',
+                               "n_top_members": 25
+                           })
+
+    assert response.status_code == 200
+    response_json = response.json()
+    print(response_json)
+
+    assert len(response_json) <= 25  # always <= n_top_members
+
+    for name in response_json:
+        assert name['metadata']['pipeline_name'] == 'scramble_collection_tokens'
+        assert name['metadata']['collection_id'] == collection_id
+
+    # uniqueness
+    names = [name['name'] for name in response_json]
+    assert len(names) == len(set(names))
