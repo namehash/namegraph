@@ -134,8 +134,8 @@ def convert_to_suggestion_format(
     return response
 
 
-@app.post("/", response_model=list[Suggestion])
-async def root(name: NameRequest):
+@app.post("/", response_model=list[Suggestion], tags=['generator'])
+async def generate_names(name: NameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -253,8 +253,8 @@ def convert_to_grouped_suggestions_format(
     return response
 
 
-@app.post("/grouped_by_category", response_model=GroupedSuggestions)
-async def root(name: NameRequest):
+@app.post("/grouped_by_category", response_model=GroupedSuggestions, tags=['generator'])
+async def grouped_by_category(name: NameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -275,8 +275,8 @@ async def root(name: NameRequest):
     return response
 
 
-@app.post("/suggestions_by_category", response_model=GroupedSuggestions)
-async def root(name: GroupedNameRequest):
+@app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
+async def suggestions_by_category(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -302,7 +302,7 @@ async def root(name: GroupedNameRequest):
     return response
 
 
-@app.post("/sample_collection_members", response_model=list[Suggestion])
+@app.post("/sample_collection_members", response_model=list[Suggestion], tags=['collections'])
 async def sample_collection_members(sample_command: SampleCollectionMembers):
     result, es_response_metadata = generator_matcher.sample_members_from_collection(
         sample_command.collection_id,
@@ -326,7 +326,7 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
     return response
 
 
-@app.post("/fetch_top_collection_members", response_model=list[Suggestion])
+@app.post("/fetch_top_collection_members", response_model=list[Suggestion], tags=['collections'])
 async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembersRequest):
     """
     * this endpoint returns top 10 members from the collection specified by collection_id
@@ -372,7 +372,7 @@ def convert_to_collection_format(collections: list[Collection]):
     return collections_json
 
 
-@app.post("/find_collections_by_string", response_model=CollectionSearchResponse)
+@app.post("/find_collections_by_string", response_model=CollectionSearchResponse, tags=['collections'])
 async def find_collections_by_string(query: CollectionSearchByString):
     t_before = perf_counter()
 
@@ -421,7 +421,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     return response
 
 
-@app.post("/count_collections_by_string", response_model=CollectionsContainingNameCountResponse)
+@app.post("/count_collections_by_string", response_model=CollectionsContainingNameCountResponse, tags=['collections'])
 async def get_collections_count_by_string(query: CollectionCountByStringRequest):
     t_before = perf_counter()
 
@@ -447,7 +447,7 @@ async def get_collections_count_by_string(query: CollectionCountByStringRequest)
     return {'count': count, 'metadata': metadata}
 
 
-@app.post("/find_collections_by_collection", response_model=CollectionSearchResponse)
+@app.post("/find_collections_by_collection", response_model=CollectionSearchResponse, tags=['collections'])
 async def find_collections_by_collection(query: CollectionSearchByCollection):
     """
     * this search raises exception with status code 404 if the collection with id `collection_id` is absent
@@ -494,7 +494,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return response
 
 
-@app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse)
+@app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse, tags=['collections'])
 async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
     t_before = perf_counter()
 
@@ -519,7 +519,7 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
     return {'count': count, 'metadata': metadata}
 
 
-@app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse)
+@app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse, tags=['collections'])
 async def find_collections_membership_list(request: CollectionsContainingNameRequest):
     t_before = perf_counter()
 
