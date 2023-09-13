@@ -288,6 +288,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         try:
             query_params = (ElasticsearchQueryBuilder()
                             .add_ids(id_list)
+                            .set_source(False)
                             .include_fields(fields)
                             .add_limit(len(id_list))
                             .build_params())
