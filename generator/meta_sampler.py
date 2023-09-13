@@ -129,7 +129,7 @@ class MetaSampler:
                 weights=list(interpretation_weights[sampled_type_lang].values())
             )[0]
 
-            logger.debug(f'sampled_type_lang {sampled_type_lang} sampled_interpretation {sampled_interpretation}')
+            # logger.debug(f'sampled_type_lang {sampled_type_lang} sampled_interpretation {sampled_interpretation}')
 
             while True:
                 try:
