@@ -547,6 +547,6 @@ def test_fetching_top_collection_members(prod_test_client):
     response_json = response.json()
     assert len(response_json) <= 10
 
-    for name in response_json:
+    for name in response_json['suggestions']:
         assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
         assert name['metadata']['collection_id'] == collection_id
