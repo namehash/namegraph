@@ -19,6 +19,7 @@ class Collection:
             modified_timestamp: int,
             avatar_emoji: Optional[str],
             avatar_image: Optional[str],
+            related_collections: Optional[list[dict[str, Any]]] = None,
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
@@ -34,6 +35,7 @@ class Collection:
         self.modified_timestamp = modified_timestamp
         self.avatar_emoji = avatar_emoji
         self.avatar_image = avatar_image
+        self.related_collections = related_collections
 
     # FIXME make more universal or split into multiple methods
     # FIXME should we move limit_names somewhere else?
@@ -45,6 +47,7 @@ class Collection:
             tokenized_names = None
 
         fields = hit['fields']
+        _source = hit.get('_source', {})
         return cls(
             score=hit['_score'],
             collection_id=hit['_id'],
@@ -59,7 +62,8 @@ class Collection:
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
             avatar_emoji=fields['data.avatar_emoji'][0] if 'data.avatar_emoji' in fields else None,
-            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None
+            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
+            related_collections=_source.get('name_generator', {}).get('related_collections', None),
         )
 
     @classmethod
@@ -70,6 +74,7 @@ class Collection:
             tokenized_names = None
 
         fields = hit['fields']
+        _source = hit.get('_source', {})
         return cls(
             score=hit['_score'],
             collection_id=hit['_id'],
@@ -84,5 +89,6 @@ class Collection:
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
             avatar_emoji=fields['data.avatar_emoji'],
-            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None
+            avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
+            related_collections=_source.get('name_generator', {}).get('related_collections', None),
         )
