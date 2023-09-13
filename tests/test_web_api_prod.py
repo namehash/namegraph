@@ -596,7 +596,8 @@ class TestTokenScramble:
             response_json = response.json()
             print(response_json)
 
-            assert len(response_json) == 3  # 3 bigrams
+            # 3 bigrams + 2 unigrams (can produce 3 results if original name remains at the end)
+            assert len(response_json) in (3, 4)
 
             names = [name['name'] for name in response_json]
             assert len(names) == len(set(names))

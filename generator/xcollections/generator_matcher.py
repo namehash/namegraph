@@ -1162,6 +1162,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                     s = left + right
                     if s not in original_names and s not in suggestions:
                         suggestions.append(s)
+                        right_tokens.remove(right)
                         break
         elif method == 'full-shuffle':
             all_unigrams = left_tokens | right_tokens | unigrams
@@ -1171,11 +1172,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                     s = left + right
                     if s not in original_names and s not in suggestions:
                         suggestions.append(s)
+                        all_unigrams.remove(right)
                         break
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
 
         return suggestions
+
+        # todo: why plant so much
 
         # original_right_tokens = copy(right_tokens)
         #
