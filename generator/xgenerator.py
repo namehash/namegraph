@@ -963,7 +963,7 @@ class Generator:
                     max_suggestions = category_params.max_suggestions
                 except AttributeError:  # RelatedCategoryParams
                     min_suggestions = 0
-                    max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
+                    max_suggestions = 3 * category_params.max_related_collections * category_params.max_names_per_related_collection # 3 interpretations
 
                 # TODO should they use the same set of suggestions (for deduplications)
                 suggestions = meta_sampler.sample(name, 'weighted-sampling',
@@ -1036,6 +1036,10 @@ class Generator:
         for category, related_suggestions in all_related_suggestions.items():
             max_suggestions = category_params.max_names_per_related_collection
             related_suggestions.data = related_suggestions.data[:max_suggestions]
+
+        # cap related collections to max_related_collections
+        for category in list(all_related_suggestions.keys())[max_related_collections:]:
+            del all_related_suggestions[category]
 
         count_real_suggestions = sum(
             [len(suggestions) for suggestions in grouped_suggestions.values()] + [len(suggestions) for suggestions in

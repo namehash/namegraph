@@ -90,7 +90,9 @@ class CollectionGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        if ' ' in name.strip_eth_namehash_unicode_long_name:
-            return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
-        else:
-            return {'tokens': interpretation.tokenization}
+        # if ' ' in name.strip_eth_namehash_unicode_long_name:
+        #     return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        # else:
+        #     return {'tokens': interpretation.tokenization}
+        #hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
+        return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}

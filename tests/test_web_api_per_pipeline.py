@@ -152,8 +152,9 @@ class TestFlagAffix:
         assert response.status_code == 200
 
         json = response.json()
-        names=[suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
+        names = [suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
         assert any(name.endswith(expected_suffix + '.eth') for name in names)
+
 
 @mark.usefixtures("emoji_pipeline")
 class TestEmoji:
@@ -331,11 +332,11 @@ class TestGrouped:
                     "label": label,
                     "categories": {
                         "related": {
-                            "enable_learning_to_rank": True,
-                            "max_names_per_related_collection": 10,
-                            "max_recursive_related_collections": 0,
-                            "max_related_collections": 10,
-                        } | diversity_parameters,
+                                       "enable_learning_to_rank": True,
+                                       "max_names_per_related_collection": 10,
+                                       "max_recursive_related_collections": 0,
+                                       "max_related_collections": 10,
+                                   } | diversity_parameters,
                     }
                 })
 
@@ -350,11 +351,12 @@ class TestGrouped:
 
         assert False, "Results are the same for all diversity parameters"
 
-    def test_prod_grouped_by_category(self, test_client):
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_grouped_by_category(self, test_client, label):
         client = test_client
 
         request_data = {
-            "label": "zeus",
+            "label": label,
             "params": {
                 "user_info": {
                     "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
@@ -411,23 +413,27 @@ class TestGrouped:
 
         assert 'categories' in response_json
         categories = response_json['categories']
-        assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other']['min_total_suggestions']
+        assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other'][
+            'min_total_suggestions']
 
-        related_count=0
+        # check min and max suggestions limits in categories
+        related_count = 0
         for category in categories:
+            print(category['name'])
             if category['type'] == 'related':
-                assert len(category['suggestions']) <= request_data['categories'][category['type']]['max_names_per_related_collection']
-                related_count+=1
+                assert len(category['suggestions']) <= request_data['categories'][category['type']][
+                    'max_names_per_related_collection']
+                related_count += 1
             else:
                 if category['type'] != 'other':
-                    assert len(category['suggestions']) >= request_data['categories'][category['type']]['min_suggestions']
+                    assert len(category['suggestions']) >= request_data['categories'][category['type']][
+                        'min_suggestions']
                 assert len(category['suggestions']) <= request_data['categories'][category['type']]['max_suggestions']
 
         assert related_count <= request_data['categories']['related']['max_related_collections']
 
         last_related_flag = False
         actual_type_order = []
-
         for i, gcat in enumerate(categories):
             assert 'type' in gcat
             assert gcat['type'] in (
@@ -445,7 +451,8 @@ class TestGrouped:
             # assert related are after one another
             if gcat['type'] == 'related':
                 assert not last_related_flag
-                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions', 'related_collections'} \
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions',
+                        'related_collections'} \
                        == set(gcat.keys())
                 assert gcat['name'] == gcat['collection_title']
                 # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
@@ -460,7 +467,19 @@ class TestGrouped:
                           gcat_type in actual_type_order]
         assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
 
-    @pytest.mark.parametrize("label", ["pinkfloyd", "kyiv", "bohr"])
+        # no duplicated suggestions within categories
+        related_suggestions = []
+        for gcat in categories:
+            suggestions = [s['name'] for s in gcat['suggestions']]
+            print(gcat['type'], gcat['name'])
+            print(suggestions)
+            if gcat['type'] == 'related':
+                related_suggestions.extend(suggestions)
+            else:
+                assert len(suggestions) == len(set(suggestions))
+        assert len(related_suggestions) == len(set(related_suggestions))
+
+    @pytest.mark.parametrize("label", ["pinkfloyd", "kyiv", "bohr", "dog", "dogs"])
     def test_returned_collection_ids(self, test_client, label):
         response = test_client.post("/suggestions_by_category", json={
             "label": label,

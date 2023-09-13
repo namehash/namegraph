@@ -506,6 +506,135 @@ class TestGroupedSuggestions:
             assert self.strategy_not_used(gcat, 'CategoryGenerator')
 
 
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_grouped_by_category(self, prod_test_client, label):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            },
+            "categories": {
+                "related": {
+                    "enable_learning_to_rank": True,
+                    "max_names_per_related_collection": 10,
+                    "max_per_type": 2,
+                    "max_recursive_related_collections": 3,
+                    "max_related_collections": 6,
+                    "name_diversity_ratio": 0.5
+                },
+                "wordplay": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "alternates": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "emojify": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "community": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "expand": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "gowild": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "other": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 6,
+                    "min_total_suggestions": 50
+                }
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+        assert response.status_code == 200
+        response_json = response.json()
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other'][
+            'min_total_suggestions']
+
+        # check min and max suggestions limits in categories
+        related_count = 0
+        for category in categories:
+            print(category['name'])
+            if category['type'] == 'related':
+                assert len(category['suggestions']) <= request_data['categories'][category['type']][
+                    'max_names_per_related_collection']
+                related_count += 1
+            else:
+                if category['type'] != 'other':
+                    assert len(category['suggestions']) >= request_data['categories'][category['type']][
+                        'min_suggestions']
+                assert len(category['suggestions']) <= request_data['categories'][category['type']]['max_suggestions']
+
+        assert related_count <= request_data['categories']['related']['max_related_collections']
+
+        last_related_flag = False
+        actual_type_order = []
+        for i, gcat in enumerate(categories):
+            assert 'type' in gcat
+            assert gcat['type'] in (
+                'related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other')
+            if gcat['type'] not in actual_type_order:
+                actual_type_order.append(gcat['type'])
+
+            assert 'name' in gcat
+            if gcat['type'] != 'related':
+                assert gcat['name'] in (
+                    'Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild', 'Other Names')
+
+            assert all([(s.get('metadata', None) is not None) is True for s in gcat['suggestions']])
+
+            # assert related are after one another
+            if gcat['type'] == 'related':
+                assert not last_related_flag
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions',
+                        'related_collections'} \
+                       == set(gcat.keys())
+                assert gcat['name'] == gcat['collection_title']
+                # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
+                # from a single member, so it's not a good idea
+                assert gcat['collection_members_count'] > 0
+                if i + 1 < len(categories) and categories[i + 1]['type'] != 'related':
+                    last_related_flag = True
+
+        # ensure the correct order of types (allow skipping types)
+        expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
+                                                      'community', 'expand', 'gowild', 'other'] if
+                          gcat_type in actual_type_order]
+        assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
+
+        # no duplicated suggestions within categories
+        related_suggestions = []
+        for gcat in categories:
+            suggestions = [s['name'] for s in gcat['suggestions']]
+            print(gcat['type'], gcat['name'])
+            print(suggestions)
+            if gcat['type'] == 'related':
+                related_suggestions.extend(suggestions)
+            else:
+                assert len(suggestions) == len(set(suggestions))
+        assert len(related_suggestions) == len(set(related_suggestions))
+
+
 @pytest.mark.integration_test
 @pytest.mark.parametrize(
     "collection_id, max_sample_size",
