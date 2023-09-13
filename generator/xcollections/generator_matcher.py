@@ -1082,10 +1082,10 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             n_top_members: int
     ) -> tuple[dict, dict]:
 
-        fields = ['metadata.id', 'data.collection_name']
+        fields = ['data.collection_name']
 
         query_params = ElasticsearchQueryBuilder() \
-            .set_term('metadata.id.keyword', collection_id) \
+            .set_term('_id', collection_id) \
             .include_fields(fields) \
             .include_script_field('names_with_tokens', script="params['_source'].data.names.stream()"
                                                               f".limit({n_top_members}).collect(Collectors.toList())") \
@@ -1113,7 +1113,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
 
         result = {
-            'collection_id': hit['fields']['metadata.id'][0],
+            'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
             'token_scramble_suggestions': token_scramble_suggestions
         }
@@ -1127,7 +1127,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
             swap_to_unigram_probability=0.3
     ) -> list[str]:
-
+        # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
         left_tokens = []
         right_tokens = []
         unigrams = []
@@ -1153,7 +1153,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         def shuffle_right(max_shuffles=10):
             nonlocal right_tokens, original_right_tokens
             shuffle_count = 0
-            while any([right_tokens[i] == o for i, o in enumerate(original_right_tokens)]) \
+            while any([right_tokens[j] == o for j, o in enumerate(original_right_tokens)]) \
                     and shuffle_count < max_shuffles:
                 random.shuffle(right_tokens)
                 shuffle_count += 1

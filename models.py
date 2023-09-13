@@ -240,7 +240,7 @@ class Top10CollectionMembersRequest(BaseModel):
 
 class ScrambleCollectionTokens(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to take tokens from', examples=['Q46111985'])
+    collection_id: str = Field(title='id of the collection to take tokens from', examples=['3OB_f2vmyuyp'])
     metadata: bool = Field(True, title='return all the metadata in response')
     method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'] = \
         Field('left-right-shuffle-with-unigrams', title='method used to scramble tokens and generate new suggestions',

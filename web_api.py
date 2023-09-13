@@ -370,7 +370,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     return response2[0]
 
 
-@app.post("/scramble_collection_tokens", response_model=list[Suggestion])
+@app.post("/scramble_collection_tokens", response_model=list[Suggestion], tags=['collections'])
 async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens):
     result, es_response_metadata = generator_matcher.scramble_tokens_from_collection(
         scramble_command.collection_id, scramble_command.method, scramble_command.n_top_members
