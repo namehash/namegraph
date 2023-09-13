@@ -248,3 +248,4 @@ class ScrambleCollectionTokens(BaseModel):
               '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
               '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
     n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
+    max_suggestions: int = Field(10, title='maximal number of suggestions to generate', ge=1)
