@@ -236,3 +236,15 @@ class Top10CollectionMembersRequest(BaseModel):
                                                          'for each related collection we find, '
                                                          'we also do a (depth 1 recursive) lookup for this many related collections '
                                                          'to the related collection.')
+
+
+class ScrambleCollectionTokens(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to take tokens from', examples=['3OB_f2vmyuyp'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'] = \
+        Field('left-right-shuffle-with-unigrams', title='method used to scramble tokens and generate new suggestions',
+  description='* left-right-shuffle - tokenize names as bigrams and shuffle the right-side tokens (do not use unigrams)'
+              '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
+              '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
+    n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)

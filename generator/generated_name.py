@@ -1,9 +1,9 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Any
 
 
 class GeneratedName:
     __slots__ = ['tokens', 'pipeline_name', 'status', 'applied_strategies', 'collection_members_count',
-                 'collection_title', 'collection_id', 'interpretation', 'grouping_category']
+                 'collection_title', 'collection_id', 'related_collections', 'interpretation', 'grouping_category']
 
     def __init__(self,
                  tokens: Tuple[str, ...],
@@ -13,7 +13,8 @@ class GeneratedName:
                  applied_strategies: Optional[List[List[str]]] = None,
                  collection_id: Optional[str] = None,
                  collection_title: Optional[str] = None,
-                 collection_members_count: Optional[int] = None,) -> None:
+                 collection_members_count: Optional[int] = None,
+                 related_collections: Optional[list[dict[str, Any]]] = None,) -> None:
 
         self.tokens = tokens
 
@@ -30,6 +31,7 @@ class GeneratedName:
         self.collection_id = collection_id
         self.collection_title = collection_title
         self.collection_members_count = collection_members_count
+        self.related_collections = related_collections
         self.interpretation = None
 
     def __str__(self):
