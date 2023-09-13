@@ -19,7 +19,7 @@ from generator.normalization.namehash_normalizer import NamehashNormalizer
 from generator.utils.log import LogEntry
 from generator.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
 from generator.xcollections.collection import Collection
-from generator.xgenerator import Generator
+from generator.xgenerator import Generator, RelatedSuggestions
 
 logger = logging.getLogger('generator')
 
@@ -167,7 +167,7 @@ category_fancy_names = {
 
 
 def convert_grouped_to_grouped_suggestions_format(
-        related_suggestions: dict[str, list[GeneratedName]],
+        related_suggestions: dict[str, RelatedSuggestions],
         grouped_suggestions: dict[str, list[GeneratedName]],
         include_metadata: bool = True
 ) -> dict[str, list[dict]]:
@@ -180,10 +180,11 @@ def convert_grouped_to_grouped_suggestions_format(
                     'suggestions': converted_suggestions if include_metadata else
                     [{'name': s['name']} for s in converted_suggestions],
                     'type': 'related',
-                    'name': collection_key[0],
-                    'collection_title': collection_key[0],
-                    'collection_id': collection_key[1],
-                    'collection_members_count': collection_key[2],
+                    'name': suggestions.collection_title,
+                    'collection_title': suggestions.collection_title,
+                    'collection_id': suggestions.collection_id,
+                    'collection_members_count': suggestions.collection_members_count,
+                    'related_collections': suggestions.related_collections,
                 })
         elif gcat in grouped_suggestions:
             converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
@@ -240,6 +241,7 @@ def convert_to_grouped_suggestions_format(
                     'collection_title': collection_key[0],
                     'collection_id': collection_key[1],
                     'collection_members_count': collection_key[2],
+                    'related_collections': [],  # TODO fix if this will be used
                 })
         elif grouped_dict[gcat]:
             grouped_response.append({
