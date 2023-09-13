@@ -248,13 +248,14 @@ class Generator:
                                            suggestion.collection_members_count)
 
                     # TODO should we remove duplicates?
+                    related_collections = suggestion.related_collections if suggestion.related_collections else []
                     all_related_suggestions[suggestion.collection_id].related_collections = [
                         {
                             'collection_id': collection['collection_id'],
                             'collection_title': collection['collection_name'],
                             'collection_members_count': collection['members_count']
                         }
-                        for collection in suggestion.related_collections[:max_recursive_related_collections]
+                        for collection in related_collections[:max_recursive_related_collections]
                     ]
 
                 all_related_suggestions[suggestion.collection_id].append(suggestion)
