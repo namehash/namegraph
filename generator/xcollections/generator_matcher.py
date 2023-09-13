@@ -12,972 +12,771 @@ from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
 
-RANDOM_COLLECTIONS = [
-    {
-        "collection_id": "Q8691332",
-        "collection_title": "Obsolete occupations",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6568325",
-        "collection_title": "DC Comics characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8387102",
-        "collection_title": "Cold War spies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q14914955",
-        "collection_title": "21st-century American male actors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q110607984",
-        "collection_title": "20th-century professional wrestlers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6312531",
-        "collection_title": "British comedy films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6710019",
-        "collection_title": "Dance styles",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1033564",
-        "collection_title": "Musical instruments",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6240182",
-        "collection_title": "Marvel Comics aliens",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619974",
-        "collection_title": "Films based on comic strips",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q31964013",
-        "collection_title": "Censored books",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6561958",
-        "collection_title": "Archie Comics characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q371776",
-        "collection_title": "Marvel Comics characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q176649",
-        "collection_title": "Explorers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6573012",
-        "collection_title": "Hellboy comics",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7786397",
-        "collection_title": "French comedy films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6620587",
-        "collection_title": "Foods named after places",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q17097513",
-        "collection_title": "Beef dishes",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1553781",
-        "collection_title": "Jazz standards",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3253626",
-        "collection_title": "Video game developers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1580173",
-        "collection_title": "Christmas films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6607083",
-        "collection_title": "Bands from Canada",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6639464",
-        "collection_title": "Shortest-reigning monarchs",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6645607",
-        "collection_title": "Paintings by Claude Monet",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q11811782",
-        "collection_title": "Stage names",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8205190",
-        "collection_title": "20th-century American singers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6461210",
-        "collection_title": "Nobel laureates in Literature",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619794",
-        "collection_title": "Fictional universes in literature",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q9057217",
-        "collection_title": "Muscle cars",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6577120",
-        "collection_title": "Women of the Victorian era",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8795685",
-        "collection_title": "Prohibition-era gangsters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q5001943",
-        "collection_title": "Classical-era composers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6262914",
-        "collection_title": "19th-century inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7012162",
-        "collection_title": "Polish inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6574909",
-        "collection_title": "Italian inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7145684",
-        "collection_title": "English inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6596077",
-        "collection_title": "Russian inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6635433",
-        "collection_title": "Prolific inventors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1322417",
-        "collection_title": "Wealthiest historical figures",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6636580",
-        "collection_title": "Richest Americans in history",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q4353132",
-        "collection_title": "Star Wars weapons",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3255153",
-        "collection_title": "Star Wars spacecraft",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1547772",
-        "collection_title": "Stars for navigation",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1141760",
-        "collection_title": "Most luminous stars",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1064642",
-        "collection_title": "Stars in Orion",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3245641",
-        "collection_title": "Pornographic actors who appeared in mainstream films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6590889",
-        "collection_title": "Muslim writers and poets",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q5128290",
-        "collection_title": "Ancient Greek writers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7905486",
-        "collection_title": "Child characters in literature",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7136631",
-        "collection_title": "19th-century paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6312512",
-        "collection_title": "American comedy films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q391049",
-        "collection_title": "Works by Salvador Dal\u00ed",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q25424983",
-        "collection_title": "Works by Gian Lorenzo Bernini",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6645649",
-        "collection_title": "Works by Henri Matisse",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q17042473",
-        "collection_title": "Most expensive video games to develop",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q24904880",
-        "collection_title": "Most expensive animated films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q477949",
-        "collection_title": "Most expensive photographs",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2476255",
-        "collection_title": "Most expensive films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1368268",
-        "collection_title": "Most expensive paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q578913",
-        "collection_title": "The New York Times Best Seller list",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q90723885",
-        "collection_title": "The World's 50 Best Bars",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7146100",
-        "collection_title": "Best Directing Academy Award winners",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q20649326",
-        "collection_title": "Best-selling films in the United States",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q468543",
-        "collection_title": "Best-selling Nintendo Entertainment System video games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6614871",
-        "collection_title": "Cult films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q99919996",
-        "collection_title": "Walt Disney Studios films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q468514",
-        "collection_title": "Best-selling albums in the United States",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6620067",
-        "collection_title": "Films set in New York City",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q859266",
-        "collection_title": "Best-selling music artists",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8273483",
-        "collection_title": "Best-selling PC games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q260894",
-        "collection_title": "Best-selling fiction authors",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q468558",
-        "collection_title": "Best-selling video games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q17096236",
-        "collection_title": "Films set on beaches",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6645657",
-        "collection_title": "Works by John Singer Sargent",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q40888113",
-        "collection_title": "Most-visited museums",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q4399678",
-        "collection_title": "Baroque paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q253427",
-        "collection_title": "Most valuable brands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6468877",
-        "collection_title": "Renaissance paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q5424600",
-        "collection_title": "FBI Ten Most Wanted Fugitives, 1980s",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3438063",
-        "collection_title": "Golfers with most European Tour wins",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q5424608",
-        "collection_title": "FBI Ten Most Wanted Fugitives, 2000s",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3116876",
-        "collection_title": "Paintings by Raphael",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1935417",
-        "collection_title": "Paintings by Rembrandt",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8709510",
-        "collection_title": "Mythological paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6621761",
-        "collection_title": "Golfers with most PGA Tour wins",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q16511139",
-        "collection_title": "The most common surnames in Germany",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q27661711",
-        "collection_title": "Most-streamed songs on Spotify",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6620885",
-        "collection_title": "Football managers with most games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6629053",
-        "collection_title": "Most-listened-to radio programs",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6643122",
-        "collection_title": "The most intense tropical cyclones",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2644810",
-        "collection_title": "Most wanted fugitives in Italy",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1575895",
-        "collection_title": "Cities with the most skyscrapers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1607351",
-        "collection_title": "NBA players with most championships",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6641487",
-        "collection_title": "Stolen paintings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6629083",
-        "collection_title": "Most popular dog breeds",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1771711",
-        "collection_title": "Most-visited art museums",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6629080",
-        "collection_title": "Most popular given names",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q46609563",
-        "collection_title": "Most-followed Twitch channels",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8508264",
-        "collection_title": "Hellenistic-era philosophers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1362208",
-        "collection_title": "Maritime explorers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q374709",
-        "collection_title": "Chess openings",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q17105506",
-        "collection_title": "Energy resources",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6625475",
-        "collection_title": "Liqueurs",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2600160",
-        "collection_title": "Board games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q11707952",
-        "collection_title": "Programming languages",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q450779",
-        "collection_title": "Hairstyles",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2678215",
-        "collection_title": "Candies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2507328",
-        "collection_title": "Cocktails",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7466917",
-        "collection_title": "Musicals",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6618930",
-        "collection_title": "Entrepreneurs",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q212664",
-        "collection_title": "Sports",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q376479",
-        "collection_title": "Banned films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7035212",
-        "collection_title": "Science fiction characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6811469",
-        "collection_title": "Banned political parties",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6640427",
-        "collection_title": "Sportswomen",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6606342",
-        "collection_title": "Athletes on Wheaties boxes",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7046061",
-        "collection_title": "Animated characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6632123",
-        "collection_title": "Pen names",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6938680",
-        "collection_title": "Discontinued software",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6278608",
-        "collection_title": "1920s cars",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6379792",
-        "collection_title": "Exploration ships",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q9536594",
-        "collection_title": "Cowboys",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q233327",
-        "collection_title": "Car brands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6628565",
-        "collection_title": "Military tactics",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q51805",
-        "collection_title": "Star Wars characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1053077",
-        "collection_title": "Mythological places",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q248137",
-        "collection_title": "Etruscan cities",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q16000160",
-        "collection_title": "Fictional pirates",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q17088638",
-        "collection_title": "Drinking games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q47226",
-        "collection_title": "South Park characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1863553",
-        "collection_title": "Hip hop musicians",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q571113",
-        "collection_title": "Glossary of chess",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3511268",
-        "collection_title": "Video game franchises",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q267149",
-        "collection_title": "The Simpsons characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q16375",
-        "collection_title": "Star Trek characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2708098",
-        "collection_title": "Apollo missions",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6357667",
-        "collection_title": "Cigar brands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q35094",
-        "collection_title": "National capitals",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6636523",
-        "collection_title": "Restaurant chains",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2733646",
-        "collection_title": "Heavy metal bands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q20900298",
-        "collection_title": "Fictional islands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q13353395",
-        "collection_title": "Time travelers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7498272",
-        "collection_title": "Star Wars creatures",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7784185",
-        "collection_title": "Cyberpunk films",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q108061205",
-        "collection_title": "Planets in science fiction",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8163929",
-        "collection_title": "1980 singles",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2750576",
-        "collection_title": "Fictional spacecraft",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619674",
-        "collection_title": "Fictional hackers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6596115",
-        "collection_title": "S&P 500 companies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q24735548",
-        "collection_title": "Fictional countries",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q779391",
-        "collection_title": "Cryptographers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q221173",
-        "collection_title": "Outline of academic disciplines",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619927",
-        "collection_title": "Films about mathematicians",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8723010",
-        "collection_title": "Women mathematicians",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q875625",
-        "collection_title": "Ancient Romans",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2268342",
-        "collection_title": "Ancient Greeks",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q614554",
-        "collection_title": "Ancient Egyptians",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q65626784",
-        "collection_title": "Ultimate Fighting Championship male fighters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6615344",
-        "collection_title": "Current mixed martial arts champions",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1188538",
-        "collection_title": "Street Fighter characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q4432676",
-        "collection_title": "Male mixed martial artists",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3082644",
-        "collection_title": "Bomber aircraft",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3409821",
-        "collection_title": "Latin phrases (full)",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q2042322",
-        "collection_title": "Historical currencies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q80167",
-        "collection_title": "Circulating currencies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q858338",
-        "collection_title": "Currencies",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8250685",
-        "collection_title": "Ancient Greek explorers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8100596",
-        "collection_title": "16th-century explorers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619420",
-        "collection_title": "Female explorers and travelers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8789379",
-        "collection_title": "Pre-computer cryptographers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8637205",
-        "collection_title": "Modern cryptographers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3769423",
-        "collection_title": "Hacker groups",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3247039",
-        "collection_title": "NASA aircraft",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6148196",
-        "collection_title": "Fictional extraterrestrial characters",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q8427931",
-        "collection_title": "Criminal duos",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q289111",
-        "collection_title": "Punk rock bands",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q516588",
-        "collection_title": "Greek mythological figures",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q56351871",
-        "collection_title": "Lunar deities",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6620952",
-        "collection_title": "Footwear designers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6619920",
-        "collection_title": "Films about computers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1514175",
-        "collection_title": "Types of sword",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7777128",
-        "collection_title": "Historians of astronomy",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q56926",
-        "collection_title": "Fashion designers",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q5827867",
-        "collection_title": "Satellites orbiting Earth",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q9651963",
-        "collection_title": "Women computer scientists",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6626703",
-        "collection_title": "Longest-running American television series",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6461577",
-        "collection_title": "Atari games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q82529",
-        "collection_title": "Pioneers in computer science",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q1369166",
-        "collection_title": "Sega Genesis games",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q3243244",
-        "collection_title": "Equations",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6638016",
-        "collection_title": "Scientific laws named after people",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q6632170",
-        "collection_title": "People considered father or mother of a scientific field",
-        "collection_members_count": 10
-    },
-    {
-        "collection_id": "Q7034480",
-        "collection_title": "Manga series",
-    }
-]
+RANDOM_COLLECTIONS = [{
+    "collection_id": "Rn4TS0G7h04u",
+    "collection_title": "Obsolete occupations",
+    "collection_members_count": 10
+}, {
+    "collection_id": "kzlXjF0nokTC",
+    "collection_title": "DC Comics characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "5CdmAuHfxLra",
+    "collection_title": "Cold War spies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "0XvELSuR7y_h",
+    "collection_title": "21st-century American male actors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "cNy9n4Tv5tFm",
+    "collection_title": "20th-century professional wrestlers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "n0yp8UgYdMss",
+    "collection_title": "British comedy films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "rUci33FP3OwS",
+    "collection_title": "Dance styles",
+    "collection_members_count": 10
+}, {
+    "collection_id": "UepWlJCTZln1",
+    "collection_title": "Musical instruments",
+    "collection_members_count": 10
+}, {
+    "collection_id": "nCyUuy6rQiAP",
+    "collection_title": "Marvel Comics aliens",
+    "collection_members_count": 10
+}, {
+    "collection_id": "KIE6K9Jg7vgv",
+    "collection_title": "Films based on comic strips",
+    "collection_members_count": 10
+}, {
+    "collection_id": "c8RGzTnqZCiD",
+    "collection_title": "Censored books",
+    "collection_members_count": 10
+}, {
+    "collection_id": "5qRqZPd_KeRO",
+    "collection_title": "Archie Comics characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "BmjZ5T2bWFpk",
+    "collection_title": "Marvel Comics characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "xzNaDygkWMVo",
+    "collection_title": "Explorers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "EA43gP3uI5NL",
+    "collection_title": "Hellboy comics",
+    "collection_members_count": 10
+}, {
+    "collection_id": "0hVnr8sRkukr",
+    "collection_title": "French comedy films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Emc7u4WtaNtp",
+    "collection_title": "Foods named after places",
+    "collection_members_count": 10
+}, {
+    "collection_id": "0WCTzrYMNoG1",
+    "collection_title": "Beef dishes",
+    "collection_members_count": 10
+}, {
+    "collection_id": "UpGCVBdMTpts",
+    "collection_title": "Jazz standards",
+    "collection_members_count": 10
+}, {
+    "collection_id": "jeJsHmpXAfk0",
+    "collection_title": "Video game developers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Rg36ar39wfFU",
+    "collection_title": "Christmas films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "CtoU6z6v7wy8",
+    "collection_title": "Bands from Canada",
+    "collection_members_count": 10
+}, {
+    "collection_id": "KhEIfPSsD9FV",
+    "collection_title": "Shortest-reigning monarchs",
+    "collection_members_count": 10
+}, {
+    "collection_id": "1hXgVdZASbRd",
+    "collection_title": "Paintings by Claude Monet",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Y8VJ5n116apI",
+    "collection_title": "Stage names",
+    "collection_members_count": 10
+}, {
+    "collection_id": "rscWddX5gdY0",
+    "collection_title": "20th-century American singers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ZWvYFmQ82Ffy",
+    "collection_title": "Nobel laureates in Literature",
+    "collection_members_count": 10
+}, {
+    "collection_id": "T9ok9ofLDeRD",
+    "collection_title": "Fictional universes in literature",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Gatf71h41k7h",
+    "collection_title": "Muscle cars",
+    "collection_members_count": 10
+}, {
+    "collection_id": "26FTReK7esbE",
+    "collection_title": "Women of the Victorian era",
+    "collection_members_count": 10
+}, {
+    "collection_id": "SqfYnJR2_gym",
+    "collection_title": "Prohibition-era gangsters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "66UpRRj5QCcj",
+    "collection_title": "Classical-era composers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "B9LhWs9SAlGI",
+    "collection_title": "19th-century inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "muYT3ivX12I2",
+    "collection_title": "Polish inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "jWav3c4dxj1F",
+    "collection_title": "Italian inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "vPXFy3hSl40y",
+    "collection_title": "English inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "wA57LVyPZvmi",
+    "collection_title": "Russian inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "sfrIjsTCGcFO",
+    "collection_title": "Prolific inventors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "aaxILPm5TdCj",
+    "collection_title": "Richest Americans in history",
+    "collection_members_count": 10
+}, {
+    "collection_id": "_knZzsUAekUG",
+    "collection_title": "Star Wars weapons",
+    "collection_members_count": 10
+}, {
+    "collection_id": "EhQ49Ozw3K0m",
+    "collection_title": "Star Wars spacecraft",
+    "collection_members_count": 10
+}, {
+    "collection_id": "dZ422ZnidxJR",
+    "collection_title": "Most luminous stars",
+    "collection_members_count": 10
+}, {
+    "collection_id": "rjisxn50I7Im",
+    "collection_title": "Stars in Orion",
+    "collection_members_count": 10
+}, {
+    "collection_id": "6Z771V6bf7tL",
+    "collection_title": "Pornographic actors who appeared in mainstream films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "1ukka8oAfM0O",
+    "collection_title": "Muslim writers and poets",
+    "collection_members_count": 10
+}, {
+    "collection_id": "17qyaSyQimYH",
+    "collection_title": "Ancient Greek writers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "4mHWqJIUCZVY",
+    "collection_title": "Child characters in literature",
+    "collection_members_count": 10
+}, {
+    "collection_id": "DEPfifLgFKgh",
+    "collection_title": "19th-century paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "72vVPATqGYtQ",
+    "collection_title": "American comedy films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "HSQMe2jPewDo",
+    "collection_title": "Works by Salvador Dalí",
+    "collection_members_count": 10
+}, {
+    "collection_id": "wBKV7zdAEJuk",
+    "collection_title": "Works by Gian Lorenzo Bernini",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ZKLnjo_W2lhF",
+    "collection_title": "Works by Henri Matisse",
+    "collection_members_count": 10
+}, {
+    "collection_id": "zKtzooh5Yjmf",
+    "collection_title": "Most expensive video games to develop",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Fb77Zojl7Jwy",
+    "collection_title": "Most expensive animated films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "dAYrT9CDP2Zk",
+    "collection_title": "Most expensive photographs",
+    "collection_members_count": 10
+}, {
+    "collection_id": "0iC_8BQ0pNKL",
+    "collection_title": "Most expensive films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "k9m_GNKecMXI",
+    "collection_title": "Most expensive paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "RONmxbNvOqzw",
+    "collection_title": "The New York Times Best Seller list",
+    "collection_members_count": 10
+}, {
+    "collection_id": "YC6mjmAgE_xD",
+    "collection_title": "The World's 50 Best Bars",
+    "collection_members_count": 10
+}, {
+    "collection_id": "s3Kd1FDjzRrH",
+    "collection_title": "Best Directing Academy Award winners",
+    "collection_members_count": 10
+}, {
+    "collection_id": "goZlhqv7nhjy",
+    "collection_title": "Best-selling films in the United States",
+    "collection_members_count": 10
+}, {
+    "collection_id": "yxA8UUSpyEta",
+    "collection_title": "Best-selling Nintendo Entertainment System video games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "CchbWfyn2Rql",
+    "collection_title": "Cult films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "gIGHkbXQJgzS",
+    "collection_title": "Walt Disney Studios films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "d6kMx2Zq3n2u",
+    "collection_title": "Best-selling albums in the United States",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Te7dYo4n78l5",
+    "collection_title": "Films set in New York City",
+    "collection_members_count": 10
+}, {
+    "collection_id": "BzdUNUNW77cB",
+    "collection_title": "Best-selling music artists",
+    "collection_members_count": 10
+}, {
+    "collection_id": "n5ApBFzc8FIS",
+    "collection_title": "Best-selling PC games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "wvDEXG71Hw6t",
+    "collection_title": "Best-selling fiction authors",
+    "collection_members_count": 10
+}, {
+    "collection_id": "YEqAyeqw5_8E",
+    "collection_title": "Best-selling video games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "BxJSj2cUXRGp",
+    "collection_title": "Films set on beaches",
+    "collection_members_count": 10
+}, {
+    "collection_id": "RFdwh8N68bzC",
+    "collection_title": "Works by John Singer Sargent",
+    "collection_members_count": 10
+}, {
+    "collection_id": "zRjpr5tsasLH",
+    "collection_title": "Most-visited museums",
+    "collection_members_count": 10
+}, {
+    "collection_id": "dCw6FzMg9ZqO",
+    "collection_title": "Baroque paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "9aTrdtcqd26t",
+    "collection_title": "Most valuable brands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "bPwgtwmL1ScK",
+    "collection_title": "Renaissance paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "RpLJVythw7er",
+    "collection_title": "FBI Ten Most Wanted Fugitives, 1980s",
+    "collection_members_count": 10
+}, {
+    "collection_id": "9BUtvOe1sZp8",
+    "collection_title": "Golfers with most European Tour wins",
+    "collection_members_count": 10
+}, {
+    "collection_id": "bBsOoiQw94bf",
+    "collection_title": "FBI Ten Most Wanted Fugitives, 2000s",
+    "collection_members_count": 10
+}, {
+    "collection_id": "sso2QwGMX7yE",
+    "collection_title": "Paintings by Raphael",
+    "collection_members_count": 10
+}, {
+    "collection_id": "AgYZzjohMOTo",
+    "collection_title": "Paintings by Rembrandt",
+    "collection_members_count": 10
+}, {
+    "collection_id": "bhD0YD60Az7W",
+    "collection_title": "Mythological paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "w8k_K0488Mkv",
+    "collection_title": "Golfers with most PGA Tour wins",
+    "collection_members_count": 10
+}, {
+    "collection_id": "RufejBxGSt3j",
+    "collection_title": "The most common surnames in Germany",
+    "collection_members_count": 10
+}, {
+    "collection_id": "jK9pcmL39qt_",
+    "collection_title": "Most-streamed songs on Spotify",
+    "collection_members_count": 10
+}, {
+    "collection_id": "6hjz5WHssENL",
+    "collection_title": "Football managers with most games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "8ySok7TjE13v",
+    "collection_title": "Most-listened-to radio programs",
+    "collection_members_count": 10
+}, {
+    "collection_id": "hdud6s9Wv6FH",
+    "collection_title": "The most intense tropical cyclones",
+    "collection_members_count": 10
+}, {
+    "collection_id": "wezgtOjcJTfU",
+    "collection_title": "Most wanted fugitives in Italy",
+    "collection_members_count": 10
+}, {
+    "collection_id": "CddzuA9u59wN",
+    "collection_title": "Cities with the most skyscrapers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Z3YN5Uez0MVU",
+    "collection_title": "NBA players with most championships",
+    "collection_members_count": 10
+}, {
+    "collection_id": "jLGcbcAA_klI",
+    "collection_title": "Stolen paintings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "2a7qaCz26MRq",
+    "collection_title": "Most popular dog breeds",
+    "collection_members_count": 10
+}, {
+    "collection_id": "GQxwMlq9SDlt",
+    "collection_title": "Most-visited art museums",
+    "collection_members_count": 10
+}, {
+    "collection_id": "qlVLOp9YGwX8",
+    "collection_title": "Most popular given names",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Dx7EDYecPGQ2",
+    "collection_title": "Most-followed Twitch channels",
+    "collection_members_count": 10
+}, {
+    "collection_id": "IgKizwjeLuO5",
+    "collection_title": "Hellenistic-era philosophers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "l0ajAWNvf6Yr",
+    "collection_title": "Maritime explorers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ujSC7uk5IA_D",
+    "collection_title": "Chess openings",
+    "collection_members_count": 10
+}, {
+    "collection_id": "TmFOy31z3Cdr",
+    "collection_title": "Energy resources",
+    "collection_members_count": 10
+}, {
+    "collection_id": "4vaYiFMbwZAB",
+    "collection_title": "Liqueurs",
+    "collection_members_count": 10
+}, {
+    "collection_id": "zeE0CyJumwa8",
+    "collection_title": "Board games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "iCXiiZoHh2ml",
+    "collection_title": "Programming languages",
+    "collection_members_count": 10
+}, {
+    "collection_id": "LpZKTtODovKs",
+    "collection_title": "Hairstyles",
+    "collection_members_count": 10
+}, {
+    "collection_id": "0iHNOsobou3f",
+    "collection_title": "Candies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "nll65OOYz9T8",
+    "collection_title": "Cocktails",
+    "collection_members_count": 10
+}, {
+    "collection_id": "lPuLOu5HQpzT",
+    "collection_title": "Musicals",
+    "collection_members_count": 10
+}, {
+    "collection_id": "d11eBUhLqijD",
+    "collection_title": "Entrepreneurs",
+    "collection_members_count": 10
+}, {
+    "collection_id": "WUvdQ5MPcqpQ",
+    "collection_title": "Sports",
+    "collection_members_count": 10
+}, {
+    "collection_id": "eJtHOwTktJ1w",
+    "collection_title": "Banned films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "q0frEa2zle1Y",
+    "collection_title": "Science fiction characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "87XDeSmBu0DW",
+    "collection_title": "Banned political parties",
+    "collection_members_count": 10
+}, {
+    "collection_id": "1sPckzCRx3HY",
+    "collection_title": "Sportswomen",
+    "collection_members_count": 10
+}, {
+    "collection_id": "fxfprvLrFFjG",
+    "collection_title": "Athletes on Wheaties boxes",
+    "collection_members_count": 10
+}, {
+    "collection_id": "isv7LAyTH5Ft",
+    "collection_title": "Animated characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "raUFSb1GdbJ_",
+    "collection_title": "Pen names",
+    "collection_members_count": 10
+}, {
+    "collection_id": "d1UbNz8pfV5Q",
+    "collection_title": "Discontinued software",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ybv_9FpqYLbl",
+    "collection_title": "1920s cars",
+    "collection_members_count": 10
+}, {
+    "collection_id": "BUJFgijETBJA",
+    "collection_title": "Exploration ships",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ovZAARoXEw60",
+    "collection_title": "Cowboys",
+    "collection_members_count": 10
+}, {
+    "collection_id": "tvBGcodKLstS",
+    "collection_title": "Car brands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "BYJQfDxjpI9w",
+    "collection_title": "Military tactics",
+    "collection_members_count": 10
+}, {
+    "collection_id": "CpCD1CdRD06d",
+    "collection_title": "Star Wars characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "coC_eu9KvoCN",
+    "collection_title": "Mythological places",
+    "collection_members_count": 10
+}, {
+    "collection_id": "I14bpsrVpQqE",
+    "collection_title": "Etruscan cities",
+    "collection_members_count": 10
+}, {
+    "collection_id": "9NFG1WEBHo1a",
+    "collection_title": "Fictional pirates",
+    "collection_members_count": 10
+}, {
+    "collection_id": "5f3xUvXtouJr",
+    "collection_title": "Drinking games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "QCgbqo5D35QY",
+    "collection_title": "South Park characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "pQ5br1AM8WS0",
+    "collection_title": "Hip hop musicians",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Dd9jxVuuuAGk",
+    "collection_title": "Glossary of chess",
+    "collection_members_count": 10
+}, {
+    "collection_id": "OGOlCrPAEqTx",
+    "collection_title": "Video game franchises",
+    "collection_members_count": 10
+}, {
+    "collection_id": "GYYuvk3MQc9j",
+    "collection_title": "The Simpsons characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ZARwGb97Klxe",
+    "collection_title": "Star Trek characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "UpveSTQBSyL2",
+    "collection_title": "Apollo missions",
+    "collection_members_count": 10
+}, {
+    "collection_id": "JT1kR0GHtvo0",
+    "collection_title": "Cigar brands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "ZbiRjnJ1UVKQ",
+    "collection_title": "National capitals",
+    "collection_members_count": 10
+}, {
+    "collection_id": "qoNSe9Sae3by",
+    "collection_title": "Restaurant chains",
+    "collection_members_count": 10
+}, {
+    "collection_id": "3Z8U4tsobyPo",
+    "collection_title": "Heavy metal bands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "dORVWe_XS9uH",
+    "collection_title": "Fictional islands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "PXK0XidiGaq9",
+    "collection_title": "Time travelers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "q2kkMM74A5mV",
+    "collection_title": "Star Wars creatures",
+    "collection_members_count": 10
+}, {
+    "collection_id": "QnkK23Gk8jPM",
+    "collection_title": "Cyberpunk films",
+    "collection_members_count": 10
+}, {
+    "collection_id": "4DN1YsrDgvQz",
+    "collection_title": "Planets in science fiction",
+    "collection_members_count": 10
+}, {
+    "collection_id": "kB_LYH9Cm8G9",
+    "collection_title": "1980 singles",
+    "collection_members_count": 10
+}, {
+    "collection_id": "nDTcwrPMJV4r",
+    "collection_title": "Fictional spacecraft",
+    "collection_members_count": 10
+}, {
+    "collection_id": "LVH632ccYneC",
+    "collection_title": "Fictional hackers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "1fuDavdSb219",
+    "collection_title": "S&P 500 companies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "o5joEHqwxILQ",
+    "collection_title": "Fictional countries",
+    "collection_members_count": 10
+}, {
+    "collection_id": "PIA_aCFoMZul",
+    "collection_title": "Cryptographers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "CkOz4FMOKtvr",
+    "collection_title": "Outline of academic disciplines",
+    "collection_members_count": 10
+}, {
+    "collection_id": "HgRv0SRx0Ox6",
+    "collection_title": "Films about mathematicians",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Zm_wPk1y5vvd",
+    "collection_title": "Women mathematicians",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Yo6n6XRoo2l0",
+    "collection_title": "Ancient Romans",
+    "collection_members_count": 10
+}, {
+    "collection_id": "a93lHGFRzP31",
+    "collection_title": "Ancient Greeks",
+    "collection_members_count": 10
+}, {
+    "collection_id": "N8hOXdjVQjuZ",
+    "collection_title": "Ancient Egyptians",
+    "collection_members_count": 10
+}, {
+    "collection_id": "R5os_gRrhAR0",
+    "collection_title": "Ultimate Fighting Championship male fighters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "TYH9rMt54U4P",
+    "collection_title": "Current mixed martial arts champions",
+    "collection_members_count": 10
+}, {
+    "collection_id": "USPyI8ZRDupc",
+    "collection_title": "Street Fighter characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "NJlLzYrhIvYi",
+    "collection_title": "Male mixed martial artists",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Tkm6X2KhkCgg",
+    "collection_title": "Bomber aircraft",
+    "collection_members_count": 10
+}, {
+    "collection_id": "QgJAPZ80rXlm",
+    "collection_title": "Latin phrases (full)",
+    "collection_members_count": 10
+}, {
+    "collection_id": "A4oPQkViRRoS",
+    "collection_title": "Historical currencies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "DKd5PiITYx4S",
+    "collection_title": "Circulating currencies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "59vidPzkFOkx",
+    "collection_title": "Currencies",
+    "collection_members_count": 10
+}, {
+    "collection_id": "837dlXhajRUx",
+    "collection_title": "Ancient Greek explorers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "6XwhccNWq1dH",
+    "collection_title": "16th-century explorers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "nqMku1yqmOag",
+    "collection_title": "Female explorers and travelers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Wuv2eLY7BBm6",
+    "collection_title": "Pre-computer cryptographers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "7GkyeC9IWZ_Y",
+    "collection_title": "Modern cryptographers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "yce20ppJTPaR",
+    "collection_title": "Hacker groups",
+    "collection_members_count": 10
+}, {
+    "collection_id": "MP8wk872pYYL",
+    "collection_title": "NASA aircraft",
+    "collection_members_count": 10
+}, {
+    "collection_id": "zw2La_KTIzfl",
+    "collection_title": "Fictional extraterrestrial characters",
+    "collection_members_count": 10
+}, {
+    "collection_id": "3l5KcyaWNTYp",
+    "collection_title": "Criminal duos",
+    "collection_members_count": 10
+}, {
+    "collection_id": "DpVpG0nFIFtN",
+    "collection_title": "Punk rock bands",
+    "collection_members_count": 10
+}, {
+    "collection_id": "3vkCFOZ101p1",
+    "collection_title": "Greek mythological figures",
+    "collection_members_count": 10
+}, {
+    "collection_id": "JtCnUA0x_BD5",
+    "collection_title": "Lunar deities",
+    "collection_members_count": 10
+}, {
+    "collection_id": "oGOANxvfU8cX",
+    "collection_title": "Footwear designers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "XqPQbwma51i1",
+    "collection_title": "Films about computers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "XW4IILWegiXl",
+    "collection_title": "Types of sword",
+    "collection_members_count": 10
+}, {
+    "collection_id": "19DhHlGEa3Dr",
+    "collection_title": "Historians of astronomy",
+    "collection_members_count": 10
+}, {
+    "collection_id": "j0Wu2vwyVj7R",
+    "collection_title": "Fashion designers",
+    "collection_members_count": 10
+}, {
+    "collection_id": "qB8M4s9PgN1k",
+    "collection_title": "Satellites orbiting Earth",
+    "collection_members_count": 10
+}, {
+    "collection_id": "A5fXMo9LJYLG",
+    "collection_title": "Women computer scientists",
+    "collection_members_count": 10
+}, {
+    "collection_id": "cDy2E8g5tEvc",
+    "collection_title": "Longest-running American television series",
+    "collection_members_count": 10
+}, {
+    "collection_id": "vn8mUlr1UQ6J",
+    "collection_title": "Atari games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "KLfU1xWB6TIi",
+    "collection_title": "Pioneers in computer science",
+    "collection_members_count": 10
+}, {
+    "collection_id": "nEjrCGdNtoRp",
+    "collection_title": "Sega Genesis games",
+    "collection_members_count": 10
+}, {
+    "collection_id": "3Ruz4H6s7iyQ",
+    "collection_title": "Equations",
+    "collection_members_count": 10
+}, {
+    "collection_id": "Sd0WHBpuWFW1",
+    "collection_title": "Scientific laws named after people",
+    "collection_members_count": 10
+}, {
+    "collection_id": "X6S0sgGBKPnO",
+    "collection_title": "People considered father or mother of a scientific field",
+    "collection_members_count": 10
+}, {
+    "collection_id": "yoWTPmmY9HNz",
+    "collection_title": "Manga series",
+    "collection_members_count": 10
+}]
 
 logger = logging.getLogger('generator')
 
@@ -1268,7 +1067,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'collection_title': response['_source']['data']['collection_name'],
             'collection_members_count': response['_source']['metadata']['members_count'],
             'top_members': [item['normalized_name'] for item in response['_source']['template']['top10_names']],
-            'related_collections': random.sample(RANDOM_COLLECTIONS, max_recursive_related_collections) #TODO get from ES
+            'related_collections': random.sample(RANDOM_COLLECTIONS, max_recursive_related_collections)
+            # TODO get from ES
         }
 
         return result, es_response_metadata
