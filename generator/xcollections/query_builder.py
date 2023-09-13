@@ -10,6 +10,19 @@ class ElasticsearchQueryBuilder:
             'query': {},
         }
 
+    def add_ids(self, ids: list[str]) -> ElasticsearchQueryBuilder:
+        """
+        Adds ids to the query builder
+
+        :param ids: list of ids
+        :return: self
+        """
+        self._query['query']['ids'] = {
+            'values': ids
+        }
+
+        return self
+
     def add_must(self, type: str, query: dict) -> ElasticsearchQueryBuilder:
         """
         Adds a must query to the query builder

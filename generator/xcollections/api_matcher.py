@@ -38,7 +38,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             query = f'{tokenized_query} {wo_spaces}'
 
         include_fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
@@ -87,7 +87,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 .build_params()
 
         try:
-            print(query_params)
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
 
             if not apply_diversity:
@@ -101,7 +100,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
     def get_collections_count_by_string(self, query: str, mode: str) -> tuple[Union[int, str], dict]:
-
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'
@@ -148,14 +146,14 @@ class CollectionMatcherForAPI(CollectionMatcher):
             sort_order = 'ES'
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         # find collection with specified collection_id
         id_match_params = (ElasticsearchQueryBuilder()
-                           .set_term('metadata.id.keyword', collection_id)
+                           .set_term('_id', collection_id)
                            .set_source(False)
                            .include_fields(fields)
                            .include_script_field('script_names', get_names_script(limit_names=100))
@@ -189,7 +187,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                         .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
                                    fields=["data.names.normalized_name"])
                         .add_filter('term', {'data.public': True})
-                        .add_must_not('term', {"metadata.id.keyword": collection_id})
+                        .add_must_not('term', {"_id": collection_id})
                         .add_rank_feature('template.collection_rank', boost=100)
                         .add_rank_feature('metadata.members_count')
                         .add_rank_feature('template.members_rank_mean')
@@ -250,7 +248,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
@@ -282,18 +280,19 @@ class CollectionMatcherForAPI(CollectionMatcher):
     def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
 
         fields = [
-            'metadata.id', 'data.collection_name', 'template.collection_rank', 'metadata.owner',
+            'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
         try:
             query_params = (ElasticsearchQueryBuilder()
-                            .set_terms('metadata.id.keyword', id_list)
+                            .add_ids(id_list)
                             .include_fields(fields)
                             .add_limit(len(id_list))
                             .build_params())
 
+            # TODO can be optimized by using mget, but we need to map wikidata ids to elastic ids
             collections, _ = self._execute_query(query_params, limit_names=10)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)

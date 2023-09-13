@@ -47,7 +47,7 @@ class Collection:
         fields = hit['fields']
         return cls(
             score=hit['_score'],
-            collection_id=fields['metadata.id'][0],
+            collection_id=hit['_id'],
             title=fields['data.collection_name'][0],
             rank=fields['template.collection_rank'][0],
             owner=fields['metadata.owner'][0],
@@ -72,7 +72,7 @@ class Collection:
         fields = hit['fields']
         return cls(
             score=hit['_score'],
-            collection_id=fields['metadata.id'][0],
+            collection_id=hit['_id'],
             title=fields['data.collection_name'][0],
             rank=fields['template.collection_rank'][0],
             owner=fields['metadata.owner'][0],

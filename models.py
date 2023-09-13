@@ -120,8 +120,8 @@ class GroupedNameRequest(BaseModel):
     #                                     ge=0.0, le=1.0,
     #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
     #                                                 'primary names will be generated')
-    params: Optional[GroupedParams] = Field(None, title='pipeline parameters',
-                                            description='includes all the parameters for all nodes of the pipeline')
+    params: GroupedParams = Field(GroupedParams(), title='pipeline parameters',
+                                  description='includes all the parameters for all nodes of the pipeline')
 
     categories: CategoriesParams = Field(default=CategoriesParams(),
         title='controls the results of other categories than related (except for "Other Names")')
@@ -197,6 +197,8 @@ class CollectionCategory(GroupingCategory):
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
     collection_members_count: int = Field(title='number of members in the collection')
+    related_collections: list[RecursiveRelatedCollection] = Field(title='related collections to this collection')
+
 
 
 class OtherCategory(GroupingCategory):
@@ -214,7 +216,7 @@ class GroupedSuggestions(BaseModel):
 
 class SampleCollectionMembers(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to sample from', examples=['Q6615994'])
+    collection_id: str = Field(title='id of the collection to sample from', examples=['qdeq7I9z0_jv'])
     metadata: bool = Field(True, title='return all the metadata in response')
     max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
                                  description='if the collection has less members than max_sample_size, '
@@ -226,8 +228,14 @@ class SampleCollectionMembers(BaseModel):
 
 class Top10CollectionMembersRequest(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to fetch names from', examples=['Q6607079'])
+    collection_id: str = Field(title='id of the collection to fetch names from', examples=['ri2QqxnAqZT7'])
     metadata: bool = Field(True, title='return all the metadata in response')
+    max_recursive_related_collections: int = Field(3, ge=0, le=10,
+                                                   title='Set to 0 to disable the "recursive related collection search". '
+                                                         'When set to a value between 1 and 10, '
+                                                         'for each related collection we find, '
+                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
+                                                         'to the related collection.')
 
 
 class ScrambleCollectionTokens(BaseModel):
