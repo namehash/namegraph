@@ -198,3 +198,15 @@ Requirements:
 2. Within each category: sample type and lang of interpretation, sample interpretaion with this type and lang. Sample pipeline (weights of pipelines depends on type and language. Do it in parallel?
 3. Sample `max number of suggestions per category`. How handle `min_available_fraction`?
 
+### Suggestions by category
+
+For each category MetaSampler is created with appropriate pipelines.
+In parallel, all MetaSamplers are exectuted. In one MetaSampler:
+1. Apply global limits.
+2. For each interpretation (interpretation_type, lang, tokenization) a sampler is created.
+3. 
+
+
+After generation of suggestions for all categories:
+1. For each category number of suggestions is limited by category's `max_suggestions`.
+2. If `count_real_suggestions` < `min_total_suggestions` then RandomAvailable names are appended as `other` category.
