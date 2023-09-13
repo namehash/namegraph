@@ -482,3 +482,19 @@ class TestGrouped:
             # most wikidata ids are no longer than 12 symbols
             # instead our generated ids are 12 symbols long
             assert len(collection_id) >= 12
+
+    def test_fetching_top_collection_members(self, test_client):
+        client = test_client
+        collection_id = 'JCzsKPv4HQ2N'  # Q15102072
+
+        response = client.post("/fetch_top_collection_members",
+                               json={"collection_id": collection_id})
+
+        assert response.status_code == 200
+        response_json = response.json()
+        assert len(response_json) <= 10
+
+        for name in response_json['suggestions']:
+            assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
+            assert name['metadata']['collection_id'] == collection_id
+            

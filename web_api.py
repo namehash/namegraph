@@ -92,7 +92,7 @@ from models import (
     Suggestion,
     SampleCollectionMembers,
     GroupedSuggestions,
-    Top10CollectionMembersRequest, GroupedNameRequest,
+    Top10CollectionMembersRequest, GroupedNameRequest, CollectionCategory,
 )
 
 from collection_models import (
@@ -166,6 +166,24 @@ category_fancy_names = {
 }
 
 
+def convert_related_to_grouped_suggestions_format(
+        related_suggestions: dict[str, RelatedSuggestions], include_metadata: bool = True) -> list[dict]:
+    grouped_response = []
+    for collection_key, suggestions in related_suggestions.items():
+        converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
+        grouped_response.append({
+            'suggestions': converted_suggestions if include_metadata else
+            [{'name': s['name']} for s in converted_suggestions],
+            'type': 'related',
+            'name': suggestions.collection_title,
+            'collection_title': suggestions.collection_title,
+            'collection_id': suggestions.collection_id,
+            'collection_members_count': suggestions.collection_members_count,
+            'related_collections': suggestions.related_collections,
+        })
+    return grouped_response
+
+
 def convert_grouped_to_grouped_suggestions_format(
         related_suggestions: dict[str, RelatedSuggestions],
         grouped_suggestions: dict[str, list[GeneratedName]],
@@ -174,18 +192,7 @@ def convert_grouped_to_grouped_suggestions_format(
     grouped_response: list[dict] = []
     for gcat in generator.config.generation.grouping_categories_order:
         if gcat == 'related':
-            for collection_key, suggestions in related_suggestions.items():
-                converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
-                grouped_response.append({
-                    'suggestions': converted_suggestions if include_metadata else
-                    [{'name': s['name']} for s in converted_suggestions],
-                    'type': 'related',
-                    'name': suggestions.collection_title,
-                    'collection_title': suggestions.collection_title,
-                    'collection_id': suggestions.collection_id,
-                    'collection_members_count': suggestions.collection_members_count,
-                    'related_collections': suggestions.related_collections,
-                })
+            grouped_response.extend(convert_related_to_grouped_suggestions_format(related_suggestions,include_metadata))
         elif gcat in grouped_suggestions:
             converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
             grouped_response.append({
@@ -328,13 +335,13 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
     return response
 
 
-@app.post("/fetch_top_collection_members", response_model=list[Suggestion], tags=['collections'])
+@app.post("/fetch_top_collection_members", response_model=CollectionCategory, tags=['collections'])
 async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembersRequest):
     """
     * this endpoint returns top 10 members from the collection specified by collection_id
     """
     result, es_response_metadata = generator_matcher.fetch_top10_members_from_collection(
-        fetch_top10_command.collection_id
+        fetch_top10_command.collection_id, fetch_top10_command.max_recursive_related_collections
     )
 
     top_members = []
@@ -348,9 +355,16 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
         obj.interpretation = []
         top_members.append(obj)
 
-    response = convert_to_suggestion_format(top_members, include_metadata=fetch_top10_command.metadata)
+    # response = convert_to_suggestion_format(top_members, include_metadata=fetch_top10_command.metadata)
 
-    return response
+    rs = RelatedSuggestions(result['collection_id'], result['collection_title'], result['collection_members_count'], )
+    rs.related_collections = result['related_collections']
+    rs.extend(top_members)
+
+    response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs}, 
+                                                              include_metadata=fetch_top10_command.metadata)
+
+    return response2[0]
 
 
 def convert_to_collection_format(collections: list[Collection]):
