@@ -230,3 +230,9 @@ class Top10CollectionMembersRequest(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     collection_id: str = Field(title='id of the collection to fetch names from', examples=['ri2QqxnAqZT7'])
     metadata: bool = Field(True, title='return all the metadata in response')
+    max_recursive_related_collections: int = Field(3, ge=0, le=10,
+                                                   title='Set to 0 to disable the "recursive related collection search". '
+                                                         'When set to a value between 1 and 10, '
+                                                         'for each related collection we find, '
+                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
+                                                         'to the related collection.')
