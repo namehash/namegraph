@@ -92,7 +92,10 @@ from models import (
     Suggestion,
     SampleCollectionMembers,
     GroupedSuggestions,
-    Top10CollectionMembersRequest, GroupedNameRequest, CollectionCategory,
+    Top10CollectionMembersRequest,
+    GroupedNameRequest,
+    ScrambleCollectionTokens,
+    CollectionCategory,
 )
 
 from collection_models import (
@@ -361,10 +364,32 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     rs.related_collections = result['related_collections']
     rs.extend(top_members)
 
-    response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs}, 
+    response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
                                                               include_metadata=fetch_top10_command.metadata)
 
     return response2[0]
+
+
+@app.post("/scramble_collection_tokens", response_model=list[Suggestion], tags=['collections'])
+async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens):
+    result, es_response_metadata = generator_matcher.scramble_tokens_from_collection(
+        scramble_command.collection_id, scramble_command.method, scramble_command.n_top_members
+    )
+
+    suggestions = []
+    for name in result['token_scramble_suggestions']:
+        obj = GeneratedName(tokens=(name,),
+                            pipeline_name='scramble_collection_tokens',
+                            collection_id=result['collection_id'],
+                            collection_title=result['collection_title'],
+                            grouping_category='related',
+                            applied_strategies=[])
+        obj.interpretation = []
+        suggestions.append(obj)
+
+    response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata)
+
+    return response
 
 
 def convert_to_collection_format(collections: list[Collection]):
