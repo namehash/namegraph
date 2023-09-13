@@ -197,6 +197,8 @@ class CollectionCategory(GroupingCategory):
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
     collection_members_count: int = Field(title='number of members in the collection')
+    related_collections: list[RecursiveRelatedCollection] = Field(title='related collections to this collection')
+
 
 
 class OtherCategory(GroupingCategory):

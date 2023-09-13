@@ -445,7 +445,7 @@ class TestGrouped:
             # assert related are after one another
             if gcat['type'] == 'related':
                 assert not last_related_flag
-                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions'} \
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions', 'related_collections'} \
                        == set(gcat.keys())
                 assert gcat['name'] == gcat['collection_title']
                 # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
