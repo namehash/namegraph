@@ -554,7 +554,7 @@ def test_fetching_top_collection_members(prod_test_client):
 
 class TestTokenScramble:
     @pytest.mark.integration_test
-    def test_left_right_shuffle(prod_test_client):
+    def test_left_right_shuffle(self, prod_test_client):
         client = prod_test_client
         collection_id = 'dzifE0uLLXb0'
 
@@ -581,7 +581,7 @@ class TestTokenScramble:
 
 
         @pytest.mark.integration_test
-        def test_left_right_shuffle_with_unigrams_interesting_names(prod_test_client):
+        def test_left_right_shuffle_with_unigrams_interesting_names(self, prod_test_client):
             client = prod_test_client
             collection_id = '3OB_f2vmyuyp'  # tropical fruit
 
@@ -609,7 +609,7 @@ class TestTokenScramble:
 
 
         @pytest.mark.integration_test
-        def test_full_shuffle(prod_test_client):
+        def test_full_shuffle(self, prod_test_client):
             client = prod_test_client
             collection_id = '3OB_f2vmyuyp'  # tropical fruit
 
