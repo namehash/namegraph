@@ -39,6 +39,7 @@ class CollectionGenerator(NameGenerator):
         self.max_per_type = config.collections.max_per_type
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
+        #TODO maybe use concatenation of all tokenizations as query
         if ' ' in name.strip_eth_namehash_unicode_long_name:
             tokens = name.strip_eth_namehash_unicode_long_name.strip().split(' ')
         else:
@@ -64,10 +65,13 @@ class CollectionGenerator(NameGenerator):
         ]
 
         return (
-            GeneratedName(tokenized_name, applied_strategies=[[self.__class__.__name__]],
+            GeneratedName(tokenized_name,
+                          applied_strategies=[[self.__class__.__name__]],
                           grouping_category=self.get_grouping_category(output_name=''.join(tokenized_name)),
-                          collection_title=collection.title, collection_id=collection.collection_id,
-                          collection_members_count=collection.number_of_names)
+                          collection_title=collection.title,
+                          collection_id=collection.collection_id,
+                          collection_members_count=collection.number_of_names,
+                          related_collections=collection.related_collections,)
             for collection, tokenized_name in roundrobin(*collections_with_tuples)
             if tokenized_name != tokens
         )
@@ -90,7 +94,9 @@ class CollectionGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        if ' ' in name.strip_eth_namehash_unicode_long_name:
-            return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
-        else:
-            return {'tokens': interpretation.tokenization}
+        # if ' ' in name.strip_eth_namehash_unicode_long_name:
+        #     return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        # else:
+        #     return {'tokens': interpretation.tokenization}
+        #hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
+        return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
