@@ -409,6 +409,11 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 mid = len(unigrams_list) // 2
                 left_tokens_list = list(left_tokens | set(unigrams_list[:mid]))
                 right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
+                # alternative version of left/right tokens with different unigrams
+                alt_left_tokens_list = list(left_tokens | set(unigrams_list[mid:]))
+                alt_right_tokens_list = list(right_tokens | set(unigrams_list[:mid]))
+                random.shuffle(alt_left_tokens_list)
+                random.shuffle(alt_right_tokens_list)
             random.shuffle(left_tokens_list)
             random.shuffle(right_tokens_list)
 
@@ -417,8 +422,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 pass
             elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list)) - 1) < n_suggestions:
                 n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
-                left_tokens_list *= n_repeats
-                right_tokens_list *= n_repeats
+                if method == 'left-right-shuffle':
+                    left_tokens_list *= n_repeats
+                    right_tokens_list *= n_repeats
+                elif method == 'left-right-shuffle-with-unigrams':
+                    left_mixed_unigrams = left_tokens_list + alt_left_tokens_list
+                    right_mixed_unigrams = right_tokens_list + alt_right_tokens_list
+                    left_tokens_list = (n_repeats // 2 + 1) * left_mixed_unigrams
+                    right_tokens_list = (n_repeats // 2 + 1) * right_mixed_unigrams
 
             while left_tokens_list and (n_suggestions is None or len(suggestions) < n_suggestions):
                 left = left_tokens_list.pop()
