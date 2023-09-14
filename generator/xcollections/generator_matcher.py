@@ -1150,29 +1150,36 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         original_names = {t[0] for t in name_tokens_tuples}
         suggestions = []
 
+        left_tokens_list = list(left_tokens)
+        right_tokens_list = list(right_tokens)
+        unigrams_list = list(unigrams)
+
         if method == 'left-right-shuffle' or method == 'left-right-shuffle-with-unigrams':
             if method == 'left-right-shuffle-with-unigrams':
-                unigrams_list = list(unigrams)
+                random.shuffle(unigrams_list)
                 mid = len(unigrams_list) // 2
-                left_tokens.update(unigrams_list[:mid])
-                right_tokens.update(unigrams_list[mid:])
-            while left_tokens:
-                left = left_tokens.pop()
-                for right in right_tokens:
+                left_tokens_list = list(left_tokens | set(unigrams_list[:mid]))
+                right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
+            random.shuffle(left_tokens_list)
+            random.shuffle(right_tokens_list)
+            while left_tokens_list:
+                left = left_tokens_list.pop()
+                for i, right in enumerate(right_tokens_list):
                     s = left + right
                     if s not in original_names and s not in suggestions:
                         suggestions.append(s)
-                        right_tokens.remove(right)
+                        del right_tokens_list[i]
                         break
         elif method == 'full-shuffle':
-            all_unigrams = left_tokens | right_tokens | unigrams
+            all_unigrams = list(left_tokens | right_tokens | unigrams)
+            random.shuffle(all_unigrams)
             while len(all_unigrams) >= 2:
                 left = all_unigrams.pop()
-                for right in all_unigrams:
+                for i, right in enumerate(all_unigrams):
                     s = left + right
                     if s not in original_names and s not in suggestions:
                         suggestions.append(s)
-                        all_unigrams.remove(right)
+                        del all_unigrams[i]
                         break
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
