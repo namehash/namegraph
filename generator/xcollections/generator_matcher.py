@@ -1079,7 +1079,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             collection_id: str,
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
-            n_top_members: int
+            n_top_members: int,
+            n_suggestions: int
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name']
@@ -1110,7 +1111,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
-        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
+        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(
+            name_tokens_tuples, method, n_suggestions=n_suggestions
+        )
 
         result = {
             'collection_id': hit['_id'],
@@ -1125,8 +1128,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_tokens_tuples: list[tuple[str, list[str]]],
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
-            swap_to_unigram_probability=0.3
+            n_suggestions: Optional[int] = None
     ) -> list[str]:
+
         # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
         left_tokens = set()
         right_tokens = set()
@@ -1162,7 +1166,16 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
             random.shuffle(left_tokens_list)
             random.shuffle(right_tokens_list)
-            while left_tokens_list:
+
+            # if not enough left/right tokens, repeat tokens
+            if n_suggestions is None:
+                pass
+            elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list))) < n_suggestions:
+                n_repeats = min(n_suggestions // est_n_suggestions + 1, est_n_suggestions)
+                left_tokens_list *= n_repeats
+                right_tokens_list *= n_repeats
+
+            while left_tokens_list and (n_suggestions is None or len(suggestions) < n_suggestions):
                 left = left_tokens_list.pop()
                 for i, right in enumerate(right_tokens_list):
                     s = left + right
@@ -1173,7 +1186,15 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         elif method == 'full-shuffle':
             all_unigrams = list(left_tokens | right_tokens | unigrams)
             random.shuffle(all_unigrams)
-            while len(all_unigrams) >= 2:
+
+            # if not enough all_unigrams, repeat tokens
+            if n_suggestions is None:
+                pass
+            elif (est_n_suggestions := len(all_unigrams) // 2) < n_suggestions:
+                n_repeats = min(n_suggestions // est_n_suggestions + 1, est_n_suggestions)
+                all_unigrams *= n_repeats
+
+            while len(all_unigrams) >= 2 and (n_suggestions is None or len(suggestions) < n_suggestions):
                 left = all_unigrams.pop()
                 for i, right in enumerate(all_unigrams):
                     s = left + right
@@ -1183,5 +1204,11 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                         break
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
+
+        random.shuffle(suggestions)
+
+        if n_suggestions is not None and len(suggestions) != n_suggestions:
+            logger.warning(f'[get_suggestions_by_scrambling_tokens] number of suggestions ({len(suggestions)}) '
+                           f'does not equal desired n_suggestions ({n_suggestions})')
 
         return suggestions

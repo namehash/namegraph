@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, field_serializer, ConfigDict
+from pydantic import BaseModel, Field, field_serializer, ConfigDict, field_validator, PositiveInt
 from pydantic.networks import IPvAnyAddress
 from datetime import datetime
 
@@ -248,3 +248,5 @@ class ScrambleCollectionTokens(BaseModel):
               '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
               '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
     n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
+    n_suggestions: Optional[PositiveInt] = Field(None, title='desired number of suggestions to be returned',
+                                                 examples=[10])

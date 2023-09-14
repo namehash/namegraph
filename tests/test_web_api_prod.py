@@ -569,7 +569,7 @@ class TestTokenScramble:
         response_json = response.json()
         print(response_json)
 
-        assert len(response_json) <= 25  # always <= n_top_members
+        assert len(response_json) <= 25  # always <= n_top_members (if n_suggestions=None)
 
         for name in response_json:
             assert name['metadata']['pipeline_name'] == 'scramble_collection_tokens'
@@ -625,7 +625,26 @@ class TestTokenScramble:
             response_json = response.json()
             print(response_json)
 
-            assert len(response_json) == 4  # 8 tokens -> 4 bigrams
+            assert len(response_json) == 4  # 8 tokens -> 4 bigrams (if n_suggestions=None)
 
             names = [name['name'] for name in response_json]
             assert len(names) == len(set(names))
+
+        @pytest.mark.integration_test
+        def test_full_shuffle_repeat_tokens(self, prod_test_client):
+            client = prod_test_client
+            collection_id = '3OB_f2vmyuyp'  # tropical fruit
+
+            response = client.post("/scramble_collection_tokens",
+                                   json={
+                                       "collection_id": collection_id,
+                                       "method": 'full-shuffle',
+                                       "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant,
+                                       'n_suggestions': 100
+                                   })
+
+            assert response.status_code == 200
+            response_json = response.json()
+            print(response_json)
+
+            assert len(response_json) == 100
