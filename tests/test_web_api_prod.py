@@ -754,7 +754,7 @@ class TestTokenScramble:
             response_json = response.json()
             print(response_json)
 
-            assert len(response_json) == 4  # 8 tokens -> 4 bigrams (if n_suggestions=None)
+            assert len(response_json) == 4  # 8 tokens -> 4 bigrams (if max_suggestions=None)
 
             names = [name['name'] for name in response_json]
             assert len(names) == len(set(names))
@@ -769,7 +769,7 @@ class TestTokenScramble:
                                        "collection_id": collection_id,
                                        "method": 'full-shuffle',
                                        "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant,
-                                       'n_suggestions': 100
+                                       'max_suggestions': 100
                                    })
 
             assert response.status_code == 200

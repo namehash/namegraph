@@ -326,7 +326,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             collection_id: str,
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
             n_top_members: int,
-            n_suggestions: int
+            max_suggestions: int
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name']
@@ -358,7 +358,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
         token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(
-            name_tokens_tuples, method, n_suggestions=n_suggestions
+            name_tokens_tuples, method, n_suggestions=max_suggestions
         )
 
         result = {
@@ -417,7 +417,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             if n_suggestions is None:
                 pass
             elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list))) < n_suggestions:
-                n_repeats = min(n_suggestions // est_n_suggestions + 1, est_n_suggestions)
+                n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
                 left_tokens_list *= n_repeats
                 right_tokens_list *= n_repeats
 
@@ -437,7 +437,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             if n_suggestions is None:
                 pass
             elif (est_n_suggestions := len(all_unigrams) // 2) < n_suggestions:
-                n_repeats = min(n_suggestions // est_n_suggestions + 1, est_n_suggestions)
+                n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
                 all_unigrams *= n_repeats
 
             while len(all_unigrams) >= 2 and (n_suggestions is None or len(suggestions) < n_suggestions):
