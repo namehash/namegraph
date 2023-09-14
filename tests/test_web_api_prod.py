@@ -725,8 +725,8 @@ class TestTokenScramble:
             response_json = response.json()
             print(response_json)
 
-            # 3 bigrams + 2 unigrams (can produce 3 results if original name remains at the end)
-            assert len(response_json) in (3, 4)
+            # 3 bigrams + 2 unigrams, no max_suggestions -> no repeated tokens
+            assert len(response_json) in (3, 4)  # (len can be 3 if 4th suggestion is an original name)
 
             names = [name['name'] for name in response_json]
             assert len(names) == len(set(names))
@@ -746,15 +746,17 @@ class TestTokenScramble:
             response = client.post("/scramble_collection_tokens",
                                    json={
                                        "collection_id": collection_id,
-                                       "method": 'left-right-shuffle-with-unigrams',
-                                       "n_top_members": 5  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                       "method": 'full-shuffle',
+                                       "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                       "max_suggestions": 4
                                    })
 
             assert response.status_code == 200
             response_json = response.json()
             print(response_json)
 
-            assert len(response_json) == 4  # 8 tokens -> 4 bigrams (if max_suggestions=None)
+            # 8 tokens -> 4 bigrams, max_suggestions=4 -> use repeated tokens if 4th suggestion is an original name
+            assert len(response_json) == 4
 
             names = [name['name'] for name in response_json]
             assert len(names) == len(set(names))

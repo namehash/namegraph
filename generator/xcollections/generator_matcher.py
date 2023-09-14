@@ -415,7 +415,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             # if not enough left/right tokens, repeat tokens
             if n_suggestions is None:
                 pass
-            elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list))) < n_suggestions:
+            elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list)) - 1) < n_suggestions:
                 n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
                 left_tokens_list *= n_repeats
                 right_tokens_list *= n_repeats
@@ -435,7 +435,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             # if not enough all_unigrams, repeat tokens
             if n_suggestions is None:
                 pass
-            elif (est_n_suggestions := len(all_unigrams) // 2) < n_suggestions:
+            elif (est_n_suggestions := len(all_unigrams) // 2 - 1) < n_suggestions:
                 n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
                 all_unigrams *= n_repeats
 
