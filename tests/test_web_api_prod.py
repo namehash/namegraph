@@ -691,7 +691,8 @@ class TestTokenScramble:
                                json={
                                    "collection_id": collection_id,
                                    "method": 'left-right-shuffle',
-                                   "n_top_members": 25
+                                   "n_top_members": 25,
+                                   "n_suggestions": None
                                })
 
         assert response.status_code == 200
@@ -718,7 +719,8 @@ class TestTokenScramble:
                                    json={
                                        "collection_id": collection_id,
                                        "method": 'left-right-shuffle-with-unigrams',
-                                       "n_top_members": 5  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                       "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                       "n_suggestions": None
                                    })
 
             assert response.status_code == 200
