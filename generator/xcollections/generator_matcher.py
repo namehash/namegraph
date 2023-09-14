@@ -1,7 +1,6 @@
 from typing import Optional, Literal
 from time import perf_counter
 from itertools import cycle
-from copy import copy
 import concurrent.futures
 import logging
 import random
