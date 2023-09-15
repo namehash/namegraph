@@ -360,7 +360,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
 
     # response = convert_to_suggestion_format(top_members, include_metadata=fetch_top10_command.metadata)
 
-    rs = RelatedSuggestions(result['collection_id'], result['collection_title'], result['collection_members_count'], )
+    rs = RelatedSuggestions(result['collection_title'], result['collection_id'], result['collection_members_count'], )
     rs.related_collections = result['related_collections']
     rs.extend(top_members)
 
