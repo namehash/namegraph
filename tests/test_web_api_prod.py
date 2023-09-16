@@ -692,7 +692,7 @@ class TestTokenScramble:
                                    "collection_id": collection_id,
                                    "method": 'left-right-shuffle',
                                    "n_top_members": 25,
-                                   "max_suggestions": None
+                                   "max_suggestions": None  # no token reuse
                                })
 
         assert response.status_code == 200
@@ -735,7 +735,7 @@ class TestTokenScramble:
 
         for s in names:
             if s.startswith('egg'):
-                assert s[3:] in ('avocado', 'apple', 'fruit', 'coconut')
+                assert s[3:] in ('avocado.eth', 'apple.eth', 'fruit.eth', 'coconut.eth')
             elif s.endswith('apple.eth'):
                 assert s[:-len('apple.eth')] in ('avocado', 'jack', 'coconut', 'egg')
 
@@ -764,16 +764,16 @@ class TestTokenScramble:
         assert len(names) == len(set(names))
 
     @pytest.mark.integration_test
-    def test_full_shuffle_repeat_tokens(self, prod_test_client):
+    def test_left_right_shuffle_with_unigrams_repeat_tokens(self, prod_test_client):
         client = prod_test_client
         collection_id = '3OB_f2vmyuyp'  # tropical fruit
 
         response = client.post("/scramble_collection_tokens",
                                json={
                                    "collection_id": collection_id,
-                                   "method": 'full-shuffle',
-                                   "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant,
-                                   'max_suggestions': 100  # n_tokens=8 -> 8*5*5 = 200 so 100 should be ok
+                                   "method": 'left-right-shuffle-with-unigrams',
+                                   "n_top_members": 15,
+                                   'max_suggestions': 40
                                })
 
         assert response.status_code == 200
@@ -783,4 +783,4 @@ class TestTokenScramble:
         names = [name['name'] for name in response_json]
         assert len(names) == len(set(names))
 
-        assert len(names) == 100
+        assert len(names) == 40
