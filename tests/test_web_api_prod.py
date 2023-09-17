@@ -691,14 +691,15 @@ class TestTokenScramble:
                                json={
                                    "collection_id": collection_id,
                                    "method": 'left-right-shuffle',
-                                   "n_top_members": 25
+                                   "n_top_members": 25,
+                                   "max_suggestions": None  # no token reuse
                                })
 
         assert response.status_code == 200
         response_json = response.json()
         print(response_json)
 
-        assert len(response_json) <= 25  # always <= n_top_members
+        assert len(response_json) <= 25  # always <= n_top_members (if max_suggestions=None)
 
         for name in response_json:
             assert name['metadata']['pipeline_name'] == 'scramble_collection_tokens'
@@ -709,51 +710,77 @@ class TestTokenScramble:
         assert len(names) == len(set(names))
 
 
-        @pytest.mark.integration_test
-        def test_left_right_shuffle_with_unigrams_interesting_names(self, prod_test_client):
-            client = prod_test_client
-            collection_id = '3OB_f2vmyuyp'  # tropical fruit
+    @pytest.mark.integration_test
+    def test_left_right_shuffle_with_unigrams_interesting_names(self, prod_test_client):
+        client = prod_test_client
+        collection_id = '3OB_f2vmyuyp'  # tropical fruit
 
-            response = client.post("/scramble_collection_tokens",
-                                   json={
-                                       "collection_id": collection_id,
-                                       "method": 'left-right-shuffle-with-unigrams',
-                                       "n_top_members": 5  # avocado, pine-apple, jack-fruit, coconut, egg-plant
-                                   })
+        response = client.post("/scramble_collection_tokens",
+                               json={
+                                   "collection_id": collection_id,
+                                   "method": 'left-right-shuffle-with-unigrams',
+                                   "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                   "max_suggestions": None
+                               })
 
-            assert response.status_code == 200
-            response_json = response.json()
-            print(response_json)
+        assert response.status_code == 200
+        response_json = response.json()
+        print(f'len of the response: {len(response_json)}')
+        print(response_json)
+        # 3 bigrams + 2 unigrams, no max_suggestions -> no repeated tokens
+        assert len(response_json) in (3, 4)  # (len can be 3 if 4th suggestion is an original name)
 
-            assert len(response_json) == 3  # 3 bigrams
+        names = [name['name'] for name in response_json]
+        assert len(names) == len(set(names))
 
-            names = [name['name'] for name in response_json]
-            assert len(names) == len(set(names))
-
-            for s in names:
-                if s.startswith('egg'):
-                    assert s[3:] in ('avocado', 'apple', 'fruit', 'coconut')
-                elif s.endswith('apple'):
-                    assert s[4:] in ('avocado', 'jack', 'coconut', 'egg')
+        for s in names:
+            if s.startswith('egg'):
+                assert s[3:] in ('avocado.eth', 'apple.eth', 'fruit.eth', 'coconut.eth')
+            elif s.endswith('apple.eth'):
+                assert s[:-len('apple.eth')] in ('avocado', 'jack', 'coconut', 'egg')
 
 
-        @pytest.mark.integration_test
-        def test_full_shuffle(self, prod_test_client):
-            client = prod_test_client
-            collection_id = '3OB_f2vmyuyp'  # tropical fruit
+    @pytest.mark.integration_test
+    def test_full_shuffle(self, prod_test_client):
+        client = prod_test_client
+        collection_id = '3OB_f2vmyuyp'  # tropical fruit
 
-            response = client.post("/scramble_collection_tokens",
-                                   json={
-                                       "collection_id": collection_id,
-                                       "method": 'left-right-shuffle-with-unigrams',
-                                       "n_top_members": 5  # avocado, pine-apple, jack-fruit, coconut, egg-plant
-                                   })
+        response = client.post("/scramble_collection_tokens",
+                               json={
+                                   "collection_id": collection_id,
+                                   "method": 'full-shuffle',
+                                   "n_top_members": 5,  # avocado, pine-apple, jack-fruit, coconut, egg-plant
+                                   "max_suggestions": 4
+                               })
 
-            assert response.status_code == 200
-            response_json = response.json()
-            print(response_json)
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
 
-            assert len(response_json) == 4  # 8 tokens -> 4 bigrams
+        # 8 tokens -> 4 bigrams, max_suggestions=4 -> use repeated tokens if 4th suggestion is an original name
+        assert len(response_json) == 4
 
-            names = [name['name'] for name in response_json]
-            assert len(names) == len(set(names))
+        names = [name['name'] for name in response_json]
+        assert len(names) == len(set(names))
+
+    @pytest.mark.integration_test
+    def test_left_right_shuffle_with_unigrams_repeat_tokens(self, prod_test_client):
+        client = prod_test_client
+        collection_id = '3OB_f2vmyuyp'  # tropical fruit
+
+        response = client.post("/scramble_collection_tokens",
+                               json={
+                                   "collection_id": collection_id,
+                                   "method": 'left-right-shuffle-with-unigrams',
+                                   "n_top_members": 15,
+                                   'max_suggestions': 40
+                               })
+
+        assert response.status_code == 200
+        response_json = response.json()
+        print(response_json)
+
+        names = [name['name'] for name in response_json]
+        assert len(names) == len(set(names))
+
+        assert len(names) == 40

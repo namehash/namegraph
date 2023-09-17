@@ -1,7 +1,6 @@
 from typing import Optional, Literal
 from time import perf_counter
 from itertools import cycle
-from copy import copy
 import concurrent.futures
 import logging
 import random
@@ -325,7 +324,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             collection_id: str,
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
-            n_top_members: int
+            n_top_members: int,
+            max_suggestions: int
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name']
@@ -356,7 +356,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
-        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(name_tokens_tuples, method)
+        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(
+            name_tokens_tuples, method, n_suggestions=max_suggestions
+        )
 
         result = {
             'collection_id': hit['_id'],
@@ -371,61 +373,98 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_tokens_tuples: list[tuple[str, list[str]]],
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
-            swap_to_unigram_probability=0.3
+            n_suggestions: Optional[int] = None
     ) -> list[str]:
+
         # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
-        left_tokens = []
-        right_tokens = []
-        unigrams = []
+        left_tokens = set()
+        right_tokens = set()
+        unigrams = set()
         for name, tokenized_name in name_tokens_tuples:
             if len(tokenized_name) == 1:
                 further_tokenized_name = self.bigram_longest_tokenizer.get_tokenization(name)
                 if further_tokenized_name is None or further_tokenized_name == (name, ''):
-                    unigrams.append(name)
+                    unigrams.add(name)
                 else:
-                    left_tokens.append(further_tokenized_name[0])
-                    right_tokens.append(further_tokenized_name[1])
+                    left_tokens.add(further_tokenized_name[0])
+                    right_tokens.add(further_tokenized_name[1])
             elif len(tokenized_name) == 2:
-                left_tokens.append(tokenized_name[0])
-                right_tokens.append(tokenized_name[1])
+                left_tokens.add(tokenized_name[0])
+                right_tokens.add(tokenized_name[1])
             elif len(tokenized_name) > 2:
-                left_tokens.append(tokenized_name[0])
+                left_tokens.add(tokenized_name[0])
                 # todo: there might be a better approach (if more than 2 tokens, cut in the center?)
-                right_tokens.append(''.join(tokenized_name[1:]))
+                right_tokens.add(''.join(tokenized_name[1:]))
 
         original_names = {t[0] for t in name_tokens_tuples}
-        original_right_tokens = copy(right_tokens)
+        suggestions = []
 
-        def shuffle_right(max_shuffles=10):
-            nonlocal right_tokens, original_right_tokens
-            shuffle_count = 0
-            while any([right_tokens[j] == o for j, o in enumerate(original_right_tokens)]) \
-                    and shuffle_count < max_shuffles:
-                random.shuffle(right_tokens)
-                shuffle_count += 1
+        left_tokens_list = list(left_tokens)
+        right_tokens_list = list(right_tokens)
+        unigrams_list = list(unigrams)
 
-        if method == 'left-right-shuffle':
-            shuffle_right()
-            suggestions = [l + r for l, r in zip(left_tokens, right_tokens)]
-        elif method == 'left-right-shuffle-with-unigrams':
-            shuffle_right()
-            for i in range(len(left_tokens)):
-                if not unigrams:
-                    break
-                if random.random() < swap_to_unigram_probability:
-                    if random.random() < 0.5:
-                        left_tokens[i] = unigrams.pop(0)
-                    else:
-                        right_tokens[i] = unigrams.pop(0)
-            suggestions = [l + r for l, r in zip(left_tokens, right_tokens)]
+        if method == 'left-right-shuffle' or method == 'left-right-shuffle-with-unigrams':
+            if method == 'left-right-shuffle-with-unigrams':
+                random.shuffle(unigrams_list)
+                mid = len(unigrams_list) // 2
+                left_tokens_list = list(left_tokens | set(unigrams_list[:mid]))
+                right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
+                # alternative version of left/right tokens with different unigrams
+                alt_left_tokens_list = list(left_tokens | set(unigrams_list[mid:]))
+                alt_right_tokens_list = list(right_tokens | set(unigrams_list[:mid]))
+                random.shuffle(alt_left_tokens_list)
+                random.shuffle(alt_right_tokens_list)
+            random.shuffle(left_tokens_list)
+            random.shuffle(right_tokens_list)
+
+            # if not enough left/right tokens, repeat tokens
+            if n_suggestions is None:
+                pass
+            elif (est_n_suggestions := min(len(left_tokens_list), len(right_tokens_list)) - 1) < n_suggestions:
+                n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
+                if method == 'left-right-shuffle':
+                    left_tokens_list *= n_repeats
+                    right_tokens_list *= n_repeats
+                elif method == 'left-right-shuffle-with-unigrams':
+                    left_mixed_unigrams = left_tokens_list + alt_left_tokens_list
+                    right_mixed_unigrams = right_tokens_list + alt_right_tokens_list
+                    left_tokens_list = (n_repeats // 2 + 1) * left_mixed_unigrams
+                    right_tokens_list = (n_repeats // 2 + 1) * right_mixed_unigrams
+
+            while left_tokens_list and (n_suggestions is None or len(suggestions) < n_suggestions):
+                left = left_tokens_list.pop()
+                for i, right in enumerate(right_tokens_list):
+                    s = left + right
+                    if s not in original_names and s not in suggestions:
+                        suggestions.append(s)
+                        del right_tokens_list[i]
+                        break
         elif method == 'full-shuffle':
-            all_unigrams = left_tokens + right_tokens + unigrams
+            all_unigrams = list(left_tokens | right_tokens | unigrams)
             random.shuffle(all_unigrams)
-            suggestions = [l + r for l, r in zip(all_unigrams[::2], all_unigrams[1::2])]
+
+            # if not enough all_unigrams, repeat tokens
+            if n_suggestions is None:
+                pass
+            elif (est_n_suggestions := len(all_unigrams) // 2 - 1) < n_suggestions:
+                n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
+                all_unigrams *= n_repeats
+
+            while len(all_unigrams) >= 2 and (n_suggestions is None or len(suggestions) < n_suggestions):
+                left = all_unigrams.pop()
+                for i, right in enumerate(all_unigrams):
+                    s = left + right
+                    if s not in original_names and s not in suggestions:
+                        suggestions.append(s)
+                        del all_unigrams[i]
+                        break
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
 
-        # todo: filter double tokens e.g. 'thethe' ?
-        suggestions = list(set(suggestions) - original_names)
+        random.shuffle(suggestions)
+
+        if n_suggestions is not None and len(suggestions) != n_suggestions:
+            logger.warning(f'[get_suggestions_by_scrambling_tokens] number of suggestions ({len(suggestions)}) '
+                           f'does not equal desired n_suggestions ({n_suggestions})')
 
         return suggestions
