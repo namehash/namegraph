@@ -325,7 +325,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             collection_id: str,
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
             n_top_members: int,
-            max_suggestions: int
+            max_suggestions: int,
+            seed: int
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name']
@@ -357,7 +358,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
         token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(
-            name_tokens_tuples, method, n_suggestions=max_suggestions
+            name_tokens_tuples, method, seed, n_suggestions=max_suggestions
         )
 
         result = {
@@ -373,8 +374,11 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_tokens_tuples: list[tuple[str, list[str]]],
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
+            seed: int,
             n_suggestions: Optional[int] = None
     ) -> list[str]:
+
+        rnd = random.Random(seed)
 
         # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
         left_tokens = set()
@@ -399,23 +403,23 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         original_names = {t[0] for t in name_tokens_tuples}
         suggestions = []
 
-        left_tokens_list = list(left_tokens)
-        right_tokens_list = list(right_tokens)
-        unigrams_list = list(unigrams)
+        left_tokens_list = list(sorted(left_tokens))
+        right_tokens_list = list(sorted(right_tokens))
+        unigrams_list = list(sorted(unigrams))
 
         if method == 'left-right-shuffle' or method == 'left-right-shuffle-with-unigrams':
             if method == 'left-right-shuffle-with-unigrams':
-                random.shuffle(unigrams_list)
+                rnd.shuffle(unigrams_list)
                 mid = len(unigrams_list) // 2
                 left_tokens_list = list(left_tokens | set(unigrams_list[:mid]))
                 right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
                 # alternative version of left/right tokens with different unigrams
                 alt_left_tokens_list = list(left_tokens | set(unigrams_list[mid:]))
                 alt_right_tokens_list = list(right_tokens | set(unigrams_list[:mid]))
-                random.shuffle(alt_left_tokens_list)
-                random.shuffle(alt_right_tokens_list)
-            random.shuffle(left_tokens_list)
-            random.shuffle(right_tokens_list)
+                rnd.shuffle(alt_left_tokens_list)
+                rnd.shuffle(alt_right_tokens_list)
+            rnd.shuffle(left_tokens_list)
+            rnd.shuffle(right_tokens_list)
 
             # if not enough left/right tokens, repeat tokens
             if n_suggestions is None:
@@ -441,7 +445,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                         break
         elif method == 'full-shuffle':
             all_unigrams = list(left_tokens | right_tokens | unigrams)
-            random.shuffle(all_unigrams)
+            rnd.shuffle(all_unigrams)
 
             # if not enough all_unigrams, repeat tokens
             if n_suggestions is None:
@@ -461,7 +465,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
 
-        random.shuffle(suggestions)
+        rnd.shuffle(suggestions)
 
         if n_suggestions is not None and len(suggestions) != n_suggestions:
             logger.warning(f'[get_suggestions_by_scrambling_tokens] number of suggestions ({len(suggestions)}) '

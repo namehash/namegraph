@@ -252,3 +252,6 @@ class ScrambleCollectionTokens(BaseModel):
   examples=[10], description='must be a positive integer or null\n* number of generated suggestions will be '
                              '`max_suggestions` or less (exactly `max_suggestions` if there are enough names)\n'
                              '* if null, no tokens are repeated')
+    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
+                      title='seed for random number generator',
+                      description='if not provided (but can\'t be null), random seed will be generated')

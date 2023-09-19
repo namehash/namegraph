@@ -821,3 +821,27 @@ class TestTokenScramble:
         assert len(names) == len(set(names))
 
         assert len(names) == 40
+
+    @pytest.mark.integration_test
+    def test_left_right_shuffle_with_unigrams_same_seed_same_result(self, prod_test_client):
+        client = prod_test_client
+        collection_id = '3OB_f2vmyuyp'  # tropical fruit
+        seed = 123
+
+        request_json = {
+            "collection_id": collection_id,
+            "method": 'left-right-shuffle-with-unigrams',
+            "n_top_members": 15,
+            "max_suggestions": 40,
+            "seed": seed
+        }
+
+        response = client.post("/scramble_collection_tokens", json=request_json)
+        assert response.status_code == 200
+        names1 = [name['name'] for name in response.json()]
+
+        response = client.post("/scramble_collection_tokens", json=request_json)
+        assert response.status_code == 200
+        names2 = [name['name'] for name in response.json()]
+
+        assert names1 == names2

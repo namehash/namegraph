@@ -374,7 +374,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
 async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens):
     result, es_response_metadata = generator_matcher.scramble_tokens_from_collection(
         scramble_command.collection_id, scramble_command.method,
-        scramble_command.n_top_members, scramble_command.max_suggestions
+        scramble_command.n_top_members, scramble_command.max_suggestions, scramble_command.seed
     )
 
     suggestions = []
