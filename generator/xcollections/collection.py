@@ -41,13 +41,24 @@ class Collection:
     # FIXME should we move limit_names somewhere else?
     @classmethod
     def from_elasticsearch_hit(cls, hit: dict[str, Any], limit_names: int = 10) -> Collection:
+        fields = hit['fields']
+        _source = hit.get('_source', {})
+
+        normalized_names_key = 'template.top25_names.normalized_name' \
+            if 'template.top25_names.normalized_name' in fields else 'template.top10_names.normalized_name'
+        namehashes_key = 'template.top25_names.namehash' \
+            if 'template.top25_names.namehash' in fields else 'template.top10_names.namehash'
+        tokenized_names_key = 'top25_names' \
+            if 'top25_names' in _source.get('template', dict()) else 'top10_names'
+
         try:
-            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']][:limit_names]
+            tokenized_names = [
+                tuple(name['tokenized_name'])
+                for name in hit['_source']['template'][tokenized_names_key]
+            ][:limit_names]
         except KeyError:
             tokenized_names = None
 
-        fields = hit['fields']
-        _source = hit.get('_source', {})
         return cls(
             score=hit['_score'],
             collection_id=hit['_id'],
@@ -55,9 +66,8 @@ class Collection:
             rank=fields['template.collection_rank'][0],
             owner=fields['metadata.owner'][0],
             number_of_names=fields['metadata.members_count'][0],
-            names=fields['template.top10_names.normalized_name'][:limit_names],
-            namehashes=fields['template.top10_names.namehash'][:limit_names]
-            if 'template.top10_names.namehash' in fields else None,
+            names=fields[normalized_names_key][:limit_names],
+            namehashes=fields[namehashes_key][:limit_names] if namehashes_key in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],
@@ -68,13 +78,20 @@ class Collection:
 
     @classmethod
     def from_elasticsearch_hit_script_names(cls, hit: dict[str, Any], limit_names: int = 100) -> Collection:
+        fields = hit['fields']
+        _source = hit.get('_source', {})
+
+        tokenized_names_key = 'top25_names' \
+            if 'top25_names' in _source.get('template', dict()) else 'top10_names'
+
         try:
-            tokenized_names = [tuple(name['tokenized_name']) for name in hit['_source']['data']['names']][:limit_names]
+            tokenized_names = [
+                tuple(name['tokenized_name'])
+                for name in hit['_source']['template'][tokenized_names_key]
+            ][:limit_names]
         except KeyError:
             tokenized_names = None
 
-        fields = hit['fields']
-        _source = hit.get('_source', {})
         return cls(
             score=hit['_score'],
             collection_id=hit['_id'],
@@ -84,7 +101,7 @@ class Collection:
             number_of_names=fields['metadata.members_count'][0],
             names=fields['script_names'][:limit_names],
             namehashes=fields['script_namehashes'][:limit_names]
-            if 'script_namehashes' in fields else None,
+                if 'script_namehashes' in fields else None,
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2],
             modified_timestamp=fields['metadata.modified'][0],

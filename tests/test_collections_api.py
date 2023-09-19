@@ -337,7 +337,7 @@ class TestCorrectConfiguration:
         assert response.status_code == 200
         response_json = response.json()
         print(response_json)
-        assert 'Progressive rock artists' in [c['title'] for c in response_json['related_collections']]
+        assert 'English people' in [c['title'] for c in response_json['related_collections']]
         assert 'ri2QqxnAqZT7' not in [c['collection_id'] for c in response_json['related_collections']]
         assert len(response_json['related_collections']) == 10
 
