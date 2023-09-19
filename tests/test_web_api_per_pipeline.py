@@ -479,6 +479,44 @@ class TestGrouped:
                 assert len(suggestions) == len(set(suggestions))
         assert len(related_suggestions) == len(set(related_suggestions))
 
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_related_collections_duplicates(self, test_client, label):
+        client = test_client
+
+        request_data = {
+            "label": label,
+            "categories": {
+                "related": {
+                    "enable_learning_to_rank": True,
+                    "max_names_per_related_collection": 10,
+                    "max_per_type": 2,
+                    "max_recursive_related_collections": 3,
+                    "max_related_collections": 6,
+                    "name_diversity_ratio": 0.5
+                },
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+        assert response.status_code == 200
+        response_json = response.json()
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+
+        collections_used = []
+        for category in categories:
+            if category['type'] != 'related':
+                continue
+
+            collections_used.append(category['collection_id'])
+            collections_used.extend([
+                related_collection['collection_id']
+                for related_collection in category['related_collections']
+            ])
+
+        assert len(collections_used) == len(set(collections_used))
+
     @pytest.mark.parametrize("label", ["pinkfloyd", "kyiv", "bohr", "dog", "dogs"])
     def test_returned_collection_ids(self, test_client, label):
         response = test_client.post("/suggestions_by_category", json={
