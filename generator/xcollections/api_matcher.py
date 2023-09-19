@@ -51,6 +51,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.public': True}) \
+            .add_filter('term', {'data.archived': False}) \
             .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
             .add_offset(offset) \
             .add_rank_feature('template.collection_rank', boost=100) \
@@ -112,6 +113,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         query_params = ElasticsearchQueryBuilder() \
             .add_query(query, fields=query_fields, type_='cross_fields') \
             .add_filter('term', {'data.public': True}) \
+            .add_filter('term', {'data.archived': False}) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .add_rank_feature('metadata.members_count') \
             .build_params()
@@ -187,6 +189,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                         .add_query(' '.join(found_collection.names), boolean_clause='should', type_='cross_fields',
                                    fields=["data.names.normalized_name"])
                         .add_filter('term', {'data.public': True})
+                        .add_filter('term', {'data.archived': False}) \
                         .add_must_not('term', {"_id": collection_id})
                         .add_rank_feature('template.collection_rank', boost=100)
                         .add_rank_feature('metadata.members_count')
@@ -221,6 +224,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         query_params = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.names.normalized_name': name_label}) \
             .add_filter('term', {'data.public': True}) \
+            .add_filter('term', {'data.archived': False}) \
             .build_params()
 
         try:
@@ -259,6 +263,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
                         .add_filter('term', {'data.public': True})
+                        .add_filter('term', {'data.archived': False}) \
                         .add_rank_feature('metadata.members_count')
                         .add_rank_feature('template.members_system_interesting_score_median')
                         .add_rank_feature('template.valid_members_ratio')

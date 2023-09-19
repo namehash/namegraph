@@ -46,8 +46,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
+            .add_filter('term', {'data.archived': False}) \
             .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
-            .set_source({'includes': ['data.names.tokenized_name', 'name_generator.related_collections']}) \
+            .set_source({'includes': ['template.top25_names.tokenized_name', 'name_generator.related_collections']}) \
             .add_rank_feature('template.collection_rank', boost=100) \
             .include_fields(include_fields)
 
@@ -117,7 +118,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
                         .add_filter('term', {'data.public': True})
-                        .set_source({'includes': ['data.names.tokenized_name', 'name_generator.related_collections']})
+                        .add_filter('term', {'data.archived': False})
+                        .set_source({'includes': ['template.top25_names.tokenized_name',
+                                                  'name_generator.related_collections']})
                         .add_rank_feature('metadata.members_count')
                         .add_rank_feature('template.members_system_interesting_score_median')
                         .add_rank_feature('template.valid_members_ratio')

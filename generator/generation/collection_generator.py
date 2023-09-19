@@ -58,7 +58,7 @@ class CollectionGenerator(NameGenerator):
             logger.info(f'Collection: {collection.title} score: {collection.score} names: {len(collection.names)}')
 
         # list of collections, where each collection is a list of tuples - (collection object, tokenized_name)
-        suggestions_limit = params.get('max_names_per_related_collection', self.suggestions_limit)
+        suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
         collections_with_tuples = [
             [(collection, tokenized_name) for tokenized_name in collection.tokenized_names[:suggestions_limit]]
             for collection in collections

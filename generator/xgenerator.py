@@ -251,7 +251,9 @@ class Generator:
                     all_related_suggestions[suggestion.collection_id].related_collections = []
                     collections_id2related[suggestion.collection_id] = suggestion.related_collections or []
 
-                all_related_suggestions[suggestion.collection_id].append(suggestion)
+                collection_suggestions = all_related_suggestions[suggestion.collection_id]
+                if len(collection_suggestions) < max_names_per_related_collection:
+                    collection_suggestions.append(suggestion)
             del grouped_suggestions['related']
 
         # round-robin with sampling from one list until something that is not a duplicate is found
