@@ -52,6 +52,7 @@ class CollectionGenerator(NameGenerator):
             name_diversity_ratio=params.get('name_diversity_ratio', self.name_diversity_ratio),
             max_per_type=params.get('max_per_type', self.max_per_type),
             enable_learning_to_rank=params.get('enable_learning_to_rank', True),
+            limit_names=25  #use top25 field; for deduplication
         )
 
         for collection in collections:
