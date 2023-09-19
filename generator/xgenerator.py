@@ -3,7 +3,7 @@ import concurrent.futures
 import logging
 import random
 import time
-from itertools import islice
+from itertools import islice, cycle
 from typing import List, Any
 
 import wordninja
@@ -239,6 +239,7 @@ class Generator:
         # split related
 
         all_related_suggestions: dict[str, RelatedSuggestions] = {}
+        collections_id2related: dict[str, list[dict]] = {}
         if 'related' in grouped_suggestions:
             for suggestion in grouped_suggestions['related']:
                 if suggestion.collection_id not in all_related_suggestions:
@@ -247,19 +248,46 @@ class Generator:
                                            suggestion.collection_id,
                                            suggestion.collection_members_count)
 
-                    # TODO should we remove duplicates?
-                    related_collections = suggestion.related_collections if suggestion.related_collections else []
-                    all_related_suggestions[suggestion.collection_id].related_collections = [
-                        {
-                            'collection_id': collection['collection_id'],
-                            'collection_title': collection['collection_name'],
-                            'collection_members_count': collection['members_count']
-                        }
-                        for collection in related_collections[:max_recursive_related_collections]
-                    ]
+                    all_related_suggestions[suggestion.collection_id].related_collections = []
+                    collections_id2related[suggestion.collection_id] = suggestion.related_collections or []
 
                 all_related_suggestions[suggestion.collection_id].append(suggestion)
             del grouped_suggestions['related']
+
+        # round-robin with sampling from one list until something that is not a duplicate is found
+        # the intention is to split duplicates evenly between collections
+        used_collection_ids = set(collections_id2related.keys())
+        for collection_id, related_collections in cycle(list(collections_id2related.items())):
+            # if this list is empty, then check if there are any related collections left at all
+            if not related_collections:
+                # if nothing is left, then break
+                if not any(collections_id2related.values()):
+                    break
+                # if something is left, then skip this collection
+                else:
+                    continue
+
+            # get the first non-used related collection
+            related_collection = related_collections.pop(0)
+            while related_collection['collection_id'] in used_collection_ids:
+                if not related_collections:
+                    break
+                related_collection = related_collections.pop(0)
+
+            # if it is still in used_collection_ids, then it means there are no more related collections left
+            if related_collection['collection_id'] in used_collection_ids:
+                continue
+
+            used_collection_ids.add(related_collection['collection_id'])
+            all_related_suggestions[collection_id].related_collections.append({
+                'collection_id': related_collection['collection_id'],
+                'collection_title': related_collection['collection_name'],
+                'collection_members_count': related_collection['members_count']
+            })
+
+        for collection_id, related_suggestions in all_related_suggestions.items():
+            related_suggestions.related_collections = \
+                related_suggestions.related_collections[:max_recursive_related_collections]
 
         # TODO agregate duplicates
         # all_suggestions = aggregate_duplicates(all_suggestions)
