@@ -25,4 +25,6 @@ class SpecialCharacterAffixGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,)}
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid
+                           or name.strip_eth_namehash_unicode
+                           or name.strip_eth_namehash,)}
