@@ -634,6 +634,40 @@ class TestGroupedSuggestions:
                 assert len(suggestions) == len(set(suggestions))
         assert len(related_suggestions) == len(set(related_suggestions))
 
+    @pytest.mark.parametrize("label", ["😊😊😊"])
+    def test_prod_grouped_by_category_emojis(self, prod_test_client, label):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+        
+        response_json = response.json()
+        print(response)
+        print(response_json)
+        assert response.status_code == 200
+        
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+
+
+        related_count = 0
+        for category in categories:
+            print(category['name'])
+            print([s['name'] for s in category['suggestions']])
+           
 
 @pytest.mark.integration_test
 @pytest.mark.parametrize(

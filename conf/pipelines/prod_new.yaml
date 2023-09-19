@@ -141,7 +141,7 @@
   generator: PrefixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0.5
@@ -163,7 +163,7 @@
   generator: SuffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0.5
@@ -472,7 +472,7 @@
   generator: ReverseGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0
