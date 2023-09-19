@@ -212,7 +212,8 @@ def test_prod_leet(prod_test_client):
 def test_prod_flag(prod_test_client):
     client = prod_test_client
     response = client.post("/",
-                           json={"label": "firecar", "sorter": "round-robin", "metadata": False, "min_suggestions": 1000,
+                           json={"label": "firecar", "sorter": "round-robin", "metadata": False,
+                                 "min_suggestions": 1000,
                                  "max_suggestions": 1000, "params": {
                                    "country": 'pl'
                                }})
@@ -447,20 +448,23 @@ class TestGroupedSuggestions:
 
         for i, gcat in enumerate(categories):
             assert 'type' in gcat
-            assert gcat['type'] in ('related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other')
+            assert gcat['type'] in (
+            'related', 'wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other')
             if gcat['type'] not in actual_type_order:
                 actual_type_order.append(gcat['type'])
 
             assert 'name' in gcat
             if gcat['type'] != 'related':
-                assert gcat['name'] in ('Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild', 'Other Names')
+                assert gcat['name'] in (
+                'Word Play', 'Alternates', '😍 Emojify', 'Community', 'Expand', 'Go Wild', 'Other Names')
 
             assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
 
             # assert related are after one another
             if gcat['type'] == 'related':
                 assert not last_related_flag
-                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions', 'related_collections'} \
+                assert {'type', 'name', 'collection_id', 'collection_title', 'collection_members_count', 'suggestions',
+                        'related_collections'} \
                        == set(gcat.keys())
                 assert gcat['name'] == gcat['collection_title']
                 # we could assert that it's greater than len(gcat['suggestions']), but we may produce more suggestions
@@ -471,9 +475,9 @@ class TestGroupedSuggestions:
 
         # ensure the correct order of types (allow skipping types)
         expected_order = [gcat_type for gcat_type in ['related', 'alternates', 'wordplay', 'emojify',
-                                                      'community', 'expand', 'gowild', 'other'] if gcat_type in actual_type_order]
+                                                      'community', 'expand', 'gowild', 'other'] if
+                          gcat_type in actual_type_order]
         assert actual_type_order == expected_order  # conf.generation.grouping_categories_order
-
 
     @pytest.mark.integration_test
     @pytest.mark.parametrize(
@@ -504,7 +508,6 @@ class TestGroupedSuggestions:
             assert all([(s.get('metadata', None) is not None) is metadata for s in gcat['suggestions']])
             assert self.strategy_not_used(gcat, 'EasterEggGenerator')
             assert self.strategy_not_used(gcat, 'CategoryGenerator')
-
 
     @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
     def test_prod_grouped_by_category(self, prod_test_client, label):
@@ -652,22 +655,23 @@ class TestGroupedSuggestions:
             }
         }
         response = client.post("/suggestions_by_category", json=request_data)
-        
+
         response_json = response.json()
-        print(response)
-        print(response_json)
         assert response.status_code == 200
-        
 
         assert 'categories' in response_json
         categories = response_json['categories']
 
-
-        related_count = 0
         for category in categories:
             print(category['name'])
             print([s['name'] for s in category['suggestions']])
-           
+            if category['type'] == 'emojify':
+                assert len(category['suggestions']) > 0  # Flag
+            elif category['type'] == 'community':
+                assert len(category['suggestions']) > 0
+            elif category['type'] == 'expand':
+                assert len(category['suggestions']) > 0
+
 
 @pytest.mark.integration_test
 @pytest.mark.parametrize(

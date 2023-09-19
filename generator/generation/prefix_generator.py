@@ -24,4 +24,7 @@ class PrefixGenerator(NameGenerator):
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid_long_name,)}
+        return {'tokens': (
+            name.strip_eth_namehash_unicode_replace_invalid_long_name
+            or name.strip_eth_namehash_unicode
+            or name.strip_eth_namehash,)}

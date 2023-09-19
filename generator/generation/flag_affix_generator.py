@@ -290,4 +290,4 @@ class FlagAffixGenerator(NameGenerator):
                 country = name.params['user_info']['user_ip_country'].upper()
             except (KeyError, AttributeError, TypeError):
                 country = None
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'country': country}
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid or name.strip_eth_namehash_unicode or name.strip_eth_namehash,), 'country': country}
