@@ -323,7 +323,7 @@ def test_not_instant_search_temp(prod_test_client):
     ])
 
 
-@pytest.xfail
+@pytest.mark.xfail
 def test_prod_only_random_or_substr_for_non_ascii_input(prod_test_client):
     client = prod_test_client
     response = client.post("/",
