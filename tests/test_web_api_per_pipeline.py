@@ -416,6 +416,11 @@ class TestGrouped:
         assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other'][
             'min_total_suggestions']
 
+        for category in categories:
+            if category['type'] == 'related':
+                if category['collection_members_count'] > 10:
+                    assert len(category['suggestions']) == 10
+
         # check min and max suggestions limits in categories
         related_count = 0
         for category in categories:
