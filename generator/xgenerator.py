@@ -196,7 +196,7 @@ class Generator:
                     max_suggestions = category_params.max_suggestions
                 except AttributeError:  # RelatedCategoryParams
                     min_suggestions = 0
-                    max_suggestions = 3 * category_params.max_related_collections * category_params.max_names_per_related_collection # 3 interpretations
+                    max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit) # 3 interpretations
 
                 # TODO should they use the same set of suggestions (for deduplications)
                 suggestions = meta_sampler.sample(name, 'weighted-sampling',
@@ -222,7 +222,7 @@ class Generator:
                         max_suggestions = category_params.max_suggestions
                     except AttributeError:  # RelatedCategoryParams
                         min_suggestions = 0
-                        max_suggestions = category_params.max_related_collections * category_params.max_names_per_related_collection
+                        max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit)
 
                     futures[executor.submit(meta_sampler.sample, name, 'weighted-sampling',
                                             min_suggestions=min_suggestions, max_suggestions=max_suggestions,
