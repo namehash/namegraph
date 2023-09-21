@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import Type
+from typing import Type, Callable
 from ens_normalize import is_ens_normalized
 
 from generator.domains import Domains
@@ -79,8 +79,16 @@ class MetaSampler:
             global_limits[pipeline.pipeline_name] = limit
         return global_limits
 
-    def sample(self, name: InputName, sorter_name: str, min_suggestions: int, max_suggestions: int,
-               min_available_fraction: float, category_endpoint: bool = False) -> list[GeneratedName]:
+    def sample(
+            self,
+            name: InputName,
+            sorter_name: str,
+            min_suggestions: int,
+            max_suggestions: int,
+            min_available_fraction: float,
+            category_endpoint: bool = False,
+            is_already_sampled: Callable[[str], bool] = lambda x: False,
+    ) -> list[GeneratedName]:
         min_available_required = int(min_suggestions * min_available_fraction)
 
         mode = name.params.get('mode', 'full')
@@ -171,6 +179,13 @@ class MetaSampler:
                                 # log suggestions which are not ens normalized
                                 logger.warning(f"suggestion not ens-normalized: '{str(suggestion)}'; "
                                                f"metadata: {suggestion.dict()}")
+                                suggestion = next(suggestions)
+                                logger.debug(
+                                    f'Pipeline: {sampled_pipeline.pipeline_name} sampled suggestion: {suggestion}')
+                                suggestion.status = self.domains.get_name_status(str(suggestion))
+                            elif is_already_sampled(str(suggestion)):
+                                logger.debug(
+                                    f'suggestion is already sampled (in another sampler): {suggestion}')
                                 suggestion = next(suggestions)
                                 logger.debug(
                                     f'Pipeline: {sampled_pipeline.pipeline_name} sampled suggestion: {suggestion}')

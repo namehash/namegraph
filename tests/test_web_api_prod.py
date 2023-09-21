@@ -638,6 +638,77 @@ class TestGroupedSuggestions:
                 assert len(suggestions) == len(set(suggestions))
         assert len(related_suggestions) == len(set(related_suggestions))
 
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_grouped_by_category_no_duplicates_among_categories(self, prod_test_client, label):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            },
+            "categories": {
+                "related": {
+                    "enable_learning_to_rank": True,
+                    "max_names_per_related_collection": 10,
+                    "max_per_type": 2,
+                    "max_recursive_related_collections": 3,
+                    "max_related_collections": 6,
+                    "name_diversity_ratio": 0.5
+                },
+                "wordplay": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "alternates": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "emojify": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "community": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "expand": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "gowild": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 2
+                },
+                "other": {
+                    "max_suggestions": 10,
+                    "min_suggestions": 6,
+                    "min_total_suggestions": 50
+                }
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+        assert response.status_code == 200
+        response_json = response.json()
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+
+        suggestions = []
+        for gcat in categories:
+            for suggestion in gcat['suggestions']:
+                suggestions.append(suggestion['name'])
+
+        assert len(suggestions) == len(set(suggestions))
+
     @pytest.mark.parametrize("label", ["😊😊😊"])
     def test_prod_grouped_by_category_emojis(self, prod_test_client, label):
         client = prod_test_client
