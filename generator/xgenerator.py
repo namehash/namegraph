@@ -1,5 +1,6 @@
 import collections
 import concurrent.futures
+import threading
 import logging
 import random
 import time
@@ -210,6 +211,15 @@ class Generator:
                     f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
                 grouped_suggestions[category] = suggestions
         else:
+            multi_sampler_lock = threading.Lock()
+            multi_sampler_suggestions_str = set()
+
+            def is_already_sampled(suggestion: str) -> bool:
+                with multi_sampler_lock:
+                    if not (sampled := suggestion in multi_sampler_suggestions_str):
+                        multi_sampler_suggestions_str.add(suggestion)
+                    return sampled
+
             # multithreading using concurrent.futures
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.grouped_metasamplers)) as executor:
                 futures = {}
@@ -227,7 +237,7 @@ class Generator:
                     futures[executor.submit(meta_sampler.sample, name, 'weighted-sampling',
                                             min_suggestions=min_suggestions, max_suggestions=max_suggestions,
                                             min_available_fraction=min_available_fraction,
-                                            category_endpoint=True)] = category
+                                            category_endpoint=True, is_already_sampled=is_already_sampled)] = category
                 for future in concurrent.futures.as_completed(futures):
                     category = futures[future]
                     suggestions = future.result()
