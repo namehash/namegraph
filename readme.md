@@ -181,16 +181,7 @@ Parameters:
 
 Requirements:
 * order of categories is fixed
-* which categories should be removed?
-  * always keep related?
-  * sample with weights? or use fixed order? or remove with the least of suggestions?
-
-* every generator must be mapped to only one category, so PersonAffixGenerator must be split
-* if there is not enough names in generators then it is preferred to use CollectionGenerator than RandomAvailableNameGenerator?
-  * should it be a second search by Elastic? or the first search should ask for more collections?
-  * or we can use unrelated collections (like in writers block) - this not change latency
-
-* still there might be categories with small number of names - what then?
+* every generator must be mapped to only one category
 * flag generator suggestion should appear in 10% of suggestions - maybe we should detect if it is first search by a user
   * should we remove first pass of sampling with every generator?
 
@@ -204,7 +195,6 @@ For each category MetaSampler is created with appropriate pipelines.
 In parallel, all MetaSamplers are exectuted. In one MetaSampler:
 1. Apply global limits.
 2. For each interpretation (interpretation_type, lang, tokenization) a sampler is created.
-3. 
 
 
 After generation of suggestions for all categories:
