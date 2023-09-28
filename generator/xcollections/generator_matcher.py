@@ -382,7 +382,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         rnd = random.Random(seed)
 
-        # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
+        # collect bigrams (left and right tokens) and unigrams (names from collection that could not be tokenized)
         left_tokens = OrderedSet()
         right_tokens = OrderedSet()
         unigrams = OrderedSet()
@@ -411,21 +411,15 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 left_tokens_list = list(left_tokens)
                 right_tokens_list = list(right_tokens)
             else:  # left-right-shuffle-with-unigrams
-                alt_left_tokens = OrderedSet(left_tokens)
-                alt_right_tokens = OrderedSet(right_tokens)
                 rnd.shuffle(unigrams_list)
                 mid = len(unigrams_list) // 2
 
-                left_tokens.update(unigrams_list[:mid])
-                right_tokens.update(unigrams_list[mid:])
-                left_tokens_list = list(left_tokens)
-                right_tokens_list = list(right_tokens)
+                left_tokens_list = list(left_tokens | OrderedSet(unigrams_list[:mid]))
+                right_tokens_list = list(right_tokens | OrderedSet(unigrams_list[mid:]))
 
                 # alternative version of left/right token lists with different unigrams
-                alt_left_tokens.update(unigrams_list[mid:])
-                alt_right_tokens.update(unigrams_list[:mid])
-                alt_left_tokens_list = list(alt_left_tokens)
-                alt_right_tokens_list = list(alt_right_tokens)
+                alt_left_tokens_list = list(left_tokens | OrderedSet(unigrams_list[mid:]))
+                alt_right_tokens_list = list(right_tokens | OrderedSet(unigrams_list[:mid]))
 
                 rnd.shuffle(alt_left_tokens_list)
                 rnd.shuffle(alt_right_tokens_list)
@@ -456,10 +450,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                         del right_tokens_list[i]
                         break
         elif method == 'full-shuffle':
-            all_unigrams = OrderedSet(left_tokens)
-            all_unigrams.update(right_tokens)
-            all_unigrams.update(unigrams)
-            all_unigrams_list = list(all_unigrams)
+            all_unigrams_list = list(left_tokens | right_tokens | unigrams)
             rnd.shuffle(all_unigrams_list)
 
             # if not enough all_unigrams_list, repeat tokens
