@@ -823,16 +823,27 @@ class TestTokenScramble:
         assert len(names) == 40
 
     @pytest.mark.integration_test
-    def test_left_right_shuffle_with_unigrams_same_seed_same_result(self, prod_test_client):
+    @pytest.mark.parametrize(
+        "collection_id, method",
+        [
+            ("BmjZ5T2bWFpk", 'left-right-shuffle-with-unigrams'),  # marvel characters
+            ("BmjZ5T2bWFpk", 'left-right-shuffle'),
+            ("BmjZ5T2bWFpk", 'full-shuffle'),
+            ("3OB_f2vmyuyp", 'left-right-shuffle-with-unigrams'),  # tropical fruit
+            ("3OB_f2vmyuyp", 'left-right-shuffle'),
+            ("3OB_f2vmyuyp", 'full-shuffle'),
+            ("JCzsKPv4HQ2N", 'left-right-shuffle-with-unigrams'),  # single player video games
+        ]
+    )
+    def test_left_right_shuffle_with_unigrams_same_seed_same_result(self, prod_test_client, collection_id, method):
         client = prod_test_client
-        collection_id = '3OB_f2vmyuyp'  # tropical fruit
         seed = 123
 
         request_json = {
             "collection_id": collection_id,
-            "method": 'left-right-shuffle-with-unigrams',
-            "n_top_members": 15,
-            "max_suggestions": 40,
+            "method": method,
+            "n_top_members": 25,
+            "max_suggestions": 30,
             "seed": seed
         }
 
