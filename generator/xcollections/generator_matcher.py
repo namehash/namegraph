@@ -11,6 +11,8 @@ from fastapi import HTTPException
 from generator.xcollections.matcher import CollectionMatcher
 from generator.xcollections.collection import Collection
 from generator.xcollections.query_builder import ElasticsearchQueryBuilder
+from generator.utils import OrderedSet
+
 
 logger = logging.getLogger('generator')
 
@@ -384,9 +386,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         rnd = random.Random(seed)
 
         # collect bigrams (left and right tokens) and unigrams (collection names that could not be tokenized)
-        left_tokens = set()
-        right_tokens = set()
-        unigrams = set()
+        left_tokens = OrderedSet()
+        right_tokens = OrderedSet()
+        unigrams = OrderedSet()
         for name, tokenized_name in name_tokens_tuples:
             if len(tokenized_name) == 1:
                 further_tokenized_name = self.bigram_longest_tokenizer.get_tokenization(name)
@@ -405,22 +407,32 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         original_names = {t[0] for t in name_tokens_tuples}
         suggestions = []
-
-        left_tokens_list = list(sorted(left_tokens))
-        right_tokens_list = list(sorted(right_tokens))
-        unigrams_list = list(sorted(unigrams))
+        unigrams_list = list(unigrams)
 
         if method == 'left-right-shuffle' or method == 'left-right-shuffle-with-unigrams':
-            if method == 'left-right-shuffle-with-unigrams':
+            if method == 'left-right-shuffle':
+                left_tokens_list = list(left_tokens)
+                right_tokens_list = list(right_tokens)
+            else:  # left-right-shuffle-with-unigrams
+                alt_left_tokens = OrderedSet(left_tokens)
+                alt_right_tokens = OrderedSet(right_tokens)
                 rnd.shuffle(unigrams_list)
                 mid = len(unigrams_list) // 2
-                left_tokens_list = list(left_tokens | set(unigrams_list[:mid]))
-                right_tokens_list = list(right_tokens | set(unigrams_list[mid:]))
-                # alternative version of left/right tokens with different unigrams
-                alt_left_tokens_list = list(left_tokens | set(unigrams_list[mid:]))
-                alt_right_tokens_list = list(right_tokens | set(unigrams_list[:mid]))
+
+                left_tokens.update(unigrams_list[:mid])
+                right_tokens.update(unigrams_list[mid:])
+                left_tokens_list = list(left_tokens)
+                right_tokens_list = list(right_tokens)
+
+                # alternative version of left/right token lists with different unigrams
+                alt_left_tokens.update(unigrams_list[mid:])
+                alt_right_tokens.update(unigrams_list[:mid])
+                alt_left_tokens_list = list(alt_left_tokens)
+                alt_right_tokens_list = list(alt_right_tokens)
+
                 rnd.shuffle(alt_left_tokens_list)
                 rnd.shuffle(alt_right_tokens_list)
+
             rnd.shuffle(left_tokens_list)
             rnd.shuffle(right_tokens_list)
 
@@ -432,7 +444,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 if method == 'left-right-shuffle':
                     left_tokens_list *= n_repeats
                     right_tokens_list *= n_repeats
-                elif method == 'left-right-shuffle-with-unigrams':
+                else:  # left-right-shuffle-with-unigrams
                     left_mixed_unigrams = left_tokens_list + alt_left_tokens_list
                     right_mixed_unigrams = right_tokens_list + alt_right_tokens_list
                     left_tokens_list = (n_repeats // 2 + 1) * left_mixed_unigrams
@@ -447,23 +459,26 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                         del right_tokens_list[i]
                         break
         elif method == 'full-shuffle':
-            all_unigrams = list(left_tokens | right_tokens | unigrams)
-            rnd.shuffle(all_unigrams)
+            all_unigrams = OrderedSet(left_tokens)
+            all_unigrams.update(right_tokens)
+            all_unigrams.update(unigrams)
+            all_unigrams_list = list(all_unigrams)
+            rnd.shuffle(all_unigrams_list)
 
-            # if not enough all_unigrams, repeat tokens
+            # if not enough all_unigrams_list, repeat tokens
             if n_suggestions is None:
                 pass
-            elif (est_n_suggestions := len(all_unigrams) // 2 - 1) < n_suggestions:
+            elif (est_n_suggestions := len(all_unigrams_list) // 2 - 1) < n_suggestions:
                 n_repeats = min(n_suggestions // est_n_suggestions + 2, est_n_suggestions)
-                all_unigrams *= n_repeats
+                all_unigrams_list *= n_repeats
 
-            while len(all_unigrams) >= 2 and (n_suggestions is None or len(suggestions) < n_suggestions):
-                left = all_unigrams.pop()
-                for i, right in enumerate(all_unigrams):
+            while len(all_unigrams_list) >= 2 and (n_suggestions is None or len(suggestions) < n_suggestions):
+                left = all_unigrams_list.pop()
+                for i, right in enumerate(all_unigrams_list):
                     s = left + right
                     if s not in original_names and s not in suggestions:
                         suggestions.append(s)
-                        del all_unigrams[i]
+                        del all_unigrams_list[i]
                         break
         else:
             raise ValueError(f'[get_suggestions_by_scrambling_tokens] no such method allowed: \'{method}\'')
