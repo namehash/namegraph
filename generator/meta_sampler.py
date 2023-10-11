@@ -106,13 +106,13 @@ class MetaSampler:
             global_limits = self.get_global_limits(mode, max_suggestions, category_limits=True)
         else:
             global_limits = self.get_global_limits(mode, min_suggestions)
-        logger.info(f'global_limits {global_limits}')
+        logger.debug(f'global_limits {global_limits}')
 
         sorters = {}
         for (interpretation_type, lang), interpretations in name.interpretations.items():
             for interpretation in interpretations:
                 weights = self.get_weights(tuple(self.pipelines), interpretation_type, lang, mode)
-                # logger.info(f'weights {weights}')
+                # logger.debug(f'weights {weights}')
                 sorters[interpretation] \
                     = self.get_sampler(sorter_name)(self.config, self.pipelines, weights)
 
@@ -149,7 +149,7 @@ class MetaSampler:
                     sampled_pipeline = next(sorters[sampled_interpretation])
                     logger.debug(f'sampled_pipeline {sampled_pipeline.pipeline_name}')
 
-                    # logger.info(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
+                    # logger.debug(f'global_limits {global_limits[sampled_pipeline.pipeline_name]}')
                     if global_limits[sampled_pipeline.pipeline_name] is not None and \
                             global_limits[sampled_pipeline.pipeline_name] == 0:
                         sorters[sampled_interpretation].pipeline_used(sampled_pipeline)

@@ -68,11 +68,11 @@ class Pipeline:
         self.generators: List[NameGenerator] = []
         self.filters: List[Filter] = []
 
-        logger.info(f'Pipeline {self.definition.name} initing.')
+        logger.info(f'Pipeline {self.pipeline_name} initing.')
         self._build()
 
         self.cache = {}
-        logger.info(f'Pipeline {self.definition.name} inited.')
+        logger.info(f'Pipeline {self.pipeline_name} inited.')
 
     def __eq__(self, other: Pipeline) -> bool:
         return isinstance(other, Pipeline) and self.pipeline_name == other.pipeline_name
@@ -89,10 +89,10 @@ class Pipeline:
         Generate suggestions, results are cached.
         """
         if interpretation:
-            logger.info(
-                f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
+            logger.debug(
+                f'Pipeline {self.pipeline_name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
         else:
-            logger.info(f'Pipeline {self.definition.name} suggestions apply on N {name.input_name}.')
+            logger.debug(f'Pipeline {self.pipeline_name} suggestions apply on N {name.input_name}.')
 
         hash = self.generator.hash(name, interpretation)
         # print('HASH', interpretation.tokenization, hash, len(self.cache))
@@ -101,14 +101,14 @@ class Pipeline:
             if should_run:  # TODO ok?
 
                 if interpretation:
-                    logger.info(
-                        f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
+                    logger.debug(
+                        f'Pipeline {self.pipeline_name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
                 else:
-                    logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
+                    logger.debug(f'Pipeline {self.pipeline_name} suggestions generation on N {name.input_name}.')
                 start_time = time.time()
                 suggestions = self.generator.apply(name, interpretation)
                 generator_time = 1000 * (time.time() - start_time)
-                logger.info(f'Pipeline suggestions generated. Time: {generator_time:.2f}')
+                logger.info(f'Pipeline {self.pipeline_name} suggestions generated. Time: {generator_time:.2f}')
 
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
@@ -133,7 +133,7 @@ class Pipeline:
             else:
                 suggestions = []
             self.cache[hash] = PipelineResultsIterator(suggestions)
-            logger.info('Pipeline suggestions cached.')
+            logger.debug(f'Pipeline {self.pipeline_name} suggestions cached.')
         return self.cache[hash]
 
     def _build(self):
