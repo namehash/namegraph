@@ -216,8 +216,14 @@ class CollectionMatcherForAPI(CollectionMatcher):
         if not apply_diversity:
             return collections, es_response_metadata
 
-        diversified = self._apply_diversity(collections, max_related_collections, name_diversity_ratio, max_per_type)
-        return diversified, es_response_metadata
+        diversified = self._apply_diversity(
+            [found_collection] + collections,
+            max_related_collections + 1,
+            name_diversity_ratio,
+            max_per_type
+        )
+        diversified = [c for c in diversified if c.collection_id != found_collection.collection_id]
+        return diversified[:max_related_collections], es_response_metadata
 
     def get_collections_membership_count_for_name(self, name_label: str) -> tuple[Union[int, str], dict]:
 
