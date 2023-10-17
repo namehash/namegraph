@@ -10,6 +10,11 @@ from ..generated_name import GeneratedName
 logger = logging.getLogger('generator')
 
 
+def uniq(l):
+    used = set()
+    return [x for x in l if x not in used and (used.add(x) or True)]
+
+
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
@@ -39,16 +44,33 @@ class CollectionGenerator(NameGenerator):
         self.max_per_type = config.collections.max_per_type
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
-        #TODO maybe use concatenation of all tokenizations as query
+        # TODO maybe use concatenation of all tokenizations as query
         if ' ' in name.strip_eth_namehash_unicode_long_name:
             tokens = name.strip_eth_namehash_unicode_long_name.strip().split(' ')
         else:
-            tokens = interpretation.tokenization
-        
+            # tokens = interpretation.tokenization
+            # alternative 1
+            # tokens = list(interpretation.tokenization) + [name.strip_eth_namehash_unicode_long_name.strip()]
+            # alternative 2 all tokenizations
+            tokens = []
+            tokens.append(name.strip_eth_namehash_unicode_long_name.strip())
+            for interpretations2 in name.interpretations.values():
+                for interpretation in interpretations2:
+                    # skip tokenizations with initials
+                    if 'type' in interpretation.features and interpretation.features['type'] in (
+                    'first with initial', 'last with initial'):
+                        continue
+                    tokens.extend(interpretation.tokenization)
+
+            tokens = uniq(tokens)
+            tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
+
         params = name.params if name.params is not None else dict()
         suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
+        logger.info(f'CollectionGenerator query: {tokens}')
         collections, _ = self.collection_matcher.search_for_generator(
             tokens,
+            name.strip_eth_namehash_unicode_long_name.strip(),
             max_related_collections=params.get('max_related_collections', self.collections_limit),
             name_diversity_ratio=params.get('name_diversity_ratio', self.name_diversity_ratio),
             max_per_type=params.get('max_per_type', self.max_per_type),
@@ -72,15 +94,17 @@ class CollectionGenerator(NameGenerator):
                           collection_title=collection.title,
                           collection_id=collection.collection_id,
                           collection_members_count=collection.number_of_names,
-                          related_collections=collection.related_collections,)
+                          related_collections=collection.related_collections, )
             for collection, tokenized_name in roundrobin(*collections_with_tuples)
             if tokenized_name != tokens
         )
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
-        #NOT USED?
+        # NOT USED?
+        input_name = ''.join(tokens)
         collections, _ = self.collection_matcher.search_for_generator(
             tokens,
+            input_name,
             max_related_collections=self.collections_limit,
         )
         # TODO round robin? weighted sampling?
@@ -99,5 +123,5 @@ class CollectionGenerator(NameGenerator):
         #     return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
         # else:
         #     return {'tokens': interpretation.tokenization}
-        #hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
+        # hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
         return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
