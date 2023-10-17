@@ -45,15 +45,17 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         # TODO maybe use concatenation of all tokenizations as query
+        input_name = name.strip_eth_namehash_unicode_long_name.strip()
         if ' ' in name.strip_eth_namehash_unicode_long_name:
-            tokens = name.strip_eth_namehash_unicode_long_name.strip().split(' ')
+            tokens = input_name.split(' ')
         else:
             # tokens = interpretation.tokenization
             # alternative 1
             # tokens = list(interpretation.tokenization) + [name.strip_eth_namehash_unicode_long_name.strip()]
             # alternative 2 all tokenizations
             tokens = []
-            tokens.append(name.strip_eth_namehash_unicode_long_name.strip())
+            if input_name:
+                tokens.append(input_name)
             for interpretations2 in name.interpretations.values():
                 for interpretation in interpretations2:
                     # skip tokenizations with initials
@@ -63,7 +65,8 @@ class CollectionGenerator(NameGenerator):
                     tokens.extend(interpretation.tokenization)
 
             tokens = uniq(tokens)
-            tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
+            if input_name:
+                tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
 
         params = name.params if name.params is not None else dict()
         suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
