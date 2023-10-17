@@ -64,7 +64,7 @@ class WeightedSorterWithOrder(Sampler):
             # self.first_pass = get_numpy_rng().choice(list(self.weights.keys()), len(self.weights),
             #                                          p=normalized_weights, replace=False).tolist()
             self.first_pass = [x[1] for x in sorted(
-                [(math.log(get_random_rng().random()) / weight, k) for k, weight in self.weights.items()], reverse=True)]
+                [(math.log(1 - get_random_rng().random()) / weight, k) for k, weight in self.weights.items()], reverse=True)]
         else:
             self.first_pass = []
 
