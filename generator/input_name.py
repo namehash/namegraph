@@ -9,6 +9,11 @@ class Interpretation:
         self.in_type_probability = in_type_probability
         self.features = features or {}
 
+    def __str__(self):
+        return f'Interpretation(type={self.type}, lang={self.lang}, tokenization={self.tokenization}'
+
+    def __repr__(self):
+        return str(self)
 
 class InputName:
     """

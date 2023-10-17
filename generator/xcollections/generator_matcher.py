@@ -56,7 +56,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
         if enable_learning_to_rank:
             query_params = query_builder \
-                .add_query(tokenized_query, fields=query_fields, type_='most_fields') \
+                .add_query(tokenized_query, fields=query_fields, type_='most_fields', type2='query_string') \
                 .add_rank_feature('metadata.members_rank_mean', boost=1) \
                 .add_rank_feature('metadata.members_rank_median', boost=1) \
                 .add_rank_feature('template.members_system_interesting_score_mean', boost=1) \
@@ -78,7 +78,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             query_params = query_builder \
                 .add_query(tokenized_query, fields=query_fields, type_='cross_fields') \
                 .add_rank_feature('metadata.members_count', boost=1) \
-                .build_params()
+                .build_params()  #TODO: query_string?
 
         try:
             collections, es_response_metadata = self._execute_query(query_params, limit_names)
@@ -143,6 +143,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     def search_for_generator(
             self,
             tokens: tuple[str, ...],
+            input_name: str,
             max_related_collections: int = 5,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
@@ -164,7 +165,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
             membership_future = executor.submit(
                 self._search_by_membership,
-                name_label=''.join(tokens),
+                name_label=input_name,
                 limit_names=limit_names,
                 sort_order='AI',
                 max_results=max_related_collections,

@@ -182,6 +182,7 @@ class Generator:
         logger.info('End preprocessing')
 
         logger.info(str(name.types_probabilities))
+        logger.info(str(name.interpretations))
 
         logger.info('Start sampling')
 
