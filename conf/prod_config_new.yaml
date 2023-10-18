@@ -91,6 +91,8 @@ generation:
       - Wikipedia2VGenerator
       - W2VGenerator
       - WordnetSynonymsGenerator
+      - Wikipedia2VGeneratorRocks
+      - W2VGeneratorRocks
     emojify:
       - EmojiGenerator
       - FlagAffixGenerator
