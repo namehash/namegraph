@@ -59,6 +59,8 @@ tokenization:
 generation:
   word2vec_url: embeddings.pkl
   word2vec_path: data/embeddings.pkl
+  word2vec_rocks_url: w2v.tgz
+  word2vec_rocks_path: data/w2v
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
   name2emoji_path: tests/data/name2emoji.json
@@ -74,6 +76,8 @@ generation:
     RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
+  wikipedia2vec_rocks_url: wiki2v.tgz
+  wikipedia2vec_rocks_path: tests/data/wiki2v
   person_name_affixes_path: data/person_name_affixes.json
   person_name_emojify_affixes_path: data/person_name_emojify_affixes.json
   person_name_expand_affixes_path: data/person_name_expand_affixes.json

@@ -299,7 +299,7 @@ def test_not_instant_search(prod_test_client):
     json = response.json()
     assert len(json) > 0
     assert any([
-        'W2VGenerator' in strategy
+        'W2VGenerator' in strategy or 'W2VGeneratorRocks' in strategy
         for name in json
         for strategy in name['metadata']['applied_strategies']
     ])
@@ -317,7 +317,7 @@ def test_not_instant_search_temp(prod_test_client):
     json = response.json()
     assert len(json) > 0
     assert any([
-        'W2VGenerator' in strategy
+        'W2VGenerator' in strategy or 'W2VGeneratorRocks' in strategy
         for name in json
         for strategy in name['metadata']['applied_strategies']
     ])

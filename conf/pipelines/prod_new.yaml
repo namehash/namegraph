@@ -23,7 +23,7 @@
   name: w2v
   controlflow:
     - RunIfNotInstant
-  generator: W2VGenerator
+  generator: W2VGeneratorRocks
   filters:
     - SubnameFilter
     - ValidNameFilter

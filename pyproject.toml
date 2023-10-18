@@ -32,6 +32,7 @@ elasticsearch = "8.6.2" # FIXME update version to the one used in AWS
 python-dotenv = "^1.0.0"
 boto3 = "^1.26.117"
 csuffixtree = { url = "https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl" }
+rocksdict = "^0.3.10"
 
 
 [tool.poetry.group.dev.dependencies]
