@@ -1,6 +1,6 @@
 -
   name: wiki2v
-  generator: Wikipedia2VGenerator
+  generator: Wikipedia2VGeneratorRocks
   filters:
     - SubnameFilter
     - ValidNameFilter
