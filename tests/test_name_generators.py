@@ -31,6 +31,7 @@ from generator.generation import (
     CollectionGenerator,
     ReverseGenerator,
     RhymesGenerator,
+    W2VGeneratorRocks
 )
 from generator.generated_name import GeneratedName
 
@@ -185,7 +186,7 @@ def test_abbreviation_generator_order():
 def test_w2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = W2VGenerator(config)
+        strategy = W2VGeneratorRocks(config)
         tokenized_name = ('my', 'pikachu', '123')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('your', 'pikachu', '123') in generated_names
