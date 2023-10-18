@@ -62,7 +62,7 @@ def init(config: DictConfig):
                                 override=True)
 
     download_embeddings_extract(s3_downloader, config.generation.word2vec_rocks_url, config.generation.word2vec_rocks_path)
-    # download_embeddings_extract(s3_downloader, config.generation.wikipedia2vec_rocks_url, config.generation.wikipedia2vec_rocks_path)
+    download_embeddings_extract(s3_downloader, config.generation.wikipedia2vec_rocks_url, config.generation.wikipedia2vec_rocks_path)
 
 
 

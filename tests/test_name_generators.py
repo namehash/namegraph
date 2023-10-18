@@ -31,7 +31,8 @@ from generator.generation import (
     CollectionGenerator,
     ReverseGenerator,
     RhymesGenerator,
-    W2VGeneratorRocks
+    W2VGeneratorRocks,
+    Wikipedia2VGeneratorRocks
 )
 from generator.generated_name import GeneratedName
 

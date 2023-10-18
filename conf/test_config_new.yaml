@@ -77,7 +77,7 @@ generation:
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
   wikipedia2vec_rocks_url: wiki2v.tgz
-  wikipedia2vec_rocks_path: tests/data/wiki2v
+  wikipedia2vec_rocks_path: data/wiki2v
   person_name_affixes_path: data/person_name_affixes.json
   person_name_emojify_affixes_path: data/person_name_emojify_affixes.json
   person_name_expand_affixes_path: data/person_name_expand_affixes.json
