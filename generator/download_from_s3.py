@@ -47,7 +47,7 @@ def download_embeddings_extract(s3_downloader, url, path):
     file = tarfile.open('/tmp/embeddings.tgz')
     file.extractall(path)
     file.close()
-    #TODO remove temp file?
+    os.remove('/tmp/embeddings.tgz')
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config_new")
 def init(config: DictConfig):

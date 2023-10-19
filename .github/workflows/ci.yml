@@ -45,6 +45,7 @@ jobs:
         run: |
             ln -s ../tests/data/wikipedia2vec.pkl data/wikipedia2vec.pkl
             touch data/wikipedia2vec.pkl.vectors.npy
+            ln -s ../tests/data/wiki2v data/wiki2v
             poetry run python3 generator/download.py
             poetry run python3 generator/download_from_s3.py
             poetry run python3 generator/download_names.py
