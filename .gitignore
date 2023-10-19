@@ -32,7 +32,3 @@ research/avatars/*.xlsx
 !research/token-scramble/*.ipynb
 .env
 
-research/sensitive-collections/*.json
-research/sensitive-collections/*.csv
-research/sensitive-collections/*.txt
-!research/sensitive-collections/keywords.txt
