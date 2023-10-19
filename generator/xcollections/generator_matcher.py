@@ -296,13 +296,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             t_before = perf_counter()
             response = self.elastic.get(index=self.index_name, id=collection_id, _source_includes=fields)
             time_elapsed = (perf_counter() - t_before) * 1000
-            if response['_source']['data']['archived']:
-                raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
         except elasticsearch.exceptions.NotFoundError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+        if response['_source']['data']['archived']:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         es_response_metadata = {
             'n_total_hits': 1,
