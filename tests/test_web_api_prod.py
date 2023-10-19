@@ -630,6 +630,10 @@ class TestGroupedSuggestions:
         related_suggestions = []
         for gcat in categories:
             suggestions = [s['name'] for s in gcat['suggestions']]
+
+            suggestion_tokens = [s['tokenized_label'] for s in gcat['suggestions']]
+            assert suggestions == list(map(lambda ts: ''.join(ts) + '.eth', suggestion_tokens))
+
             print(gcat['type'], gcat['name'])
             print(suggestions)
             if gcat['type'] == 'related':
