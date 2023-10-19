@@ -42,12 +42,13 @@ def download_embeddings(s3_downloader, url, path):
     vectors = '.vectors.npy'
     s3_downloader.download_file(url + vectors, path + vectors, override=False)
 
-def download_embeddings_extract(s3_downloader, url, path):
-    s3_downloader.download_file(url, '/tmp/embeddings.tgz', override=False)
-    file = tarfile.open('/tmp/embeddings.tgz')
-    file.extractall(path)
-    file.close()
-    os.remove('/tmp/embeddings.tgz')
+def download_embeddings_extract(s3_downloader, url, path, override=False):
+    if not Path(path).exists() or override:
+        s3_downloader.download_file(url, '/tmp/embeddings.tgz', override=False)
+        file = tarfile.open('/tmp/embeddings.tgz')
+        file.extractall(path)
+        file.close()
+        os.remove('/tmp/embeddings.tgz')
 
 @hydra.main(version_base=None, config_path="../conf", config_name="prod_config_new")
 def init(config: DictConfig):
