@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import List, Tuple, Iterable, Dict, Any
+from typing import List, Tuple, Iterable, Dict, Any, Iterator
 from itertools import islice, cycle
 import hashlib
 import re
@@ -83,7 +83,7 @@ class SubstringMatchGenerator(NameGenerator):
         self.suffix_tree_impl = SuffixTreeImpl(config) if HAS_SUFFIX_TREE else None
         self.re_impl = ReImpl(config)
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    def generate(self, tokens: Tuple[str, ...]) -> Iterator[Tuple[str, ...]]:
         if len(''.join(tokens)) == 0:
             return []
 
@@ -93,9 +93,19 @@ class SubstringMatchGenerator(NameGenerator):
             names = self.re_impl.find(pattern)
         else:
             names = self.suffix_tree_impl.find(pattern)
+
         # self.limit=100 #TODO set to request's max_suggestions
         # return single tokens
-        return ((name,) for name in islice(names, self.limit))
+
+        def get_tokens_from_suggestion(s: str) -> tuple:
+            start = s.find(pattern)
+            if start == -1:
+                return (s,)
+            end = start + len(pattern)
+            s_tokens = s[:start], s[start:end], s[end:]
+            return tuple(q for q in s_tokens if q)
+
+        return (get_tokens_from_suggestion(name) for name in islice(names, self.limit))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),
