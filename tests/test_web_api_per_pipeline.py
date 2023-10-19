@@ -559,4 +559,12 @@ class TestGrouped:
         for name in response_json['suggestions']:
             assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
             assert name['metadata']['collection_id'] == collection_id
-            
+
+    def test_fetching_top_collection_members_archived(self, test_client):
+        client = test_client
+        collection_id = 'B1r8GhHWIgAA'  # archived
+
+        response = client.post("/fetch_top_collection_members",
+                               json={"collection_id": collection_id})
+
+        assert response.status_code == 410
