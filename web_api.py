@@ -117,6 +117,7 @@ def convert_to_suggestion_format(
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
+        'tokenized_label': list(name.tokens)
     } for name in names]
 
     if include_metadata:
@@ -176,7 +177,7 @@ def convert_related_to_grouped_suggestions_format(
         converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
         grouped_response.append({
             'suggestions': converted_suggestions if include_metadata else
-            [{'name': s['name']} for s in converted_suggestions],
+            [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
             'type': 'related',
             'name': suggestions.collection_title,
             'collection_title': suggestions.collection_title,
@@ -200,7 +201,7 @@ def convert_grouped_to_grouped_suggestions_format(
             converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
             grouped_response.append({
                 'suggestions': converted_suggestions if include_metadata else
-                [{'name': s['name']} for s in converted_suggestions],
+                [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
                 'type': gcat,
                 'name': category_fancy_names[gcat],
             })
@@ -245,7 +246,7 @@ def convert_to_grouped_suggestions_format(
             for collection_key in collection_categories_order:
                 grouped_response.append({
                     'suggestions': related_dict[collection_key] if include_metadata else
-                    [{'name': s['name']} for s in related_dict[collection_key]],
+                    [{k: v for k, v in sug.items() if k != 'metadata'} for sug in related_dict[collection_key]],
                     'type': 'related',
                     'name': collection_key[0],
                     'collection_title': collection_key[0],
@@ -256,7 +257,7 @@ def convert_to_grouped_suggestions_format(
         elif grouped_dict[gcat]:
             grouped_response.append({
                 'suggestions': grouped_dict[gcat] if include_metadata else
-                [{'name': s['name']} for s in grouped_dict[gcat]],
+                [{k: v for k, v in sug.items() if k != 'metadata'} for sug in grouped_dict[gcat]],
                 'type': gcat,
                 'name': category_fancy_names[gcat],
             })

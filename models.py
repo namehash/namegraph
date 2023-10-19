@@ -181,6 +181,7 @@ class Metadata(BaseModel):
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
+    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
