@@ -290,12 +290,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name', 'template.top10_names.normalized_name',
-                  'metadata.members_count', 'name_generator.related_collections']
+                  'metadata.members_count', 'name_generator.related_collections', 'data.archived']
 
         try:
             t_before = perf_counter()
             response = self.elastic.get(index=self.index_name, id=collection_id, _source_includes=fields)
             time_elapsed = (perf_counter() - t_before) * 1000
+            if response['_source']['data']['archived']:
+                raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
         except elasticsearch.exceptions.NotFoundError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
         except Exception as ex:
