@@ -302,8 +302,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        if response['_source']['data']['archived']:
-            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
+        # TODO: as quick fix for filtering collections (e.g. nazi) with archived=True; needs to be activated when those collection will be marked in separated field
+        # if response['_source']['data']['archived']:
+        #     raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         es_response_metadata = {
             'n_total_hits': 1,
