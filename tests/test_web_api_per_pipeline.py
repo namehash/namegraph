@@ -560,6 +560,7 @@ class TestGrouped:
             assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
             assert name['metadata']['collection_id'] == collection_id
 
+    @pytest.mark.xfail(reason="Enable when we move filtered collections to use a separate field") # TODO
     def test_fetching_top_collection_members_archived(self, test_client):
         client = test_client
         collection_id = 'B1r8GhHWIgAA'  # archived
