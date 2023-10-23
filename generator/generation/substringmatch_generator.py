@@ -96,16 +96,18 @@ class SubstringMatchGenerator(NameGenerator):
 
         # self.limit=100 #TODO set to request's max_suggestions
         # return single tokens
+        return ((name,) for name in islice(names, self.limit))
 
-        def get_tokens_from_suggestion(s: str) -> tuple:
-            start = s.find(pattern)
-            if start == -1:
-                return (s,)
-            end = start + len(pattern)
-            s_tokens = s[:start], s[start:end], s[end:]
-            return tuple(q for q in s_tokens if q)
+        # Disabled because it may introduce more errors
+        # def get_tokens_from_suggestion(s: str) -> tuple:
+        #     start = s.find(pattern)
+        #     if start == -1:
+        #         return (s,)
+        #     end = start + len(pattern)
+        #     s_tokens = s[:start], s[start:end], s[end:]
+        #     return tuple(q for q in s_tokens if q)
 
-        return (get_tokens_from_suggestion(name) for name in islice(names, self.limit))
+        # return (get_tokens_from_suggestion(name) for name in islice(names, self.limit))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),
