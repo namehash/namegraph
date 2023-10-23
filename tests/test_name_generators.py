@@ -525,7 +525,7 @@ def test_substringmatchgenerator_short():
         strategy = SubstringMatchGenerator(config)
         tokenized_name = ('4',)
         generated_names = list(strategy.generate(tokenized_name))
-        assert ('0000', '4', '00',) in generated_names
+        assert ('0000400',) in generated_names
 
 
 def test_substringmatchgenerator_sorting():
@@ -536,8 +536,8 @@ def test_substringmatchgenerator_sorting():
         generated_names = list(strategy.generate(tokenized_name))
         generated_tokens = generated_names
 
-        assert ('0004206', '9',) in generated_tokens  # interesting_score = 988
-        assert ('00', '0004206', '9',) in generated_tokens  # interesting_score = 227
+        assert ('00042069',) in generated_tokens  # interesting_score = 988
+        assert ('0000042069',) in generated_tokens  # interesting_score = 227
 
         longer_pos = generated_tokens.index(('00', '0004206', '9',))
         shorter_pos = generated_tokens.index(('0004206', '9',))
