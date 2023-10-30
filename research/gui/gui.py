@@ -217,7 +217,7 @@ for i, category in enumerate(categories):
         if st.session_state.containers[category['collection_id']]:
             container.markdown('**Sampled/scrambled:** ' + st.session_state.containers[category['collection_id']])
 
-    if 'related_collections' in category:
+    if 'related_collections' in category and category['related_collections']:
         st.markdown('##### Related collections')
         for collection, column in zip(category['related_collections'],
                                       st.columns(len(category['related_collections']))):

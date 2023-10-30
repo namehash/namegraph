@@ -69,7 +69,7 @@ class Collection:
             names=fields[normalized_names_key][:limit_names],
             namehashes=fields[namehashes_key][:limit_names] if namehashes_key in fields else None,
             tokenized_names=tokenized_names,
-            name_types=fields['template.collection_types'][1::2],
+            name_types=fields['template.collection_types'][1::2] if 'template.collection_types' in fields else [],
             modified_timestamp=fields['metadata.modified'][0],
             avatar_emoji=fields['data.avatar_emoji'][0] if 'data.avatar_emoji' in fields else None,
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
@@ -103,7 +103,7 @@ class Collection:
             namehashes=fields['script_namehashes'][:limit_names]
                 if 'script_namehashes' in fields else None,
             tokenized_names=tokenized_names,
-            name_types=fields['template.collection_types'][1::2],
+            name_types=fields['template.collection_types'][1::2] if 'template.collection_types' in fields else [],
             modified_timestamp=fields['metadata.modified'][0],
             avatar_emoji=fields['data.avatar_emoji'],
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
