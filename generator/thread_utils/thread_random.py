@@ -24,7 +24,7 @@ def get_numpy_rng():
     if 'thread_locals' in globals():
         rng_per_thread = getattr(globals()['thread_locals'], 'numpy_rng', None)
         if rng_per_thread is None:
-            logger.warning(f'Using random module instead of a thread-specific rng!')
+            logger.warning(f'Using numpy.random module instead of a thread-specific rng!')
         rng = rng_per_thread if rng_per_thread is not None else np_random
     else:
         rng = np_random
