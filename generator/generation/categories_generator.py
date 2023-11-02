@@ -1,5 +1,4 @@
 import csv
-import random
 
 import itertools
 import collections
@@ -15,6 +14,8 @@ from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
 from ..input_name import InputName, Interpretation
 from ..utils import Singleton
+from generator.thread_utils import get_random_rng
+
 
 logger = logging.getLogger('generator')
 
@@ -28,7 +29,7 @@ class Categories(metaclass=Singleton):
                 self.inverted_categories[token].append(category)
 
         for tokens in self.categories.values():
-            random.shuffle(tokens)
+            get_random_rng().shuffle(tokens)
 
     def get_names(self, category: str) -> list[str]:
         return self.categories.get(category, [])
@@ -65,10 +66,12 @@ class CategoriesGenerator(NameGenerator):
 
         token = ''.join(tokens)
 
+        rng = get_random_rng()
+
         iterators = []
         for category in self.categories.get_categories(token):
             names = self.categories.get_names(category)
-            start_index = random.randint(0, len(names))
+            start_index = rng.randint(0, len(names))
             iterators.append(
                 itertools.chain(itertools.islice(names, start_index, None), itertools.islice(names, 0, start_index)))
 
