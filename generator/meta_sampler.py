@@ -2,6 +2,8 @@ import logging
 import random
 from typing import Type, Callable
 from ens_normalize import is_ens_normalized
+import numpy as np
+import hashlib
 
 from generator.domains import Domains
 from generator.generated_name import GeneratedName
@@ -90,6 +92,10 @@ class MetaSampler:
             is_already_sampled: Callable[[str], bool] = lambda x: False,
     ) -> list[GeneratedName]:
         min_available_required = int(min_suggestions * min_available_fraction)
+
+        # todo: initialize rng for this thread
+
+        # todo: after the sampling: del thread_locals.rng (??) -> probably not needed
 
         mode = name.params.get('mode', 'full')
 
