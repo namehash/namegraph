@@ -2,7 +2,6 @@ import collections
 import concurrent.futures
 import threading
 import logging
-import random
 import time
 from itertools import islice, cycle
 from typing import List, Any
