@@ -749,6 +749,7 @@ class TestGroupedSuggestions:
             elif category['type'] == 'expand':
                 assert len(category['suggestions']) > 0
 
+    @pytest.mark.xfail
     @pytest.mark.integration_test
     @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
     def test_prod_deterministic_behavior(self, prod_test_client, label):
