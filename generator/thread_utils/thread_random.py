@@ -1,6 +1,9 @@
 import logging
 import random
+
 import numpy.random as np_random
+
+from .thread_locals import thread_locals
 
 
 # todo: is "sth in globals()" and "globals()['thread_locals']" thread-safe?
@@ -15,6 +18,7 @@ def get_random_rng():
             logger.warning(f'Using random module instead of a thread-specific rng!')
         rng = rng_per_thread if rng_per_thread is not None else random
     else:
+        logger.warning(f'Using random module instead of a thread-specific rng!')
         rng = random
     return rng
 
@@ -27,6 +31,7 @@ def get_numpy_rng():
             logger.warning(f'Using numpy.random module instead of a thread-specific rng!')
         rng = rng_per_thread if rng_per_thread is not None else np_random
     else:
+        logger.warning(f'Using numpy.random module instead of a thread-specific rng!')
         rng = np_random
 
     return rng
