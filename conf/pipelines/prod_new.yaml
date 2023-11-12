@@ -308,6 +308,10 @@
     instant: 1
     domain_detail: 1
     full: 2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 2
 -
   name: keycap
   generator: KeycapGenerator
