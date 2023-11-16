@@ -159,7 +159,7 @@ class Generator:
             categories_params=None,
             min_total_suggestions: int = 50,
             params: dict[str, Any] = None
-    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]], list[tuple[str]]]:
+    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]], list[tuple[str, ...]]]:
         params = params or {}
         categories_params = categories_params or {}
 

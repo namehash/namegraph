@@ -754,6 +754,7 @@ class TestGroupedSuggestions:
             ("zeusgodofolympus", {("zeus", "god", "of", "olympus"), ("zeusgodofolympus",)}),
             ("scoobydoowhereareyou🐕", {("scoobydoo", "where", "are", "you"), ("scoobydoowhereareyou",)}),
             ("desert sessions", {("desert", "sessions"), ("desertsessions",)}),
+            ("vitalik", {("vitali", "k"), ("vitalik",)}),
         ]
     )
     def test_returning_all_tokenizations(
