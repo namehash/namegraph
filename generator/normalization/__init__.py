@@ -3,3 +3,4 @@ from .unicode_normalizer import UnicodeNormalizer
 from .replace_invalid_normalizer import ReplaceInvalidNormalizer
 from .namehash_normalizer import NamehashNormalizer
 from .long_name_normalizer import LongNameNormalizer
+from .quotes_normalizer import QuotesNormalizer

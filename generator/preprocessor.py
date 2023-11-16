@@ -5,7 +5,8 @@ from generator.normalization import (
     NamehashNormalizer,
     UnicodeNormalizer,
     ReplaceInvalidNormalizer,
-    LongNameNormalizer
+    LongNameNormalizer,
+    QuotesNormalizer
 )
 from generator.input_name import InputName, Interpretation
 
@@ -22,12 +23,17 @@ class Preprocessor:
         self.unicode_normalizer = UnicodeNormalizer(config)
         self.replace_invalid_normalizer = ReplaceInvalidNormalizer(config)
         self.long_name_normalizer = LongNameNormalizer(config)
+        self.quotes_normalizer = QuotesNormalizer(config)
 
         self.ngram_classifier = NGramClassifier(config)
         self.person_name_classifier = PersonNameClassifier(config)
 
     def normalize(self, name: InputName) -> None:
-        strip_eth = self.strip_eth_normalizer.normalize(name.input_name)
+        if name.input_name.startswith('"') and name.input_name.endswith('"'):
+            name.is_pretokenized = True
+        name.strip_quotes_name = self.quotes_normalizer.normalize(name.input_name)
+
+        strip_eth = self.strip_eth_normalizer.normalize(name.strip_quotes_name)
         name.strip_eth_namehash = self.namehash_normalizer.normalize(strip_eth)
 
         name.strip_eth_namehash_unicode \
@@ -41,6 +47,9 @@ class Preprocessor:
             = self.long_name_normalizer.normalize(name.strip_eth_namehash_unicode)
         name.strip_eth_namehash_long_name \
             = self.long_name_normalizer.normalize(name.strip_eth_namehash)
+
+        if name.is_pretokenized:
+            name.pretokenization = tuple(name.strip_eth_namehash_unicode_long_name.strip().split())
 
     def classify(self, name: InputName) -> None:
         if name.strip_eth_namehash:
