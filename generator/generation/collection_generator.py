@@ -129,4 +129,6 @@ class CollectionGenerator(NameGenerator):
         # else:
         #     return {'tokens': interpretation.tokenization}
         # hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
-        return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        if name.is_pretokenized:
+            return {'tokens': name.pretokenization}
+        return {'tokens': tuple(name.strip_eth_namehash_unicode_long_name.strip().split(' '))}

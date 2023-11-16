@@ -29,9 +29,9 @@ class Preprocessor:
         self.person_name_classifier = PersonNameClassifier(config)
 
     def normalize(self, name: InputName) -> None:
-        if name.input_name.startswith('"') and name.input_name.endswith('"'):
+        if name.input_name.strip().startswith('"') and name.input_name.strip().endswith('"'):
             name.is_pretokenized = True
-        name.strip_quotes_name = self.quotes_normalizer.normalize(name.input_name)
+        name.strip_quotes_name = self.quotes_normalizer.normalize(name.input_name.strip())
 
         strip_eth = self.strip_eth_normalizer.normalize(name.strip_quotes_name)
         name.strip_eth_namehash = self.namehash_normalizer.normalize(strip_eth)
