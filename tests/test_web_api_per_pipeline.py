@@ -286,7 +286,7 @@ class TestCollections:
         assert False, "Results are the same for both enable_learning_to_rank=True and enable_learning_to_rank=False"
 
     def test_metadata_collection_field2(self, test_client):
-        response = test_client.post("/", json={"label": "virgil abloh"})
+        response = test_client.post("/", json={"label": "\"virgil abloh\""})
         assert response.status_code == 200
         json = response.json()
         collection_names = _extract_titles(json)
