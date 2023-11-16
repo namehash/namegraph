@@ -748,6 +748,46 @@ class TestGroupedSuggestions:
             elif category['type'] == 'expand':
                 assert len(category['suggestions']) > 0
 
+    @pytest.mark.parametrize(
+        "input_label, expected_tokenizations",
+        [
+            ("zeusgodofolympus", {("zeus", "god", "of", "olympus"), ("zeusgodofolympus",)}),
+            ("scoobydoowhereareyou🐕", {("scoobydoo", "where", "are", "you"), ("scoobydoowhereareyou",)}),
+            ("desert sessions", {("desert", "sessions"), ("desertsessions",)}),
+        ]
+    )
+    def test_returning_all_tokenizations(
+            self,
+            prod_test_client,
+            input_label: str,
+            expected_tokenizations: set[tuple[str]]
+    ):
+        client = prod_test_client
+
+        request_data = {
+            "label": input_label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+
+        response_json = response.json()
+        assert response.status_code == 200
+
+        assert 'all_tokenizations' in response_json
+
+        all_tokenizations = response_json['all_tokenizations']
+        assert len(all_tokenizations) == len(set(map(tuple, all_tokenizations)))
+        assert set(map(tuple, all_tokenizations)) == expected_tokenizations
+
 
 @pytest.mark.integration_test
 @pytest.mark.parametrize(

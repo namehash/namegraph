@@ -275,14 +275,18 @@ async def grouped_by_category(name: NameRequest):
     params['mode'] = 'grouped_' + params['mode']
 
     generator.clear_cache()
-    result = generator.generate_names(name.label,
-                                      sorter=name.sorter,
-                                      min_suggestions=name.min_suggestions,
-                                      max_suggestions=name.max_suggestions,
-                                      min_available_fraction=name.min_primary_fraction,
-                                      params=params)
+    result = generator.generate_names(
+        name.label,
+        sorter=name.sorter,
+        min_suggestions=name.min_suggestions,
+        max_suggestions=name.max_suggestions,
+        min_available_fraction=name.min_primary_fraction,
+        params=params
+    )
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
+    response['all_tokenizations'] = []  # todo: fix if this will be used
+
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return response
@@ -297,7 +301,7 @@ async def suggestions_by_category(name: GroupedNameRequest):
     # params['mode'] = 'grouped_' + params['mode']
 
     generator.clear_cache()
-    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+    related_suggestions, grouped_suggestions, all_tokenizations = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
         max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
@@ -309,6 +313,8 @@ async def suggestions_by_category(name: GroupedNameRequest):
 
     response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
                                                              include_metadata=name.params.metadata)
+    response['all_tokenizations'] = all_tokenizations
+
     logger.info(json.dumps(
         log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
 

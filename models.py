@@ -213,6 +213,7 @@ class GroupedSuggestions(BaseModel):
         title='grouped suggestions',
         description='list of suggestions grouped by category type'
     )
+    all_tokenizations: list[list[str]] = Field(title='all inferred tokenizations of input label')
 
 
 class SampleCollectionMembers(BaseModel):
