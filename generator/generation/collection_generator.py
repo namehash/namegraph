@@ -46,10 +46,11 @@ class CollectionGenerator(NameGenerator):
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         # TODO maybe use concatenation of all tokenizations as query
         input_name: str = name.strip_eth_namehash_unicode_long_name.strip()
-        # if ' ' in name.strip_eth_namehash_unicode_long_name:  # todo: can it be removed?
-        #     tokens = input_name.split(' ')
+
         if name.is_pretokenized:
             tokens = name.pretokenization
+        elif ' ' in input_name:
+            tokens = input_name.split(' ')
         else:
             # tokens = interpretation.tokenization
             # alternative 1
@@ -131,4 +132,5 @@ class CollectionGenerator(NameGenerator):
         # hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
         if name.is_pretokenized:
             return {'tokens': name.pretokenization}
+        # fixme: should be compatible with the actual tokenization (?)
         return {'tokens': tuple(name.strip_eth_namehash_unicode_long_name.strip().split(' '))}
