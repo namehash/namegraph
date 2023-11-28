@@ -2,6 +2,9 @@ import logging
 from typing import List, Tuple, Iterable, Any
 from itertools import cycle, islice
 
+import emoji
+import regex
+
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
 from ..xcollections import CollectionMatcherForGenerator
@@ -64,6 +67,14 @@ class CollectionGenerator(NameGenerator):
                         continue
                     tokens.extend(interpretation.tokenization)
 
+            # adding emojis, which have been removed from the name
+            normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name.strip()
+            # some characters have been removed
+            if normalized_name != name.strip_eth_namehash_long_name:
+                for grapheme in regex.finditer(r'\X', name.strip_eth_namehash_long_name):
+                    if emoji.is_emoji(grapheme.group()):
+                        tokens.append(grapheme.group())
+
             tokens = uniq(tokens)
             if input_name:
                 tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
@@ -86,7 +97,7 @@ class CollectionGenerator(NameGenerator):
 
         # list of collections, where each collection is a list of tuples - (collection object, tokenized_name)
         collections_with_tuples = [
-            [(collection, tokenized_name) for tokenized_name in collection.tokenized_names[:suggestions_limit]]
+            [(collection, (name,)) for name in collection.names[:suggestions_limit]]
             for collection in collections
         ]
 
