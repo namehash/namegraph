@@ -9,7 +9,9 @@ from generator.tokenization import (
     BigramTokenizer,
     WordNinjaTokenizer,
     BigramWordnetTokenizer,
-    BigramDictionaryTokenizer, AllTokenizer
+    BigramDictionaryTokenizer, 
+    AllTokenizer,
+    ImprovedWordNinjaTokenizer,
 )
 
 # repeatable, braverest, semisoft, chinamen
@@ -81,7 +83,7 @@ def test_word_ninja_tokenizer2():
 def test_new_word_ninja_tokenizer(name, tokenized_name):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        tokenizer = WordNinjaTokenizer(config)
+        tokenizer = ImprovedWordNinjaTokenizer(config)
         tokenized_names = tokenizer.tokenize(name)
         assert tokenized_names[0] == tokenized_name
 
