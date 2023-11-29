@@ -25,6 +25,11 @@ def emoji_split(name: str) -> List[Tuple[str, bool]]:
 
 @lru_cache(64)
 def _tokenizer(name: str) -> List[Tuple[str, ...]]:
+    return [tuple(wordninja.split(name))]
+
+
+@lru_cache(64)
+def _improved_tokenizer(name: str) -> List[Tuple[str, ...]]:
     tokens = []
     for token, is_emoji in emoji_split(name):
         if is_emoji:
@@ -50,3 +55,14 @@ class WordNinjaTokenizer(Tokenizer):
 
     def tokenize(self, name: str) -> List[Tuple[str, ...]]:
         return _tokenizer(name)
+
+
+class ImprovedWordNinjaTokenizer(Tokenizer):
+    """Return one the most probable tokenization."""
+
+    def __init__(self, config):
+        super().__init__()
+        wordninja.DEFAULT_LANGUAGE_MODEL = wordninja.LanguageModel(config.tokenization.wordninja_dictionary)
+
+    def tokenize(self, name: str) -> List[Tuple[str, ...]]:
+        return _improved_tokenizer(name)
