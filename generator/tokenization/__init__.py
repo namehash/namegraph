@@ -3,6 +3,7 @@ from .bigram_dictionary_tokenizer import BigramDictionaryTokenizer
 from .bigram_longest_tokenizer import BigramLongestTokenizer
 from .bigram_wordnet_tokenizer import BigramWordnetTokenizer
 from .wordninja_tokenizer import WordNinjaTokenizer
+from .wordninja_tokenizer import ImprovedWordNinjaTokenizer
 from .none_tokenizer import NoneTokenizer
 from .all_tokenizer import AllTokenizer
 from .person_name_tokenizer import PersonNameTokenizer
