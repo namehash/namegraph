@@ -97,7 +97,7 @@ class CollectionGenerator(NameGenerator):
 
         # list of collections, where each collection is a list of tuples - (collection object, tokenized_name)
         collections_with_tuples = [
-            [(collection, (name,)) for name in collection.names[:suggestions_limit]]
+            [(collection, tokenized_name) for tokenized_name in collection.tokenized_names[:suggestions_limit]]
             for collection in collections
         ]
 
