@@ -58,10 +58,6 @@ def test_word_ninja_tokenizer2():
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert ('york', 'newyork', '123') in tokenized_names
 
-        print(tokenizer.tokenize('vitalik'))
-        print(tokenizer.tokenize('avsa'))
-        print(tokenizer.tokenize('brantly'))
-
 
 @mark.parametrize(
     "name,tokenized_name", [
