@@ -56,6 +56,35 @@ def test_word_ninja_tokenizer2():
         tokenized_names = tokenizer.tokenize('yorknewyork123')
         assert ('york', 'newyork', '123') in tokenized_names
 
+        print(tokenizer.tokenize('vitalik'))
+        print(tokenizer.tokenize('avsa'))
+        print(tokenizer.tokenize('brantly'))
+
+
+@mark.parametrize(
+    "name,tokenized_name", [
+        ['funny💩', ('funny', '💩')],
+        ['funny💩💩', ('funny', '💩','💩')],
+        ['7️⃣7️⃣7️⃣', ('7️⃣', '7️⃣', '7️⃣')],
+        ['namehash©', ('name', 'hash', '©')],
+        ['🅵🅸🆃', ('🅵🅸🆃',)],
+        ['john🇺🇸', ('john', '🇺🇸')],
+        ['_yumi', ('_', 'yumi')],
+        ['español', ('espa','ñ','ol')],
+        ['‍420', ('‍', '420',)],
+        ['٠٠٩', ('٠٠٩',)],
+        ['عليكم٠٠٩', ('عليكم', '٠٠٩')],
+        ['•5776', ('•', '5776')],
+        ['سعودي', ('سعودي',)],
+        ['京a00002', ('京', 'a', '00002')],
+    ])
+def test_new_word_ninja_tokenizer(name, tokenized_name):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        tokenizer = WordNinjaTokenizer(config)
+        tokenized_names = tokenizer.tokenize(name)
+        assert tokenized_names[0] == tokenized_name
+
 
 def test_none_tokenizer():
     with initialize(version_base=None, config_path="../conf/"):
