@@ -67,17 +67,20 @@ class CollectionGenerator(NameGenerator):
                         continue
                     tokens.extend(interpretation.tokenization)
 
-            # adding emojis, which have been removed from the name
-            normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name.strip()
-            # some characters have been removed
-            if normalized_name != name.strip_eth_namehash_long_name:
-                for grapheme in regex.finditer(r'\X', name.strip_eth_namehash_long_name):
-                    if emoji.is_emoji(grapheme.group()):
-                        tokens.append(grapheme.group())
-
             tokens = uniq(tokens)
             if input_name:
                 tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
+
+        # adding emojis, which have been removed from the name
+        normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name.strip()
+        # some characters have been removed
+        if normalized_name != name.strip_eth_namehash_long_name:
+            emojis = []
+            for grapheme in regex.finditer(r'\X', name.strip_eth_namehash_long_name):
+                if emoji.is_emoji(grapheme.group()):
+                    emojis.append(grapheme.group())
+            emojis = uniq(emojis)
+            tokens.extend(emojis)
 
         params = name.params if name.params is not None else dict()
         suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
