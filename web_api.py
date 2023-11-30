@@ -336,6 +336,8 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
 
     response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
 
+    logger.info(json.dumps({'endpoint': 'sample_collection_members', 'request': sample_command.model_dump()}))
+
     return response
 
 
@@ -368,6 +370,8 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
                                                               include_metadata=fetch_top10_command.metadata)
 
+    logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
+
     return response2[0]
 
 
@@ -390,6 +394,8 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
         suggestions.append(obj)
 
     response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata)
+
+    logger.info(json.dumps({'endpoint': 'scramble_collection_tokens', 'request': scramble_command.model_dump()}))
 
     return response
 
