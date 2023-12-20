@@ -749,6 +749,7 @@ class TestGroupedSuggestions:
             elif category['type'] == 'expand':
                 assert len(category['suggestions']) > 0
 
+    # reason is described here - https://app.shortcut.com/ps-web3/story/22270/nondeterministic-behavior-for-vitalik
     @pytest.mark.xfail
     @pytest.mark.integration_test
     @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
