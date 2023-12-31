@@ -1,126 +1,134 @@
 Users: 1
-[2023-12-31 12:53:06,687] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:53:06,688] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:53:06,688] 66597c70e2ee/INFO/locust.runners: Ramping to 1 users at a rate of 1.00 per second
-[2023-12-31 12:53:06,689] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 1} (1 total users)
-[2023-12-31 12:54:06,428] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:54:06,467] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:54:15,025] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:54:15,025] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:54:15,026] 5bed2e9f9be9/INFO/locust.runners: Ramping to 1 users at a rate of 1.00 per second
+[2023-12-31 13:54:15,027] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 1} (1 total users)
+[2023-12-31 13:55:14,778] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 13:55:14,818] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          299     2(0.67%) |    196      32    1953    100 |    5.10        0.03
+POST     suggestions_by_category                                                          249     3(1.20%) |    239      31    2099    110 |    4.17        0.05
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       299     2(0.67%) |    196      32    1953    100 |    5.10        0.03
+         Aggregated                                                                       249     3(1.20%) |    239      31    2099    110 |    4.17        0.05
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               100    150    220    300    420    790   1100   1100   2000   2000   2000    299
+POST     suggestions_by_category                                                               110    220    310    350    720    900   1200   1200   2100   2100   2100    249
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            100    150    220    300    420    790   1100   1100   2000   2000   2000    299
+         Aggregated                                                                            110    220    310    350    720    900   1200   1200   2100   2100   2100    249
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-2                  POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+3                  POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:          6349940 kB
 Users: 2
-[2023-12-31 12:54:07,041] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:54:07,041] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:54:07,042] 66597c70e2ee/INFO/locust.runners: Ramping to 2 users at a rate of 1.00 per second
-[2023-12-31 12:54:08,043] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 2} (2 total users)
-[2023-12-31 12:55:06,792] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:55:06,827] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:55:15,363] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:55:15,363] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:55:15,364] 5bed2e9f9be9/INFO/locust.runners: Ramping to 2 users at a rate of 1.00 per second
+[2023-12-31 13:55:16,366] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 2} (2 total users)
+[2023-12-31 13:56:15,137] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 13:56:15,180] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          578    10(1.73%) |    204      31    1918    110 |    9.68        0.17
+POST     suggestions_by_category                                                          583    46(7.89%) |    203      33    1521     95 |    9.75        0.77
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       578    10(1.73%) |    204      31    1918    110 |    9.68        0.17
+         Aggregated                                                                       583    46(7.89%) |    203      33    1521     95 |    9.75        0.77
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               110    180    300    330    400    790   1000   1200   1900   1900   1900    578
+POST     suggestions_by_category                                                                95    160    260    320    460    830   1000   1200   1500   1500   1500    583
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            110    180    300    330    400    790   1000   1200   1900   1900   1900    578
+         Aggregated                                                                             95    160    260    320    460    830   1000   1200   1500   1500   1500    583
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-10                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+46                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:          7057244 kB
 Users: 3
-[2023-12-31 12:55:07,382] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:55:07,382] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:55:07,383] 66597c70e2ee/INFO/locust.runners: Ramping to 3 users at a rate of 1.00 per second
-[2023-12-31 12:55:09,385] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 3} (3 total users)
-[2023-12-31 12:56:07,154] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:56:07,191] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:56:15,740] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:56:15,741] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:56:15,741] 5bed2e9f9be9/INFO/locust.runners: Ramping to 3 users at a rate of 1.00 per second
+[2023-12-31 13:56:17,743] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 3} (3 total users)
+[2023-12-31 13:57:15,510] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 13:57:15,547] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          755     5(0.66%) |    232      31    1492    110 |   12.64        0.08
+POST     suggestions_by_category                                                          793    45(5.67%) |    220      31    1452    100 |   13.30        0.75
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       755     5(0.66%) |    232      31    1492    110 |   12.64        0.08
+         Aggregated                                                                       793    45(5.67%) |    220      31    1452    100 |   13.30        0.75
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               110    200    300    350    550    950   1100   1200   1500   1500   1500    755
+POST     suggestions_by_category                                                               100    170    290    350    490    930   1100   1200   1500   1500   1500    793
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            110    200    300    350    550    950   1100   1200   1500   1500   1500    755
+         Aggregated                                                                            100    170    290    350    490    930   1100   1200   1500   1500   1500    793
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-5                  POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+45                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:          7763488 kB
 Users: 4
-[2023-12-31 12:56:07,753] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:56:07,754] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:56:07,754] 66597c70e2ee/INFO/locust.runners: Ramping to 4 users at a rate of 1.00 per second
-[2023-12-31 12:56:10,757] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 4} (4 total users)
-[2023-12-31 12:57:07,528] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:57:07,569] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:57:16,089] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:57:16,090] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:57:16,090] 5bed2e9f9be9/INFO/locust.runners: Ramping to 4 users at a rate of 1.00 per second
+[2023-12-31 13:57:19,093] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 4} (4 total users)
+[2023-12-31 13:58:15,865] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 13:58:15,900] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          934     5(0.54%) |    248      33    1426    120 |   15.66        0.08
+POST     suggestions_by_category                                                          941    16(1.70%) |    246      29    1442    120 |   15.75        0.27
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       934     5(0.54%) |    248      33    1426    120 |   15.66        0.08
+         Aggregated                                                                       941    16(1.70%) |    246      29    1442    120 |   15.75        0.27
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               120    200    330    380    570   1000   1200   1200   1400   1400   1400    934
+POST     suggestions_by_category                                                               120    200    300    360    580   1000   1200   1300   1400   1400   1400    941
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            120    200    330    380    570   1000   1200   1200   1400   1400   1400    934
+         Aggregated                                                                            120    200    300    360    580   1000   1200   1300   1400   1400   1400    941
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-5                  POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+16                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:          8443956 kB
 Users: 6
-[2023-12-31 12:57:08,119] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:57:08,119] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:57:08,120] 66597c70e2ee/INFO/locust.runners: Ramping to 6 users at a rate of 1.00 per second
-[2023-12-31 12:57:13,124] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 6} (6 total users)
-[2023-12-31 12:58:07,889] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:58:07,924] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:58:16,498] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:58:16,498] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:58:16,499] 5bed2e9f9be9/INFO/locust.runners: Ramping to 6 users at a rate of 1.00 per second
+[2023-12-31 13:58:21,503] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 6} (6 total users)
+[2023-12-31 13:59:16,261] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 13:59:16,296] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                         1025    14(1.37%) |    332      31    2268    200 |   17.22        0.24
+POST     suggestions_by_category                                                         1383    14(1.01%) |    247      32    1730    120 |   23.17        0.23
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                      1025    14(1.37%) |    332      31    2268    200 |   17.22        0.24
+         Aggregated                                                                      1383    14(1.01%) |    247      32    1730    120 |   23.17        0.23
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               200    370    440    500    880   1100   1400   1500   2200   2300   2300   1025
+POST     suggestions_by_category                                                               120    210    320    380    550    990   1200   1300   1600   1700   1700   1383
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            200    370    440    500    880   1100   1400   1500   2200   2300   2300   1025
+         Aggregated                                                                            120    210    320    380    550    990   1200   1300   1600   1700   1700   1383
 
 Error report
 # occurrences      Error
@@ -128,80 +136,89 @@ Error report
 14                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:          9865372 kB
 Users: 8
-[2023-12-31 12:58:08,505] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:58:08,505] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:58:08,506] 66597c70e2ee/INFO/locust.runners: Ramping to 8 users at a rate of 1.00 per second
-[2023-12-31 12:58:15,513] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 8} (8 total users)
-[2023-12-31 12:59:08,269] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 12:59:08,310] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 13:59:16,861] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 13:59:16,861] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 13:59:16,862] 5bed2e9f9be9/INFO/locust.runners: Ramping to 8 users at a rate of 1.00 per second
+[2023-12-31 13:59:23,867] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 8} (8 total users)
+[2023-12-31 14:00:16,633] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 14:00:16,670] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                         1035    12(1.16%) |    430      31    2332    290 |   17.33        0.20
+POST     suggestions_by_category                                                         1526    17(1.11%) |    293      31    2708    160 |   25.54        0.28
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                      1035    12(1.16%) |    430      31    2332    290 |   17.33        0.20
+         Aggregated                                                                      1526    17(1.11%) |    293      31    2708    160 |   25.54        0.28
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               290    450    570    650   1100   1300   1500   1600   2200   2300   2300   1035
+POST     suggestions_by_category                                                               160    260    360    420    650   1200   1400   1500   2000   2700   2700   1526
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            290    450    570    650   1100   1300   1500   1600   2200   2300   2300   1035
+         Aggregated                                                                            160    260    360    420    650   1200   1400   1500   2000   2700   2700   1526
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-12                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+17                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:         10770912 kB
 Users: 16
-[2023-12-31 12:59:08,893] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 12:59:08,894] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 12:59:08,895] 66597c70e2ee/INFO/locust.runners: Ramping to 16 users at a rate of 1.00 per second
-[2023-12-31 12:59:23,914] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 16} (16 total users)
-[2023-12-31 13:00:08,654] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 13:00:08,701] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 14:00:17,253] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 14:00:17,253] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 14:00:17,254] 5bed2e9f9be9/INFO/locust.runners: Ramping to 16 users at a rate of 1.00 per second
+[2023-12-31 14:00:32,273] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 16} (16 total users)
+[2023-12-31 14:01:17,018] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 14:01:17,065] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          983    10(1.02%) |    840      33    2974    730 |   16.49        0.17
+POST     suggestions_by_category                                                         1594    22(1.38%) |    520      32    4200    380 |   26.68        0.37
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       983    10(1.02%) |    840      33    2974    730 |   16.49        0.17
+         Aggregated                                                                      1594    22(1.38%) |    520      32    4200    380 |   26.68        0.37
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                               730    990   1200   1300   1600   1900   2300   2500   3000   3000   3000    983
+POST     suggestions_by_category                                                               380    550    680    790   1200   1600   2100   2400   3500   4200   4200   1594
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                            730    990   1200   1300   1600   1900   2300   2500   3000   3000   3000    983
+         Aggregated                                                                            380    550    680    790   1200   1600   2100   2400   3500   4200   4200   1594
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-10                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+22                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
 
+RAM
+Active:         10863380 kB
 Users: 32
-[2023-12-31 13:00:09,366] 66597c70e2ee/INFO/locust.main: Run time limit set to 60 seconds
-[2023-12-31 13:00:09,366] 66597c70e2ee/INFO/locust.main: Starting Locust 2.20.0
-[2023-12-31 13:00:09,367] 66597c70e2ee/INFO/locust.runners: Ramping to 32 users at a rate of 1.00 per second
-[2023-12-31 13:00:40,388] 66597c70e2ee/INFO/locust.runners: All users spawned: {"WebsiteUser": 32} (32 total users)
-[2023-12-31 13:01:09,114] 66597c70e2ee/INFO/locust.main: --run-time limit reached, shutting down
-[2023-12-31 13:01:09,162] 66597c70e2ee/INFO/locust.main: Shutting down (exit code 1)
+[2023-12-31 14:01:17,644] 5bed2e9f9be9/INFO/locust.main: Run time limit set to 60 seconds
+[2023-12-31 14:01:17,644] 5bed2e9f9be9/INFO/locust.main: Starting Locust 2.20.0
+[2023-12-31 14:01:17,645] 5bed2e9f9be9/INFO/locust.runners: Ramping to 32 users at a rate of 1.00 per second
+[2023-12-31 14:01:48,676] 5bed2e9f9be9/INFO/locust.runners: All users spawned: {"WebsiteUser": 32} (32 total users)
+[2023-12-31 14:02:17,414] 5bed2e9f9be9/INFO/locust.main: --run-time limit reached, shutting down
+[2023-12-31 14:02:17,463] 5bed2e9f9be9/INFO/locust.main: Shutting down (exit code 1)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     suggestions_by_category                                                          944    13(1.38%) |   1452      32    6010   1200 |   15.81        0.22
+POST     suggestions_by_category                                                         1541    14(0.91%) |    903      34    6509    700 |   25.79        0.23
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                       944    13(1.38%) |   1452      32    6010   1200 |   15.81        0.22
+         Aggregated                                                                      1541    14(0.91%) |    903      34    6509    700 |   25.79        0.23
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-POST     suggestions_by_category                                                              1200   1800   2000   2300   2900   3400   4600   5000   6000   6000   6000    944
+POST     suggestions_by_category                                                               700    970   1200   1400   1900   2300   3100   3500   5600   6500   6500   1541
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                           1200   1800   2000   2300   2900   3400   4600   5000   6000   6000   6000    944
+         Aggregated                                                                            700    970   1200   1400   1900   2300   3100   3500   5600   6500   6500   1541
 
 Error report
 # occurrences      Error
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-13                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
+14                 POST suggestions_by_category: HTTPError('503 Server Error: Service Unavailable for url: suggestions_by_category')
 ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+RAM
+Active:         10916420 kB
