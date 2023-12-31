@@ -31,3 +31,5 @@ research/avatars/*.csv
 research/avatars/*.xlsx
 !research/token-scramble/*.ipynb
 .env
+data/w2v/
+data/wiki2v/
