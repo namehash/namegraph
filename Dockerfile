@@ -40,4 +40,4 @@ RUN python3 generator/namehash_common/generate_cache.py
 
 HEALTHCHECK --interval=60s --start-period=60s --retries=3 CMD python3 healthcheck.py
 
-CMD python3 generator/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 4 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker
+CMD python3 generator/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 8 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker
