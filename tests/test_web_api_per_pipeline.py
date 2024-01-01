@@ -351,7 +351,7 @@ class TestGrouped:
 
         assert False, "Results are the same for all diversity parameters"
 
-    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman", "[003fda97309fd6aa9d7753dcffa37a] 12345"])
     def test_prod_grouped_by_category(self, test_client, label):
         client = test_client
 
