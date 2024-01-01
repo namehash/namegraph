@@ -43,3 +43,12 @@ def test_normalize():
         assert name.strip_eth_namehash_unicode_replace_invalid_long_name == 'zeusgod'
         assert name.strip_eth_namehash_unicode_long_name == 'zeus god'
         assert name.strip_eth_namehash_long_name == 'Zeus god'
+
+        name = InputName('[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', {})
+        do.normalize(name)
+        assert name.strip_eth_namehash == ''
+        assert name.strip_eth_namehash_unicode == ''
+        assert name.strip_eth_namehash_unicode_replace_invalid == ''
+        assert name.strip_eth_namehash_unicode_replace_invalid_long_name == ''
+        assert name.strip_eth_namehash_unicode_long_name == ''
+        assert name.strip_eth_namehash_long_name == ''
