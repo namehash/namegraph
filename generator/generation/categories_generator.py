@@ -3,6 +3,7 @@ import csv
 import itertools
 import collections
 import logging
+import random
 
 from operator import itemgetter
 from typing import List, Dict, Tuple
@@ -28,8 +29,9 @@ class Categories(metaclass=Singleton):
             for token in tokens:
                 self.inverted_categories[token].append(category)
 
+        random.seed(0)
         for tokens in self.categories.values():
-            get_random_rng().shuffle(tokens)
+            random.shuffle(tokens)
 
     def get_names(self, category: str) -> list[str]:
         return self.categories.get(category, [])
