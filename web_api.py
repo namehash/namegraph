@@ -145,7 +145,6 @@ async def generate_names(name: NameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
 
-    generator.clear_cache()
     result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
@@ -274,7 +273,6 @@ async def grouped_by_category(name: NameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
     result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
@@ -296,7 +294,6 @@ def suggestions_by_category(name: GroupedNameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     # params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
     related_suggestions, grouped_suggestions = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
