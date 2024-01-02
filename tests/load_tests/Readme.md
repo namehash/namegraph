@@ -44,15 +44,19 @@ Memory with number of workers:
 - uvicorn 8 31 GB? crash
 - gunicorn 4 with preload 8 GB
 - gunicorn 8 with preload 11 GB
+- r5a.large (2vCPU) gunicorn 8 with preload 11 GB
 
 Conclusions:
 - more workers is better, probably more than 2 x vCPU will be better because ES is taking long time
 - more workers needs more RAM, we can try more initialization on startup or focus on memory optimization
-- with 4 vCPU nad 8GB RAM we can serve 934 requests for 4 parallel users in 1 minute with avg time 248 ms
-- with 4 vCPU nad 11GB RAM we can serve 1383 requests for 6 parallel users in 1 minute with avg time 247 ms
+- with 4 vCPU (4 workers) and 8GB RAM we can serve 934 requests for 4 parallel users in 1 minute with avg time 248 ms (16 req/s)
+- with 4 vCPU (8 workers) and 11GB RAM we can serve 1383 requests for 6 parallel users in 1 minute with avg time 247 ms (23 req/s)
+- with 2 vCPU (8 workers) and 11GB RAM we can serve 951 requests for 4 parallel users in 1 minute with avg time 243 ms (16 req/s)
+- with 2 vCPU (4 workers) and 8GB RAM we can serve 906 requests for 4 parallel users in 1 minute with avg time 255 ms (15 req/s)
+
 
 apt update
-apt install curl vim htop
+apt install vim htop
 pip3 install locust
 vim run_tests.sh 
 vim locust_suggestions_by_category.py
@@ -70,5 +74,5 @@ Memory worker (VIRT, RES):
 - gunicorn 1 worker sync: 15.1-11.3=3.8 GB
 - gunicorn 2 worker sync: 19.1-11.4=7.7 GB
 - gunicorn 2 worker uvicorn with preload: 15.6-11.7 = 3.9 GB
-- gunicorn 4 worker uvicorn with preload: 4 GB
+- gunicorn 4 worker uvicorn with preload: 4 GB - error?
 - gunicorn 8 worker uvicorn with preload: 11 GB
