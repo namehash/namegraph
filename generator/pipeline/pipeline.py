@@ -95,8 +95,8 @@ class Pipeline:
             logger.debug(f'Pipeline {self.pipeline_name} suggestions apply on N {name.input_name}.')
 
         hash = self.generator.hash(name, interpretation)
-        # print('HASH', interpretation.tokenization, hash, len(self.cache))
-        if hash not in self.cache:
+        # print('HASH', hash, len(self.cache), id(self.cache), self.pipeline_name, os.getpid(), threading.get_ident(), list(self.cache.keys()))
+        if hash not in name.cache[self.pipeline_name]:
             should_run = all([controlflow.should_run(name, interpretation) for controlflow in self.controlflow])
             if should_run:  # TODO ok?
 
@@ -132,9 +132,9 @@ class Pipeline:
 
             else:
                 suggestions = []
-            self.cache[hash] = PipelineResultsIterator(suggestions)
+            name.cache[self.pipeline_name][hash] = PipelineResultsIterator(suggestions)
             logger.debug(f'Pipeline {self.pipeline_name} suggestions cached.')
-        return self.cache[hash]
+        return name.cache[self.pipeline_name][hash]
 
     def _build(self):
         # make control flow optional

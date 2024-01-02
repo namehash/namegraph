@@ -289,7 +289,7 @@ async def grouped_by_category(name: NameRequest):
 
 
 @app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
-async def suggestions_by_category(name: GroupedNameRequest):
+def suggestions_by_category(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -599,3 +599,6 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     }
 
     return {'collections': collections, 'metadata': metadata}
+
+
+#TODO gc.freeze() ?
