@@ -340,7 +340,3 @@ class Generator:
 
         return all_related_suggestions, grouped_suggestions
 
-    def clear_cache(self) -> None:
-        for pipeline in self.pipelines:
-            pipeline.clear_cache()
-        self.random_available_name_pipeline.clear_cache()

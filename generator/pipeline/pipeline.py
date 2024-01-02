@@ -71,7 +71,6 @@ class Pipeline:
         logger.info(f'Pipeline {self.pipeline_name} initing.')
         self._build()
 
-        self.cache = {}
         logger.info(f'Pipeline {self.pipeline_name} inited.')
 
     def __eq__(self, other: Pipeline) -> bool:
@@ -79,10 +78,6 @@ class Pipeline:
 
     def __hash__(self) -> int:
         return hash(self.pipeline_name)
-
-    def clear_cache(self):
-        """Cache must be cleared before every request because index in pipeline results is saved."""
-        self.cache.clear()
 
     def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
         """
