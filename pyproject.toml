@@ -33,6 +33,7 @@ boto3 = "^1.26.117"
 csuffixtree = { url = "https://github.com/Carbon225/csuffixtree-py/releases/download/v0.3.7/csuffixtree-0.3.7-py3-none-any.whl" }
 rocksdict = "^0.3.10"
 gunicorn = "^21.2.0"
+aiohttp = "^3.9.1"
 
 
 [tool.poetry.group.dev.dependencies]
