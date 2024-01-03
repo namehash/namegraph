@@ -221,12 +221,12 @@ class Generator:
                         multi_sampler_suggestions_str.add(suggestion)
                     return sampled
 
+            async def helper(coro, category):
+                return category, await coro
 
             calls = []
-            cateogires=[]
+            start_time = time.time()
             for category, meta_sampler in self.grouped_metasamplers.items():
-                start_time = time.time()
-
                 category_params = getattr(categories_params, category)
                 try:
                     min_suggestions = category_params.min_suggestions
@@ -236,19 +236,19 @@ class Generator:
                     max_suggestions = 3 * category_params.max_related_collections * max(
                         category_params.max_names_per_related_collection, self.config.collections.suggestions_limit)
 
-                calls.append(meta_sampler.sample(name, 'weighted-sampling',
+                calll=helper(meta_sampler.sample(name, 'weighted-sampling',
                                         min_suggestions=min_suggestions, max_suggestions=max_suggestions,
                                         min_available_fraction=min_available_fraction,
-                                        category_endpoint=True, is_already_sampled=is_already_sampled))
-                cateogires.append(category)
-            sasdad = await asyncio.gather(*calls)
-            for category, suggestions in zip(cateogires,sasdad):
-                # category = futures[future]
-                # suggestions = future.result()
+                                        category_endpoint=True, is_already_sampled=is_already_sampled), category)
+                calls.append(calll)
+
+            for task, category in asyncio.as_completed(calls):
+                suggestions = await task
                 generator_time = 1000 * (time.time() - start_time)
                 logger.info(
                     f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
                 grouped_suggestions[category] = suggestions
+
 
         # split related
 
