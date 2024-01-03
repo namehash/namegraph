@@ -427,7 +427,7 @@
   generator: CollectionGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0.1

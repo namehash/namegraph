@@ -1,8 +1,8 @@
 from typing import Tuple, Iterator
-from random import shuffle
 
 from generator.generation import NameGenerator
 from ..input_name import InputName, Interpretation
+from generator.thread_utils import get_random_rng
 
 
 
@@ -27,7 +27,7 @@ class EasterEggGenerator(NameGenerator):
             return []
 
         name = ''.join(tokens)
-        shuffle(self.messages)
+        get_random_rng().shuffle(self.messages)
         return ((m.format(name=name),) for m in self.messages)
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:

@@ -115,22 +115,30 @@ class CollectionMatcher(metaclass=Singleton):
             limit_names: int,
             script_names=False
     ) -> tuple[list[Collection], dict[str, Any]]:
-        t_before = perf_counter()
-        response = self.elastic.search(index=self.index_name, **query_params)
-        time_elapsed = (perf_counter() - t_before) * 1000
+        try:
+            t_before = perf_counter()
+            response = self.elastic.search(index=self.index_name, **query_params)
+            time_elapsed = (perf_counter() - t_before) * 1000
 
-        hits = response["hits"]["hits"]
-        n_total_hits = response["hits"]['total']['value']
-        es_response_metadata = {
-            'n_total_hits': n_total_hits if n_total_hits <= 1000 else '1000+',
-            'took': response['took'],
-            'elasticsearch_communication_time': time_elapsed,
-        }
-        if script_names:
-            collections = [Collection.from_elasticsearch_hit_script_names(hit, limit_names) for hit in hits]
-        else:
-            collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]
-        return collections, es_response_metadata
+            hits = response["hits"]["hits"]
+            n_total_hits = response["hits"]['total']['value']
+            es_response_metadata = {
+                'n_total_hits': n_total_hits if n_total_hits <= 1000 else '1000+',
+                'took': response['took'],
+                'elasticsearch_communication_time': time_elapsed,
+            }
+            if script_names:
+                collections = [Collection.from_elasticsearch_hit_script_names(hit, limit_names) for hit in hits]
+            else:
+                collections = [Collection.from_elasticsearch_hit(hit, limit_names) for hit in hits]
+            return collections, es_response_metadata
+        except elasticsearch.BadRequestError as e:
+            logger.error(e)
+            return [], {
+                'n_total_hits': 0,
+                'took': 0,
+                'elasticsearch_communication_time': 0,
+            }
 
     def _search_related(
             self,
