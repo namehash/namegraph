@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import json
 import logging
@@ -62,7 +63,7 @@ def init():
         #     config.elasticsearch.index = settings.elasticsearch_index
 
         generator = Generator(config)
-        generator.generate_names('cat', min_suggestions=100, max_suggestions=100, min_available_fraction=0.9)  # init
+        asyncio.get_event_loop().run_until_complete(generator.generate_names('cat', min_suggestions=100, max_suggestions=100, min_available_fraction=0.9) ) # init
         return generator
 
 
@@ -145,7 +146,7 @@ async def generate_names(name: NameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
 
-    result = generator.generate_names(name.label,
+    result = await generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,
@@ -273,7 +274,7 @@ async def grouped_by_category(name: NameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
 
-    result = generator.generate_names(name.label,
+    result = await generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
                                       max_suggestions=name.max_suggestions,
@@ -287,14 +288,14 @@ async def grouped_by_category(name: NameRequest):
 
 
 @app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
-def suggestions_by_category(name: GroupedNameRequest):
+async def suggestions_by_category(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     # params['mode'] = 'grouped_' + params['mode']
 
-    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+    related_suggestions, grouped_suggestions = await generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
         max_names_per_related_collection=name.categories.related.max_names_per_related_collection,

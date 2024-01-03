@@ -109,7 +109,7 @@ class CollectionMatcher(metaclass=Singleton):
 
         return diversified + penalized_collections[:max_limit - len(diversified)]
 
-    def _execute_query(
+    async def _execute_query(
             self,
             query_params: dict,
             limit_names: int,
@@ -117,7 +117,7 @@ class CollectionMatcher(metaclass=Singleton):
     ) -> tuple[list[Collection], dict[str, Any]]:
         try:
             t_before = perf_counter()
-            response = self.elastic.search(index=self.index_name, **query_params)
+            response = await self.elastic.search(index=self.index_name, **query_params)
             time_elapsed = (perf_counter() - t_before) * 1000
 
             hits = response["hits"]["hits"]
@@ -140,7 +140,7 @@ class CollectionMatcher(metaclass=Singleton):
                 'elasticsearch_communication_time': 0,
             }
 
-    def _search_related(
+    async def _search_related(
             self,
             query: str,
             max_limit: int,
@@ -168,7 +168,7 @@ class CollectionMatcher(metaclass=Singleton):
             .include_fields(fields) \
             .build_params()
 
-        collections, es_response_metadata = self._execute_query(query_params, limit_names)
+        collections, es_response_metadata = await self._execute_query(query_params, limit_names)
 
         if not apply_diversity:
             return collections[:max_limit], es_response_metadata

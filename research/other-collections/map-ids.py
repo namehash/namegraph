@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import json
 import os
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, AsyncElasticsearch
 
 
 def connect_to_elasticsearch(
@@ -12,7 +12,7 @@ def connect_to_elasticsearch(
         username: str,
         password: str,
 ):
-    return Elasticsearch(
+    return AsyncElasticsearch(
         hosts=[{
             'scheme': scheme,
             'host': host,

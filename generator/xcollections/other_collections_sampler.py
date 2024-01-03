@@ -1,3 +1,4 @@
+import asyncio
 import json
 import random
 from omegaconf import DictConfig
@@ -14,17 +15,17 @@ class OtherCollectionsSampler(metaclass=Singleton):
         self.api_matcher = CollectionMatcherForAPI(config)
         with open(self.other_collections_path, 'r', encoding='utf-8') as f:
             other_collections_records: list[dict[str, str]] = json.load(f)
-        self.other_collections: list[Collection] = self._retrieve_full_collections_from_es(other_collections_records)
+        self.other_collections: list[Collection] = asyncio.get_event_loop().run_until_complete(self._retrieve_full_collections_from_es(other_collections_records))
 
     def _sample_collections(self, k: int) -> list[Collection]:
         return random.sample(self.other_collections, k=k)
 
-    def _retrieve_full_collections_from_es(self, collection_records: list[dict[str, str]]) -> list[Collection]:
+    async def _retrieve_full_collections_from_es(self, collection_records: list[dict[str, str]]) -> list[Collection]:
         if not self.api_matcher.active:
             return []
 
         collection_ids = [c['id'] for c in collection_records]
-        return self.api_matcher.get_collections_by_id_list(collection_ids)
+        return await self.api_matcher.get_collections_by_id_list(collection_ids)
 
     def get_other_collections(
             self,

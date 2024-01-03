@@ -24,7 +24,7 @@ class NameGenerator:
         self._grouping_category = 'unknown'
         self._init_grouping_category()
 
-    def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
+    async def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         return (
             GeneratedName(generated, grouping_category=self.get_grouping_category(output_name=''.join(generated)),
                           applied_strategies=[[self.__class__.__name__]])

@@ -15,7 +15,7 @@ BOOST = 3
 
 
 class CollectionMatcherForAPI(CollectionMatcher):
-    def search_by_string(
+    async def search_by_string(
             self,
             query: str,
             mode: str,
@@ -88,7 +88,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 .build_params()
 
         try:
-            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+            collections, es_response_metadata = await self._execute_query(query_params, limit_names)
 
             if not apply_diversity:
                 return collections[:max_related_collections], es_response_metadata
@@ -133,7 +133,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         return count if count <= 1000 else '1000+', {'elasticsearch_communication_time': time_elapsed}
 
-    def search_by_collection(
+    async def search_by_collection(
             self,
             collection_id: str,
             max_related_collections: int = 3,
@@ -163,7 +163,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                            .build_params())
 
         try:
-            collections, es_response_metadata = self._execute_query(id_match_params, limit_names=100, script_names=True)
+            collections, es_response_metadata = await self._execute_query(id_match_params, limit_names=100, script_names=True)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [id-to-collection search]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
@@ -205,7 +205,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                         .build_params())
 
         try:
-            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+            collections, es_response_metadata = await self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [collection-to-collections search]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
@@ -248,7 +248,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
 
         return count if count <= 1000 else '1000+', {'elasticsearch_communication_time': time_elapsed}
 
-    def get_collections_membership_list_for_name(
+    async def get_collections_membership_list_for_name(
             self,
             name_label: str,
             limit_names: int = 10,
@@ -281,14 +281,14 @@ class CollectionMatcherForAPI(CollectionMatcher):
                         .add_offset(offset)
                         .build_params())
         try:
-            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+            collections, es_response_metadata = await self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-member]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         return collections, es_response_metadata
 
-    def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
+    async def get_collections_by_id_list(self, id_list: list[str]) -> list[Collection]:
 
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
@@ -305,7 +305,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                             .build_params())
 
             # TODO can be optimized by using mget, but we need to map wikidata ids to elastic ids
-            collections, _ = self._execute_query(query_params, limit_names=10)
+            collections, _ = await self._execute_query(query_params, limit_names=10)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex

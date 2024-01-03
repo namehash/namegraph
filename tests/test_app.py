@@ -17,7 +17,7 @@ def run_around_tests():
     Domains.remove_self()
     yield
 
-
+@pytest.mark.asyncio
 @mark.parametrize(
     "overrides, expected",
     [
@@ -25,10 +25,10 @@ def run_around_tests():
          ["abilityfire", "forcefire", "mightfire"]),
     ],
 )
-def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
+async def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
         result = [str(gn) for gn in result]
         print(result)
         assert len(set(result).intersection(set(expected))) == len(expected)
@@ -44,10 +44,11 @@ def test_basic_generation(overrides: List[str], expected: List[str]) -> None:
          ["firepowercoin"]),
     ],
 )
-def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
+@pytest.mark.asyncio
+async def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
         assert len(result) == cfg.app.suggestions
@@ -60,11 +61,12 @@ def test_pipeline_override(overrides: List[str], expected: List[str]) -> None:
          ["abilityfire", "forcefire", "mightfire"]),
     ],
 )
-def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
+@pytest.mark.asyncio
+async def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
         monkeypatch.setattr('sys.stdin', io.StringIO('powerfire'))
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
         assert len(result) == 1000
@@ -77,10 +79,11 @@ def test_stdin(overrides: List[str], expected: List[str], monkeypatch) -> None:
          ["panda"]),
     ],
 )
-def test_advertised(overrides: List[str], expected: List[str]) -> None:
+@pytest.mark.asyncio
+async def test_advertised(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
 
@@ -92,10 +95,11 @@ def test_advertised(overrides: List[str], expected: List[str]) -> None:
          ["fire"]),
     ],
 )
-def test_on_sale(overrides: List[str], expected: List[str]) -> None:
+@pytest.mark.asyncio
+async def test_on_sale(overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
         result = [str(gn) for gn in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
 
@@ -112,10 +116,11 @@ def test_on_sale(overrides: List[str], expected: List[str]) -> None:
         )
     ]
 )
-def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
+@pytest.mark.asyncio
+async def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
 
         catdog_result = [gn for gn in result if str(gn) == "catdog"]
         assert len(catdog_result) == 1
@@ -128,10 +133,11 @@ def test_metadata(overrides: List[str], expected_strategies: List[str]) -> None:
         (["app.query=tubeyou", "app.suggestions=1000", "app.internet_domains=tests/data/top_internet_names_long.csv"])
     ]
 )
-def test_no_duplicates(overrides: List[str]):
+@pytest.mark.asyncio
+async def test_no_duplicates(overrides: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         cfg = compose(config_name="test_config_new", overrides=overrides)
-        result = generate(cfg, )[0]
+        result = (await generate(cfg, ))[0]
 
         unique_results = set([str(gn) for gn in result])
         assert len(unique_results) == len(result)

@@ -130,7 +130,8 @@ def test_weighted_sampling_sorter_with_order(input: List[List[GeneratedName]], e
             ]
     )]
 )
-def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expected: List[GeneratedName]):
+@pytest.mark.asyncio
+async def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input)]
@@ -144,7 +145,7 @@ def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expe
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'round-robin', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'round-robin', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
 
@@ -170,7 +171,8 @@ def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expe
         ),
     ]
 )
-def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]], expected: List[GeneratedName]):
+@pytest.mark.asyncio
+async def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]], expected: List[GeneratedName]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input)]
@@ -184,7 +186,7 @@ def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]]
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
 
@@ -195,7 +197,8 @@ def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]]
 
 
 @mark.slow
-def test_weighted_sampling_sorter_stress():
+@pytest.mark.asyncio
+async def test_weighted_sampling_sorter_stress():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=["app.suggestions=100"])
 
@@ -225,14 +228,15 @@ def test_weighted_sampling_sorter_stress():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
 
 
 @mark.slow
-def test_weighted_sampling_sorter_weights():
+@pytest.mark.asyncio
+async def test_weighted_sampling_sorter_weights():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
 
@@ -267,7 +271,7 @@ def test_weighted_sampling_sorter_weights():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
@@ -308,7 +312,8 @@ def test_weighted_sampling_sorter_weights():
         ),
     ],
 )
-def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
+@pytest.mark.asyncio
+async def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
                                                                 input_names: List[List[GeneratedName]],
                                                                 expected_strings: List[str],
                                                                 min_suggestions: int,
@@ -332,7 +337,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
 
@@ -382,7 +387,8 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
         ),
     ]
 )
-def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
+@pytest.mark.asyncio
+async def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
                                                                          input_names: List[List[GeneratedName]],
                                                                          expected_strings: List[str],
                                                                          min_suggestions: int,
@@ -406,7 +412,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
 
@@ -487,7 +493,8 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
         ),
     ]
 )
-def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
+@pytest.mark.asyncio
+async def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
         overrides: List[str],
         input_names: List[List[GeneratedName]],
         min_suggestions: int,
@@ -520,7 +527,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+        all_suggestions = await metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
             'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
                                              min_available_fraction=input_name.params['min_available_fraction'])
 

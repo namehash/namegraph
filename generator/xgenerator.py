@@ -105,7 +105,7 @@ class Generator:
         self.domains = Domains(self.config)
         wordninja.DEFAULT_LANGUAGE_MODEL = wordninja.LanguageModel(self.config.tokenization.wordninja_dictionary)
 
-    def generate_names(
+    async def generate_names(
             self,
             name: str,
             sorter: str = 'weighted-sampling',
@@ -134,21 +134,21 @@ class Generator:
         logger.info(str(name.types_probabilities))
 
         logger.info('Start sampling')
-        all_suggestions = self.metasampler.sample(name, sorter, min_suggestions=name.params['min_suggestions'],
+        all_suggestions = await self.metasampler.sample(name, sorter, min_suggestions=name.params['min_suggestions'],
                                                   max_suggestions=name.params['max_suggestions'],
                                                   min_available_fraction=name.params['min_available_fraction'])
 
         logger.info(f'Generated suggestions: {len(all_suggestions)}')
 
         if len(all_suggestions) < min_suggestions:
-            only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
+            only_available_suggestions = await self.random_available_name_pipeline.apply(name, None)
             all_suggestions.extend(only_available_suggestions)  # TODO dodawaj do osiągnięcia limitu
             logger.info(f'Generated suggestions after random: {len(all_suggestions)}')
             all_suggestions = aggregate_duplicates(all_suggestions)
 
         return all_suggestions[:max_suggestions]
 
-    def generate_grouped_names(
+    async def generate_grouped_names(
             self,
             name: str,
             max_related_collections: int = 5,
@@ -185,7 +185,7 @@ class Generator:
 
         logger.info('Start sampling')
 
-        multithreading = True
+        multithreading = False
         grouped_suggestions = {}
         if not multithreading:
             for category, meta_sampler in self.grouped_metasamplers.items():
@@ -200,7 +200,7 @@ class Generator:
                     max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit) # 3 interpretations
 
                 # TODO should they use the same set of suggestions (for deduplications)
-                suggestions = meta_sampler.sample(name, 'weighted-sampling',
+                suggestions = await meta_sampler.sample(name, 'weighted-sampling',
                                                   min_suggestions=min_suggestions,
                                                   max_suggestions=max_suggestions,
                                                   min_available_fraction=min_available_fraction,
@@ -334,7 +334,7 @@ class Generator:
                 min((min_total_suggestions - count_real_suggestions), category_params.max_suggestions),
                 category_params.min_suggestions)
             logger.info(f'Generated other suggestions: {other_suggestions_number}')
-            only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
+            only_available_suggestions = await self.random_available_name_pipeline.apply(name, None)
             grouped_suggestions['other'] = list(islice(only_available_suggestions, other_suggestions_number))
 
         return all_related_suggestions, grouped_suggestions

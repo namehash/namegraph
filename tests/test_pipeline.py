@@ -1,3 +1,4 @@
+import pytest
 from hydra import compose, initialize
 
 from pytest import mark, fixture
@@ -32,12 +33,13 @@ def get_name_and_interpretation(preprocessor_test_config, name):
         (["app.query=powerfire"], ["abilityfire", "forcefire", "mightfire"]),
     ],
 )
-def test_basic_pipeline(preprocessor_test_config, overrides: List[str], expected: List[str]) -> None:
+@pytest.mark.asyncio
+async def test_basic_pipeline(preprocessor_test_config, overrides: List[str], expected: List[str]) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)
         pipeline = Pipeline(config.pipelines[0], config)
         input_name, interpretation = get_name_and_interpretation(preprocessor_test_config, config.app.query)
-        result = pipeline.apply(input_name, interpretation)
+        result = await pipeline.apply(input_name, interpretation)
         result = [str(r) for r in result]
         assert len(set(result).intersection(set(expected))) == len(expected)
         assert config.app.query not in result
@@ -160,13 +162,13 @@ def test_metadata_aggregation_different_strategies(preprocessor_test_config, ove
         for gn in result:
             assert_applied_strategies_are_equal(gn.applied_strategies, expected_strategies)
 
-
-def test_removing_input_from_output(preprocessor_test_config) -> None:
+@pytest.mark.asyncio
+async def test_removing_input_from_output(preprocessor_test_config) -> None:
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pipeline = Pipeline(config.pipelines[0], config)
 
         input_name, interpretation = get_name_and_interpretation(preprocessor_test_config, 'vitalik.eth')
-        result = pipeline.apply(input_name, interpretation)
+        result = await pipeline.apply(input_name, interpretation)
         result = [str(r) for r in result]
         assert 'vitalik' not in result

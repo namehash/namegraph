@@ -1,3 +1,4 @@
+import asyncio
 from typing import List, Dict
 from datetime import timedelta
 from timeit import default_timer as timer
@@ -20,7 +21,7 @@ def generate_from_file(file):
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def generate(config: DictConfig) -> list[list[GeneratedName]]:
+async def generate(config: DictConfig) -> list[list[GeneratedName]]:
     logger.setLevel(config.app.logging_level)
     for handler in logger.handlers:
         handler.setLevel(config.app.logging_level)
@@ -40,7 +41,7 @@ def generate(config: DictConfig) -> list[list[GeneratedName]]:
     for query in queries:
         logger.info(f"Generating names for: {query}")
         start = timer()
-        suggestions = generator.generate_names(query)
+        suggestions = await generator.generate_names(query)
         end = timer()
         all_suggestions.append(suggestions)
         logger.info(f"Generation time (s): {timedelta(seconds=end - start)}")
@@ -50,4 +51,4 @@ def generate(config: DictConfig) -> list[list[GeneratedName]]:
 
 
 if __name__ == "__main__":
-    generate()
+    asyncio.run(generate())

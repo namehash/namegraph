@@ -79,7 +79,7 @@ class Pipeline:
     def __hash__(self) -> int:
         return hash(self.pipeline_name)
 
-    def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
+    async def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
         """
         Generate suggestions, results are cached.
         """
@@ -101,7 +101,7 @@ class Pipeline:
                 else:
                     logger.debug(f'Pipeline {self.pipeline_name} suggestions generation on N {name.input_name}.')
                 start_time = time.time()
-                suggestions = self.generator.apply(name, interpretation)
+                suggestions = await self.generator.apply(name, interpretation)
                 generator_time = 1000 * (time.time() - start_time)
                 logger.info(f'Pipeline {self.pipeline_name} suggestions generated. Time: {generator_time:.2f}')
 

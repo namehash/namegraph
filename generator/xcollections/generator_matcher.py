@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional, Literal
 from time import perf_counter
 from itertools import cycle
@@ -18,7 +19,7 @@ logger = logging.getLogger('generator')
 
 
 class CollectionMatcherForGenerator(CollectionMatcher):
-    def _search_for_generator(
+    async def _search_for_generator(
             self,
             tokens: tuple[str, ...],
             max_related_collections: int = 5,
@@ -81,7 +82,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 .build_params()  #TODO: query_string?
 
         try:
-            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+            collections, es_response_metadata = await self._execute_query(query_params, limit_names)
 
             if not apply_diversity:
                 return collections[:max_related_collections], es_response_metadata
@@ -99,7 +100,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
     # FIXME duplicate of CollectionMatcherForAPI.get_collections_membership_list_for_name
     # FIXME either we remove this or move to a parent class
-    def _search_by_membership(
+    async def _search_by_membership(
             self,
             name_label: str,
             limit_names: int = 10,
@@ -133,14 +134,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                         .add_offset(offset)
                         .build_params())
         try:
-            collections, es_response_metadata = self._execute_query(query_params, limit_names)
+            collections, es_response_metadata = await self._execute_query(query_params, limit_names)
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-member]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
         return collections, es_response_metadata
 
-    def search_for_generator(
+    async def search_for_generator(
             self,
             tokens: tuple[str, ...],
             input_name: str,
@@ -152,28 +153,48 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     ) -> tuple[list[Collection], dict]:
 
         t_before = perf_counter()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-            related_future = executor.submit(
-                self._search_for_generator,
+        related_future, membership_future = await asyncio.gather(
+            self._search_for_generator(
                 tokens=tokens,
                 max_related_collections=max_related_collections,
                 name_diversity_ratio=name_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names,
                 enable_learning_to_rank=enable_learning_to_rank
-            )
-
-            membership_future = executor.submit(
-                self._search_by_membership,
+            ),
+            self._search_by_membership(
                 name_label=input_name,
                 limit_names=limit_names,
                 sort_order='AI',
                 max_results=max_related_collections,
                 offset=0
             )
+        )
+        related, es_response_metadata1 = related_future
+        membership, es_response_metadata2 = membership_future
 
-            related, es_response_metadata1 = related_future.result()
-            membership, es_response_metadata2 = membership_future.result()
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        #     related_future = executor.submit(
+        #         self._search_for_generator,
+        #         tokens=tokens,
+        #         max_related_collections=max_related_collections,
+        #         name_diversity_ratio=name_diversity_ratio,
+        #         max_per_type=max_per_type,
+        #         limit_names=limit_names,
+        #         enable_learning_to_rank=enable_learning_to_rank
+        #     )
+        #
+        #     membership_future = executor.submit(
+        #         self._search_by_membership,
+        #         name_label=input_name,
+        #         limit_names=limit_names,
+        #         sort_order='AI',
+        #         max_results=max_related_collections,
+        #         offset=0
+        #     )
+        #
+        #     related, es_response_metadata1 = related_future.result()
+        #     membership, es_response_metadata2 = membership_future.result()
 
         time_elapsed = (perf_counter() - t_before) * 1000
 

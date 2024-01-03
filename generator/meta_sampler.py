@@ -80,7 +80,7 @@ class MetaSampler:
             global_limits[pipeline.pipeline_name] = limit
         return global_limits
 
-    def sample(
+    async def sample(
             self,
             name: InputName,
             sorter_name: str,
@@ -161,7 +161,7 @@ class MetaSampler:
                         logger.debug(f'global_limits reached by {sampled_pipeline.pipeline_name}')
                         continue
 
-                    suggestions = sampled_pipeline.apply(name, sampled_interpretation)
+                    suggestions = await sampled_pipeline.apply(name, sampled_interpretation)
 
                     try:
                         suggestion = next(suggestions)

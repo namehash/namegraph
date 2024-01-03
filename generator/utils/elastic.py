@@ -1,4 +1,4 @@
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 
 def connect_to_elasticsearch(
@@ -7,8 +7,8 @@ def connect_to_elasticsearch(
         port: int,
         username: str,
         password: str,
-) -> Elasticsearch:
-    return Elasticsearch(
+) -> AsyncElasticsearch:
+    return AsyncElasticsearch(
         hosts=[{
             'scheme': scheme,
             'host': host,
@@ -20,5 +20,5 @@ def connect_to_elasticsearch(
     )
 
 
-def index_exists(elastic: Elasticsearch, index_name: str) -> bool:
+def index_exists(elastic: AsyncElasticsearch, index_name: str) -> bool:
     return elastic.indices.exists(index=index_name)
