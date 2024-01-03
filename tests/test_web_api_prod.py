@@ -779,12 +779,14 @@ class TestGroupedSuggestions:
 
         assert response1.json() == response2.json()
 
-
+    @pytest.mark.integration_test
     @pytest.mark.parametrize("label, expected_tokens",
                              [
                                  ("\"songs forthe deaf\"", ('songs', 'forthe', 'deaf')),
+                                 ("\"pinkfloyd\"", ('pinkfloyd',)),
+                                 ("\"apricots andcherries\"", ('apricots', 'andcherries')),
                              ])
-    def test_prod_pretokenized_input_label(self, prod_test_client, label: str, expected_tokens: tuple[str]):
+    def test_prod_pretokenized_input_label_for_related(self, prod_test_client, label: str, expected_tokens: tuple[str]):
         client = prod_test_client
 
         request_data = {

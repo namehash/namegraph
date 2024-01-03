@@ -51,7 +51,7 @@ class CollectionGenerator(NameGenerator):
         input_name: str = name.strip_eth_namehash_unicode_long_name.strip()
 
         if name.is_pretokenized:
-            tokens = name.pretokenization
+            tokens = list(name.pretokenization)
         elif ' ' in input_name:
             tokens = input_name.split(' ')
         else:
