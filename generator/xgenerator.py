@@ -223,9 +223,8 @@ class Generator:
             # multithreading using concurrent.futures
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.grouped_metasamplers)) as executor:
                 futures = {}
+                start_time = time.time()
                 for category, meta_sampler in self.grouped_metasamplers.items():
-                    start_time = time.time()
-
                     category_params = getattr(categories_params, category)
                     try:
                         min_suggestions = category_params.min_suggestions
