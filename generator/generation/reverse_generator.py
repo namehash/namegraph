@@ -19,7 +19,7 @@ class ReverseGenerator(NameGenerator):
         reversed_name = ''.join(tokens)[::-1]
         yield (reversed_name,)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

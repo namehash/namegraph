@@ -130,7 +130,7 @@ class LeetGenerator(NameGenerator):
 
         return generated
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> list[tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> list[tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

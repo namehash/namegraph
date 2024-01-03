@@ -39,7 +39,7 @@ class HyphenGenerator(NameGenerator):
             islice(product((True, False), repeat=len(tokens) - 1), min(2 ** (len(tokens) - 1) - 1, self.limit))
         ]
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

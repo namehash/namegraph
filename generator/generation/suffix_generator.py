@@ -20,7 +20,7 @@ class SuffixGenerator(NameGenerator):
         name = ''.join(tokens)
         return (tuple(list(tokens) + [suffix]) for suffix in self.suffixes if not name.endswith(suffix))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

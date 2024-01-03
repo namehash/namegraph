@@ -15,6 +15,7 @@ from generator.xcollections.generator_matcher import CollectionMatcherForGenerat
 
 from helpers import check_generator_response, generate_example_names
 
+# pytestmark = pytest.mark.asyncio(scope="module")
 
 @pytest.fixture(scope="module")
 def prod_test_client():
@@ -412,7 +413,7 @@ def test_prod_user_info_ip(prod_test_client, ip_addr, response_code):
     response_json = response.json()
     print(response_json)
 
-
+# @pytest.mark.asyncio(scope="class")
 class TestGroupedSuggestions:
 
     @staticmethod
@@ -512,7 +513,8 @@ class TestGroupedSuggestions:
             assert self.strategy_not_used(gcat, 'CategoryGenerator')
 
     @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
-    def test_prod_grouped_by_category(self, prod_test_client, label):
+    @pytest.mark.asyncio
+    async def test_prod_grouped_by_category(self, prod_test_client, label):
         client = prod_test_client
 
         request_data = {
@@ -715,7 +717,8 @@ class TestGroupedSuggestions:
         assert len(suggestions) == len(set(suggestions))
 
     @pytest.mark.parametrize("label", ["😊😊😊"])
-    def test_prod_grouped_by_category_emojis(self, prod_test_client, label):
+    @pytest.mark.asyncio
+    async def test_prod_grouped_by_category_emojis(self, prod_test_client, label):
         client = prod_test_client
 
         request_data = {

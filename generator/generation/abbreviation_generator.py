@@ -40,7 +40,7 @@ class AbbreviationGenerator(NameGenerator):
             for flags in all_flags
         )
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

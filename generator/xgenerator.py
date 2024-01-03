@@ -242,8 +242,8 @@ class Generator:
                                         category_endpoint=True, is_already_sampled=is_already_sampled), category)
                 calls.append(calll)
 
-            for task, category in asyncio.as_completed(calls):
-                suggestions = await task
+            for task in asyncio.as_completed(calls):
+                category, suggestions = await task
                 generator_time = 1000 * (time.time() - start_time)
                 logger.info(
                     f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')

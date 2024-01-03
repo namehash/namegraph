@@ -62,7 +62,7 @@ class W2VGenerator(NameGenerator):
 
         return (tuple(x[0]) for x in sorted(result, key=itemgetter(1), reverse=True))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
@@ -86,14 +86,15 @@ class W2VGeneratorRocks(NameGenerator):
         
         self.combination_limiter = CombinationLimiter(self.limit)
 
-    def most_similar(self, token:str, topn:int):
+    async def most_similar(self, token:str, topn:int):
         ind = self.token_to_id[token]
         similar = self.rockdb[ind][:topn]
+        # similar = (await self.rockdb.get(ind))[:topn]
         similar = [(self.tokens[i], d) for i, d in similar]
         return similar
 
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    async def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         if len(''.join(tokens)) == 0:
             return []
 
@@ -102,7 +103,7 @@ class W2VGeneratorRocks(NameGenerator):
         tokens_synsets = []
         for token in tokens:
             try:
-                tokens_synsets.append([(token, 1.0)] + self.most_similar(token, topn=topn))
+                tokens_synsets.append([(token, 1.0)] + await self.most_similar(token, topn=topn))
             except KeyError:  # token not in embedding dictionary
                 tokens_synsets.append([(token, 1.0)])
 
@@ -122,8 +123,8 @@ class W2VGeneratorRocks(NameGenerator):
 
         return (tuple(x[0]) for x in sorted(result, key=itemgetter(1), reverse=True))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
-        return self.generate(**self.prepare_arguments(name, interpretation))
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return await self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': interpretation.tokenization}

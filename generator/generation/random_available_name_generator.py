@@ -50,7 +50,7 @@ class RandomAvailableNameGenerator(NameGenerator):
             result = self.names
         return ((x,) for x in result)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(limit=name.params['max_suggestions'])
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

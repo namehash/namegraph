@@ -25,13 +25,14 @@ class NameGenerator:
         self._init_grouping_category()
 
     async def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
+        omg = await self.generate2(name, interpretation)
         return (
             GeneratedName(generated, grouping_category=self.get_grouping_category(output_name=''.join(generated)),
                           applied_strategies=[[self.__class__.__name__]])
-            for generated in self.generate2(name, interpretation)
+            for generated in omg
         )
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         raise NotImplementedError
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

@@ -30,7 +30,7 @@ class EasterEggGenerator(NameGenerator):
         get_random_rng().shuffle(self.messages)
         return ((m.format(name=name),) for m in self.messages)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

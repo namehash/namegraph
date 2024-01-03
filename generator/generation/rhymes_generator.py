@@ -66,7 +66,7 @@ class RhymesGenerator(NameGenerator):
                 continue
 
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
 

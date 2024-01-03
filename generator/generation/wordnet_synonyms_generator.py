@@ -61,7 +61,7 @@ class WordnetSynonymsGenerator(NameGenerator):
 
         return dict(sorted(stats.items(), key=itemgetter(1), reverse=True))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

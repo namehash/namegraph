@@ -48,7 +48,7 @@ class Wikipedia2VGenerator(NameGenerator):
 
         return (tuple(x) for x in result)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
@@ -68,13 +68,14 @@ class Wikipedia2VGeneratorRocks(NameGenerator):
         self.token_to_id = {token: ind for ind, token in enumerate(self.tokens)}
         self.rockdb = rocksdict.Rdict(similar_path, access_type=AccessType.read_only())
 
-    def most_similar(self, token:str, topn:int):
+    async def most_similar(self, token:str, topn:int):
         ind = self.token_to_id[token]
         similar = self.rockdb[ind][:topn]
+        # similar = (await self.rockdb.get(ind))[:topn]
         similar = [(self.tokens[i], d) for i, d in similar]
         return similar
 
-    def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+    async def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
         if len(''.join(tokens)) == 0:
             return []
 
@@ -82,7 +83,7 @@ class Wikipedia2VGeneratorRocks(NameGenerator):
         query = f'ENTITY/{name}'
 
         try:
-            similar = self.most_similar(query, topn=self.limit)
+            similar = await self.most_similar(query, topn=self.limit)
         except KeyError:
             return []
 
@@ -95,8 +96,8 @@ class Wikipedia2VGeneratorRocks(NameGenerator):
 
         return (tuple(x) for x in result)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
-        return self.generate(**self.prepare_arguments(name, interpretation))
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+        return await self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         return {'tokens': ('_'.join(interpretation.tokenization),)}

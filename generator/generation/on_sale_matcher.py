@@ -34,7 +34,7 @@ class OnSaleMatchGenerator(NameGenerator):
             result.extend(self.index[token].keys())
         return (item[1] for item in sort_by_value_under_key(result, self.domains.on_sale, sort_key=0, reverse=True))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> Iterator[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

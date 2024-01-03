@@ -182,14 +182,14 @@ def test_abbreviation_generator_order():
             for three_idx in three_abbr_indices
         )
 
-
+@pytest.mark.asyncio
 @pytest.mark.slow
-def test_w2vsimilarity():
+async def test_w2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         strategy = W2VGeneratorRocks(config)
         tokenized_name = ('my', 'pikachu', '123')
-        generated_names = list(strategy.generate(tokenized_name))
+        generated_names = list(await strategy.generate(tokenized_name))
         assert ('your', 'pikachu', '123') in generated_names
         assert ('my', 'mickey', '123') in generated_names
 
@@ -477,13 +477,13 @@ def test_on_sale_matcher_sorting():
 
         assert alibaba_pos < fire_pos < orange_pos
 
-
-def test_wikipedia2vsimilarity():
+@pytest.mark.asyncio
+async def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         strategy = Wikipedia2VGeneratorRocks(config)
         tokenized_name = ('billy', 'corgan')
-        generated_names = list(strategy.generate(tokenized_name))
+        generated_names = list(await strategy.generate(tokenized_name))
         print(generated_names)
         assert ('the', 'smashing', 'pumpkins',) in generated_names
 

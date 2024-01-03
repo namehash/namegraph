@@ -64,7 +64,7 @@ class PersonNameGenerator(NameGenerator):
         return (tokens + (data[0][index][0],) if data[0][index][1] == 'suffix' else (data[0][index][0],) + tokens for
                 index in order)
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):

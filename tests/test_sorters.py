@@ -29,15 +29,15 @@ class PipelineMock():
         self.weights = {'ngram': {'default': weight}}
         self.mode_weights_multiplier = {'full': 1}
 
-    def apply(self, name: InputName = None, interpretation: Interpretation = None) -> PipelineResultsIterator:
+    async def apply(self, name: InputName = None, interpretation: Interpretation = None) -> PipelineResultsIterator:
         return self.iterator
 
-
-def get_suggestions(sorter):
+@pytest.mark.asyncio
+async def get_suggestions(sorter):
     result = []
     for pipeline in sorter:
         try:
-            pri = pipeline.apply()
+            pri = await pipeline.apply()
             gn = next(pri)
             result.append(gn)
         except StopIteration:
@@ -56,13 +56,14 @@ def get_suggestions(sorter):
             ['a', 'b', 'c', 'aa', 'cc', 'ccc', 'cccc']
     )]
 )
-def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
+@pytest.mark.asyncio
+async def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
         pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input)]
         sorter = RoundRobinSampler(config, pipelines, None)
 
-        result = get_suggestions(sorter)
+        result = await get_suggestions(sorter)
 
         sorted_strings = [str(gn) for gn in result]
         assert sorted_strings == expected_strings
@@ -79,13 +80,14 @@ def test_round_robin_sorter(input: List[List[GeneratedName]], expected_strings: 
         ),
     ]
 )
-def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
+@pytest.mark.asyncio
+async def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path='../conf/'):
         config = compose(config_name='test_config_new')
         pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input)]
         sorter = WeightedSorter(config, pipelines, {pipeline: 1.0 for pipeline in pipelines})
 
-        result = get_suggestions(sorter)
+        result = await get_suggestions(sorter)
 
         sorted_strings = [str(gn) for gn in result]
         assert sorted_strings == expected_strings
@@ -102,13 +104,14 @@ def test_weighted_sampling_sorter(input: List[List[GeneratedName]], expected_str
         ),
     ]
 )
-def test_weighted_sampling_sorter_with_order(input: List[List[GeneratedName]], expected_strings: List[str]):
+@pytest.mark.asyncio
+async def test_weighted_sampling_sorter_with_order(input: List[List[GeneratedName]], expected_strings: List[str]):
     with initialize(version_base=None, config_path='../conf/'):
         config = compose(config_name='test_config_new')
         pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input)]
         sorter = WeightedSorterWithOrder(config, pipelines, {pipeline: 1.0 for pipeline in pipelines})
 
-        result = get_suggestions(sorter)
+        result = await get_suggestions(sorter)
 
         sorted_strings = [str(gn) for gn in result]
         assert sorted_strings == expected_strings

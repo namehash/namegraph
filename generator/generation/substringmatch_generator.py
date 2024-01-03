@@ -109,7 +109,7 @@ class SubstringMatchGenerator(NameGenerator):
 
         # return (get_tokens_from_suggestion(name) for name in islice(names, self.limit))
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return roundrobin(self.generate(name.strip_eth_namehash_unicode_long_name),
                           self.generate(name.strip_eth_namehash_long_name))
         # TODO: optimize

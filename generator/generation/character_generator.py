@@ -69,7 +69,7 @@ class CharacterGenerator(NameGenerator):
 
         return (diverse_results + [result for result in all_results if result not in diverse_results_set])[:self.limit]
 
-    def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
+    async def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))
 
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
