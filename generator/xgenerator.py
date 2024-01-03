@@ -1,3 +1,4 @@
+import asyncio
 import collections
 import concurrent.futures
 import threading
@@ -185,7 +186,7 @@ class Generator:
 
         logger.info('Start sampling')
 
-        multithreading = False
+        multithreading = True
         grouped_suggestions = {}
         if not multithreading:
             for category, meta_sampler in self.grouped_metasamplers.items():
@@ -220,30 +221,34 @@ class Generator:
                         multi_sampler_suggestions_str.add(suggestion)
                     return sampled
 
-            # multithreading using concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.grouped_metasamplers)) as executor:
-                futures = {}
-                start_time = time.time()
-                for category, meta_sampler in self.grouped_metasamplers.items():
-                    category_params = getattr(categories_params, category)
-                    try:
-                        min_suggestions = category_params.min_suggestions
-                        max_suggestions = category_params.max_suggestions
-                    except AttributeError:  # RelatedCategoryParams
-                        min_suggestions = 0
-                        max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit)
 
-                    futures[executor.submit(meta_sampler.sample, name, 'weighted-sampling',
-                                            min_suggestions=min_suggestions, max_suggestions=max_suggestions,
-                                            min_available_fraction=min_available_fraction,
-                                            category_endpoint=True, is_already_sampled=is_already_sampled)] = category
-                for future in concurrent.futures.as_completed(futures):
-                    category = futures[future]
-                    suggestions = future.result()
-                    generator_time = 1000 * (time.time() - start_time)
-                    logger.info(
-                        f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
-                    grouped_suggestions[category] = suggestions
+            calls = []
+            cateogires=[]
+            for category, meta_sampler in self.grouped_metasamplers.items():
+                start_time = time.time()
+
+                category_params = getattr(categories_params, category)
+                try:
+                    min_suggestions = category_params.min_suggestions
+                    max_suggestions = category_params.max_suggestions
+                except AttributeError:  # RelatedCategoryParams
+                    min_suggestions = 0
+                    max_suggestions = 3 * category_params.max_related_collections * max(
+                        category_params.max_names_per_related_collection, self.config.collections.suggestions_limit)
+
+                calls.append(meta_sampler.sample(name, 'weighted-sampling',
+                                        min_suggestions=min_suggestions, max_suggestions=max_suggestions,
+                                        min_available_fraction=min_available_fraction,
+                                        category_endpoint=True, is_already_sampled=is_already_sampled))
+                cateogires.append(category)
+            sasdad = await asyncio.gather(*calls)
+            for category, suggestions in zip(cateogires,sasdad):
+                # category = futures[future]
+                # suggestions = future.result()
+                generator_time = 1000 * (time.time() - start_time)
+                logger.info(
+                    f'Generated suggestions in category {category}: {len(suggestions)} Time: {generator_time:.2f}')
+                grouped_suggestions[category] = suggestions
 
         # split related
 
