@@ -33,7 +33,7 @@ Tests are made from NameGenerator docker container and logs are saved in `report
 apt update
 apt install vim htop
 pip3 install locust
-
+cd tests/load_tests
 bash run_tests.sh > log 2>&1
 ```
 
@@ -53,26 +53,6 @@ Conclusions:
 - with 4 vCPU (8 workers) and 11GB RAM we can serve 1383 requests for 6 parallel users in 1 minute with avg time 247 ms (23 req/s)
 - with 2 vCPU (8 workers) and 11GB RAM we can serve 951 requests for 4 parallel users in 1 minute with avg time 243 ms (16 req/s)
 - with 2 vCPU (4 workers) and 8GB RAM we can serve 906 requests for 4 parallel users in 1 minute with avg time 255 ms (15 req/s)
-
-
-apt update
-apt install vim htop
-pip3 install locust
-vim run_tests.sh 
-vim locust_suggestions_by_category.py
-
-
-bash run_tests.sh > log 2>&1
-
-
-
-poetry run gunicorn web_api:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --timeout 120
-
-Memory worker (VIRT, RES):
-- uvicorn 1: 5,5GB 4GB  14.8-11=3.8 GB
-- uvicorn 2: 2x 5,5GB 4GB 18.7-11=7.7 GB
-- gunicorn 1 worker sync: 15.1-11.3=3.8 GB
-- gunicorn 2 worker sync: 19.1-11.4=7.7 GB
-- gunicorn 2 worker uvicorn with preload: 15.6-11.7 = 3.9 GB
-- gunicorn 4 worker uvicorn with preload: 4 GB - error?
-- gunicorn 8 worker uvicorn with preload: 11 GB
+- threadpool is better than async for mall number of users
+  - 1 user: 335 req/m, avg 177 ms vs 282 req/m, avg 207 ms
+  - 32 users: 1146 req/m, avg 1207 ms vs 1277 req/m, avg 1086 ms
