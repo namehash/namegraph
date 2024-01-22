@@ -63,7 +63,8 @@ class WeightedSorterWithOrder(Sampler):
             # normalized_weights = normalized_weights / np.sum(normalized_weights)
             # self.first_pass = get_numpy_rng().choice(list(self.weights.keys()), len(self.weights),
             #                                          p=normalized_weights, replace=False).tolist()
-            self.first_pass = [x[1] for x in sorted([(math.log(get_random_rng().random()) / weight, k) for k, weight in self.weights.items()], reverse=True)]
+            self.first_pass = [x[1] for x in sorted(
+                [(math.log(get_random_rng().random()) / weight, k) for k, weight in self.weights.items()], reverse=True)]
         else:
             self.first_pass = []
 
@@ -71,8 +72,8 @@ class WeightedSorterWithOrder(Sampler):
         if self.first_pass:
             return self.first_pass.pop(0)
         if self.weights:
-            sum_of_weights=sum(self.weights.values())
-            normalized_weights = [w/sum_of_weights for w in self.weights.values()]
+            sum_of_weights = sum(self.weights.values())
+            normalized_weights = [w / sum_of_weights for w in self.weights.values()]
             pipeline = choice2(list(self.weights.keys()), normalized_weights)
             # pipeline = get_random_rng().choices(list(self.weights.keys()), weights=list(self.weights.values()))[
             #     0]  # TODO: optimize?
