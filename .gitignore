@@ -22,6 +22,7 @@ research/emoji/emoji_w2v/*.zip
 !research/emoji/emoji_w2v/*.ipynb
 research/symbol/*.xlsx
 !research/symbol/*.ipynb
+!research/user-collections/*.ipynb
 !research/clustering-collections/*.ipynb
 research/elasticsearch/*.jsonl
 !research/rhymes/*.ipynb
