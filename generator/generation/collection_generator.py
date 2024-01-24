@@ -48,8 +48,11 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         # TODO maybe use concatenation of all tokenizations as query
-        input_name = name.strip_eth_namehash_unicode_long_name.strip()
-        if ' ' in name.strip_eth_namehash_unicode_long_name:
+        input_name: str = name.strip_eth_namehash_unicode_long_name.strip()
+
+        if name.is_pretokenized:
+            tokens = list(name.pretokenization)
+        elif ' ' in input_name:
             tokens = input_name.split(' ')
         else:
             # tokens = interpretation.tokenization
@@ -86,7 +89,7 @@ class CollectionGenerator(NameGenerator):
         suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
         logger.info(f'CollectionGenerator query: {tokens}')
         collections, _ = self.collection_matcher.search_for_generator(
-            tokens,
+            tuple(tokens),
             name.strip_eth_namehash_unicode_long_name.strip(),
             max_related_collections=params.get('max_related_collections', self.collections_limit),
             name_diversity_ratio=params.get('name_diversity_ratio', self.name_diversity_ratio),
@@ -141,4 +144,7 @@ class CollectionGenerator(NameGenerator):
         # else:
         #     return {'tokens': interpretation.tokenization}
         # hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
-        return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        if name.is_pretokenized:
+            return {'tokens': name.pretokenization}
+        # fixme: should be compatible with the actual tokenization (?)
+        return {'tokens': tuple(name.strip_eth_namehash_unicode_long_name.strip().split(' '))}

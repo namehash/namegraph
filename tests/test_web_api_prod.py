@@ -779,6 +779,43 @@ class TestGroupedSuggestions:
 
         assert response1.json() == response2.json()
 
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label, expected_tokens",
+                             [
+                                 ("\"songs forthe deaf\"", ('songs', 'forthe', 'deaf')),
+                                 ("\"pinkfloyd\"", ('pinkfloyd',)),
+                                 ("\"apricots andcherries\"", ('apricots', 'andcherries')),
+                             ])
+    def test_prod_pretokenized_input_label_for_related(self, prod_test_client, label: str, expected_tokens: tuple[str]):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+
+        response_json = response.json()
+        assert response.status_code == 200
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        for cat in categories:
+            if cat['type'] == 'related':
+                # todo: what to test here (metadata.interpretation is a result of unused prepare_arguments method)
+                for s in cat['suggestions']:
+                    assert s['metadata']['interpretation'][2] == "{'tokens': " + str(expected_tokens) + "}"
+
+
 
     @pytest.mark.parametrize(
         "input_label, expected_tokenizations",

@@ -113,8 +113,9 @@ class CategoriesParams(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 class GroupedNameRequest(BaseModel):
-    label: str = Field(title='input label', description='cannot contain dots (.)',
-                       pattern='^[^.]*$', examples=['zeus'])
+    label: str = Field(title='input label', pattern='^[^.]*$', examples=['zeus'],
+                       description='* cannot contain dots (.)'
+                                   '\n* if enclosed in double quotes assuming label is pre-tokenized')
 
     # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
     #                                     ge=0.0, le=1.0,

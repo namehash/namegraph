@@ -183,6 +183,8 @@ class Generator:
 
         logger.info(str(name.types_probabilities))
         logger.info(str(name.interpretations))
+        if name.is_pretokenized:
+            logger.info(f'Input label is pretokenized: {name.pretokenization}')
 
         logger.info('Start sampling')
 
