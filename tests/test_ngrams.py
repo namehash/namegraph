@@ -1,11 +1,12 @@
 from hydra import initialize, compose
 
-from namehash_common.ngrams import Ngrams
+from generator.namehash_common.ngrams import Ngrams
+from generator.tokenization.all_tokenizer import AllTokenizer
 
 
 def test_ngrams():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="prod_config")
+        config = compose(config_name="prod_config_new")
         ngrams = Ngrams(config)
         assert ngrams.unigram_count('the') > ngrams.unigram_count('cat')
         assert ngrams.word_probability('the') > ngrams.word_probability('cat')
@@ -27,3 +28,22 @@ def test_ngrams():
         assert ngrams.sequence_probability(['nft']) > ngrams.sequence_probability(['n', 'f', 't'])
         assert ngrams.sequence_probability(['nft']) > ngrams.sequence_probability(['sdfghsldhgsldk'])
         assert ngrams.sequence_probability(['rakuten']) > ngrams.sequence_probability(['sdfghsldhgsldk'])
+
+
+def test_gap_prob():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="prod_config_new")
+        ngrams = Ngrams(config)
+        tokenizer = AllTokenizer(config)
+
+        toks = tokenizer.tokenize('ŁcatŁ')
+        tok1 = None
+        tok2 = None
+        for t in toks:
+            if t == ('', 'a', ''):
+                tok1 = t
+            elif t == ('', 'cat', ''):
+                tok2 = t
+            if None not in (tok1, tok2):
+                break
+        assert ngrams.sequence_probability(tok1) < ngrams.sequence_probability(tok2)

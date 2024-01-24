@@ -8,14 +8,20 @@ from .permute_generator import PermuteGenerator
 from .prefix_generator import PrefixGenerator
 from .suffix_generator import SuffixGenerator
 from .wordnet_synonyms_generator import WordnetSynonymsGenerator
-from .w2v_generator import W2VGenerator
+from .w2v_generator import W2VGenerator, W2VGeneratorRocks
 from .categories_generator import CategoriesGenerator
 from .random_available_name_generator import RandomAvailableNameGenerator
 from .on_sale_matcher import OnSaleMatchGenerator
-from .wikipedia2v_generator import Wikipedia2VGenerator
+from .wikipedia2v_generator import Wikipedia2VGenerator, Wikipedia2VGeneratorRocks
 from .special_character_affix_generator import SpecialCharacterAffixGenerator
 from .substringmatch_generator import SubstringMatchGenerator
 from .leet_generator import LeetGenerator
 from .keycap_generator import KeycapGenerator
 from .person_name_generator import PersonNameGenerator
+from .person_name_emojify_generator import PersonNameEmojifyGenerator
+from .person_name_expand_generator import PersonNameExpandGenerator
 from .symbol_generator import SymbolGenerator
+from .collection_generator import CollectionGenerator
+from .easteregg_generator import EasterEggGenerator
+from .reverse_generator import ReverseGenerator
+from .rhymes_generator import RhymesGenerator

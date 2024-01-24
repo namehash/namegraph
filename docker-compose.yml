@@ -4,6 +4,11 @@ services:
     environment:
       - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - ES_HOST=${ES_HOST}
+      - ES_PORT=${ES_PORT}
+      - ES_USERNAME=${ES_USERNAME}
+      - ES_PASSWORD=${ES_PASSWORD}
+      - ES_INDEX=${ES_INDEX}
     image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
     ports:
       - 80:8000

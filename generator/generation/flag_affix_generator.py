@@ -270,6 +270,9 @@ class FlagAffixGenerator(NameGenerator):
         }
 
     def generate(self, tokens: Tuple[str, ...], country: str = None) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         if country is None or country.upper() not in self.country2emoji:
             return []
 
@@ -282,6 +285,9 @@ class FlagAffixGenerator(NameGenerator):
     def prepare_arguments(self, name: InputName, interpretation: Interpretation):
         try:
             country = name.params['country'].upper()
-        except:
-            country = None
-        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid,), 'country': country}
+        except (KeyError, AttributeError):
+            try:
+                country = name.params['user_info']['user_ip_country'].upper()
+            except (KeyError, AttributeError, TypeError):
+                country = None
+        return {'tokens': (name.strip_eth_namehash_unicode_replace_invalid or name.strip_eth_namehash_unicode or name.strip_eth_namehash,), 'country': country}

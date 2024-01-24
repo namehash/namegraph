@@ -58,16 +58,20 @@ class Pipeline:
         except ConfigAttributeError:
             self.global_limits = {}
 
+        try:  # copy to internal dict
+            self.category_limits = dictconfig_to_dict(definition.category_limits)
+        except ConfigAttributeError:
+            self.category_limits = {}
+
         self.config: DictConfig = config
         self.controlflow: List[ControlFlow] = []
         self.generators: List[NameGenerator] = []
         self.filters: List[Filter] = []
 
-        logger.info(f'Pipeline {self.definition.name} initing.')
+        logger.info(f'Pipeline {self.pipeline_name} initing.')
         self._build()
 
-        self.cache = {}
-        logger.info(f'Pipeline {self.definition.name} inited.')
+        logger.info(f'Pipeline {self.pipeline_name} inited.')
 
     def __eq__(self, other: Pipeline) -> bool:
         return isinstance(other, Pipeline) and self.pipeline_name == other.pipeline_name
@@ -75,40 +79,36 @@ class Pipeline:
     def __hash__(self) -> int:
         return hash(self.pipeline_name)
 
-    def clear_cache(self):
-        """Cache must be cleared before every request because index in pipeline results is saved."""
-        self.cache.clear()
-
-    def apply(self, name: InputName, interpretation: Interpretation) -> PipelineResultsIterator:
+    def apply(self, name: InputName, interpretation: Interpretation | None) -> PipelineResultsIterator:
         """
         Generate suggestions, results are cached.
         """
         if interpretation:
-            logger.info(
-                f'Pipeline {self.definition.name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
+            logger.debug(
+                f'Pipeline {self.pipeline_name} suggestions apply on I {interpretation.type} {str(interpretation.tokenization)}.')
         else:
-            logger.info(f'Pipeline {self.definition.name} suggestions apply on N {name.input_name}.')
+            logger.debug(f'Pipeline {self.pipeline_name} suggestions apply on N {name.input_name}.')
 
         hash = self.generator.hash(name, interpretation)
-        # print('HASH', interpretation.tokenization, hash, len(self.cache))
-        if hash not in self.cache:
+        # print('HASH', hash, len(self.cache), id(self.cache), self.pipeline_name, os.getpid(), threading.get_ident(), list(self.cache.keys()))
+        if hash not in name.pipelines_cache[self.pipeline_name]:
             should_run = all([controlflow.should_run(name, interpretation) for controlflow in self.controlflow])
             if should_run:  # TODO ok?
 
                 if interpretation:
-                    logger.info(
-                        f'Pipeline {self.definition.name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
+                    logger.debug(
+                        f'Pipeline {self.pipeline_name} suggestions generation on I {interpretation.type} {str(interpretation.tokenization)}.')
                 else:
-                    logger.info(f'Pipeline {self.definition.name} suggestions generation on N {name.input_name}.')
+                    logger.debug(f'Pipeline {self.pipeline_name} suggestions generation on N {name.input_name}.')
                 start_time = time.time()
                 suggestions = self.generator.apply(name, interpretation)
                 generator_time = 1000 * (time.time() - start_time)
-                logger.info(f'Pipeline suggestions generated. Time: {generator_time:.2f}')
+                logger.info(f'Pipeline {self.pipeline_name} suggestions generated. Time: {generator_time:.2f}')
 
                 for filter_ in self.filters:
                     suggestions = filter_.apply(suggestions)
                 # remove input name from suggestions
-                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash)  # TODO niewiadomo jaki jest input
+                input_word = re.sub(r'\.\w+$', '', name.strip_eth_namehash).replace(' ', '')  # TODO niewiadomo jaki jest input
                 suggestions = (s for s in suggestions if str(s) != input_word)
 
                 # suggestions = aggregate_duplicates(suggestions)
@@ -127,9 +127,9 @@ class Pipeline:
 
             else:
                 suggestions = []
-            self.cache[hash] = PipelineResultsIterator(suggestions)
-            logger.info('Pipeline suggestions cached.')
-        return self.cache[hash]
+            name.pipelines_cache[self.pipeline_name][hash] = PipelineResultsIterator(suggestions)
+            logger.debug(f'Pipeline {self.pipeline_name} suggestions cached.')
+        return name.pipelines_cache[self.pipeline_name][hash]
 
     def _build(self):
         # make control flow optional

@@ -1,17 +1,22 @@
 import csv
-import glob
-import itertools, collections
-import logging
-from pathlib import Path
-from operator import itemgetter
-from typing import List, Dict, Tuple, Any
 
+import itertools
+import collections
+import logging
+import random
+
+from operator import itemgetter
+from typing import List, Dict, Tuple
+
+from more_itertools import roundrobin
 from omegaconf import DictConfig
 
 from . import NameGenerator
 from .combination_limiter import CombinationLimiter, prod
 from ..input_name import InputName, Interpretation
 from ..utils import Singleton
+from generator.thread_utils import get_random_rng
+
 
 logger = logging.getLogger('generator')
 
@@ -23,6 +28,10 @@ class Categories(metaclass=Singleton):
         for category, tokens in self.categories.items():
             for token in tokens:
                 self.inverted_categories[token].append(category)
+
+        random.seed(0)
+        for tokens in self.categories.values():
+            random.shuffle(tokens)
 
     def get_names(self, category: str) -> list[str]:
         return self.categories.get(category, [])
@@ -54,18 +63,21 @@ class CategoriesGenerator(NameGenerator):
         self.categories = Categories(config)
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         token = ''.join(tokens)
-        tokens_synsets = self.get_similar(token).items()
 
-        return ((x[0],) for x in sorted(tokens_synsets, key=itemgetter(1), reverse=True))
+        rng = get_random_rng()
 
-    def get_similar(self, token: str) -> Dict[str, int]:
-        stats = collections.defaultdict(int)
-        stats[token] += 1
+        iterators = []
         for category in self.categories.get_categories(token):
-            for token in self.categories.get_names(category):
-                stats[token] += 1
-        return stats
+            names = self.categories.get_names(category)
+            start_index = rng.randint(0, len(names))
+            iterators.append(
+                itertools.chain(itertools.islice(names, start_index, None), itertools.islice(names, 0, start_index)))
+
+        return ((s,) for s in roundrobin(*iterators))
 
     def generate2(self, name: InputName, interpretation: Interpretation) -> List[Tuple[str, ...]]:
         return self.generate(**self.prepare_arguments(name, interpretation))

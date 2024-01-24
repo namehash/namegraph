@@ -1,6 +1,6 @@
 -
   name: wiki2v
-  generator: Wikipedia2VGenerator
+  generator: Wikipedia2VGeneratorRocks
   filters:
     - SubnameFilter
     - ValidNameFilter
@@ -15,11 +15,15 @@
     instant: 1
     domain_detail: 1
     full: 0.33
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.5
 -
   name: w2v
   controlflow:
     - RunIfNotInstant
-  generator: W2VGenerator
+  generator: W2VGeneratorRocks
   filters:
     - SubnameFilter
     - ValidNameFilter
@@ -38,6 +42,10 @@
     instant: 1
     domain_detail: 1
     full: 0.33
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.5
 -
   name: categories-no-tokenizer
   generator: CategoriesGenerator
@@ -55,6 +63,13 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+    grouped_instant: 0
+    grouped_domain_detail: 0
+    grouped_full: 0
+  category_limits:
+    instant: 0
+    domain_detail: 0
+    full: 0
 -
   name: synonyms
   generator: WordnetSynonymsGenerator
@@ -73,6 +88,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.5
 -
   name: on-sale
   generator: OnSaleMatchGenerator
@@ -92,6 +111,10 @@
     full: 0.2
   mode_weights_multiplier:
     instant: 0
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: permute
   generator: PermuteGenerator
@@ -109,12 +132,16 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: prefix
   generator: PrefixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0.5
@@ -127,12 +154,16 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: suffix
   generator: SuffixGenerator
   filters:
     - SubnameFilter
-    - ValidNameFilter
+    - ValidNameLengthFilter
   weights:
     ngram:
       default: 0.5
@@ -145,6 +176,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: substring
   generator: SubstringMatchGenerator
@@ -163,6 +198,10 @@
     full: 0.2
   mode_weights_multiplier:
     instant: 0
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: hyphens
   generator: HyphenGenerator
@@ -180,6 +219,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: special-char-affix
   generator: SpecialCharacterAffixGenerator
@@ -197,6 +240,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: abbreviation
   generator: AbbreviationGenerator
@@ -214,6 +261,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: flag-affix
   generator: FlagAffixGenerator
@@ -233,6 +284,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: leet
   generator: LeetGenerator
@@ -250,6 +305,10 @@
     instant: 0
     domain_detail: 0
   global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 2
+  category_limits:
     instant: 1
     domain_detail: 1
     full: 2
@@ -271,6 +330,10 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: emoji
   generator: EmojiGenerator
@@ -290,9 +353,13 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
-  name: person-name
-  generator: PersonNameGenerator
+  name: person-name-emojify
+  generator: PersonNameEmojifyGenerator
   filters:
     - SubnameFilter
     - ValidNameLengthFilter
@@ -300,13 +367,38 @@
     ngram:
       default: 0
     person:
-      default: 5
+      default: 2
     other:
       default: 0
   global_limits:
     instant: 1
     domain_detail: 1
     full: 0.1
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
+-
+  name: person-name-expand
+  generator: PersonNameExpandGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 3
+    other:
+      default: 0
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.1
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
 -
   name: symbol
   generator: SymbolGenerator
@@ -326,3 +418,106 @@
     instant: 1
     domain_detail: 1
     full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6
+-
+  name: collections
+  generator: CollectionGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0.1
+      en: 10
+    person:
+      default: 0.1
+    other:
+      default: 0
+  global_limits:
+    instant: 0
+    domain_detail: 0
+    full: 0
+    grouped_instant: 0.33
+    grouped_domain_detail: 0.33
+    grouped_full: 0.33
+-
+  name: easteregg
+  generator: EasterEggGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 0
+    other:
+      default: 1
+  mode_weights_multiplier:
+    instant: 0.166
+    domain_detail: 0
+    full: 0
+  global_limits:
+    instant: 1
+    domain_detail: 0
+    full: 0
+    grouped_instant: 0
+    grouped_domain_detail: 0
+    grouped_full: 0
+  category_limits:
+    instant: 0
+    domain_detail: 0
+    full: 0
+-
+  name: reverse
+  generator: ReverseGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0
+    person:
+      default: 1
+    other:
+      default: 0
+  mode_weights_multiplier:
+    instant: 0.166
+    domain_detail: 0.1
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 1
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 1
+-
+  name: rhymes
+  generator: RhymesGenerator
+  filters:
+    - SubnameFilter
+    - ValidNameLengthFilter
+  weights:
+    ngram:
+      default: 0.5
+      en: 1
+    person:
+      default: 0.1
+    other:
+      default: 0
+  mode_weights_multiplier:
+    instant: 0.166
+    domain_detail: 0.15
+    full: 0.5
+  global_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.2
+  category_limits:
+    instant: 1
+    domain_detail: 1
+    full: 0.6

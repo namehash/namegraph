@@ -44,6 +44,9 @@ class CharacterGenerator(NameGenerator):
         raise NotImplementedError('this is an abstract class with no mapping specified')
 
     def generate(self, tokens: Tuple[str, ...]) -> List[Tuple[str, ...]]:
+        if len(''.join(tokens)) == 0:
+            return []
+
         all_possibilities = self.get_all_possibilities(tokens)
 
         if len(tokens) == 1:

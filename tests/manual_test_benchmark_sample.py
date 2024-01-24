@@ -8,7 +8,7 @@ from generator.generation.random_available_name_generator import _softmax
 random.seed(0)
 np.random.seed(0)
 
-n = 70  # 250000 70
+n = 10000  # 250000 70
 a = list(range(n))
 probabilities = [random.random() for _ in range(n)]
 probabilities[0] = 100
@@ -16,7 +16,7 @@ probabilities = np.clip(probabilities, 0.0, 4.0)
 probabilities: list[float] = _softmax(probabilities).tolist()
 accumulated_probabilities = list(accumulate(probabilities))
 
-k = 200
+k = 10000
 k = min(n, k)
 
 rng = np.random.default_rng()
@@ -37,6 +37,10 @@ def numpy_w_replace():
 
 def numpy_wo_replace():
     return np.random.choice(a, size=k, replace=False, p=probabilities)
+
+def shuffle():
+    np.random.shuffle(a)
+    return a
 
 
 def random_w_replace_acc():
@@ -128,6 +132,11 @@ def fast_choice(options, probs):
 
 def check(r):
     print(len(set(r)))
+
+
+def test_shuffle(benchmark):
+    r = benchmark(shuffle)
+    check(r)
 
 
 def test_numpy_wo_replace(benchmark):

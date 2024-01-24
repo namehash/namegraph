@@ -6,6 +6,8 @@ import json
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
+import myunicode
+
 
 def parser_xlsx(filepath: str):
     wb = load_workbook(filepath)
@@ -36,6 +38,16 @@ def parser_xlsx(filepath: str):
     return symbol2names
 
 
+def filter_out_unnormalized(symbol2names: dict[str, list[str]]) -> dict[str, list[str]]:
+    filtered = dict()
+    for symbol, value in symbol2names.items():
+        if myunicode.is_ens_normalized(symbol) and myunicode.script_of(symbol) == 'Common':
+            filtered[symbol] = value
+        else:
+            print(f'Filtered out {repr(symbol)}, script - {myunicode.script_of(symbol)}')
+    return filtered
+
+
 def invert_mapping(symbol2names: dict[str, list[str]]) -> dict[str, list[str]]:
     name2symbols = defaultdict(list)
     for symbol, names in symbol2names.items():
@@ -60,7 +72,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     symbol2names = parser_xlsx(args.sheet)
-    name2symbols = invert_mapping(symbol2names)
+    filtered_symbol2names = filter_out_unnormalized(symbol2names)
+    name2symbols = invert_mapping(filtered_symbol2names)
 
     with open(args.freqs, 'r', encoding='utf-8') as f:
         freqs = json.load(f)
@@ -68,4 +81,4 @@ if __name__ == '__main__':
     name2sorted_symbols = sort_mapping(name2symbols, freqs)
 
     with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(name2sorted_symbols, f, indent=2, ensure_ascii=False)
+        json.dump(name2sorted_symbols, f, indent=2, ensure_ascii=False, sort_keys=True)

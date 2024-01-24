@@ -5,6 +5,13 @@ import ahocorasick
 from .tokenizer import Tokenizer
 
 
+class Gap(str):
+    def __new__(cls, gap_length):
+        obj = str.__new__(cls, '')
+        obj.gap_length = gap_length
+        return obj
+
+
 class DFS:
     def __init__(self, automaton, name, skip_non_words=False, with_gaps=False):
         self.automaton = automaton
@@ -29,7 +36,7 @@ class DFS:
                 t = []
                 for start, end, in_dictionary in r:
                     if not in_dictionary and self.with_gaps:
-                        t.append('')
+                        t.append(Gap(end - start))
                     else:
                         t.append(self.name[start:end])
                 yield tuple(t)

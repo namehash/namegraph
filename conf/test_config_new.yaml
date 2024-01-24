@@ -29,6 +29,21 @@ app:
   #for longer names only first 30 characters are taken into consideration
   name_length_limit: 30
   min_available_fraction: 0.1
+# if present, env variables will override values below
+elasticsearch:
+  scheme: ${oc.env:ES_SCHEME,https}
+  host: ${oc.env:ES_HOST,localhost}
+  port: ${oc.decode:${oc.env:ES_PORT,9243}}
+  username: ${oc.env:ES_USERNAME,elastic}
+  password: ${oc.env:ES_PASSWORD,password}
+  index: ${oc.env:ES_INDEX,collection-templates} #TODO create a specific test index with a few test collections
+  ltr:
+    feature_store: ${oc.env:ES_LTR_FEATURE_STORE,ltr-metadata-index}
+    feature_set: ${oc.env:ES_LTR_FEATURE_SET,ltr-feature-set}
+    model_name: ${oc.env:ES_LTR_MODEL_NAME,exp6-8}
+    window_size:
+      instant: 20
+      domain_detail: 100
 filtering:
   # List of already registered domains
 #  domains: tests/data/primary.csv
@@ -44,6 +59,8 @@ tokenization:
 generation:
   word2vec_url: embeddings.pkl
   word2vec_path: data/embeddings.pkl
+  word2vec_rocks_url: w2v.tgz
+  word2vec_rocks_path: data/w2v
   suffixes_path: tests/data/suffixes.txt
   prefixes_path: tests/data/prefixes.txt
   name2emoji_path: tests/data/name2emoji.json
@@ -59,7 +76,57 @@ generation:
     RandomAvailableNameGenerator: 20000
   wikipedia2vec_url: enwiki_20180420_100d.processed.pkl
   wikipedia2vec_path: tests/data/wikipedia2vec.pkl
+  wikipedia2vec_rocks_url: wiki2v.tgz
+  wikipedia2vec_rocks_path: tests/data/wiki2v
   person_name_affixes_path: data/person_name_affixes.json
+  person_name_emojify_affixes_path: data/person_name_emojify_affixes.json
+  person_name_expand_affixes_path: data/person_name_expand_affixes.json
+  suffix2rhymes_path: data/suffix2rhymes.json
+  leetspeak_path: data/leetspeak.json
+  grouping_categories:
+    related:
+      - CollectionGenerator
+    wordplay:
+      - AbbreviationGenerator
+      - PermuteGenerator
+      - HyphenGenerator
+    alternates:
+      - Wikipedia2VGenerator
+      - W2VGenerator
+      - WordnetSynonymsGenerator
+      - Wikipedia2VGeneratorRocks
+      - W2VGeneratorRocks
+    emojify:
+      - EmojiGenerator
+      - FlagAffixGenerator
+      - KeycapGenerator
+      - SymbolGenerator
+      - PersonNameEmojifyGenerator
+    community:
+      - SubstringMatchGenerator
+      - OnSaleMatchGenerator
+      - CategoriesGenerator
+    expand:
+      - PrefixGenerator
+      - SuffixGenerator
+      - SpecialCharacterAffixGenerator
+      - RhymesGenerator
+      - PersonNameExpandGenerator
+    gowild:
+      - LeetGenerator
+      - EasterEggGenerator
+      - ReverseGenerator
+    other:
+      - RandomAvailableNameGenerator
+  grouping_categories_order:
+    - related
+    - alternates
+    - wordplay
+    - emojify
+    - community
+    - expand
+    - gowild
+    - other
 sorting:
   weighted_sampling:
     weights:
@@ -80,6 +147,7 @@ sorting:
       SubstringMatchGenerator: 1
       LeetGenerator: 1
       KeycapGenerator: 1
+      CollectionGenerator: 1
 random_available_name_pipeline:
   name: random
   generator: RandomAvailableNameGenerator
@@ -96,9 +164,16 @@ person_names:
   lastnames_path: data/person_names_lastnames.json
   other_path: data/person_names_other.json
   country_stats_path: data/person_names_country_stats.json
+  country2langs_path: data/country2langs.json
 ngrams:
   lazy_loading: true
   unigrams: data/ngrams/unigram_freq.csv
   bigrams: data/ngrams/bigram_freq.csv
   custom_dictionary: tests/data/ngrams/custom_dictionary.txt
   custom_token_frequency: 500000
+collections:
+  other_collections_path: data/collections_data/other_collections.json
+  collections_limit: 3
+  suggestions_limit: 25  # per one collections
+  name_diversity_ratio: 0.5
+  max_per_type: 2
