@@ -281,6 +281,8 @@ async def grouped_by_category(name: NameRequest):
                                       params=params)
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
+    response['all_tokenizations'] = []  # todo: fix if this will be used
+
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return response
@@ -294,7 +296,7 @@ def suggestions_by_category(name: GroupedNameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     # params['mode'] = 'grouped_' + params['mode']
 
-    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+    related_suggestions, grouped_suggestions, all_tokenizations  = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
         max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
@@ -306,6 +308,8 @@ def suggestions_by_category(name: GroupedNameRequest):
 
     response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
                                                              include_metadata=name.params.metadata)
+    response['all_tokenizations'] = all_tokenizations
+
     logger.info(json.dumps(
         log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
 

@@ -3,6 +3,7 @@ import concurrent.futures
 import threading
 import logging
 import time
+from functools import reduce
 from itertools import islice, cycle
 from typing import List, Any
 
@@ -157,7 +158,7 @@ class Generator:
             categories_params=None,
             min_total_suggestions: int = 50,
             params: dict[str, Any] = None
-    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]]]:
+    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]], list[tuple[str, ...]]]:
         params = params or {}
         categories_params = categories_params or {}
 
@@ -337,5 +338,9 @@ class Generator:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
             grouped_suggestions['other'] = list(islice(only_available_suggestions, other_suggestions_number))
 
-        return all_related_suggestions, grouped_suggestions
+        unique_tokenizations = set(reduce(list.__add__,
+                                          [[i.tokenization for i in ints] for ints in name.interpretations.values()]))
+
+        return all_related_suggestions, grouped_suggestions, list(unique_tokenizations)
+
 
