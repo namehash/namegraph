@@ -3,7 +3,6 @@ import logging
 import re
 import sys
 from typing import List, Tuple, Any
-import gensim.downloader
 import rocksdict
 from rocksdict import AccessType
 
@@ -21,6 +20,7 @@ class Wikipedia2VGenerator(NameGenerator):
     def __init__(self, config):
         super().__init__(config)
         try:
+            import gensim.downloader
             self.model: gensim.models.keyedvectors.KeyedVectors = \
                 gensim.models.keyedvectors.KeyedVectors.load(config.generation.wikipedia2vec_path, mmap='r')
         except FileNotFoundError as e:

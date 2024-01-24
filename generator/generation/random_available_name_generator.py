@@ -1,4 +1,4 @@
-import random, logging
+import logging
 from itertools import accumulate
 from typing import List, Tuple, Any
 
@@ -8,6 +8,8 @@ import numpy.typing as npt
 from .name_generator import NameGenerator
 from ..domains import Domains
 from ..input_name import InputName, Interpretation
+from generator.thread_utils import get_random_rng
+
 
 logger = logging.getLogger('generator')
 
@@ -43,7 +45,7 @@ class RandomAvailableNameGenerator(NameGenerator):
             limit = self.limit
         limit = min(limit * 2, self.limit)
         if len(self.domains.only_available) >= limit:
-            result = random.choices(self.names, cum_weights=self.accumulated_probabilities, k=limit)
+            result = get_random_rng().choices(self.names, cum_weights=self.accumulated_probabilities, k=limit)
         else:
             result = self.names
         return ((x,) for x in result)

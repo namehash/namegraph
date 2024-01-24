@@ -3,7 +3,6 @@ import logging
 import sys
 from operator import itemgetter
 from typing import List, Tuple, Any
-import gensim.downloader
 import itertools
 
 import rocksdict
@@ -26,6 +25,7 @@ class W2VGenerator(NameGenerator):
         super().__init__(config)
         # self.model = gensim.downloader.load(config.generation.word2vec_model)
         try:
+            import gensim.downloader
             self.model: gensim.models.keyedvectors.KeyedVectors = \
                 gensim.models.keyedvectors.KeyedVectors.load(config.generation.word2vec_path, mmap='r')
         except FileNotFoundError as e:

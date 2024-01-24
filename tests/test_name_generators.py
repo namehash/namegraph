@@ -481,7 +481,7 @@ def test_on_sale_matcher_sorting():
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = Wikipedia2VGenerator(config)
+        strategy = Wikipedia2VGeneratorRocks(config)
         tokenized_name = ('billy', 'corgan')
         generated_names = list(strategy.generate(tokenized_name))
         print(generated_names)

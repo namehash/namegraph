@@ -1,3 +1,4 @@
+import collections
 from typing import Optional
 
 
@@ -33,6 +34,8 @@ class InputName:
         self.strip_eth_namehash_unicode_replace_invalid_long_name = None
         self.strip_eth_namehash_unicode_long_name = None
         self.strip_eth_namehash_long_name = None
+
+        self.pipelines_cache = collections.defaultdict(dict)
 
     def add_type(self, type: str, lang: str, probability: float, override: bool = True):
         if override or (type, lang) not in self.types_probabilities:

@@ -145,7 +145,6 @@ async def generate_names(name: NameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
 
-    generator.clear_cache()
     result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
@@ -274,15 +273,12 @@ async def grouped_by_category(name: NameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
-    result = generator.generate_names(
-        name.label,
-        sorter=name.sorter,
-        min_suggestions=name.min_suggestions,
-        max_suggestions=name.max_suggestions,
-        min_available_fraction=name.min_primary_fraction,
-        params=params
-    )
+    result = generator.generate_names(name.label,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions,
+                                      min_available_fraction=name.min_primary_fraction,
+                                      params=params)
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
     response['all_tokenizations'] = []  # todo: fix if this will be used
@@ -293,15 +289,14 @@ async def grouped_by_category(name: NameRequest):
 
 
 @app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
-async def suggestions_by_category(name: GroupedNameRequest):
+def suggestions_by_category(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     # params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
-    related_suggestions, grouped_suggestions, all_tokenizations = generator.generate_grouped_names(
+    related_suggestions, grouped_suggestions, all_tokenizations  = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
         max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
@@ -342,6 +337,8 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
 
     response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
 
+    logger.info(json.dumps({'endpoint': 'sample_collection_members', 'request': sample_command.model_dump()}))
+
     return response
 
 
@@ -374,6 +371,8 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
                                                               include_metadata=fetch_top10_command.metadata)
 
+    logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
+
     return response2[0]
 
 
@@ -396,6 +395,8 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
         suggestions.append(obj)
 
     response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata)
+
+    logger.info(json.dumps({'endpoint': 'scramble_collection_tokens', 'request': scramble_command.model_dump()}))
 
     return response
 
@@ -599,3 +600,6 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     }
 
     return {'collections': collections, 'metadata': metadata}
+
+
+#TODO gc.freeze() ?

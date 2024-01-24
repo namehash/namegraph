@@ -351,7 +351,7 @@ class TestGrouped:
 
         assert False, "Results are the same for all diversity parameters"
 
-    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman", "[003fda97309fd6aa9d7753dcffa37a] 12345"])
     def test_prod_grouped_by_category(self, test_client, label):
         client = test_client
 
@@ -413,8 +413,11 @@ class TestGrouped:
 
         assert 'categories' in response_json
         categories = response_json['categories']
-        assert sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other'][
-            'min_total_suggestions']
+        # keeping other max_suggestions is more important than min_total_suggestions
+        assert (sum([len(gcat['suggestions']) for gcat in categories if gcat['type']=='other']) == request_data['categories']['other'][
+            'max_suggestions'] or
+                sum([len(gcat['suggestions']) for gcat in categories]) >= request_data['categories']['other'][
+            'min_total_suggestions'])
 
         for category in categories:
             if category['type'] == 'related':

@@ -1,5 +1,4 @@
 import logging
-import random
 from typing import Type, Callable
 from ens_normalize import is_ens_normalized
 
@@ -10,6 +9,8 @@ from generator.sampling import WeightedSorterWithOrder
 from generator.sampling.round_robin_sampler import RoundRobinSampler
 from generator.sampling.sampler import Sampler
 from generator.input_name import InputName
+from generator.thread_utils import init_seed_for_thread, get_random_rng
+
 
 logger = logging.getLogger('generator')
 
@@ -91,6 +92,8 @@ class MetaSampler:
     ) -> list[GeneratedName]:
         min_available_required = int(min_suggestions * min_available_fraction)
 
+        init_seed_for_thread(seed_label=name.input_name)  # init random generators for a thread
+
         mode = name.params.get('mode', 'full')
 
         types_lang_weights = {}
@@ -122,17 +125,19 @@ class MetaSampler:
         all_suggestions_str = set()
         joined_input_name = name.input_name.replace(' ', '')
 
+        rng = get_random_rng()
+
         while True:
             if len(all_suggestions) >= max_suggestions or not types_lang_weights:
                 break
 
             # sample interpretation
-            sampled_type_lang = random.choices(
+            sampled_type_lang = rng.choices(
                 list(types_lang_weights.keys()),
                 weights=list(types_lang_weights.values())
             )[0]
 
-            sampled_interpretation = random.choices(
+            sampled_interpretation = rng.choices(
                 list(interpretation_weights[sampled_type_lang].keys()),
                 weights=list(interpretation_weights[sampled_type_lang].values())
             )[0]

@@ -1,6 +1,7 @@
 import os
 import sys
 from time import time as get_time
+from time import sleep
 
 import pytest
 from fastapi.testclient import TestClient
@@ -748,6 +749,37 @@ class TestGroupedSuggestions:
             elif category['type'] == 'expand':
                 assert len(category['suggestions']) > 0
 
+    # reason is described here - https://app.shortcut.com/ps-web3/story/22270/nondeterministic-behavior-for-vitalik
+    @pytest.mark.xfail
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_deterministic_behavior(self, prod_test_client, label):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response1 = client.post("/suggestions_by_category", json=request_data)
+        assert response1.status_code == 200
+
+        sleep(0.1)
+
+        response2 = client.post("/suggestions_by_category", json=request_data)
+        assert response2.status_code == 200
+
+        assert response1.json() == response2.json()
+
+
     @pytest.mark.parametrize(
         "input_label, expected_tokenizations",
         [
@@ -788,6 +820,7 @@ class TestGroupedSuggestions:
         all_tokenizations = response_json['all_tokenizations']
         assert len(all_tokenizations) == len(set(map(tuple, all_tokenizations)))
         assert set(map(tuple, all_tokenizations)) == expected_tokenizations
+
 
 
 @pytest.mark.integration_test
