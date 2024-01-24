@@ -1,3 +1,4 @@
+import collections
 from typing import Optional
 
 
@@ -34,6 +35,8 @@ class InputName:
         self.strip_eth_namehash_unicode_replace_invalid_long_name = None
         self.strip_eth_namehash_unicode_long_name = None
         self.strip_eth_namehash_long_name = None
+
+        self.pipelines_cache = collections.defaultdict(dict)
 
         self.is_pretokenized: bool = False
         self.pretokenization: tuple[str, ...] | None = None
