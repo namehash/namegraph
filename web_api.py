@@ -117,6 +117,7 @@ def convert_to_suggestion_format(
     response = [{
         'name': str(name) + '.eth',
         # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
+        'tokenized_label': list(name.tokens)
     } for name in names]
 
     if include_metadata:
@@ -144,7 +145,6 @@ async def generate_names(name: NameRequest):
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
 
-    generator.clear_cache()
     result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
@@ -176,7 +176,7 @@ def convert_related_to_grouped_suggestions_format(
         converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
         grouped_response.append({
             'suggestions': converted_suggestions if include_metadata else
-            [{'name': s['name']} for s in converted_suggestions],
+            [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
             'type': 'related',
             'name': suggestions.collection_title,
             'collection_title': suggestions.collection_title,
@@ -200,7 +200,7 @@ def convert_grouped_to_grouped_suggestions_format(
             converted_suggestions = convert_to_suggestion_format(grouped_suggestions[gcat], include_metadata=True)
             grouped_response.append({
                 'suggestions': converted_suggestions if include_metadata else
-                [{'name': s['name']} for s in converted_suggestions],
+                [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
                 'type': gcat,
                 'name': category_fancy_names[gcat],
             })
@@ -245,7 +245,7 @@ def convert_to_grouped_suggestions_format(
             for collection_key in collection_categories_order:
                 grouped_response.append({
                     'suggestions': related_dict[collection_key] if include_metadata else
-                    [{'name': s['name']} for s in related_dict[collection_key]],
+                    [{k: v for k, v in sug.items() if k != 'metadata'} for sug in related_dict[collection_key]],
                     'type': 'related',
                     'name': collection_key[0],
                     'collection_title': collection_key[0],
@@ -256,7 +256,7 @@ def convert_to_grouped_suggestions_format(
         elif grouped_dict[gcat]:
             grouped_response.append({
                 'suggestions': grouped_dict[gcat] if include_metadata else
-                [{'name': s['name']} for s in grouped_dict[gcat]],
+                [{k: v for k, v in sug.items() if k != 'metadata'} for sug in grouped_dict[gcat]],
                 'type': gcat,
                 'name': category_fancy_names[gcat],
             })
@@ -273,7 +273,6 @@ async def grouped_by_category(name: NameRequest):
     params = name.params.model_dump() if name.params is not None else dict()
     params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
     result = generator.generate_names(name.label,
                                       sorter=name.sorter,
                                       min_suggestions=name.min_suggestions,
@@ -282,21 +281,22 @@ async def grouped_by_category(name: NameRequest):
                                       params=params)
 
     response = convert_to_grouped_suggestions_format(result, include_metadata=name.metadata)
+    response['all_tokenizations'] = []  # todo: fix if this will be used
+
     logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return response
 
 
 @app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
-async def suggestions_by_category(name: GroupedNameRequest):
+def suggestions_by_category(name: GroupedNameRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
     params = name.params.model_dump() if name.params is not None else dict()
     # params['mode'] = 'grouped_' + params['mode']
 
-    generator.clear_cache()
-    related_suggestions, grouped_suggestions = generator.generate_grouped_names(
+    related_suggestions, grouped_suggestions, all_tokenizations  = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
         max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
@@ -308,6 +308,8 @@ async def suggestions_by_category(name: GroupedNameRequest):
 
     response = convert_grouped_to_grouped_suggestions_format(related_suggestions, grouped_suggestions,
                                                              include_metadata=name.params.metadata)
+    response['all_tokenizations'] = all_tokenizations
+
     logger.info(json.dumps(
         log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
 
@@ -334,6 +336,8 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
         sampled_members.append(obj)
 
     response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
+
+    logger.info(json.dumps({'endpoint': 'sample_collection_members', 'request': sample_command.model_dump()}))
 
     return response
 
@@ -367,6 +371,8 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
                                                               include_metadata=fetch_top10_command.metadata)
 
+    logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
+
     return response2[0]
 
 
@@ -389,6 +395,8 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
         suggestions.append(obj)
 
     response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata)
+
+    logger.info(json.dumps({'endpoint': 'scramble_collection_tokens', 'request': scramble_command.model_dump()}))
 
     return response
 
@@ -592,3 +600,6 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     }
 
     return {'collections': collections, 'metadata': metadata}
+
+
+#TODO gc.freeze() ?

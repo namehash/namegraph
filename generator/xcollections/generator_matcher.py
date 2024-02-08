@@ -290,7 +290,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
     ) -> tuple[dict, dict]:
 
         fields = ['data.collection_name', 'template.top10_names.normalized_name',
-                  'metadata.members_count', 'name_generator.related_collections']
+                  'metadata.members_count', 'name_generator.related_collections', 'data.archived']
 
         try:
             t_before = perf_counter()
@@ -301,6 +301,10 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+        # TODO: as quick fix for filtering collections (e.g. nazi) with archived=True; needs to be activated when those collection will be marked in separated field
+        # if response['_source']['data']['archived']:
+        #     raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         es_response_metadata = {
             'n_total_hits': 1,

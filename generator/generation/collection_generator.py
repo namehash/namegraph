@@ -2,6 +2,9 @@ import logging
 from typing import List, Tuple, Iterable, Any
 from itertools import cycle, islice
 
+import emoji
+import regex
+
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
 from ..xcollections import CollectionMatcherForGenerator
@@ -45,8 +48,11 @@ class CollectionGenerator(NameGenerator):
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
         # TODO maybe use concatenation of all tokenizations as query
-        input_name = name.strip_eth_namehash_unicode_long_name.strip()
-        if ' ' in name.strip_eth_namehash_unicode_long_name:
+        input_name: str = name.strip_eth_namehash_unicode_long_name.strip()
+
+        if name.is_pretokenized:
+            tokens = list(name.pretokenization)
+        elif ' ' in input_name:
             tokens = input_name.split(' ')
         else:
             # tokens = interpretation.tokenization
@@ -68,11 +74,22 @@ class CollectionGenerator(NameGenerator):
             if input_name:
                 tokens[0] = f'{tokens[0]}^1.5'  # boost untokenized
 
+        # adding emojis, which have been removed from the name
+        normalized_name = name.strip_eth_namehash_unicode_replace_invalid_long_name.strip()
+        # some characters have been removed
+        if normalized_name != name.strip_eth_namehash_long_name:
+            emojis = []
+            for grapheme in regex.finditer(r'\X', name.strip_eth_namehash_long_name):
+                if emoji.is_emoji(grapheme.group()):
+                    emojis.append(grapheme.group())
+            emojis = uniq(emojis)
+            tokens.extend(emojis)
+
         params = name.params if name.params is not None else dict()
         suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
         logger.info(f'CollectionGenerator query: {tokens}')
         collections, _ = self.collection_matcher.search_for_generator(
-            tokens,
+            tuple(tokens),
             name.strip_eth_namehash_unicode_long_name.strip(),
             max_related_collections=params.get('max_related_collections', self.collections_limit),
             name_diversity_ratio=params.get('name_diversity_ratio', self.name_diversity_ratio),
@@ -127,4 +144,7 @@ class CollectionGenerator(NameGenerator):
         # else:
         #     return {'tokens': interpretation.tokenization}
         # hack for running ES for only one interpretation/tokenization, e.g. dog -> ['dog'], ['do','g']
-        return {'tokens': name.strip_eth_namehash_unicode_long_name.strip().split(' ')}
+        if name.is_pretokenized:
+            return {'tokens': name.pretokenization}
+        # fixme: should be compatible with the actual tokenization (?)
+        return {'tokens': tuple(name.strip_eth_namehash_unicode_long_name.strip().split(' '))}

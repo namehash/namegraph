@@ -2,8 +2,8 @@ import collections
 import concurrent.futures
 import threading
 import logging
-import random
 import time
+from functools import reduce
 from itertools import islice, cycle
 from typing import List, Any
 
@@ -158,7 +158,7 @@ class Generator:
             categories_params=None,
             min_total_suggestions: int = 50,
             params: dict[str, Any] = None
-    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]]]:
+    ) -> tuple[dict[str, RelatedSuggestions], dict[str, list[GeneratedName]], list[tuple[str, ...]]]:
         params = params or {}
         categories_params = categories_params or {}
 
@@ -183,6 +183,8 @@ class Generator:
 
         logger.info(str(name.types_probabilities))
         logger.info(str(name.interpretations))
+        if name.is_pretokenized:
+            logger.info(f'Input label is pretokenized: {name.pretokenization}')
 
         logger.info('Start sampling')
 
@@ -224,9 +226,8 @@ class Generator:
             # multithreading using concurrent.futures
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.grouped_metasamplers)) as executor:
                 futures = {}
+                start_time = time.time()
                 for category, meta_sampler in self.grouped_metasamplers.items():
-                    start_time = time.time()
-
                     category_params = getattr(categories_params, category)
                     try:
                         min_suggestions = category_params.min_suggestions
@@ -339,9 +340,9 @@ class Generator:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
             grouped_suggestions['other'] = list(islice(only_available_suggestions, other_suggestions_number))
 
-        return all_related_suggestions, grouped_suggestions
+        unique_tokenizations = set(reduce(list.__add__,
+                                          [[i.tokenization for i in ints] for ints in name.interpretations.values()]))
 
-    def clear_cache(self) -> None:
-        for pipeline in self.pipelines:
-            pipeline.clear_cache()
-        self.random_available_name_pipeline.clear_cache()
+        return all_related_suggestions, grouped_suggestions, list(unique_tokenizations)
+
+

@@ -1,6 +1,7 @@
 import os
 import sys
 from time import time as get_time
+from time import sleep
 
 import pytest
 from fastapi.testclient import TestClient
@@ -630,6 +631,10 @@ class TestGroupedSuggestions:
         related_suggestions = []
         for gcat in categories:
             suggestions = [s['name'] for s in gcat['suggestions']]
+
+            suggestion_tokens = [s['tokenized_label'] for s in gcat['suggestions']]
+            assert suggestions == list(map(lambda ts: ''.join(ts) + '.eth', suggestion_tokens))
+
             print(gcat['type'], gcat['name'])
             print(suggestions)
             if gcat['type'] == 'related':
@@ -743,6 +748,116 @@ class TestGroupedSuggestions:
                 assert len(category['suggestions']) > 0
             elif category['type'] == 'expand':
                 assert len(category['suggestions']) > 0
+
+    # reason is described here - https://app.shortcut.com/ps-web3/story/22270/nondeterministic-behavior-for-vitalik
+    @pytest.mark.xfail
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label", ["zeus", "dog", "dogs", "superman"])
+    def test_prod_deterministic_behavior(self, prod_test_client, label):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response1 = client.post("/suggestions_by_category", json=request_data)
+        assert response1.status_code == 200
+
+        sleep(0.1)
+
+        response2 = client.post("/suggestions_by_category", json=request_data)
+        assert response2.status_code == 200
+
+        assert response1.json() == response2.json()
+
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("label, expected_tokens",
+                             [
+                                 ("\"songs forthe deaf\"", ('songs', 'forthe', 'deaf')),
+                                 ("\"pinkfloyd\"", ('pinkfloyd',)),
+                                 ("\"apricots andcherries\"", ('apricots', 'andcherries')),
+                             ])
+    def test_prod_pretokenized_input_label_for_related(self, prod_test_client, label: str, expected_tokens: tuple[str]):
+        client = prod_test_client
+
+        request_data = {
+            "label": label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+
+        response_json = response.json()
+        assert response.status_code == 200
+
+        assert 'categories' in response_json
+        categories = response_json['categories']
+        for cat in categories:
+            if cat['type'] == 'related':
+                # todo: what to test here (metadata.interpretation is a result of unused prepare_arguments method)
+                for s in cat['suggestions']:
+                    assert s['metadata']['interpretation'][2] == "{'tokens': " + str(expected_tokens) + "}"
+
+
+
+    @pytest.mark.parametrize(
+        "input_label, expected_tokenizations",
+        [
+            ("zeusgodofolympus", {("zeus", "god", "of", "olympus"), ("zeusgodofolympus",)}),
+            ("scoobydoowhereareyou🐕", {("scoobydoo", "where", "are", "you"), ("scoobydoowhereareyou",)}),
+            ("desert sessions", {("desert", "sessions"), ("desertsessions",)}),
+            ("vitalik", {("vitali", "k"), ("vitalik",)}),
+        ]
+    )
+    def test_returning_all_tokenizations(
+            self,
+            prod_test_client,
+            input_label: str,
+            expected_tokenizations: set[tuple[str]]
+    ):
+        client = prod_test_client
+
+        request_data = {
+            "label": input_label,
+            "params": {
+                "user_info": {
+                    "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    "user_ip_addr": "192.168.0.1",
+                    "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                    "user_ip_country": "us"
+                },
+                "mode": "full",
+                "metadata": True
+            }
+        }
+        response = client.post("/suggestions_by_category", json=request_data)
+
+        response_json = response.json()
+        assert response.status_code == 200
+
+        assert 'all_tokenizations' in response_json
+
+        all_tokenizations = response_json['all_tokenizations']
+        assert len(all_tokenizations) == len(set(map(tuple, all_tokenizations)))
+        assert set(map(tuple, all_tokenizations)) == expected_tokenizations
+
 
 
 @pytest.mark.integration_test

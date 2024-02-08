@@ -428,10 +428,10 @@ def test_on_sale_matcher():
         tokenized_name = ('pay', 'fire', '123')
         generated_names = list(strategy.generate(tokenized_name))
         print(generated_names)
-        assert ('payshare',) in generated_names
-        assert ('payfix',) in generated_names
-        assert ('paygreen',) in generated_names
-        assert ('paytrust',) in generated_names
+        assert ('pay', 'share',) in generated_names
+        assert ('pay', 'fix',) in generated_names
+        assert ('pay', 'green',) in generated_names
+        assert ('pay', 'trust',) in generated_names
         assert ('fire',) in generated_names
 
 
@@ -468,11 +468,11 @@ def test_on_sale_matcher_sorting():
         generated_tokens = generated_names
 
         assert ('orange',) in generated_tokens  # intersting_score = 69.98
-        assert ('fieldmarshal',) in generated_tokens  # intersting_score = 300.0
+        assert ('field', 'marshal',) in generated_tokens  # intersting_score = 300.0
         assert ('fire',) in generated_tokens  # intersting_score = 190.5115
 
         orange_pos = generated_tokens.index(('orange',))
-        alibaba_pos = generated_tokens.index(('fieldmarshal',))
+        alibaba_pos = generated_tokens.index(('field', 'marshal',))
         fire_pos = generated_tokens.index(('fire',))
 
         assert alibaba_pos < fire_pos < orange_pos
@@ -481,7 +481,7 @@ def test_on_sale_matcher_sorting():
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = Wikipedia2VGenerator(config)
+        strategy = Wikipedia2VGeneratorRocks(config)
         tokenized_name = ('billy', 'corgan')
         generated_names = list(strategy.generate(tokenized_name))
         print(generated_names)
@@ -636,7 +636,7 @@ def test_rhymes_generator():
 
         tokenized_name = ('caravan',)
         gen = strategy.generate(tokenized_name)
-        generated_names = list(map(lambda x: x[0], list(gen)))
+        generated_names = list(map(lambda x: ''.join(x), list(gen)))
         expected_names = map(lambda s: tokenized_name[0] + s, (
             "van", "fan", "sullivan", "ivan", "stefan", "evan",
             "ativan", "donovan", "stephan", "orphan", "minivan", "sylvan")
@@ -645,7 +645,7 @@ def test_rhymes_generator():
 
         tokenized_name = ('van', 'fan', 'sullivan')
         gen = strategy.generate(tokenized_name)
-        generated_names = list(map(lambda x: x[0], list(gen)))
+        generated_names = list(map(lambda x: ''.join(x), list(gen)))
         discarded_names = map(lambda s: ''.join(tokenized_name) + s,
                               ("van", "fan", "sullivan"))
         assert all([name not in generated_names for name in discarded_names])

@@ -7,6 +7,7 @@ import numpy as np
 
 from .name_generator import NameGenerator
 from ..input_name import InputName, Interpretation
+from generator.thread_utils import get_numpy_rng
 
 
 def standardize(a):
@@ -59,7 +60,7 @@ class PersonNameGenerator(NameGenerator):
         else:
             data = self.both
 
-        order = np.random.choice(len(data[0]), size=len(data[0]), replace=False, p=data[1])
+        order = get_numpy_rng().choice(len(data[0]), size=len(data[0]), replace=False, p=data[1])
         return (tokens + (data[0][index][0],) if data[0][index][1] == 'suffix' else (data[0][index][0],) + tokens for
                 index in order)
 

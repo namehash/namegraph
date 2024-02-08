@@ -1,11 +1,11 @@
 import json
 import re
 import unicodedata
-import random
 from typing import Tuple, Iterator
 
 from generator.generation import NameGenerator
 from ..input_name import InputName, Interpretation
+from generator.thread_utils import get_random_rng
 
 
 class RhymesGenerator(NameGenerator):
@@ -35,6 +35,8 @@ class RhymesGenerator(NameGenerator):
 
         rhyme_suffix = RhymesGenerator.get_rhyme_suffix(name_vmetaphone_repr)
 
+        rng = get_random_rng()
+
         for suffix_len in range(len(rhyme_suffix), 2, -1):
             suffix = rhyme_suffix[-suffix_len:]
             rhymes = self.suffix2rhymes.get(suffix, None)
@@ -54,12 +56,12 @@ class RhymesGenerator(NameGenerator):
 
             rhymes_top = rhymes[:shuffle_threshold]
             rhymes_bottom = rhymes[shuffle_threshold:]
-            random.shuffle(rhymes_top)
-            random.shuffle(rhymes_bottom)
+            rng.shuffle(rhymes_top)
+            rng.shuffle(rhymes_bottom)
             rhymes = rhymes_top + rhymes_bottom
 
             try:
-                yield from [(name + r,) for r in rhymes if r != name and r not in tokens]
+                yield from [(name, r) for r in rhymes if r != name and r not in tokens]
             except StopIteration:
                 continue
 

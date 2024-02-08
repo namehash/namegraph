@@ -113,8 +113,9 @@ class CategoriesParams(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 class GroupedNameRequest(BaseModel):
-    label: str = Field(title='input label', description='cannot contain dots (.)',
-                       pattern='^[^.]*$', examples=['zeus'])
+    label: str = Field(title='input label', pattern='^[^.]*$', examples=['zeus'],
+                       description='* cannot contain dots (.)'
+                                   '\n* if enclosed in double quotes assuming label is pre-tokenized')
 
     # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
     #                                     ge=0.0, le=1.0,
@@ -181,6 +182,7 @@ class Metadata(BaseModel):
 
 class Suggestion(BaseModel):
     name: str = Field(title="suggested similar name (not label)")
+    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
@@ -212,6 +214,7 @@ class GroupedSuggestions(BaseModel):
         title='grouped suggestions',
         description='list of suggestions grouped by category type'
     )
+    all_tokenizations: list[list[str]] = Field(title='all inferred tokenizations of input label')
 
 
 class SampleCollectionMembers(BaseModel):
