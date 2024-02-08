@@ -38,7 +38,8 @@ def archive_collections(es: Elasticsearch, collection_ids: list[str]):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='Takes a TXT file where each line is a collection ID, and archives them in '
+                                        'Elasticsearch by setting the "archived" field to True')
     parser.add_argument('--input', type=str, required=True, help='TXT file with collection IDs to archive')
     args = parser.parse_args()
 

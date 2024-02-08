@@ -4,7 +4,9 @@ import csv
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description="Takes the first column of a CSV file, maps to IDs, and writes to a TXT file")
+    parser = ArgumentParser(description="Takes the first column of a CSV file, which is the name of a related "
+                                        "collection we have found, then maps it to the Elasticsearch IDs, and finally, "
+                                        "writes to a TXT file to be later used in the archiving script.")
     parser.add_argument('--input', type=str, required=True, help='Path to the input CSV file')
     parser.add_argument('--mapping', type=str, required=True, help='Path to the mapping JSON file')
     parser.add_argument('--output', type=str, required=True, help='Path to the output TXT file')

@@ -76,7 +76,9 @@ def search_by_keyword(es: Elasticsearch, keywords: list[str]) -> list[Collection
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='This scripts takes a list of keywords and searches for collections in '
+                                        'Elasticsearch. We then write the result collections and all the related to it '
+                                        'collections to a CSV file. We also write a JSON file with name to ID mapping.')
     parser.add_argument('--input', type=str, required=True, help='TXT file with keywords')
     parser.add_argument('--output', type=str, required=True, help='output CSV file')
     parser.add_argument('--mapping-output', type=str, required=True, help='output JSON name to ID mapping file')
