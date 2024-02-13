@@ -820,10 +820,11 @@ class TestGroupedSuggestions:
     @pytest.mark.parametrize(
         "input_label, expected_tokenizations",
         [
-            ("zeusgodofolympus", {("zeus", "god", "of", "olympus"), ("zeusgodofolympus",)}),
-            ("scoobydoowhereareyou🐕", {("scoobydoo", "where", "are", "you"), ("scoobydoowhereareyou",)}),
-            ("desert sessions", {("desert", "sessions"), ("desertsessions",)}),
-            ("vitalik", {("vitali", "k"), ("vitalik",)}),
+            ("zeusgodofolympus", [["zeus", "god", "of", "olympus"], ["zeusgodofolympus",]]),
+            ("scoobydoowhereareyou🐕", [["scoobydoo", "where", "are", "you"], ["scoobydoowhereareyou",]]),
+            ("desert sessions", [["desert", "sessions"], ["desertsessions",]]),
+            ("vitalik", [["vitali", "k"], ["vitalik",]]),
+            ("[c22afcacf9fa8f6739f336d72819b218194753d2193719895ff5abe81fe667e6]", []),
         ]
     )
     def test_returning_all_tokenizations(
@@ -856,7 +857,7 @@ class TestGroupedSuggestions:
 
         all_tokenizations = response_json['all_tokenizations']
         assert len(all_tokenizations) == len(set(map(tuple, all_tokenizations)))
-        assert set(map(tuple, all_tokenizations)) == expected_tokenizations
+        assert all_tokenizations == expected_tokenizations
 
 
 
