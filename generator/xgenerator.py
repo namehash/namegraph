@@ -341,21 +341,7 @@ class Generator:
             only_available_suggestions = self.random_available_name_pipeline.apply(name, None)
             grouped_suggestions['other'] = list(islice(only_available_suggestions, other_suggestions_number))
 
-        # unique_tokenizations3 = list(uniq([(i.tokenization for i in ints) for ints in name.interpretations.values()]))
-
-        for ints in name.interpretations.values():
-            for i in ints:
-                print(i.tokenization)
-            # print((i.tokenization for i in ints))
-
         unique_tokenizations = list(uniq([i.tokenization for ints in name.interpretations.values() for i in ints]))
-
-        # unique_tokenizations2 = set(reduce(list.__add__,
-        #                                   [[i.tokenization for i in ints] for ints in name.interpretations.values()]))
-
-        print(unique_tokenizations)
-        # print(unique_tokenizations2)
-        # print(unique_tokenizations3)
 
         return all_related_suggestions, grouped_suggestions, unique_tokenizations
 
