@@ -6,6 +6,7 @@ from time import perf_counter
 import pytest
 from pytest import mark
 from fastapi.testclient import TestClient
+from hydra import compose, initialize
 
 from generator.domains import Domains
 from generator.generation.categories_generator import Categories
@@ -539,6 +540,99 @@ class TestCorrectConfiguration:
         assert 'Industrial designers' in titles
         assert 'Yu-Gi-Oh! video games' not in titles
         assert 'Oh Yeon-seo filmography' not in titles
+
+    @pytest.mark.integration_test
+    def test_find_collections_by_string_archived(self, test_test_client):
+        client = test_test_client
+        string = 'Waffen-SS'  # qKRMjGsAicbq - Waffen-SS personnel
+
+        response = client.post("/find_collections_by_string", json={
+            "query": string,
+            "mode": "instant",
+            "max_related_collections": 15,
+            "max_total_collections": 15
+        })
+
+        assert response.status_code == 200
+
+        response_json = response.json()
+
+        for collection in response_json['related_collections']:
+            assert collection['collection_id'] != 'qKRMjGsAicbq'
+
+    @pytest.mark.integration_test
+    def test_get_collections_by_id_list_archived(self):
+        collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+        with initialize(version_base=None, config_path="../conf/"):
+            config = compose(config_name="test_config_new")
+            collection_matcher = CollectionMatcherForAPI(config)
+            collections = collection_matcher.get_collections_by_id_list([collection_id])
+            assert len(collections) == 0
+
+    @pytest.mark.integration_test
+    def test_find_collections_by_collection_archived_main(self, test_test_client):
+        client = test_test_client
+        collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+        response = client.post("/find_collections_by_collection", json={
+            "collection_id": collection_id,
+            "max_related_collections": 10,
+            "min_other_collections": 0,
+            "max_other_collections": 0,
+            "max_total_collections": 10,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
+            "sort_order": 'AI'
+        })
+
+        assert response.status_code == 410
+
+    @pytest.mark.integration_test
+    def test_find_collections_by_collection_archived_other(self, test_test_client):
+        client = test_test_client
+        collection_id = 'bobVn_JSavxm'  # Military units and formations of the Waffen-SS
+        archived_collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+        response = client.post("/find_collections_by_collection", json={
+            "collection_id": collection_id,
+            "max_related_collections": 10,
+            "min_other_collections": 0,
+            "max_other_collections": 10,
+            "max_total_collections": 10,
+            "name_diversity_ratio": 0.5,
+            "max_per_type": 3,
+            "limit_names": 10,
+            "sort_order": 'AI'
+        })
+
+        assert response.status_code == 200
+        response_json = response.json()
+
+        for collection in response_json['related_collections']:
+            assert collection['collection_id'] != archived_collection_id
+
+    @pytest.mark.integration_test
+    @pytest.mark.parametrize("member", ["rudolfhoss", "wilhelmmohnke", "karlwolff",
+                                        "kurtmeyer", "karlbrandt", "guntergrass"])
+    def test_find_collections_by_member_archived(self, test_test_client, member):
+        client = test_test_client
+        archived_collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+        response = client.post("/find_collections_by_member", json={
+            "label": member,
+            "sort_order": "AI",
+            "mode": 'domain_detail',
+            "offset": 0,
+            'max_results': 10
+        })
+
+        assert response.status_code == 200
+
+        response_json = response.json()
+
+        for collection in response_json['collections']:
+            assert collection['collection_id'] != archived_collection_id
 
 @mark.usefixtures("unavailable_configuration")
 class TestCollectionApiUnavailable:

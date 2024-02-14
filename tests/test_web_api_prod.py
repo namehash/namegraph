@@ -906,6 +906,107 @@ def test_fetching_top_collection_members(prod_test_client):
         assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
         assert name['metadata']['collection_id'] == collection_id
 
+@pytest.mark.integration_test
+def test_suggestions_by_category_archived(prod_test_client):
+    client = prod_test_client
+    response = client.post("/suggestions_by_category", json={
+        "label": "Waffen-SS personnel",
+        "params": {
+            "user_info": {
+                "user_wallet_addr": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                "user_ip_addr": "192.168.0.1",
+                "session_id": "d6374908-94c3-420f-b2aa-6dd41989baef",
+                "user_ip_country": "us"
+            },
+            "mode": "full",
+            "metadata": True
+        },
+        "categories": {
+            "related": {
+                "enable_learning_to_rank": True,
+                "max_names_per_related_collection": 10,
+                "max_per_type": 2,
+                "max_recursive_related_collections": 3,
+                "max_related_collections": 10,
+                "name_diversity_ratio": 0.5
+            },
+            "wordplay": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "alternates": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "emojify": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "community": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "expand": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "gowild": {
+                "max_suggestions": 10,
+                "min_suggestions": 2
+            },
+            "other": {
+                "max_suggestions": 10,
+                "min_suggestions": 6,
+                "min_total_suggestions": 50
+            }
+        }
+    })
+
+    assert response.status_code == 200
+    response_json = response.json()
+
+    assert 'categories' in response_json
+    categories = response_json['categories']
+    assert len(categories) > 0
+    for cat in categories:
+        if cat['type'] == 'related':
+            for s in cat['suggestions']:
+                assert s['metadata']['collection_id'] not in [
+                    'qKRMjGsAicbq',  # Waffen-SS personnel (archived)
+                    '7Y4V_MMzHJw8'  # SS personnel (archived)
+                ]
+
+@pytest.mark.integration_test
+def test_sample_members_from_collection_archived(prod_test_client):
+    client = prod_test_client
+    collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+    response = client.post("/sample_collection_members",
+                           json={"collection_id": collection_id, "max_sample_size": 10, "seed": 42})
+
+    assert response.status_code == 410  # should be archived
+
+@pytest.mark.integration_test
+def test_fetch_top_collection_members_archived(prod_test_client):
+    client = prod_test_client
+    collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+    response = client.post("/fetch_top_collection_members",
+                           json={"collection_id": collection_id})
+
+    assert response.status_code == 410  # should be archived
+
+@pytest.mark.integration_test
+def test_scramble_collection_tokens_archived(prod_test_client):
+    client = prod_test_client
+    collection_id = 'qKRMjGsAicbq'  # Waffen-SS personnel
+
+    response = client.post("/scramble_collection_tokens",
+                            json={"collection_id": collection_id, "method": 'left-right-shuffle',
+                                  "n_top_members": 25, "max_suggestions": 1000})
+
+    assert response.status_code == 410  # should be archived
+
 
 class TestTokenScramble:
     @pytest.mark.integration_test
