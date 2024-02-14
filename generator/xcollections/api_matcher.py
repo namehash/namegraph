@@ -180,7 +180,6 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 logger.error(f'collection with id {collection_id} has no archived field')
             else:
                 logger.error(f'collection with id {collection_id} is archived')
-            print('found_collection', found_collection.archived, found_collection.collection_id, found_collection.title)
             raise HTTPException(status_code=410, detail=f"Collection with id={collection_id} is archived.")
 
         es_time_first = es_response_metadata['took']
