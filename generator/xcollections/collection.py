@@ -20,6 +20,7 @@ class Collection:
             avatar_emoji: Optional[str],
             avatar_image: Optional[str],
             related_collections: Optional[list[dict[str, Any]]] = None,
+            archived: Optional[bool] = None,
             # TODO do we need those above? and do we need anything else?
     ):
         self.score = score
@@ -36,6 +37,7 @@ class Collection:
         self.avatar_emoji = avatar_emoji
         self.avatar_image = avatar_image
         self.related_collections = related_collections
+        self.archived = archived
 
     # FIXME make more universal or split into multiple methods
     # FIXME should we move limit_names somewhere else?
@@ -74,6 +76,7 @@ class Collection:
             avatar_emoji=fields['data.avatar_emoji'][0] if 'data.avatar_emoji' in fields else None,
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
             related_collections=_source.get('name_generator', {}).get('related_collections', None),
+            archived=fields.get('data.archived', [None])[0],
         )
 
     @classmethod
@@ -108,4 +111,5 @@ class Collection:
             avatar_emoji=fields['data.avatar_emoji'],
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
             related_collections=_source.get('name_generator', {}).get('related_collections', None),
+            archived=fields.get('data.archived', [None])[0],
         )

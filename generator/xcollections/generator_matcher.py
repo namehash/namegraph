@@ -217,7 +217,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_sample_size: int = 10,
     ) -> tuple[dict, dict]:
 
-        fields = ['data.collection_name']
+        fields = ['data.collection_name', 'data.archived']
 
         sampling_script = """
             def number_of_names = params._source.data.names.size();
@@ -275,6 +275,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         except IndexError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
+        if hit['fields']['data.archived'][0]:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
+
         result = {
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
@@ -302,9 +305,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        # TODO: as quick fix for filtering collections (e.g. nazi) with archived=True; needs to be activated when those collection will be marked in separated field
-        # if response['_source']['data']['archived']:
-        #     raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
+        if response['_source']['data']['archived']:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         es_response_metadata = {
             'n_total_hits': 1,
@@ -339,7 +341,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             seed: int
     ) -> tuple[dict, dict]:
 
-        fields = ['data.collection_name']
+        fields = ['data.collection_name', 'data.archived']
 
         query_params = ElasticsearchQueryBuilder() \
             .set_term('_id', collection_id) \
@@ -365,6 +367,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             }
         except IndexError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+
+        if hit['fields']['data.archived'][0]:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
         token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(

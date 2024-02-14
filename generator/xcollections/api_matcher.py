@@ -150,7 +150,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image',
+            'data.archived'
         ]
 
         # find collection with specified collection_id
@@ -173,6 +174,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
         except IndexError as ex:
             logger.error(f'could not find collection with id {collection_id}', exc_info=True)
             raise HTTPException(status_code=404, detail=f"Collection with id={collection_id} not found.")
+
+        if found_collection.archived != False:
+            if found_collection.archived is None:
+                logger.error(f'collection with id {collection_id} has no archived field')
+            else:
+                logger.error(f'collection with id {collection_id} is archived')
+            raise HTTPException(status_code=410, detail=f"Collection with id={collection_id} is archived.")
 
         es_time_first = es_response_metadata['took']
         es_comm_time_first = es_response_metadata['elasticsearch_communication_time']
@@ -293,7 +301,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image',
+            'data.archived'
         ]
 
         try:
@@ -310,4 +319,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        return collections
+        filtered_collections = [c for c in collections if c.archived == False]
+
+        if len(filtered_collections) < len(collections):
+            logger.warning(f'{len(collections) - len(filtered_collections)} collections were archived')
+
+        return filtered_collections
