@@ -9,6 +9,7 @@ from typing import List, Optional
 import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 from hydra import initialize, compose
 from pydantic_settings import BaseSettings
 
@@ -40,6 +41,13 @@ class Settings(BaseSettings):
 settings = Settings()
 app = FastAPI(title="NameGenerator API")  # TODO add version
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 def init():
     with initialize(version_base=None, config_path="conf/"):
