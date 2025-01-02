@@ -5,7 +5,7 @@ description = ""
 authors = []
 readme = "readme.md"
 packages = [
-    { include = "generator" }
+    { include = "name_graph" }
 ]
 
 
