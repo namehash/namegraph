@@ -39,7 +39,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-app = FastAPI(title="NameGenerator API")  # TODO add version
+app = FastAPI(title="NameGraph API")  # TODO add version
 
 app.add_middleware(
     CORSMiddleware,
