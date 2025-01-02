@@ -1,8 +1,8 @@
 import random
 import re
 
-from generator.domains import Domains
-from generator.generation.categories_generator import load_categories
+from name_graph.domains import Domains
+from name_graph.generation.categories_generator import load_categories
 from hydra import initialize, compose
 
 with initialize(version_base=None, config_path="../../conf/"):

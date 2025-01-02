@@ -1,13 +1,13 @@
 import io
 
-from generator.app import generate
+from name_graph.app import generate
 from hydra import compose, initialize_config_module, initialize
 
 import pytest
 from pytest import mark
 from typing import List
 
-from generator.domains import Domains
+from name_graph.domains import Domains
 
 from utils import assert_applied_strategies_are_equal
 

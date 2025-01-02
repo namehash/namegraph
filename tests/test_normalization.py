@@ -1,4 +1,4 @@
-from generator.normalization import *
+from name_graph.normalization import *
 
 
 def test_unicode_normalization1():

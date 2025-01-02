@@ -1,7 +1,7 @@
 from hydra import initialize, compose
 
-from generator.input_name import InputName
-from generator.preprocessor import Preprocessor
+from name_graph.input_name import InputName
+from name_graph.preprocessor import Preprocessor
 
 
 def test_do():

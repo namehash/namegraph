@@ -21,10 +21,10 @@ ARG AWS_ACCESS_KEY_ID
 
 COPY data/ data
 
-RUN mkdir generator
-COPY generator/download_from_s3.py generator/
+RUN mkdir name_graph
+COPY name_graph/download_from_s3.py generator/
 COPY conf/ conf
-RUN python3 generator/download_from_s3.py
+RUN python3 name_graph/download_from_s3.py
 
 
 FROM python:3.11.7-slim-bookworm as app
@@ -44,9 +44,9 @@ COPY --from=prepare /app /app
 ENV PYTHONPATH=/app
 
 COPY . .
-RUN python3 generator/download.py
+RUN python3 name_graph/download.py
 
-RUN python3 generator/namehash_common/generate_cache.py
+RUN python3 name_graph/namehash_common/generate_cache.py
 
 HEALTHCHECK --interval=60s --start-period=60s --retries=3 CMD python3 healthcheck.py
 

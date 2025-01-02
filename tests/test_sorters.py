@@ -5,12 +5,12 @@ import pytest
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.domains import Domains
-from generator.generated_name import GeneratedName
-from generator.input_name import InputName, Interpretation
-from generator.meta_sampler import MetaSampler
-from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
-from generator.sampling import RoundRobinSampler, WeightedSorterWithOrder, WeightedSorter
+from name_graph.domains import Domains
+from name_graph.generated_name import GeneratedName
+from name_graph.input_name import InputName, Interpretation
+from name_graph.meta_sampler import MetaSampler
+from name_graph.pipeline.pipeline_results_iterator import PipelineResultsIterator
+from name_graph.sampling import RoundRobinSampler, WeightedSorterWithOrder, WeightedSorter
 
 
 @pytest.fixture(autouse=True)

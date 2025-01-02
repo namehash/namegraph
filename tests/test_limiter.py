@@ -1,4 +1,4 @@
-from generator.generation.combination_limiter import CombinationLimiter, prod
+from name_graph.generation.combination_limiter import CombinationLimiter, prod
 
 
 def test_limiter():

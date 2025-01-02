@@ -1,9 +1,9 @@
-# from generator.filtering import DomainFilter, ValidNameFilter
+# from name_graph.filtering import DomainFilter, ValidNameFilter
 from hydra import compose, initialize
 
-from generator.filtering.domain_filter import DomainFilter
-from generator.filtering.subname_filter import SubnameFilter
-from generator.filtering.valid_name_filter import ValidNameFilter
+from name_graph.filtering.domain_filter import DomainFilter
+from name_graph.filtering.subname_filter import SubnameFilter
+from name_graph.filtering.valid_name_filter import ValidNameFilter
 
 
 def test_domain_filter():

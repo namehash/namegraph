@@ -1,6 +1,6 @@
 import pytest
 
-from generator.domains import Domains
+from name_graph.domains import Domains
 from hydra import compose, initialize
 
 

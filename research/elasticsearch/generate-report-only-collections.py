@@ -8,9 +8,9 @@ import numpy as np
 import regex
 from tqdm import tqdm
 
-from generator.domains import Domains
-from generator.generation.categories_generator import Categories
-from generator.xcollections import CollectionMatcherForAPI
+from name_graph.domains import Domains
+from name_graph.generation.categories_generator import Categories
+from name_graph.xcollections import CollectionMatcherForAPI
 from fastapi.testclient import TestClient
 
 
