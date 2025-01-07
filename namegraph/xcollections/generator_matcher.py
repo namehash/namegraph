@@ -504,31 +504,38 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         Returns:
             Tuple of (result dict, elasticsearch response metadata)
         """
-        fields = ['data.collection_name', 'metadata.members_count', 'data.names.normalized_name']
+        fields = ['data.collection_name', 'metadata.members_count']
+
+        query_params = ElasticsearchQueryBuilder() \
+            .set_term('_id', collection_id) \
+            .include_fields(fields) \
+            .include_script_field('members', script=f"params['_source'].data.names.stream()"
+                                                  f".skip({offset}).limit({limit}).collect(Collectors.toList())") \
+            .build_params()
 
         try:
             t_before = perf_counter()
-            response = self.elastic.get(index=self.index_name, id=collection_id, _source_includes=fields)
+            response = self.elastic.search(index=self.index_name, **query_params)
             time_elapsed = (perf_counter() - t_before) * 1000
-        except elasticsearch.exceptions.NotFoundError as ex:
-            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [fetch collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        # Get paginated members
-        members = [item['normalized_name'] for item in response['_source']['data']['names']][offset:offset + limit]
+        try:
+            hit = response['hits']['hits'][0]
+            es_response_metadata = {
+                'n_total_hits': 1,
+                'took': response['took'],
+                'elasticsearch_communication_time': time_elapsed,
+            }
+        except IndexError as ex:
+            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         result = {
-            'collection_id': collection_id,
-            'collection_title': response['_source']['data']['collection_name'],
-            'collection_members_count': response['_source']['metadata']['members_count'],
-            'members': members,
-        }
-
-        es_response_metadata = {
-            'took': 0,
-            'elasticsearch_communication_time': time_elapsed,
+            'collection_id': hit['_id'],
+            'collection_title': hit['fields']['data.collection_name'][0],
+            'collection_members_count': hit['fields']['metadata.members_count'][0],
+            'members': [item['normalized_name'] for item in hit['fields']['members']]
         }
 
         return result, es_response_metadata
