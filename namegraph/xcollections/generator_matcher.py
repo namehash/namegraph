@@ -535,7 +535,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
             'collection_members_count': hit['fields']['metadata.members_count'][0],
-            'members': [item['normalized_name'] for item in hit['fields']['members']]
+            'members': [item['normalized_name'] for item in hit['fields'].get('members', [])]
         }
 
         return result, es_response_metadata

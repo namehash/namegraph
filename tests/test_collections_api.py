@@ -582,6 +582,21 @@ class TestCorrectConfiguration:
         assert response.status_code == 404
         assert "Collection with id=invalid_id not found" in response.text
 
+    @mark.integration_test
+    def test_fetch_collection_members_high_offset(self, test_test_client):
+        # Test fetching with very high offset that exceeds collection size
+        response = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": "ri2QqxnAqZT7",
+            "offset": 100000,
+            "limit": 10,
+            "metadata": True
+        })
+        assert response.status_code == 200
+        response_json = response.json()
+        
+        # Should return empty suggestions when offset is beyond collection size
+        assert len(response_json['suggestions']) == 0
+
 @mark.usefixtures("unavailable_configuration")
 class TestCollectionApiUnavailable:
     @mark.integration_test
