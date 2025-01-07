@@ -14,6 +14,7 @@ RUN apt-get update && \
 
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --only main --no-root --no-interaction --no-ansi
+RUN poetry self add poetry-export-plugin
 RUN poetry export -f requirements.txt -o requirements.txt
 
 ARG AWS_SECRET_ACCESS_KEY
@@ -22,7 +23,7 @@ ARG AWS_ACCESS_KEY_ID
 COPY data/ data
 
 RUN mkdir name_graph
-COPY name_graph/download_from_s3.py generator/
+COPY name_graph/download_from_s3.py name_graph/
 COPY conf/ conf
 RUN python3 name_graph/download_from_s3.py
 
@@ -50,4 +51,4 @@ RUN python3 name_graph/namehash_common/generate_cache.py
 
 HEALTHCHECK --interval=60s --start-period=60s --retries=3 CMD python3 healthcheck.py
 
-CMD python3 generator/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 2 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker
+CMD python3 name_graph/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 2 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker
