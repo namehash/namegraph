@@ -486,3 +486,49 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                            f'does not equal desired n_suggestions ({n_suggestions})')
 
         return suggestions
+
+    def fetch_members_from_collection(
+        self,
+        collection_id: str,
+        offset: int = 0,
+        limit: int = 10
+    ) -> tuple[dict, dict]:
+        """
+        Fetch members from a collection with pagination support
+        
+        Args:
+            collection_id: ID of the collection to fetch from
+            offset: Number of items to skip
+            limit: Maximum number of items to return
+            
+        Returns:
+            Tuple of (result dict, elasticsearch response metadata)
+        """
+        fields = ['data.collection_name', 'metadata.members_count', 'data.names.normalized_name']
+
+        try:
+            t_before = perf_counter()
+            response = self.elastic.get(index=self.index_name, id=collection_id, _source_includes=fields)
+            time_elapsed = (perf_counter() - t_before) * 1000
+        except elasticsearch.exceptions.NotFoundError as ex:
+            raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+        except Exception as ex:
+            logger.error(f'Elasticsearch search failed [fetch collection members]', exc_info=True)
+            raise HTTPException(status_code=503, detail=str(ex)) from ex
+
+        # Get paginated members
+        members = [item['normalized_name'] for item in response['_source']['data']['names']][offset:offset + limit]
+
+        result = {
+            'collection_id': collection_id,
+            'collection_title': response['_source']['data']['collection_name'],
+            'collection_members_count': response['_source']['metadata']['members_count'],
+            'members': members,
+        }
+
+        es_response_metadata = {
+            'took': 0,
+            'elasticsearch_communication_time': time_elapsed,
+        }
+
+        return result, es_response_metadata

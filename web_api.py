@@ -104,6 +104,7 @@ from models import (
     GroupedNameRequest,
     ScrambleCollectionTokens,
     CollectionCategory,
+    FetchCollectionMembersRequest,
 )
 
 from collection_models import (
@@ -608,6 +609,46 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     }
 
     return {'collections': collections, 'metadata': metadata}
+
+
+@app.post("/fetch_collection_members", response_model=CollectionCategory, tags=['collections'])
+async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest):
+    """
+    Fetch members from a collection with pagination support
+    """
+    result, es_response_metadata = generator_matcher.fetch_members_from_collection(
+        fetch_command.collection_id,
+        offset=fetch_command.offset,
+        limit=fetch_command.limit
+    )
+
+    members = []
+    for name in result['members']:
+        obj = GeneratedName(tokens=(name,),
+                          pipeline_name='fetch_collection_members',
+                          collection_id=result['collection_id'],
+                          collection_title=result['collection_title'],
+                          grouping_category='related',
+                          applied_strategies=[])
+        obj.interpretation = []
+        members.append(obj)
+
+    rs = RelatedSuggestions(result['collection_title'], 
+                           result['collection_id'], 
+                           result['collection_members_count'])
+    rs.extend(members)
+
+    response = convert_related_to_grouped_suggestions_format(
+        {result['collection_title']: rs},
+        include_metadata=fetch_command.metadata
+    )
+
+    logger.info(json.dumps({
+        'endpoint': 'fetch_collection_members', 
+        'request': fetch_command.model_dump()
+    }))
+
+    return response[0]
 
 
 #TODO gc.freeze() ?
