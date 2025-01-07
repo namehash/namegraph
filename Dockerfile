@@ -14,7 +14,7 @@ RUN apt-get update && \
 
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --only main --no-root --no-interaction --no-ansi
-RUN poetry self add poetry-export-plugin
+RUN poetry self add poetry-plugin-export
 RUN poetry export -f requirements.txt -o requirements.txt
 
 ARG AWS_SECRET_ACCESS_KEY
