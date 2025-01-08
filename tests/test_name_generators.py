@@ -3,9 +3,9 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
-from name_graph.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
-from name_graph.preprocessor import Preprocessor
-from name_graph.generation import (
+from namegraph.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
+from namegraph.preprocessor import Preprocessor
+from namegraph.generation import (
     HyphenGenerator,
     AbbreviationGenerator,
     EmojiGenerator,
@@ -34,15 +34,15 @@ from name_graph.generation import (
     W2VGeneratorRocks,
     Wikipedia2VGeneratorRocks
 )
-from name_graph.generated_name import GeneratedName
+from namegraph.generated_name import GeneratedName
 
 import pytest
 
-from name_graph.domains import Domains
-from name_graph.input_name import InputName
+from namegraph.domains import Domains
+from namegraph.input_name import InputName
 
-from name_graph.utils.suffixtree import HAS_SUFFIX_TREE
-from name_graph.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
+from namegraph.utils.suffixtree import HAS_SUFFIX_TREE
+from namegraph.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
@@ -549,7 +549,7 @@ def test_substringmatchgenerator_sorting():
 
 @needs_suffix_tree
 def test_substringmatchgenerator_re_equals_tree():
-    from name_graph.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
+    from namegraph.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
 
     if not HAS_SUFFIX_TREE:
         pytest.skip()

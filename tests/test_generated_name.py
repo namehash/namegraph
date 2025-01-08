@@ -2,7 +2,7 @@ from typing import List
 
 from pytest import mark
 
-from name_graph.generated_name import GeneratedName
+from namegraph.generated_name import GeneratedName
 
 from utils import assert_applied_strategies_are_equal
 

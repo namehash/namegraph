@@ -3,7 +3,7 @@ from itertools import accumulate
 
 import numpy as np
 
-from name_graph.generation.random_available_name_generator import _softmax
+from namegraph.generation.random_available_name_generator import _softmax
 
 random.seed(0)
 np.random.seed(0)

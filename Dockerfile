@@ -22,10 +22,10 @@ ARG AWS_ACCESS_KEY_ID
 
 COPY data/ data
 
-RUN mkdir name_graph
-COPY name_graph/download_from_s3.py name_graph/
+RUN mkdir namegraph
+COPY namegraph/download_from_s3.py namegraph/
 COPY conf/ conf
-RUN python3 name_graph/download_from_s3.py
+RUN python3 namegraph/download_from_s3.py
 
 
 FROM python:3.11.7-slim-bookworm as app
@@ -45,10 +45,10 @@ COPY --from=prepare /app /app
 ENV PYTHONPATH=/app
 
 COPY . .
-RUN python3 name_graph/download.py
+RUN python3 namegraph/download.py
 
-RUN python3 name_graph/namehash_common/generate_cache.py
+RUN python3 namegraph/namehash_common/generate_cache.py
 
 HEALTHCHECK --interval=60s --start-period=60s --retries=3 CMD python3 healthcheck.py
 
-CMD python3 name_graph/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 2 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker
+CMD python3 namegraph/download_names.py && gunicorn web_api:app --bind 0.0.0.0 --workers 2 --timeout 120 --preload --worker-class uvicorn.workers.UvicornWorker

@@ -5,7 +5,7 @@ from time import time as get_time
 from tqdm import tqdm
 import argparse
 
-from name_graph.domains import Domains
+from namegraph.domains import Domains
 from fastapi.testclient import TestClient
 from helpers import check_generator_response, SPECIAL_CHAR_REGEX
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument('data_file', help='File with names to use')
     args = parser.parse_args()
 
-    module = 'name_graph'
+    module = 'namegraph'
     filename = args.data_file
     timeout = math.inf if args.timeout == 0 else args.timeout
     enable_filter = args.no_simple

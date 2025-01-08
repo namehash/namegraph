@@ -7,7 +7,7 @@ import time
 import numpy as np
 from tqdm import tqdm
 
-from name_graph.domains import Domains
+from namegraph.domains import Domains
 from fastapi.testclient import TestClient
 
 

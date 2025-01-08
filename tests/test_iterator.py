@@ -4,7 +4,7 @@ import pytest
 from hydra import initialize, compose
 from pytest import mark
 
-from name_graph.app import generate
+from namegraph.app import generate
 
 
 @mark.parametrize(

@@ -1,4 +1,4 @@
-from name_graph.utils.unicode_wrap import unicode_wrap
+from namegraph.utils.unicode_wrap import unicode_wrap
 
 
 def test_wrap():

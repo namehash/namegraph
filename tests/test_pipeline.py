@@ -3,9 +3,9 @@ from hydra import compose, initialize
 from pytest import mark, fixture
 from typing import List
 
-from name_graph.preprocessor import Preprocessor
-from name_graph.pipeline import Pipeline
-from name_graph.input_name import InputName, Interpretation
+from namegraph.preprocessor import Preprocessor
+from namegraph.pipeline import Pipeline
+from namegraph.input_name import InputName, Interpretation
 
 from utils import assert_applied_strategies_are_equal
 

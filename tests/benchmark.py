@@ -4,8 +4,8 @@ import pytest
 from pytest import mark
 from typing import List
 
-from name_graph.domains import Domains
-from name_graph.xgenerator import Generator
+from namegraph.domains import Domains
+from namegraph.xgenerator import Generator
 
 
 @pytest.fixture(autouse=True)

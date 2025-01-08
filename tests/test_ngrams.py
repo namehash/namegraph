@@ -1,7 +1,7 @@
 from hydra import initialize, compose
 
-from name_graph.namehash_common.ngrams import Ngrams
-from name_graph.tokenization.all_tokenizer import AllTokenizer
+from namegraph.namehash_common.ngrams import Ngrams
+from namegraph.tokenization.all_tokenizer import AllTokenizer
 
 
 def test_ngrams():

@@ -1,11 +1,11 @@
 import pytest
-from name_graph.utils.unisuffixtree import HAS_SUFFIX_TREE
+from namegraph.utils.unisuffixtree import HAS_SUFFIX_TREE
 
 if not HAS_SUFFIX_TREE:
     pytest.skip('Suffix tree not available', allow_module_level=True)
 
-from name_graph.utils.unisuffixtree import UniSuffixTree
-from name_graph.utils.suffixtree import SuffixQueryTree
+from namegraph.utils.unisuffixtree import UniSuffixTree
+from namegraph.utils.suffixtree import SuffixQueryTree
 
 
 def test_bug():

@@ -13,16 +13,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from hydra import initialize, compose
 from pydantic_settings import BaseSettings
 
-from name_graph.domains import Domains
-from name_graph.generated_name import GeneratedName
-from name_graph.generation.categories_generator import Categories
-from name_graph.normalization.namehash_normalizer import NamehashNormalizer
-from name_graph.utils.log import LogEntry
-from name_graph.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
-from name_graph.xcollections.collection import Collection
-from name_graph.xgenerator import Generator, RelatedSuggestions
+from namegraph.domains import Domains
+from namegraph.generated_name import GeneratedName
+from namegraph.generation.categories_generator import Categories
+from namegraph.normalization.namehash_normalizer import NamehashNormalizer
+from namegraph.utils.log import LogEntry
+from namegraph.xcollections import CollectionMatcherForAPI, OtherCollectionsSampler, CollectionMatcherForGenerator
+from namegraph.xcollections.collection import Collection
+from namegraph.xgenerator import Generator, RelatedSuggestions
 
-logger = logging.getLogger('name_graph')
+logger = logging.getLogger('namegraph')
 
 
 # gc.set_debug(gc.DEBUG_STATS)
