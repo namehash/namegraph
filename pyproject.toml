@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "name-graph"
+name = "namegraph"
 version = "0.0.1"
 description = ""
 authors = []
