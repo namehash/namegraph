@@ -7,9 +7,9 @@ import pytest
 from pytest import mark
 from fastapi.testclient import TestClient
 
-from generator.domains import Domains
-from generator.generation.categories_generator import Categories
-from generator.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
+from namegraph.domains import Domains
+from namegraph.generation.categories_generator import Categories
+from namegraph.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 
 @pytest.fixture(scope="class")

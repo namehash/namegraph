@@ -27,7 +27,7 @@ poetry run locust -f locust_suggestions_by_category.py --users 20 --spawn-rate 0
 ## Tests
 
 `run_tests.sh` runs load tests with 1 2 3 4 6 8 16 32 parallel users, between time is set to 0.
-Tests are made from NameGenerator docker container and logs are saved in `reports` directory.
+Tests are made from NameGraph docker container and logs are saved in `reports` directory.
 
 ```commandline
 apt update

@@ -8,10 +8,10 @@ from fastapi.testclient import TestClient
 from hydra import initialize, compose
 from ens_normalize import is_ens_normalized, ens_cure
 
-from generator.domains import Domains
-from generator.generation.categories_generator import Categories
-from generator.xcollections.api_matcher import CollectionMatcherForAPI
-from generator.xcollections.generator_matcher import CollectionMatcherForGenerator
+from namegraph.domains import Domains
+from namegraph.generation.categories_generator import Categories
+from namegraph.xcollections.api_matcher import CollectionMatcherForAPI
+from namegraph.xcollections.generator_matcher import CollectionMatcherForGenerator
 
 from helpers import check_generator_response, generate_example_names
 

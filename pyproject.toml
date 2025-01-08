@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "name-generator"
+name = "namegraph"
 version = "0.0.1"
 description = ""
 authors = []
 readme = "readme.md"
 packages = [
-    { include = "generator" }
+    { include = "namegraph" }
 ]
 
 

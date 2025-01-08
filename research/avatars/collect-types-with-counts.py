@@ -6,7 +6,7 @@ import os
 import elasticsearch
 from elasticsearch.helpers import scan
 
-from generator.utils.elastic import connect_to_elasticsearch
+from namegraph.utils.elastic import connect_to_elasticsearch
 
 
 if __name__ == '__main__':
