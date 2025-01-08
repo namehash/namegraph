@@ -46,13 +46,13 @@ jobs:
             ln -s ../tests/data/wikipedia2vec.pkl data/wikipedia2vec.pkl
             touch data/wikipedia2vec.pkl.vectors.npy
             ln -s ../tests/data/wiki2v data/wiki2v
-            poetry run python3 name_graph/download.py
-            poetry run python3 name_graph/download_from_s3.py
-            poetry run python3 name_graph/download_names.py
+            poetry run python3 namegraph/download.py
+            poetry run python3 namegraph/download_from_s3.py
+            poetry run python3 namegraph/download_names.py
 
       - name: Generate cache
         run: |
-            poetry run python3 name_graph/namehash_common/generate_cache.py
+            poetry run python3 namegraph/namehash_common/generate_cache.py
 
       - name: Run tests
         env:
