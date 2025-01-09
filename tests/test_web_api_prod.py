@@ -900,7 +900,7 @@ def test_fetching_top_collection_members(prod_test_client):
 
     assert response.status_code == 200
     response_json = response.json()
-    assert len(response_json) <= 10
+    assert 0 < len(response_json) <= 10
 
     for name in response_json['suggestions']:
         assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'

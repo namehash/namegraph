@@ -258,3 +258,26 @@ class ScrambleCollectionTokens(BaseModel):
     seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
                       title='seed for random number generator',
                       description='if not provided (but can\'t be null), random seed will be generated')
+
+
+class FetchCollectionMembersRequest(BaseModel):
+    collection_id: str = Field(
+        title='id of the collection to fetch members from',
+        examples=['ri2QqxnAqZT7']
+    )
+    offset: int = Field(
+        0,
+        title='number of members to skip',
+        description='used for pagination',
+        ge=0
+    )
+    limit: int = Field(
+        10,
+        title='maximum number of members to return',
+        description='used for pagination',
+        ge=1,
+    )
+    metadata: bool = Field(
+        True,
+        title='return all the metadata in response'
+    )

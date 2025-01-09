@@ -540,6 +540,63 @@ class TestCorrectConfiguration:
         assert 'Yu-Gi-Oh! video games' not in titles
         assert 'Oh Yeon-seo filmography' not in titles
 
+    @mark.integration_test
+    def test_fetch_collection_members_pagination(self, test_test_client):
+        # Test fetching first page
+        response = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": "ri2QqxnAqZT7",
+            "offset": 0,
+            "limit": 10,
+            "metadata": True
+        })
+        assert response.status_code == 200
+        response_json = response.json()
+        
+        assert len(response_json['suggestions']) == 10
+        assert response_json['type'] == 'related'
+        assert response_json['collection_id'] == 'ri2QqxnAqZT7'
+        
+        # Test fetching second page
+        response2 = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": "ri2QqxnAqZT7", 
+            "offset": 10,
+            "limit": 10,
+            "metadata": True
+        })
+        assert response2.status_code == 200
+        response2_json = response2.json()
+        
+        # Verify different pages return different members
+        first_page_names = [s['name'] for s in response_json['suggestions']]
+        second_page_names = [s['name'] for s in response2_json['suggestions']]
+        assert not set(first_page_names).intersection(second_page_names)
+
+    @mark.integration_test
+    def test_fetch_collection_members_invalid_id(self, test_test_client):
+        response = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": "invalid_id",
+            "offset": 0,
+            "limit": 5,
+            "metadata": True
+        })
+        assert response.status_code == 404
+        assert "Collection with id=invalid_id not found" in response.text
+
+    @mark.integration_test
+    def test_fetch_collection_members_high_offset(self, test_test_client):
+        # Test fetching with very high offset that exceeds collection size
+        response = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": "ri2QqxnAqZT7",
+            "offset": 100000,
+            "limit": 10,
+            "metadata": True
+        })
+        assert response.status_code == 200
+        response_json = response.json()
+        
+        # Should return empty suggestions when offset is beyond collection size
+        assert len(response_json['suggestions']) == 0
+
 @mark.usefixtures("unavailable_configuration")
 class TestCollectionApiUnavailable:
     @mark.integration_test
