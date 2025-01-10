@@ -146,3 +146,7 @@ class CollectionsContainingNameRequest(BaseCollectionSearchLimitOffsetSort):
 
 class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided label is a member of')
+
+
+class GetCollectionByIdRequest(BaseCollectionRequest):
+    collection_id: str = Field(title='id of the collection to fetch', examples=['ri2QqxnAqZT7'])

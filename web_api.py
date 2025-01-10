@@ -116,6 +116,8 @@ from collection_models import (
     CollectionsContainingNameRequest,
     CollectionsContainingNameResponse,
     CollectionCountByStringRequest,
+    Collection as CollectionModel,
+    GetCollectionByIdRequest,
 )
 
 
@@ -649,6 +651,27 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
     }))
 
     return response[0]
+
+
+@app.post("/get_collection_by_id", response_model=CollectionModel, tags=['collections'])
+async def get_collection_by_id(request: GetCollectionByIdRequest):
+    """
+    Get information about a single collection by its ID.
+    Returns 404 if collection is not found.
+    Returns 503 if Elasticsearch is unavailable.
+    """
+
+    if not collections_matcher.active:
+        return Response(status_code=503, content='Elasticsearch Unavailable')
+
+    collections = collections_matcher.get_collections_by_id_list([request.collection_id])
+    
+    if not collections:
+        return Response(status_code=404, content=f'Collection with id={request.collection_id} not found')
+
+    collection = convert_to_collection_format(collections)[0]
+    
+    return collection
 
 
 #TODO gc.freeze() ?
