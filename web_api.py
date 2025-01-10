@@ -105,7 +105,6 @@ from models import (
     ScrambleCollectionTokens,
     CollectionCategory,
     FetchCollectionMembersRequest,
-    GetCollectionByIdRequest,
 )
 
 from collection_models import (
@@ -118,6 +117,7 @@ from collection_models import (
     CollectionsContainingNameResponse,
     CollectionCountByStringRequest,
     Collection as CollectionModel,
+    GetCollectionByIdRequest,
 )
 
 
