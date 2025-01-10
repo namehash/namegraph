@@ -597,6 +597,32 @@ class TestCorrectConfiguration:
         # Should return empty suggestions when offset is beyond collection size
         assert len(response_json['suggestions']) == 0
 
+    @mark.integration_test
+    def test_get_collection_by_id(self, test_test_client):
+        # Test successful retrieval
+        response = test_test_client.post("/get_collection_by_id", json={
+            "collection_id": "ri2QqxnAqZT7"  # Known collection ID from other tests
+        })
+        assert response.status_code == 200
+        collection = response.json()
+        assert collection['collection_id'] == "ri2QqxnAqZT7"
+        assert 'title' in collection
+        assert 'owner' in collection
+        assert 'number_of_names' in collection
+        assert 'last_updated_timestamp' in collection
+        assert 'top_names' in collection
+        assert 'types' in collection
+        assert 'avatar_emoji' in collection
+        assert 'avatar_image' in collection
+
+        # Test non-existent collection
+        response = test_test_client.post("/get_collection_by_id", json={
+            "collection_id": "nonexistent_id"
+        })
+        assert response.status_code == 404
+        assert "Collection with id=nonexistent_id not found" in response.text
+
+
 @mark.usefixtures("unavailable_configuration")
 class TestCollectionApiUnavailable:
     @mark.integration_test
@@ -641,3 +667,11 @@ class TestCollectionApiUnavailable:
             "label": "australia"
         })
         assert response.status_code == 503
+
+    @mark.integration_test
+    def test_get_collection_by_id_unavailable(self, test_test_client):
+        response = test_test_client.post("/get_collection_by_id", json={
+            "collection_id": "ri2QqxnAqZT7"
+        })
+        assert response.status_code == 503
+        assert "Elasticsearch Unavailable" in response.text
