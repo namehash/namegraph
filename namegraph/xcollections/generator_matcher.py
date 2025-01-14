@@ -325,7 +325,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'collection_title': response['_source']['data']['collection_name'],
             'collection_members_count': response['_source']['metadata']['members_count'],
             'top_members_tokenized_names': [
-                item['tokenized_name'] for item in response['_source']['template']['top10_names']],
+                tuple(item['tokenized_name']) for item in response['_source']['template']['top10_names']],
             'related_collections': related_collections[:max_recursive_related_collections]
         }
 
@@ -536,7 +536,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
             'collection_members_count': hit['fields']['metadata.members_count'][0],
-            'members': [item['normalized_name'] for item in hit['fields'].get('members', [])]
+            'members_tokenized_names': [tuple(item['tokenized_name']) for item in hit['fields'].get('members', [])]
         }
 
         return result, es_response_metadata
