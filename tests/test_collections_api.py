@@ -598,6 +598,27 @@ class TestCorrectConfiguration:
         assert len(response_json['suggestions']) == 0
 
     @mark.integration_test
+    def test_fetch_collection_members_tokenized_names(self, test_test_client):
+        name2labeltokens = {
+            "dualipa.eth": ("dua", "lipa"),
+            "thebeatles.eth": ("the", "beatles"),
+            "davidbowie.eth": ("david", "bowie")
+        }
+
+        response = test_test_client.post("/fetch_collection_members", json={
+            "collection_id": 'ri2QqxnAqZT7',  # Music artists and bands from England
+            "offset": 0,
+            "limit": 10,
+            "metadata": True
+        })
+        assert response.status_code == 200
+        response_json = response.json()
+        for item in response_json['suggestions']:
+            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
+            if item['name'] in name2labeltokens:
+                assert tuple(item['tokenized_label']) == name2labeltokens[item['name']]
+
+    @mark.integration_test
     def test_get_collection_by_id(self, test_test_client):
         # Test successful retrieval
         response = test_test_client.post("/get_collection_by_id", json={

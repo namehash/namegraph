@@ -625,13 +625,13 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
     )
 
     members = []
-    for name in result['members']:
-        obj = GeneratedName(tokens=(name,),
-                          pipeline_name='fetch_collection_members',
-                          collection_id=result['collection_id'],
-                          collection_title=result['collection_title'],
-                          grouping_category='related',
-                          applied_strategies=[])
+    for tokenized_name in result['members_tokenized_names']:
+        obj = GeneratedName(tokens=tokenized_name,
+                            pipeline_name='fetch_collection_members',
+                            collection_id=result['collection_id'],
+                            collection_title=result['collection_title'],
+                            grouping_category='related',
+                            applied_strategies=[])
         obj.interpretation = []
         members.append(obj)
 
