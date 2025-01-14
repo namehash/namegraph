@@ -563,6 +563,29 @@ class TestGrouped:
             assert name['metadata']['pipeline_name'] == 'fetch_top_collection_members'
             assert name['metadata']['collection_id'] == collection_id
 
+    def test_test_fetching_top_collection_members_tokenized(self, test_client):
+        client = test_client
+        collection_id = 'ri2QqxnAqZT7'  # Music artists and bands from England
+
+        name2labeltokens = {
+            "dualipa.eth": ("dua", "lipa"),
+            "thebeatles.eth": ("the", "beatles"),
+            "davidbowie.eth": ("david", "bowie")
+        }
+
+        response = client.post("/fetch_top_collection_members",
+                               json={"collection_id": collection_id})
+
+        assert response.status_code == 200
+        response_json = response.json()
+        assert len(response_json) <= 10
+
+        for item in response_json['suggestions']:
+            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
+            if item['name'] in name2labeltokens:
+                assert tuple(item['tokenized_label']) == name2labeltokens[item['name']]
+
+
     @pytest.mark.xfail(reason="Enable when we move filtered collections to use a separate field") # TODO
     def test_fetching_top_collection_members_archived(self, test_client):
         client = test_client

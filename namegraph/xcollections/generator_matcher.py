@@ -289,7 +289,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_recursive_related_collections: int
     ) -> tuple[dict, dict]:
 
-        fields = ['data.collection_name', 'template.top10_names.normalized_name',
+        fields = ['data.collection_name', 'template.top10_names.tokenized_name',
                   'metadata.members_count', 'name_generator.related_collections', 'data.archived']
 
         try:
@@ -324,7 +324,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'collection_id': response['_id'],
             'collection_title': response['_source']['data']['collection_name'],
             'collection_members_count': response['_source']['metadata']['members_count'],
-            'top_members': [item['normalized_name'] for item in response['_source']['template']['top10_names']],
+            'top_members_tokenized_names': [
+                item['tokenized_name'] for item in response['_source']['template']['top10_names']],
             'related_collections': related_collections[:max_recursive_related_collections]
         }
 
