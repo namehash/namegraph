@@ -368,14 +368,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
-        token_scramble_suggestions = self._get_suggestions_by_scrambling_tokens(
+        token_scramble_tokenized_suggestions = self._get_suggestions_by_scrambling_tokens(
             name_tokens_tuples, method, seed, n_suggestions=max_suggestions
         )
 
         result = {
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
-            'token_scramble_suggestions': token_scramble_suggestions
+            'token_scramble_tokenized_suggestions': token_scramble_tokenized_suggestions
         }
 
         return result, es_response_metadata
@@ -387,11 +387,11 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'],
             seed: int,
             n_suggestions: Optional[int] = None
-    ) -> list[str]:
+    ) -> list[tuple[str, ...]]:
 
         rnd = random.Random(seed)
 
-        # collect bigrams (left and right tokens) and unigrams (names from collection that could not be tokenized)
+        # collect bigrams (left and right tokens) and unigrams (names from collection consisting of a single token)
         left_tokens = OrderedSet()
         right_tokens = OrderedSet()
         unigrams = OrderedSet()
@@ -454,8 +454,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 left = left_tokens_list.pop()
                 for i, right in enumerate(right_tokens_list):
                     s = left + right
-                    if s not in original_names and s not in suggestions:
-                        suggestions.append(s)
+                    if s not in original_names and (left, right) not in suggestions:
+                        suggestions.append((left, right))
                         del right_tokens_list[i]
                         break
         elif method == 'full-shuffle':
@@ -473,8 +473,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 left = all_unigrams_list.pop()
                 for i, right in enumerate(all_unigrams_list):
                     s = left + right
-                    if s not in original_names and s not in suggestions:
-                        suggestions.append(s)
+                    if s not in original_names and (left, right) not in suggestions:
+                        suggestions.append((left, right))
                         del all_unigrams_list[i]
                         break
         else:
