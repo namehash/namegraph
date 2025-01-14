@@ -33,7 +33,7 @@ class Collection:
         self.tokenized_names = tokenized_names
         self.name_types = name_types
         self.modified_timestamp = modified_timestamp
-        self.avatar_emoji = avatar_emoji
+        self.avatar_emoji = avatar_emoji.replace('\ufe0f', '\ufe0e')
         self.avatar_image = avatar_image
         self.related_collections = related_collections
 
