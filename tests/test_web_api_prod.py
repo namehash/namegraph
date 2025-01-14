@@ -1010,6 +1010,25 @@ class TestTokenScramble:
         assert len(names) == 40
 
     @pytest.mark.integration_test
+    @pytest.mark.parametrize("method", ['left-right-shuffle-with-unigrams', 'left-right-shuffle', 'full-shuffle'])
+    def test_tokenized_suggestions(self, prod_test_client, method):
+        client = prod_test_client
+        request_json = {
+            "collection_id": "3OB_f2vmyuyp",  # tropical fruit
+            "method": method,
+            "n_top_members": 10,
+            "max_suggestions": 10,
+            "seed": 0
+        }
+
+        response = client.post("/scramble_collection_tokens", json=request_json)
+        assert response.status_code == 200
+
+        for item in response.json():
+            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
+            assert len(item['tokenized_label']) == 2  # all scramble methods concatenate 2 tokens or multi-tokens
+
+    @pytest.mark.integration_test
     @pytest.mark.parametrize(
         "collection_id, method",
         [

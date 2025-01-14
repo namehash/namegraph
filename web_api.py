@@ -395,8 +395,8 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
     )
 
     suggestions = []
-    for name in result['token_scramble_suggestions']:
-        obj = GeneratedName(tokens=(name,),
+    for tokenized_name in result['token_scramble_tokenized_suggestions']:
+        obj = GeneratedName(tokens=tokenized_name,
                             pipeline_name='scramble_collection_tokens',
                             collection_id=result['collection_id'],
                             collection_title=result['collection_title'],
