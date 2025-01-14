@@ -363,8 +363,8 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     )
 
     top_members = []
-    for name in result['top_members']:
-        obj = GeneratedName(tokens=(name,),
+    for tokenized_name in result['top_members_tokenized_names']:
+        obj = GeneratedName(tokens=tokenized_name,
                             pipeline_name='fetch_top_collection_members',
                             collection_id=result['collection_id'],
                             collection_title=result['collection_title'],
