@@ -885,7 +885,7 @@ def test_collection_members_sampling(prod_test_client, collection_id, max_sample
         assert name['metadata']['pipeline_name'] == 'sample_collection_members'
         assert name['metadata']['collection_id'] == collection_id
 
-        assert name['name'] == ''.join(name['tokenized_label']).removesuffix('.eth')
+        assert name['name'].removesuffix('.eth') == ''.join(name['tokenized_label'])
 
     # uniqueness
     names = [name['name'] for name in response_json]
