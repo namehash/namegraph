@@ -225,7 +225,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
 
             if (number_of_names <= params.max_sample_size) {
                 return params._source.data.names.stream()
-                    .map(n -> n.normalized_name)
+                    .map(n -> n.tokenized_name)
                     .collect(Collectors.toList())
             }
 
@@ -233,7 +233,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 Collections.shuffle(params._source.data.names, random);
                 return params._source.data.names.stream()
                     .limit(params.max_sample_size)
-                    .map(n -> n.normalized_name)
+                    .map(n -> n.tokenized_name)
                     .collect(Collectors.toList());
             }
 
@@ -244,14 +244,14 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 set.add(index);
             }
 
-            return set.stream().map(i -> params._source.data.names[i].normalized_name).collect(Collectors.toList());
+            return set.stream().map(i -> params._source.data.names[i].tokenized_name).collect(Collectors.toList());
         """
 
         query_params = ElasticsearchQueryBuilder() \
             .set_term('_id', collection_id) \
             .include_fields(fields) \
             .set_source(False) \
-            .include_script_field(name='sampled_members',
+            .include_script_field(name='sampled_members_tokenized_names',
                                   script=sampling_script,
                                   lang='painless',
                                   params={'seed': seed, 'max_sample_size': max_sample_size}) \
@@ -278,7 +278,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         result = {
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
-            'sampled_members': hit['fields']['sampled_members']
+            'sampled_members_tokenized_names': tuple(hit['fields']['sampled_members_tokenized_names'])
         }
 
         return result, es_response_metadata

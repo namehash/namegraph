@@ -336,8 +336,8 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
     )
 
     sampled_members = []
-    for name in result['sampled_members']:
-        obj = GeneratedName(tokens=(name,),
+    for tokenized_name in result['sampled_members_tokenized_names']:
+        obj = GeneratedName(tokens=tokenized_name,
                             pipeline_name='sample_collection_members',
                             collection_id=result['collection_id'],
                             collection_title=result['collection_title'],
