@@ -105,7 +105,7 @@ class Collection:
             tokenized_names=tokenized_names,
             name_types=fields['template.collection_types'][1::2] if 'template.collection_types' in fields else [],
             modified_timestamp=fields['metadata.modified'][0],
-            avatar_emoji=fields['data.avatar_emoji'],
+            avatar_emoji=fields['data.avatar_emoji'][0] if 'data.avatar_emoji' in fields else None,
             avatar_image=fields['data.avatar_image'][0] if 'data.avatar_image' in fields else None,
             related_collections=_source.get('name_generator', {}).get('related_collections', None),
         )
