@@ -21,7 +21,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             mode: str,
             max_related_collections: int = 3,
             offset: int = 0,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
@@ -58,7 +58,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .set_source(False) \
             .include_fields(include_fields)
 
-        if sort_order == 'AI':
+        if sort_order == 'AI-LTR':
             window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
 
             query_params = query_builder \
@@ -140,12 +140,12 @@ class CollectionMatcherForAPI(CollectionMatcher):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
 
-        if sort_order == 'AI':
-            sort_order = 'ES'
+        if sort_order == 'AI-LTR':
+            sort_order = 'AI'
 
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
@@ -252,7 +252,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -263,7 +263,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
-        if sort_order == 'AI':
+        if sort_order == 'AI-LTR':
             sort_order = 'AI-by-member'
 
         query_params = (ElasticsearchQueryBuilder()

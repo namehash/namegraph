@@ -167,7 +167,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 self._search_by_membership,
                 name_label=input_name,
                 limit_names=limit_names,
-                sort_order='AI',
+                sort_order='AI-LTR',
                 max_results=max_related_collections,
                 offset=0
             )
