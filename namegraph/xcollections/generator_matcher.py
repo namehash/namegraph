@@ -103,7 +103,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -114,7 +114,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'template.collection_types', 'metadata.modified',
         ]
 
-        if sort_order == 'AI':
+        if sort_order == 'AI-LTR':
             sort_order = 'AI-by-member'
 
         query_params = (ElasticsearchQueryBuilder()
