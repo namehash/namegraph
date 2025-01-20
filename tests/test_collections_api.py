@@ -92,6 +92,7 @@ class TestCorrectConfiguration:
         es_time = response_json['metadata'].get('elasticsearch_processing_time_ms', 0)
         assert es_time <= response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
+    @mark.skip(reason='we return only names, without the root name')
     @mark.integration_test
     def test_collection_api_eth_suffix(self, test_test_client):
         response = test_test_client.post("/find_collections_by_string", json={

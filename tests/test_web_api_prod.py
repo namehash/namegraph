@@ -962,7 +962,7 @@ class TestTokenScramble:
 
         for s in names:
             if s.startswith('egg'):
-                assert s[3:] in ('avocado.eth', 'apple.eth', 'fruit.eth', 'coconut.eth')
+                assert s[3:] in ('avocado', 'apple', 'fruit', 'coconut')
             elif s.endswith('apple.eth'):
                 assert s[:-len('apple.eth')] in ('avocado', 'jack', 'coconut', 'egg')
 

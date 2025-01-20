@@ -7,7 +7,7 @@ from models import UserInfo
 
 
 class CollectionName(BaseModel):
-    name: str = Field(title='name with `.eth`')
+    name: str = Field(title='name from a collection')
     namehash: str = Field(title='namehash of the name')
 
 
