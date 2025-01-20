@@ -5,7 +5,7 @@ from copy import deepcopy
 from enum import Enum
 
 
-class SortOrder(Enum):
+class SortOrder(str, Enum):
     AZ = 'A-Z'
     ZA = 'Z-A'
     AI = 'AI'
