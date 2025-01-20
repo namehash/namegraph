@@ -1,4 +1,5 @@
 from typing import Optional, Literal, Union
+from namegraph.xcollections.query_builder import SortOrder
 from pydantic import BaseModel, Field, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 
@@ -53,10 +54,7 @@ class BaseCollectionSearchLimitOffsetSort(BaseCollectionRequest):
     offset: int = Field(0,
                         title='offset of the first collection to return (used for pagination)',
                         description='DO NOT use pagination with diversity algorithm')
-    sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = Field('AI-LTR', title='order of the resulting collections',
-                        description='* if A-Z or Z-A - sort by title (alphabetically ascending/descending)\n'
-                                    '* if AI-LTR - use intelligent endpoint-specific ranking (with Learning to Rank for optimal results)\n'
-                                    '* if AI - use basic AI ranking (without Learning to Rank)')
+
 
 
 class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
@@ -109,11 +107,16 @@ class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search
                        description='can not contain dots (.)',
                        pattern='^[^.]+$', examples=['zeus god'])
     mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
-
+    sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = Field(SortOrder.AI, title='order of the resulting collections',
+                        description='* if A-Z or Z-A - sort by title (alphabetically ascending/descending)\n'
+                                    '* if AI - use intelligent endpoint-specific ranking (with Learning to Rank for optimal results)\n'
+                                    '* if Relevance - use relevance ranking')
 
 class CollectionSearchByCollection(BaseCollectionSearchWithOther):  # collection_details
     collection_id: str = Field(title='id of the collection used for search', examples=['ri2QqxnAqZT7'])
-
+    sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.RELEVANCE] = Field(SortOrder.RELEVANCE, title='order of the resulting collections',
+                        description='* if A-Z or Z-A - sort by title (alphabetically ascending/descending)\n'
+                                    '* if Relevance - use relevance ranking')
 
 class CollectionSearchResponse(BaseCollectionQueryResponse):
     related_collections: list[Collection] = Field(title='list of related collections')
@@ -142,7 +145,10 @@ class CollectionsContainingNameRequest(BaseCollectionSearchLimitOffsetSort):
     mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
     max_results: int = Field(3, ge=0, title='max number of collections to return (for each page)',
                  description='return collections at [offset, offset + max_results) positions (order as in sort_order)')
-
+    sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = Field(SortOrder.AI, title='order of the resulting collections',
+                        description='* if A-Z or Z-A - sort by title (alphabetically ascending/descending)\n'
+                                    '* if AI - use intelligent endpoint-specific ranking\n'
+                                    '* if Relevance - use relevance ranking')
 
 class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
     collections: list[Collection] = Field(title='list of public collections the provided label is a member of')

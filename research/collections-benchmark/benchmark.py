@@ -80,7 +80,7 @@ def find_collections_by_collection(collection_id: str):
         "name_diversity_ratio": 0.5,
         "max_per_type": 5,
         "limit_names": 10,
-        "sort_order": "AI-LTR",
+        "sort_order": "AI",
         "offset": 0,
     }
     return requests.post(
@@ -103,7 +103,7 @@ def find_collections_by_member(
         mode: str,
         max_results: int = 100,
         limit_names: int = 10,
-        sort_order: str = 'AI-LTR',
+        sort_order: str = 'AI',
         offset: int = 0,
 ):
     data = {

@@ -2,6 +2,15 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 from copy import deepcopy
+from enum import Enum
+
+
+class SortOrder(Enum):
+    AZ = 'A-Z'
+    ZA = 'Z-A'
+    AI = 'AI'
+    AI_BY_MEMBER = 'AI-by-member'
+    RELEVANCE = 'Relevance'
 
 
 class ElasticsearchQueryBuilder:
@@ -217,24 +226,26 @@ class ElasticsearchQueryBuilder:
         self._query['_source'] = value
         return self
 
-    def set_sort_order(self, sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI-by-member', 'AI'],
+    def set_sort_order(self, sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI_BY_MEMBER, SortOrder.RELEVANCE],
                        field: Optional[str]) -> ElasticsearchQueryBuilder:
         """
         Sets the sort field of the query builder based on the sort_order.
 
+        :param sort_order: SortOrder enum value specifying how to sort the results
+        :param field: Optional field to sort by (required for ALPHABETICAL_ASC and ALPHABETICAL_DESC)
         :return: self
         """
-        if sort_order == 'AI':
+        if sort_order == SortOrder.RELEVANCE:
             pass
-        elif sort_order == 'AI-by-member':
+        elif sort_order == SortOrder.AI_BY_MEMBER:
             self._query['sort'] = [{"template.nonavailable_members_ratio.raw": {"order": "desc"}},
                                    {"metadata.members_count.raw": {"order": "desc"}}, "_score"]
-        elif sort_order == 'A-Z':
+        elif sort_order == SortOrder.AZ:
             self._query['sort'] = [{field: {"order": "asc"}}, "_score"]
-        elif sort_order == 'Z-A':
+        elif sort_order == SortOrder.ZA:
             self._query['sort'] = [{field: {"order": "desc"}}, "_score"]
         else:
-            raise ValueError(f"Unexpected sort_order value: '{sort_order}'")
+            raise ValueError(f"Unexpected sort_order value: {sort_order}")
 
         return self
 

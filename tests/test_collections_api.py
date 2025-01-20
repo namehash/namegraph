@@ -289,7 +289,7 @@ class TestCorrectConfiguration:
     def test_collection_api_find_collections_by_member_ai(self, test_test_client):
         response = test_test_client.post("/find_collections_by_member", json={
             "label": "australia",
-            "sort_order": "AI-LTR",
+            "sort_order": "AI",
             "mode": 'domain_detail',
             "offset": 5,
             'max_results': 10
@@ -308,7 +308,7 @@ class TestCorrectConfiguration:
             "label": "softmachine",
             "mode": "domain_detail",
             "limit_names": 10,
-            "sort_order": 'AI-LTR',  # sort
+            "sort_order": 'AI',  # sort
             "offset": 20,  # page out of bounds (offset >= n_matched_collections)
             "max_related_collections": 100,
         })
@@ -331,7 +331,7 @@ class TestCorrectConfiguration:
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_names": 10,
-            "sort_order": 'AI-LTR'
+            "sort_order": 'AI'
         })
 
         assert response.status_code == 200
@@ -661,7 +661,7 @@ class TestCollectionApiUnavailable:
     def test_collection_api_unavailability_find_collections_by_member(self, test_test_client):
         response = test_test_client.post("/find_collections_by_member", json={
             "label": "australia",
-            "sort_order": "AI-LTR",
+            "sort_order": "AI",
             "mode": 'domain_detail',
             "offset": 5,
             'max_results': 10

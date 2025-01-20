@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 from namegraph.xcollections.matcher import CollectionMatcher
 from namegraph.xcollections.collection import Collection
-from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder
+from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder, SortOrder
 from .utils import get_names_script, get_namehashes_script
 
 logger = logging.getLogger('namegraph')
@@ -21,7 +21,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             mode: str,
             max_related_collections: int = 3,
             offset: int = 0,
-            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
@@ -58,7 +58,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .set_source(False) \
             .include_fields(include_fields)
 
-        if sort_order == 'AI-LTR':
+        if sort_order == SortOrder.AI:
             window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
 
             query_params = query_builder \
@@ -140,12 +140,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             name_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.RELEVANCE] = SortOrder.RELEVANCE,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
-
-        if sort_order == 'AI-LTR':
-            sort_order = 'AI'
 
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
@@ -252,7 +249,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI-LTR', 'AI'] = 'AI-LTR',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -263,8 +260,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
-        if sort_order == 'AI-LTR':
-            sort_order = 'AI-by-member'
+        if sort_order == SortOrder.AI:
+            sort_order = SortOrder.AI_BY_MEMBER
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
