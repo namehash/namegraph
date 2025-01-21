@@ -1,7 +1,6 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, field_serializer, ConfigDict, field_validator, PositiveInt
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 from pydantic.networks import IPvAnyAddress
-from datetime import datetime
 
 from web_api import generator
 
@@ -64,6 +63,7 @@ class OtherCategoriesParams(BaseModel):
                                  title='maximal number of suggestions to generate in one specific category')
     model_config = ConfigDict(frozen=True)
 
+
 class OtherCategoryParams(BaseModel):
     min_suggestions: int = Field(6, ge=0, le=30,
                                  title='minimal number of suggestions to generate in one specific category. '
@@ -75,6 +75,7 @@ class OtherCategoryParams(BaseModel):
                                        title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"'
                                              'it may be not fulfilled because of `max_suggestions` limit')
     model_config = ConfigDict(frozen=True)
+
 
 class RelatedCategoryParams(BaseModel):
     max_related_collections: int = Field(6, ge=0, le=10,
@@ -101,6 +102,7 @@ class RelatedCategoryParams(BaseModel):
                           'if null, then no penalty will be added')
     model_config = ConfigDict(frozen=True)
 
+
 class CategoriesParams(BaseModel):
     related: RelatedCategoryParams = Field(RelatedCategoryParams(), title='related category parameters')
     wordplay: OtherCategoriesParams = Field(OtherCategoriesParams(), title='wordplay category parameters')
@@ -111,6 +113,7 @@ class CategoriesParams(BaseModel):
     gowild: OtherCategoriesParams = Field(OtherCategoriesParams(), title='gowild category parameters')
     other: OtherCategoryParams = Field(OtherCategoryParams(), title='other category parameters')
     model_config = ConfigDict(frozen=True)
+
 
 class GroupedNameRequest(BaseModel):
     label: str = Field(title='input label', pattern='^[^.]*$', examples=['zeus'],
@@ -172,7 +175,7 @@ class Metadata(BaseModel):
         description='if name has been generated using a collection, '
                     'then this field would contains its name, else it is null'
     )
-    collection_id: Optional[str] = Field(  # todo: maybe bundle collection's title and id together
+    collection_id: Optional[str] = Field(
         title='id of the collection',
         description='if name has been generated using a collection, '
                     'then this field would contains its id, else it is null'
@@ -181,8 +184,8 @@ class Metadata(BaseModel):
 
 
 class Suggestion(BaseModel):
-    name: str = Field(title="suggested similar name (or label, in the collection endpoints)")
-    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label")
+    name: str = Field(title="suggested similar name (with the '.eth' suffix)")
+    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label (without the '.eth' suffix)")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
@@ -202,7 +205,6 @@ class CollectionCategory(GroupingCategory):
     related_collections: list[RecursiveRelatedCollection] = Field(title='related collections to this collection')
 
 
-
 class OtherCategory(GroupingCategory):
     type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'] = \
         Field(title='category type',
@@ -215,69 +217,3 @@ class GroupedSuggestions(BaseModel):
         description='list of suggestions grouped by category type'
     )
     all_tokenizations: list[list[str]] = Field(title='all inferred tokenizations of input label')
-
-
-class SampleCollectionMembers(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to sample from', examples=['qdeq7I9z0_jv'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
-                                 description='if the collection has less members than max_sample_size, '
-                                             'all the members will be returned', examples=[5])
-    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
-                      title='seed for random number generator',
-                      description='if not provided (but can\'t be null), random seed will be generated')
-
-
-class Top10CollectionMembersRequest(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to fetch names from', examples=['ri2QqxnAqZT7'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    max_recursive_related_collections: int = Field(3, ge=0, le=10,
-                                                   title='Set to 0 to disable the "recursive related collection search". '
-                                                         'When set to a value between 1 and 10, '
-                                                         'for each related collection we find, '
-                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
-                                                         'to the related collection.')
-
-
-class ScrambleCollectionTokens(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to take tokens from', examples=['3OB_f2vmyuyp'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'] = \
-        Field('left-right-shuffle-with-unigrams', title='method used to scramble tokens and generate new suggestions',
-  description='* left-right-shuffle - tokenize names as bigrams and shuffle the right-side tokens (do not use unigrams)'
-              '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
-              '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
-    n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
-    max_suggestions: Optional[PositiveInt] = Field(10, title='maximal number of suggestions to generate',
-  examples=[10], description='must be a positive integer or null\n* number of generated suggestions will be '
-                             '`max_suggestions` or less (exactly `max_suggestions` if there are enough names)\n'
-                             '* if null, no tokens are repeated')
-    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
-                      title='seed for random number generator',
-                      description='if not provided (but can\'t be null), random seed will be generated')
-
-
-class FetchCollectionMembersRequest(BaseModel):
-    collection_id: str = Field(
-        title='id of the collection to fetch members from',
-        examples=['ri2QqxnAqZT7']
-    )
-    offset: int = Field(
-        0,
-        title='number of members to skip',
-        description='used for pagination',
-        ge=0
-    )
-    limit: int = Field(
-        10,
-        title='maximum number of members to return',
-        description='used for pagination',
-        ge=1,
-    )
-    metadata: bool = Field(
-        True,
-        title='return all the metadata in response'
-    )

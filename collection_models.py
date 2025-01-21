@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Optional, Literal, Union
 from namegraph.xcollections.query_builder import SortOrder
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PositiveInt, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 
-from models import UserInfo
+from models import UserInfo, Metadata, RecursiveRelatedCollection
 
 
 class CollectionName(BaseModel):
@@ -129,6 +130,7 @@ class CollectionCountByStringRequest(BaseCollectionRequest):
                        pattern='^[^.]+$', examples=['zeus god'])
     mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
 
+
 # ======== Collection Membership ========
 
 class CollectionsContainingNameCountRequest(BaseCollectionRequest):
@@ -156,3 +158,81 @@ class CollectionsContainingNameResponse(BaseCollectionQueryResponse):
 
 class GetCollectionByIdRequest(BaseCollectionRequest):
     collection_id: str = Field(title='id of the collection to fetch', examples=['ri2QqxnAqZT7'])
+
+
+# ======== Suggestions from collections ========
+
+class SuggestionFromCollection(BaseModel):
+    name: str = Field(title="name (label) from a collection")
+    tokenized_label: list[str] = Field(title="original tokenization of name (label)")
+    metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
+                                         description="if metadata=False this key is absent")
+
+
+class CollectionWithSuggestions(BaseModel):
+    suggestions: list[SuggestionFromCollection] = Field(title='suggestions from a collection')
+    name: str = Field(title='collection title', description='kept for backwards compatibility')  # todo:  remove field if not used
+    type: Literal['related'] = Field('related', title='category type (always set to \'related\')', 
+                                     description='kept for backwards compatibility')  # todo: remove field if not used
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
+    related_collections: list[RecursiveRelatedCollection] = Field(title='related collections to this collection')
+
+
+class SampleCollectionMembers(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to sample from', examples=['qdeq7I9z0_jv'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
+                                 description='if the collection has less members than max_sample_size, '
+                                             'all the members will be returned', examples=[5])
+    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
+                      title='seed for random number generator',
+                      description='if not provided (but can\'t be null), random seed will be generated')
+
+
+class Top10CollectionMembersRequest(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to fetch names from', examples=['ri2QqxnAqZT7'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    max_recursive_related_collections: int = Field(3, ge=0, le=10,
+                                                   title='Set to 0 to disable the "recursive related collection search". '
+                                                         'When set to a value between 1 and 10, '
+                                                         'for each related collection we find, '
+                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
+                                                         'to the related collection.')
+
+
+class ScrambleCollectionTokens(BaseModel):
+    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
+    collection_id: str = Field(title='id of the collection to take tokens from', examples=['3OB_f2vmyuyp'])
+    metadata: bool = Field(True, title='return all the metadata in response')
+    method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'] = \
+        Field('left-right-shuffle-with-unigrams', title='method used to scramble tokens and generate new suggestions',
+  description='* left-right-shuffle - tokenize names as bigrams and shuffle the right-side tokens (do not use unigrams)'
+              '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
+              '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
+    n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
+    max_suggestions: Optional[PositiveInt] = Field(10, title='maximal number of suggestions to generate',
+  examples=[10], description='must be a positive integer or null\n* number of generated suggestions will be '
+                             '`max_suggestions` or less (exactly `max_suggestions` if there are enough names)\n'
+                             '* if null, no tokens are repeated')
+    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
+                      title='seed for random number generator',
+                      description='if not provided (but can\'t be null), random seed will be generated')
+
+
+class FetchCollectionMembersRequest(BaseModel):
+    collection_id: str = Field(
+        title='id of the collection to fetch members from', examples=['ri2QqxnAqZT7']
+    )
+    offset: int = Field(
+        0, title='number of members to skip', description='used for pagination', ge=0
+    )
+    limit: int = Field(
+        10, title='maximum number of members to return', description='used for pagination', ge=1,
+    )
+    metadata: bool = Field(
+        True, title='return all the metadata in response'
+    )

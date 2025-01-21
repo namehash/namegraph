@@ -98,16 +98,13 @@ categories = Categories(generator.config)
 from models import (
     NameRequest,
     Suggestion,
-    SampleCollectionMembers,
     GroupedSuggestions,
-    Top10CollectionMembersRequest,
     GroupedNameRequest,
-    ScrambleCollectionTokens,
-    CollectionCategory,
-    FetchCollectionMembersRequest,
 )
 
 from collection_models import (
+    SuggestionFromCollection,
+    CollectionWithSuggestions,
     CollectionSearchResponse,
     CollectionSearchByCollection,
     CollectionSearchByString,
@@ -117,14 +114,18 @@ from collection_models import (
     CollectionsContainingNameResponse,
     CollectionCountByStringRequest,
     Collection as CollectionModel,
+    FetchCollectionMembersRequest,
     GetCollectionByIdRequest,
+    SampleCollectionMembers,
+    ScrambleCollectionTokens,
+    Top10CollectionMembersRequest,
 )
 
 
 def convert_to_suggestion_format(
         names: List[GeneratedName],
         include_metadata: bool = True,
-        append_eth=True
+        append_eth: bool = True
 ) -> list[dict[str, str | dict]]:
     response = [{
         'name': str(name) + ('.eth' if append_eth else ''),
@@ -331,7 +332,7 @@ def suggestions_by_category(name: GroupedNameRequest):
     return response
 
 
-@app.post("/sample_collection_members", response_model=list[Suggestion], tags=['collections'])
+@app.post("/sample_collection_members", response_model=list[SuggestionFromCollection], tags=['collections'])
 async def sample_collection_members(sample_command: SampleCollectionMembers):
     result, es_response_metadata = generator_matcher.sample_members_from_collection(
         sample_command.collection_id,
@@ -357,7 +358,7 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
     return response
 
 
-@app.post("/fetch_top_collection_members", response_model=CollectionCategory, tags=['collections'])
+@app.post("/fetch_top_collection_members", response_model=CollectionWithSuggestions, tags=['collections'])
 async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembersRequest):
     """
     * this endpoint returns top 10 members from the collection specified by collection_id
@@ -392,7 +393,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     return response2[0]
 
 
-@app.post("/scramble_collection_tokens", response_model=list[Suggestion], tags=['collections'])
+@app.post("/scramble_collection_tokens", response_model=list[SuggestionFromCollection], tags=['collections'])
 async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens):
     result, es_response_metadata = generator_matcher.scramble_tokens_from_collection(
         scramble_command.collection_id, scramble_command.method,
@@ -618,7 +619,7 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     return {'collections': collections, 'metadata': metadata}
 
 
-@app.post("/fetch_collection_members", response_model=CollectionCategory, tags=['collections'])
+@app.post("/fetch_collection_members", response_model=CollectionWithSuggestions, tags=['collections'])
 async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest):
     """
     Fetch members from a collection with pagination support
