@@ -4,4 +4,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+    image: 571094861812.dkr.ecr.us-east-1.amazonaws.com/namegraph:${TAG}

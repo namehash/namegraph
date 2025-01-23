@@ -1,4 +1,4 @@
-![Tests](https://github.com/namehash/name-generator/actions/workflows/ci.yml/badge.svg?branch=master)
+![Tests](https://github.com/namehash/namegraph/actions/workflows/ci.yml/badge.svg?branch=master)
 
 # Install
 
@@ -97,7 +97,7 @@ Authorize to ECR:
 
 Push image to ECR:
 
-`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/namegraph:${TAG}
 
 ## Deploy image on remote instance
 
@@ -107,7 +107,7 @@ Set image TAG:
 
 Authorize EC2 instance in ECR:
 
-`aws ecr get-login-password | docker login --username AWS --password-stdin 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator`
+`aws ecr get-login-password | docker login --username AWS --password-stdin 571094861812.dkr.ecr.us-east-1.amazonaws.com/namegraph`
 
 (Re-Deploy) image:
 
