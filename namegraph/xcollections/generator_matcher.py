@@ -10,7 +10,7 @@ from fastapi import HTTPException
 
 from namegraph.xcollections.matcher import CollectionMatcher
 from namegraph.xcollections.collection import Collection
-from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder
+from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder, SortOrder
 from namegraph.utils import OrderedSet
 
 
@@ -103,7 +103,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -114,8 +114,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'template.collection_types', 'metadata.modified',
         ]
 
-        if sort_order == 'AI':
-            sort_order = 'AI-by-member'
+        if sort_order == SortOrder.AI:
+            sort_order = SortOrder.AI_BY_MEMBER
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
@@ -167,7 +167,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 self._search_by_membership,
                 name_label=input_name,
                 limit_names=limit_names,
-                sort_order='AI',
+                sort_order=SortOrder.AI,
                 max_results=max_related_collections,
                 offset=0
             )

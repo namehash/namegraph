@@ -12,7 +12,7 @@ from omegaconf import DictConfig
 
 from namegraph.tokenization import WordNinjaTokenizer, BigramLongestTokenizer
 from namegraph.xcollections.collection import Collection
-from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder
+from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder, SortOrder
 from namegraph.utils.elastic import connect_to_elasticsearch, index_exists
 from namegraph.utils import Singleton
 
@@ -146,14 +146,14 @@ class CollectionMatcher(metaclass=Singleton):
             max_limit: int,
             fields: list[str],
             offset: int = 0,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = None,
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = None,
             name_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
 
-        if sort_order == 'AI':
-            sort_order = 'ES'
+        if sort_order == SortOrder.AI:
+            sort_order = SortOrder.RELEVANCE
 
         apply_diversity = name_diversity_ratio is not None or max_per_type is not None
         query_params = ElasticsearchQueryBuilder() \

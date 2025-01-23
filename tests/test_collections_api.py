@@ -331,7 +331,7 @@ class TestCorrectConfiguration:
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_names": 10,
-            "sort_order": 'AI'
+            "sort_order": 'Relevance'
         })
 
         assert response.status_code == 200
