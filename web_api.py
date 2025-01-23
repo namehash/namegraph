@@ -124,12 +124,10 @@ from collection_models import (
 
 def convert_to_suggestion_format(
         names: List[GeneratedName],
-        include_metadata: bool = True,
-        append_eth: bool = True
+        include_metadata: bool = True
 ) -> list[dict[str, str | dict]]:
     response = [{
-        'name': str(name) + ('.eth' if append_eth else ''),
-        # TODO this should be done using Domains (with or without duplicates if multiple suffixes available for one label?)
+        'name': str(name),
         'tokenized_label': list(name.tokens)
     } for name in names]
 
@@ -184,12 +182,11 @@ category_fancy_names = {
 
 def convert_related_to_grouped_suggestions_format(
         related_suggestions: dict[str, RelatedSuggestions],
-        include_metadata: bool = True,
-        append_eth: bool = True
+        include_metadata: bool = True
 ) -> list[dict]:
     grouped_response = []
     for collection_key, suggestions in related_suggestions.items():
-        converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True, append_eth=append_eth)
+        converted_suggestions = convert_to_suggestion_format(suggestions, include_metadata=True)
         grouped_response.append({
             'suggestions': converted_suggestions if include_metadata else
             [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
@@ -351,7 +348,7 @@ async def sample_collection_members(sample_command: SampleCollectionMembers):
         obj.interpretation = []
         sampled_members.append(obj)
 
-    response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata, append_eth=False)
+    response = convert_to_suggestion_format(sampled_members, include_metadata=sample_command.metadata)
 
     logger.info(json.dumps({'endpoint': 'sample_collection_members', 'request': sample_command.model_dump()}))
 
@@ -385,8 +382,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     rs.extend(top_members)
 
     response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
-                                                              include_metadata=fetch_top10_command.metadata,
-                                                              append_eth=False)
+                                                              include_metadata=fetch_top10_command.metadata)
 
     logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
 
@@ -411,7 +407,7 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
         obj.interpretation = []
         suggestions.append(obj)
 
-    response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata, append_eth=False)
+    response = convert_to_suggestion_format(suggestions, include_metadata=scramble_command.metadata)
 
     logger.info(json.dumps({'endpoint': 'scramble_collection_tokens', 'request': scramble_command.model_dump()}))
 
@@ -648,8 +644,7 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
 
     response = convert_related_to_grouped_suggestions_format(
         {result['collection_title']: rs},
-        include_metadata=fetch_command.metadata,
-        append_eth=False
+        include_metadata=fetch_command.metadata
     )
 
     logger.info(json.dumps({
