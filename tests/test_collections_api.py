@@ -554,7 +554,7 @@ class TestCorrectConfiguration:
         response_json = response.json()
         
         assert len(response_json['suggestions']) == 10
-        assert response_json['type'] == 'related'
+        # assert response_json['type'] == 'related'  # we removed this field
         assert response_json['collection_id'] == 'ri2QqxnAqZT7'
         
         # Test fetching second page

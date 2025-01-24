@@ -166,7 +166,7 @@ class GetCollectionByIdRequest(BaseCollectionRequest):
 
 class SuggestionFromCollection(BaseModel):
     name: str = Field(title="label from a collection")  # todo: change to label
-    tokenized_label: list[str] = Field(title="original tokenization of label")
+    tokenized_label: list[str] = Field(title="suggested tokenization of label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
