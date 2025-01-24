@@ -601,9 +601,9 @@ class TestCorrectConfiguration:
     @mark.integration_test
     def test_fetch_collection_members_tokenized_names(self, test_test_client):
         name2labeltokens = {
-            "dualipa.eth": ("dua", "lipa"),
-            "thebeatles.eth": ("the", "beatles"),
-            "davidbowie.eth": ("david", "bowie")
+            "dualipa": ("dua", "lipa"),
+            "thebeatles": ("the", "beatles"),
+            "davidbowie": ("david", "bowie")
         }
 
         response = test_test_client.post("/fetch_collection_members", json={
@@ -615,7 +615,7 @@ class TestCorrectConfiguration:
         assert response.status_code == 200
         response_json = response.json()
         for item in response_json['suggestions']:
-            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
+            assert ''.join(item['tokenized_label']) == item['name']
             if item['name'] in name2labeltokens:
                 assert tuple(item['tokenized_label']) == name2labeltokens[item['name']]
 

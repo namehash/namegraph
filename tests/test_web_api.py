@@ -38,7 +38,7 @@ def test_read_main(test_test_client):
 
     json = response.json()
     str_names = [name["name"] for name in json]
-    assert "discharge.eth" in str_names
+    assert "discharge" in str_names
 
 
 @mark.parametrize(
@@ -70,7 +70,7 @@ def test_metadata_scheme(test_test_client, name: str):
     "name, expected_name, expected_strategies",
     [(
             "dogcat",
-            "catdog.eth",
+            "catdog",
             [
                 [
                     "PermuteGenerator", "SubnameFilter", "ValidNameFilter"
@@ -188,7 +188,7 @@ def test_min_primary_fraction(test_test_client):
     json = response.json()
     assert len(json) > 0
     names = [suggestion["name"] for suggestion in json]
-    assert 'iref.eth' not in names
+    assert 'iref' not in names
 
 
 # verifies whether only `RandomAvailableNameGenerator` has been used since it is specified as the only one, which can
@@ -234,4 +234,4 @@ def test_person_name_generator(test_test_client):
     json = response.json()
     str_names = [name["name"] for name in json]
 
-    assert "iamchris.eth" in str_names
+    assert "iamchris" in str_names
