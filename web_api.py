@@ -356,16 +356,14 @@ def convert_to_collection_format(collections: list[Collection]):
     return collections_json
 
 
-def convert_related_to_grouped_suggestions_format_for_collections(
+def convert_related_to_suggestions_from_collection_format(
         related_suggestions: RelatedSuggestions,
         include_metadata: bool = True
-) -> list[dict]:
+) -> dict:
     converted_suggestions = convert_to_suggestion_format(related_suggestions, include_metadata=True)
     return {
         'suggestions': converted_suggestions if include_metadata else
             [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
-        'type': 'related',  # todo: remove field
-        'name': related_suggestions.collection_title,  # todo: remove field
         'collection_title': related_suggestions.collection_title,
         'collection_id': related_suggestions.collection_id,
         'collection_members_count': related_suggestions.collection_members_count,
@@ -425,7 +423,7 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
     rs.related_collections = result['related_collections']
     rs.extend(top_members)
 
-    response = convert_related_to_grouped_suggestions_format_for_collections(rs, include_metadata=fetch_top10_command.metadata)
+    response = convert_related_to_suggestions_from_collection_format(rs, include_metadata=fetch_top10_command.metadata)
 
     logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
 
@@ -664,7 +662,7 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
                            result['collection_members_count'])
     rs.extend(members)
 
-    response = convert_related_to_grouped_suggestions_format_for_collections(rs, include_metadata=fetch_command.metadata)
+    response = convert_related_to_suggestions_from_collection_format(rs, include_metadata=fetch_command.metadata)
 
     logger.info(json.dumps({
         'endpoint': 'fetch_collection_members', 

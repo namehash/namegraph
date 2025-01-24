@@ -171,9 +171,6 @@ class SuggestionFromCollection(BaseModel):
 
 class CollectionWithSuggestions(BaseModel):
     suggestions: list[SuggestionFromCollection] = Field(title='suggestions from a collection')
-    name: str = Field(title='collection title', description='kept for backwards compatibility')  # todo:  remove field
-    type: Literal['related'] = Field('related', title='category type (always set to \'related\')', 
-                                     description='kept for backwards compatibility')  # todo: remove field
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
     collection_members_count: int = Field(title='number of members in the collection')
