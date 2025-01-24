@@ -1,4 +1,4 @@
-![Tests](https://github.com/namehash/name-generator/actions/workflows/ci.yml/badge.svg?branch=master)
+![Tests](https://github.com/namehash/namegraph/actions/workflows/ci.yml/badge.svg?branch=master)
 
 # Install
 
