@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field, PositiveInt, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic_core.core_schema import ValidationInfo
 
 from namegraph.xcollections.query_builder import SortOrder
 from models import UserInfo, Metadata, RecursiveRelatedCollection
@@ -87,13 +87,15 @@ class BaseCollectionSearchWithOther(BaseCollectionSearch):  # instant search, do
                                        '\nif not met, 422 status code is returned')
 
     @field_validator('max_other_collections')
-    def max_other_between_min_other_and_max_total(cls, v: int, info: FieldValidationInfo) -> int:
+    @classmethod
+    def max_other_between_min_other_and_max_total(cls, v: int, info: ValidationInfo) -> int:
         if 'min_other_collections' in info.data and info.data['min_other_collections'] > v:
             raise ValueError('min_other_collections must not be greater than max_other_collections')
         return v
 
     @field_validator('max_total_collections')
-    def max_related_between_min_other_and_max_total(cls, v: int, info: FieldValidationInfo) -> int:
+    @classmethod
+    def max_related_between_min_other_and_max_total(cls, v: int, info: ValidationInfo) -> int:
         if 'max_other_collections' in info.data and v < info.data['max_other_collections']:
             raise ValueError('max_other_collections must not be greater than max_total_collections')
         if 'min_other_collections' in info.data and 'max_related_collections' in info.data and \
