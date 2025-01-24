@@ -5,6 +5,8 @@ from pydantic.networks import IPvAnyAddress
 from web_api import generator
 
 
+# ======== Shared models ========
+
 class UserInfo(BaseModel):
     user_wallet_addr: Optional[str] = Field(None, title='wallet (public) address of the user',
                                             description='might be null',
@@ -23,6 +25,42 @@ class UserInfo(BaseModel):
     def serialize_user_ip_addr(self, user_ip_addr: IPvAnyAddress, _info) -> str:
         return str(user_ip_addr)
 
+
+class Metadata(BaseModel):
+    pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
+    interpretation: list[str | None] = Field(title='interpretation tags',
+                                             description='list of interpretation tags based on which the '
+                                                         'suggestion has been generated')
+    cached_status: str = Field(title='cached status',
+                               description='name\'s status cached at the time of application startup')
+    categories: list[str] = Field(title='domain category',
+                                  description='can be either available, taken, recently released or on sale')
+    cached_interesting_score: Optional[float] = Field(title='cached interesting score',
+                                                      description='name\'s interesting score cached at the time of '
+                                                                  'application startup')
+    applied_strategies: list[list[str]] = Field(
+        title="sequence of steps performed in every pipeline that generated the suggestion"
+    )
+    collection_title: Optional[str] = Field(
+        title='name of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its name, else it is null'
+    )
+    collection_id: Optional[str] = Field(
+        title='id of the collection',
+        description='if name has been generated using a collection, '
+                    'then this field would contains its id, else it is null'
+    )
+    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
+
+
+class RecursiveRelatedCollection(BaseModel):
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
+
+
+# ======== Generator models ========
 
 class Params(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
@@ -131,12 +169,6 @@ class GroupedNameRequest(BaseModel):
         title='controls the results of other categories than related (except for "Other Names")')
 
 
-class RecursiveRelatedCollection(BaseModel):
-    collection_id: str = Field(title='id of the collection')
-    collection_title: str = Field(title='title of the collection')
-    collection_members_count: int = Field(title='number of members in the collection')
-
-
 class NameRequest(BaseModel):
     label: str = Field(title='input label', description='cannot contain dots (.)',
                        pattern='^[^.]*$', examples=['zeus'])
@@ -155,37 +187,9 @@ class NameRequest(BaseModel):
                                      description='includes all the parameters for all nodes of the pipeline')
 
 
-class Metadata(BaseModel):
-    pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
-    interpretation: list[str | None] = Field(title='interpretation tags',
-                                             description='list of interpretation tags based on which the '
-                                                         'suggestion has been generated')
-    cached_status: str = Field(title='cached status',
-                               description='name\'s status cached at the time of application startup')
-    categories: list[str] = Field(title='domain category',
-                                  description='can be either available, taken, recently released or on sale')
-    cached_interesting_score: Optional[float] = Field(title='cached interesting score',
-                                                      description='name\'s interesting score cached at the time of '
-                                                                  'application startup')
-    applied_strategies: list[list[str]] = Field(
-        title="sequence of steps performed in every pipeline that generated the suggestion"
-    )
-    collection_title: Optional[str] = Field(
-        title='name of the collection',
-        description='if name has been generated using a collection, '
-                    'then this field would contains its name, else it is null'
-    )
-    collection_id: Optional[str] = Field(
-        title='id of the collection',
-        description='if name has been generated using a collection, '
-                    'then this field would contains its id, else it is null'
-    )
-    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
-
-
 class Suggestion(BaseModel):
-    name: str = Field(title="suggested similar name (with the '.eth' suffix)")
-    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label (without the '.eth' suffix)")
+    name: str = Field(title="suggested similar label")  # todo: change to label
+    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 

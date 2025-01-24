@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import Optional, Literal, Union
-from namegraph.xcollections.query_builder import SortOrder
 from pydantic import BaseModel, Field, PositiveInt, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 
+from namegraph.xcollections.query_builder import SortOrder
 from models import UserInfo, Metadata, RecursiveRelatedCollection
 
 
-class CollectionName(BaseModel):
-    name: str = Field(title='name from a collection')
-    namehash: str = Field(title='namehash of the name')
+class CollectionName(BaseModel):  # todo: change to CollectionLabel
+    name: str = Field(title='label from a collection')  # todo: change to label
+    namehash: str = Field(title='namehash of the name')  # todo: remove namehash (also from the collections code)
 
 
 class Collection(BaseModel):
@@ -163,17 +163,17 @@ class GetCollectionByIdRequest(BaseCollectionRequest):
 # ======== Suggestions from collections ========
 
 class SuggestionFromCollection(BaseModel):
-    name: str = Field(title="name (label) from a collection")
-    tokenized_label: list[str] = Field(title="original tokenization of name (label)")
+    name: str = Field(title="label from a collection")  # todo: change to label
+    tokenized_label: list[str] = Field(title="original tokenization of label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
 
 class CollectionWithSuggestions(BaseModel):
     suggestions: list[SuggestionFromCollection] = Field(title='suggestions from a collection')
-    name: str = Field(title='collection title', description='kept for backwards compatibility')  # todo:  remove field if not used
+    name: str = Field(title='collection title', description='kept for backwards compatibility')  # todo:  remove field
     type: Literal['related'] = Field('related', title='category type (always set to \'related\')', 
-                                     description='kept for backwards compatibility')  # todo: remove field if not used
+                                     description='kept for backwards compatibility')  # todo: remove field
     collection_id: str = Field(title='id of the collection')
     collection_title: str = Field(title='title of the collection')
     collection_members_count: int = Field(title='number of members in the collection')
@@ -216,7 +216,7 @@ class ScrambleCollectionTokens(BaseModel):
     n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
     max_suggestions: Optional[PositiveInt] = Field(10, title='maximal number of suggestions to generate',
   examples=[10], description='must be a positive integer or null\n* number of generated suggestions will be '
-                             '`max_suggestions` or less (exactly `max_suggestions` if there are enough names)\n'
+                             '`max_suggestions` or less (exactly `max_suggestions` if there are enough members)\n'
                              '* if null, no tokens are repeated')
     seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
                       title='seed for random number generator',
@@ -236,3 +236,10 @@ class FetchCollectionMembersRequest(BaseModel):
     metadata: bool = Field(
         True, title='return all the metadata in response'
     )
+
+
+# refactor models plan:
+#  [x] apply easy renamings
+#  [x] separate request forming functions
+#  3. adjust collection models and their request forming functions
+#  4. check josiah renamings

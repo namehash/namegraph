@@ -122,8 +122,10 @@ from collection_models import (
 )
 
 
+# ======== Response formatters for generator API ========
+
 def convert_to_suggestion_format(
-        names: List[GeneratedName],
+        names: List[GeneratedName] | RelatedSuggestions,
         include_metadata: bool = True
 ) -> list[dict[str, str | dict]]:
     response = [{
@@ -145,26 +147,6 @@ def convert_to_suggestion_format(
                 'collection_members_count': name.collection_members_count,
                 'grouping_category': name.grouping_category
             }
-
-    return response
-
-
-@app.post("/", response_model=list[Suggestion], tags=['generator'])
-async def generate_names(name: NameRequest):
-    seed_all(name.label)
-    log_entry = LogEntry(generator.config)
-    logger.debug(f'Request received: {name.label}')
-    params = name.params.model_dump() if name.params is not None else dict()
-
-    result = generator.generate_names(name.label,
-                                      sorter=name.sorter,
-                                      min_suggestions=name.min_suggestions,
-                                      max_suggestions=name.max_suggestions,
-                                      min_available_fraction=name.min_primary_fraction,
-                                      params=params)
-
-    response = convert_to_suggestion_format(result, include_metadata=name.metadata)
-    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
 
     return response
 
@@ -278,6 +260,28 @@ def convert_to_grouped_suggestions_format(
     return response
 
 
+# ======== Endpoints for generator API ========
+
+@app.post("/", response_model=list[Suggestion], tags=['generator'])
+async def generate_names(name: NameRequest):
+    seed_all(name.label)
+    log_entry = LogEntry(generator.config)
+    logger.debug(f'Request received: {name.label}')
+    params = name.params.model_dump() if name.params is not None else dict()
+
+    result = generator.generate_names(name.label,
+                                      sorter=name.sorter,
+                                      min_suggestions=name.min_suggestions,
+                                      max_suggestions=name.max_suggestions,
+                                      min_available_fraction=name.min_primary_fraction,
+                                      params=params)
+
+    response = convert_to_suggestion_format(result, include_metadata=name.metadata)
+    logger.info(json.dumps(log_entry.create_log_entry(name.model_dump(), result)))
+
+    return response
+
+
 @app.post("/grouped_by_category", response_model=GroupedSuggestions, tags=['generator'])
 async def grouped_by_category(name: NameRequest):
     seed_all(name.label)
@@ -329,6 +333,48 @@ def suggestions_by_category(name: GroupedNameRequest):
     return response
 
 
+# ======== Response formatters for collections API ========
+
+def convert_to_collection_format(collections: list[Collection]):
+    collections_json = [
+        {
+            'collection_id': collection.collection_id,
+            'title': collection.title,
+            'owner': collection.owner,
+            'number_of_names': collection.number_of_names,
+            'last_updated_timestamp': collection.modified_timestamp,
+            'top_names': [{
+                'name': name,
+                'namehash': namehash,
+            } for name, namehash in zip(collection.names, collection.namehashes)],
+            'types': collection.name_types,
+            'avatar_emoji': collection.avatar_emoji,
+            'avatar_image': collection.avatar_image
+        }
+        for collection in collections
+    ]
+    return collections_json
+
+
+def convert_related_to_grouped_suggestions_format_for_collections(
+        related_suggestions: RelatedSuggestions,
+        include_metadata: bool = True
+) -> list[dict]:
+    converted_suggestions = convert_to_suggestion_format(related_suggestions, include_metadata=True)
+    return {
+        'suggestions': converted_suggestions if include_metadata else
+            [{k: v for k, v in sug.items() if k != 'metadata'} for sug in converted_suggestions],
+        'type': 'related',  # todo: remove field
+        'name': related_suggestions.collection_title,  # todo: remove field
+        'collection_title': related_suggestions.collection_title,
+        'collection_id': related_suggestions.collection_id,
+        'collection_members_count': related_suggestions.collection_members_count,
+        'related_collections': related_suggestions.related_collections,
+    }
+
+
+# ======== Endpoints for collections API ========
+
 @app.post("/sample_collection_members", response_model=list[SuggestionFromCollection], tags=['collections'])
 async def sample_collection_members(sample_command: SampleCollectionMembers):
     result, es_response_metadata = generator_matcher.sample_members_from_collection(
@@ -375,18 +421,15 @@ async def fetch_top_collection_members(fetch_top10_command: Top10CollectionMembe
         obj.interpretation = []
         top_members.append(obj)
 
-    # response = convert_to_suggestion_format(top_members, include_metadata=fetch_top10_command.metadata)
-
-    rs = RelatedSuggestions(result['collection_title'], result['collection_id'], result['collection_members_count'], )
+    rs = RelatedSuggestions(result['collection_title'], result['collection_id'], result['collection_members_count'])
     rs.related_collections = result['related_collections']
     rs.extend(top_members)
 
-    response2 = convert_related_to_grouped_suggestions_format({result['collection_title']: rs},
-                                                              include_metadata=fetch_top10_command.metadata)
+    response = convert_related_to_grouped_suggestions_format_for_collections(rs, include_metadata=fetch_top10_command.metadata)
 
     logger.info(json.dumps({'endpoint': 'fetch_top_collection_members', 'request': fetch_top10_command.model_dump()}))
 
-    return response2[0]
+    return response
 
 
 @app.post("/scramble_collection_tokens", response_model=list[SuggestionFromCollection], tags=['collections'])
@@ -412,27 +455,6 @@ async def scramble_collection_tokens(scramble_command: ScrambleCollectionTokens)
     logger.info(json.dumps({'endpoint': 'scramble_collection_tokens', 'request': scramble_command.model_dump()}))
 
     return response
-
-
-def convert_to_collection_format(collections: list[Collection]):
-    collections_json = [
-        {
-            'collection_id': collection.collection_id,
-            'title': collection.title,
-            'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
-            'last_updated_timestamp': collection.modified_timestamp,
-            'top_names': [{
-                'name': name,
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
-            'types': collection.name_types,
-            'avatar_emoji': collection.avatar_emoji,
-            'avatar_image': collection.avatar_image
-        }
-        for collection in collections
-    ]
-    return collections_json
 
 
 @app.post("/find_collections_by_string", response_model=CollectionSearchResponse, tags=['collections'])
@@ -642,17 +664,14 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
                            result['collection_members_count'])
     rs.extend(members)
 
-    response = convert_related_to_grouped_suggestions_format(
-        {result['collection_title']: rs},
-        include_metadata=fetch_command.metadata
-    )
+    response = convert_related_to_grouped_suggestions_format_for_collections(rs, include_metadata=fetch_command.metadata)
 
     logger.info(json.dumps({
         'endpoint': 'fetch_collection_members', 
         'request': fetch_command.model_dump()
     }))
 
-    return response[0]
+    return response
 
 
 @app.post("/get_collection_by_id", response_model=CollectionModel, tags=['collections'])
