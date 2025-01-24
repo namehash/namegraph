@@ -102,7 +102,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 5,
             "min_other_collections": 0,
             "max_other_collections": 0,
-            "name_diversity_ratio": None,  # no diversity
+            "label_diversity_ratio": None,  # no diversity
             "max_per_type": None,
         })
         assert response.status_code == 200
@@ -151,7 +151,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 15,
             "max_total_collections": 15,
-            "name_diversity_ratio": 0.5,
+            "label_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_labels": 10,
         })
@@ -170,7 +170,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 3,
             "max_other_collections": 3,
             "max_total_collections": 6,
-            "name_diversity_ratio": 0.5,
+            "label_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_labels": 10,
         })
@@ -188,7 +188,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 0,
             "max_total_collections": 100,
-            "name_diversity_ratio": None,  # no diversity
+            "label_diversity_ratio": None,  # no diversity
             "max_per_type": None,
             "limit_labels": 10,
             "sort_order": 'Z-A',  # sort
@@ -205,7 +205,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 0,
             "max_total_collections": 100,
-            "name_diversity_ratio": None,  # no diversity
+            "label_diversity_ratio": None,  # no diversity
             "max_per_type": None,
             "limit_labels": 10,
             "sort_order": 'Z-A',  # sort
@@ -329,7 +329,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 0,
             "max_total_collections": 10,
-            "name_diversity_ratio": 0.5,
+            "label_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_labels": 10,
             "sort_order": 'Relevance'
@@ -381,7 +381,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 3,
             "max_total_collections": 6,
-            "name_diversity_ratio": 0.5,
+            "label_diversity_ratio": 0.5,
             "max_per_type": 3,
             "limit_labels": 10,
         })

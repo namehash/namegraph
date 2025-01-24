@@ -64,9 +64,9 @@ class BaseCollectionSearch(BaseCollectionSearchLimitOffsetSort):
                                         title='number of collections with the same type which are not penalized',
                                         description='* set to null if you want to disable the penalization\n'
                                                     '* if the penalization algorithm is turned on then 3 times more results (than max_related_collections) are retrieved from Elasticsearch')
-    name_diversity_ratio: Optional[float] = Field(None, examples=[0.5], ge=0.0, le=1.0,
+    label_diversity_ratio: Optional[float] = Field(None, examples=[0.5], ge=0.0, le=1.0,
         title='similarity value used for adding penalty to collections with similar labels to other collections',
-        description='* if more than name_diversity_ratio % of the labels have already been used, penalize the collection\n'
+        description='* if more than label_diversity_ratio % of the labels have already been used, penalize the collection\n'
                     '* set to null if you want disable the penalization\n'
                     '* if the penalization algorithm is turned on then 3 times more results (than `max_related_collections`) '
                     'are retrieved from Elasticsearch'

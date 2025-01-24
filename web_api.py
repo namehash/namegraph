@@ -137,7 +137,7 @@ def convert_to_suggestion_format(
         for name, name_json in zip(names, response):
             name_json['metadata'] = {
                 'applied_strategies': name.applied_strategies,
-                'cached_interesting_score': domains.get_interesting_score(name),
+                'cached_sort_score': domains.get_sort_score(name),
                 'cached_status': name.status,
                 'categories': categories.get_categories(str(name)),
                 'interpretation': name.interpretation,
@@ -469,7 +469,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
             max_related_collections=query.max_related_collections,
             offset=query.offset,
             sort_order=query.sort_order,
-            name_diversity_ratio=query.name_diversity_ratio,
+            label_diversity_ratio=query.label_diversity_ratio,
             max_per_type=query.max_per_type,
             limit_names=query.limit_labels,
         )
@@ -540,7 +540,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     related_collections, es_search_metadata = collections_matcher.search_by_collection(
         query.collection_id,
         max_related_collections=query.max_related_collections,
-        name_diversity_ratio=query.name_diversity_ratio,
+        label_diversity_ratio=query.label_diversity_ratio,
         max_per_type=query.max_per_type,
         limit_names=query.limit_labels,
         sort_order=query.sort_order,

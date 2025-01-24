@@ -61,7 +61,7 @@ class CollectionMatcher(metaclass=Singleton):
             self,
             collections: list[Collection],
             max_limit: int,
-            name_diversity_ratio: Optional[float],
+            label_diversity_ratio: Optional[float],
             max_per_type: Optional[int],
     ) -> list[Collection]:
 
@@ -72,11 +72,11 @@ class CollectionMatcher(metaclass=Singleton):
         used_types = defaultdict(int)  # types cover
 
         for collection in collections:
-            if name_diversity_ratio is not None:
+            if label_diversity_ratio is not None:
                 number_of_covered_names = len(set(collection.names) & used_names)
 
-                # if more than `name_diversity_ratio` of the names have already been used, penalize the collection
-                if number_of_covered_names / len(collection.names) < name_diversity_ratio:
+                # if more than `label_diversity_ratio` of the names have already been used, penalize the collection
+                if number_of_covered_names / len(collection.names) < label_diversity_ratio:
                     used_names.update(collection.names)
                 else:
                     penalized_collections.append((collection.score * 0.8, collection))
@@ -147,7 +147,7 @@ class CollectionMatcher(metaclass=Singleton):
             fields: list[str],
             offset: int = 0,
             sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = None,
-            name_diversity_ratio: Optional[float] = None,
+            label_diversity_ratio: Optional[float] = None,
             max_per_type: Optional[int] = None,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
@@ -155,7 +155,7 @@ class CollectionMatcher(metaclass=Singleton):
         if sort_order == SortOrder.AI:
             sort_order = SortOrder.RELEVANCE
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
         query_params = ElasticsearchQueryBuilder() \
             .add_query(query) \
             .add_filter('term', {'data.public': True}) \
@@ -173,5 +173,5 @@ class CollectionMatcher(metaclass=Singleton):
         if not apply_diversity:
             return collections[:max_limit], es_response_metadata
 
-        diversified = self._apply_diversity(collections, max_limit, name_diversity_ratio, max_per_type)
+        diversified = self._apply_diversity(collections, max_limit, label_diversity_ratio, max_per_type)
         return diversified, es_response_metadata

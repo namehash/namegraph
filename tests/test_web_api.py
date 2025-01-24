@@ -61,7 +61,7 @@ def test_metadata_scheme(test_test_client, name: str):
     for generated_name in json:
         assert sorted(generated_name.keys()) == sorted(['label', "tokenized_label", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted([
-            'applied_strategies', 'cached_interesting_score', 'cached_status',
+            'applied_strategies', 'cached_sort_score', 'cached_status',
             'categories', 'interpretation', 'pipeline_name', 'collection_title', 'collection_id', 'grouping_category'
         ])
 

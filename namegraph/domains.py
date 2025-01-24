@@ -82,15 +82,15 @@ class Domains(metaclass=Singleton):
             next(reader)
             for row in reader:
                 assert len(row) == 3
-                name, interesting_score, status = row
+                name, sort_score, status = row
                 name = strip_eth(name)
-                interesting_score = float(interesting_score)
+                sort_score = float(sort_score)
                 if status == self.TAKEN or status == self.RECENTLY_RELEASED:
-                    taken[name] = interesting_score
+                    taken[name] = sort_score
                 elif status == self.ON_SALE:
-                    on_sale[name] = interesting_score
+                    on_sale[name] = sort_score
                 elif status == self.AVAILABLE:
-                    available[name] = interesting_score
+                    available[name] = sort_score
 
         return taken, on_sale, available
 
@@ -102,7 +102,7 @@ class Domains(metaclass=Singleton):
         else:
             return self.AVAILABLE
 
-    def get_interesting_score(self, name: GeneratedName) -> Optional[float]:
+    def get_sort_score(self, name: GeneratedName) -> Optional[float]:
         if name.status is None:
             name.status = self.get_name_status(str(name))
 

@@ -35,8 +35,8 @@ class Metadata(BaseModel):
                                description='label\'s status cached at the time of application startup')
     categories: list[str] = Field(title='domain category',
                                   description='can be either available, taken, recently released or on sale')
-    cached_interesting_score: Optional[float] = Field(title='cached interesting score',
-                                                      description='label\'s interesting score cached at the time of '
+    cached_sort_score: Optional[float] = Field(title='cached sort score',
+                                                      description='label\'s sort score cached at the time of '
                                                                   'application startup')
     applied_strategies: list[list[str]] = Field(
         title="sequence of steps performed in every pipeline that generated the suggestion"
@@ -74,7 +74,7 @@ class Params(BaseModel):
     enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
-    name_diversity_ratio: Optional[float] = \
+    label_diversity_ratio: Optional[float] = \
         Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
               description='adds penalty to collections with similar names to other collections\n'
                           'if null, then no penalty will be added')
@@ -130,7 +130,7 @@ class RelatedCategoryParams(BaseModel):
     enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
-    name_diversity_ratio: Optional[float] = \
+    label_diversity_ratio: Optional[float] = \
         Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
               description='adds penalty to collections with similar names to other collections\n'
                           'if null, then no penalty will be added')

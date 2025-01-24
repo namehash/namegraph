@@ -324,9 +324,9 @@ class TestGrouped:
         for label in ['pinkfloyd', 'spears', 'kyiv', 'ronaldo', 'bohr', 'buildings', 'births', 'deaths']:
             titles = []
             for diversity_parameters in [
-                {'name_diversity_ratio': 1.0, 'max_per_type': 1},
-                {'name_diversity_ratio': 0.5, 'max_per_type': 2},
-                {'name_diversity_ratio': None, 'max_per_type': None},
+                {'label_diversity_ratio': 1.0, 'max_per_type': 1},
+                {'label_diversity_ratio': 0.5, 'max_per_type': 2},
+                {'label_diversity_ratio': None, 'max_per_type': None},
             ]:
                 response = test_client.post("/suggestions_by_category", json={
                     "label": label,
@@ -374,7 +374,7 @@ class TestGrouped:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
                 "wordplay": {
                     "max_suggestions": 10,
@@ -501,7 +501,7 @@ class TestGrouped:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
             }
         }

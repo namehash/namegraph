@@ -73,7 +73,7 @@ def add_collection(parent_collection_id: str, collection_id: str):
 def call_suggestions_by_category(label: str,
                                  max_recursive_related_collections: int = 3,
                                  max_related_collections: int = 6,
-                                 name_diversity_ratio: float = 0.5,
+                                 label_diversity_ratio: float = 0.5,
                                  max_per_type: int = 2,
                                  enable_learning_to_rank: bool = True,
                                  ):
@@ -96,7 +96,7 @@ def call_suggestions_by_category(label: str,
                 "max_per_type": max_per_type,
                 "max_recursive_related_collections": max_recursive_related_collections,
                 "max_related_collections": max_related_collections,
-                "name_diversity_ratio": name_diversity_ratio
+                "label_diversity_ratio": label_diversity_ratio
             },
             "wordplay": {
                 "max_suggestions": 10,
@@ -159,7 +159,7 @@ input = st.sidebar.text_input("Input:", value='zeus', key="input", on_change=res
 st.sidebar.slider('max_recursive_related_collections', 0, 10, 3, key='max_recursive_related_collections')
 st.sidebar.slider('max_related_collections', 0, 10, 6, key='max_related_collections')
 st.sidebar.toggle('enable_learning_to_rank', value=True, key='enable_learning_to_rank')
-st.sidebar.slider('name_diversity_ratio', 0.0, 1.0, 0.5, key='name_diversity_ratio')
+st.sidebar.slider('label_diversity_ratio', 0.0, 1.0, 0.5, key='label_diversity_ratio')
 st.sidebar.slider('max_per_type', 1, 5, 2, key='max_per_type')
 st.sidebar.header('Scramble')
 st.sidebar.selectbox("method", ("left-right-shuffle", "left-right-shuffle-with-unigrams", "full-shuffle"), index=1,
@@ -173,7 +173,7 @@ response = call_suggestions_by_category(
     input,
     max_recursive_related_collections=st.session_state.max_recursive_related_collections,
     max_related_collections=st.session_state.max_related_collections,
-    name_diversity_ratio=st.session_state.name_diversity_ratio,
+    label_diversity_ratio=st.session_state.label_diversity_ratio,
     max_per_type=st.session_state.max_per_type,
     enable_learning_to_rank=st.session_state.enable_learning_to_rank
 )

@@ -538,8 +538,8 @@ def test_substringmatchgenerator_sorting():
         generated_names = list(strategy.generate(tokenized_name))
         generated_tokens = generated_names
 
-        assert ('00042069',) in generated_tokens  # interesting_score = 988
-        assert ('0000042069',) in generated_tokens  # interesting_score = 227
+        assert ('00042069',) in generated_tokens  # sort_score = 988
+        assert ('0000042069',) in generated_tokens  # sort_score = 227
 
         longer_pos = generated_tokens.index(('0000042069',))
         shorter_pos = generated_tokens.index(('00042069',))
