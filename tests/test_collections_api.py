@@ -92,7 +92,7 @@ class TestCorrectConfiguration:
         es_time = response_json['metadata'].get('elasticsearch_processing_time_ms', 0)
         assert es_time <= response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
-    @mark.skip(reason='we return only names, without the root name')
+    @mark.skip(reason='we return only labels, without the root name')
     @mark.integration_test
     def test_collection_api_eth_suffix(self, test_test_client):
         response = test_test_client.post("/find_collections_by_string", json={
@@ -109,9 +109,9 @@ class TestCorrectConfiguration:
         response_json = response.json()
 
         assert len(response_json['related_collections'] + response_json['other_collections']) <= 5
-        assert all([member_name['name'].endswith('.eth')
+        assert all([member_name['label'].endswith('.eth')
                     for collection in response_json['related_collections'] + response_json['other_collections']
-                    for member_name in collection['top_names']])
+                    for member_name in collection['top_labels']])
 
     @mark.integration_test
     def test_collection_api_avatar_emojis_and_images(self, test_test_client):
@@ -153,7 +153,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 15,
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
-            "limit_names": 10,
+            "limit_labels": 10,
         })
 
         assert response.status_code == 200
@@ -172,7 +172,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 6,
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
-            "limit_names": 10,
+            "limit_labels": 10,
         })
 
         assert response.status_code == 200
@@ -190,7 +190,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 100,
             "name_diversity_ratio": None,  # no diversity
             "max_per_type": None,
-            "limit_names": 10,
+            "limit_labels": 10,
             "sort_order": 'Z-A',  # sort
             "offset": 0,  # page 1
             "max_related_collections": 100,
@@ -207,7 +207,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 100,
             "name_diversity_ratio": None,  # no diversity
             "max_per_type": None,
-            "limit_names": 10,
+            "limit_labels": 10,
             "sort_order": 'Z-A',  # sort
             "offset": 100,  # page 2
             "max_related_collections": 100,
@@ -269,7 +269,7 @@ class TestCorrectConfiguration:
         response = test_test_client.post("/find_collections_by_member", json={
             "label": "australia",
             "sort_order": "A-Z",
-            "limit_names": lim,
+            "limit_labels": lim,
             "mode": 'domain_detail',
             "offset": 10,
             'max_results': 30
@@ -279,8 +279,8 @@ class TestCorrectConfiguration:
         response_json = response.json()
         collection_list = response_json['collections']
 
-        # test limit names
-        assert all([len(c['top_names']) <= lim for c in collection_list])
+        # test limit labels
+        assert all([len(c['top_labels']) <= lim for c in collection_list])
 
         # test A-Z sort
         titles = [c['title'] for c in collection_list]
@@ -308,7 +308,7 @@ class TestCorrectConfiguration:
         response = test_test_client.post("/find_collections_by_member", json={
             "label": "softmachine",
             "mode": "domain_detail",
-            "limit_names": 10,
+            "limit_labels": 10,
             "sort_order": 'AI',  # sort
             "offset": 20,  # page out of bounds (offset >= n_matched_collections)
             "max_related_collections": 100,
@@ -331,7 +331,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 10,
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
-            "limit_names": 10,
+            "limit_labels": 10,
             "sort_order": 'Relevance'
         })
 
@@ -351,7 +351,7 @@ class TestCorrectConfiguration:
             "min_other_collections": 0,
             "max_other_collections": 4,
             "max_total_collections": 10,
-            "limit_names": 6,
+            "limit_labels": 6,
             "offset": 8,
             "sort_order": 'A-Z'
         })
@@ -362,8 +362,8 @@ class TestCorrectConfiguration:
 
         collection_list = response_json['related_collections']
 
-        # test limit names
-        assert all([len(c['top_names']) <= 6 for c in collection_list])
+        # test limit labels
+        assert all([len(c['top_labels']) <= 6 for c in collection_list])
 
         # test A-Z sort
         titles = [c['title'] for c in collection_list]
@@ -383,7 +383,7 @@ class TestCorrectConfiguration:
             "max_total_collections": 6,
             "name_diversity_ratio": 0.5,
             "max_per_type": 3,
-            "limit_names": 10,
+            "limit_labels": 10,
         })
         assert response.status_code == 404
 
@@ -402,10 +402,10 @@ class TestCorrectConfiguration:
         assert response.status_code == 422
 
     @mark.integration_test
-    def test_collection_api_instant_search_limit_names_gt_10(self, test_test_client):
+    def test_collection_api_instant_search_limit_labels_gt_10(self, test_test_client):
         response = test_test_client.post("/find_collections_by_string", json={
             "query": "australia",
-            "limit_names": 11,
+            "limit_labels": 11,
         })
         assert response.status_code == 422
 
@@ -568,8 +568,8 @@ class TestCorrectConfiguration:
         response2_json = response2.json()
         
         # Verify different pages return different members
-        first_page_names = [s['name'] for s in response_json['suggestions']]
-        second_page_names = [s['name'] for s in response2_json['suggestions']]
+        first_page_names = [s['label'] for s in response_json['suggestions']]
+        second_page_names = [s['label'] for s in response2_json['suggestions']]
         assert not set(first_page_names).intersection(second_page_names)
 
     @mark.integration_test
@@ -600,7 +600,7 @@ class TestCorrectConfiguration:
 
     @mark.integration_test
     def test_fetch_collection_members_tokenized_names(self, test_test_client):
-        name2labeltokens = {
+        label2tokens = {
             "dualipa": ("dua", "lipa"),
             "thebeatles": ("the", "beatles"),
             "davidbowie": ("david", "bowie")
@@ -615,9 +615,9 @@ class TestCorrectConfiguration:
         assert response.status_code == 200
         response_json = response.json()
         for item in response_json['suggestions']:
-            assert ''.join(item['tokenized_label']) == item['name']
-            if item['name'] in name2labeltokens:
-                assert tuple(item['tokenized_label']) == name2labeltokens[item['name']]
+            assert ''.join(item['tokenized_label']) == item['label']
+            if item['label'] in label2tokens:
+                assert tuple(item['tokenized_label']) == label2tokens[item['label']]
 
     @mark.integration_test
     def test_get_collection_by_id(self, test_test_client):
@@ -630,9 +630,10 @@ class TestCorrectConfiguration:
         assert collection['collection_id'] == "ri2QqxnAqZT7"
         assert 'title' in collection
         assert 'owner' in collection
-        assert 'number_of_names' in collection
+        assert 'number_of_labels' in collection
         assert 'last_updated_timestamp' in collection
-        assert 'top_names' in collection
+        assert 'top_labels' in collection
+        assert all([tuple(label.keys()) == ('label',) for label in collection['top_labels']])
         assert 'types' in collection
         assert 'avatar_emoji' in collection
         assert 'avatar_image' in collection
@@ -677,7 +678,7 @@ class TestCollectionApiUnavailable:
             "min_other_collections": 0,
             "max_other_collections": 2,
             "max_total_collections": 10,
-            "limit_names": 6,
+            "limit_labels": 6,
             "offset": 8,
             "sort_order": 'A-Z'
         })

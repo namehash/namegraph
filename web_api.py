@@ -96,10 +96,10 @@ domains = Domains(generator.config)
 categories = Categories(generator.config)
 
 from models import (
-    NameRequest,
+    LabelRequest,
     Suggestion,
     GroupedSuggestions,
-    GroupedNameRequest,
+    GroupedLabelRequest,
 )
 
 from collection_models import (
@@ -108,10 +108,10 @@ from collection_models import (
     CollectionSearchResponse,
     CollectionSearchByCollection,
     CollectionSearchByString,
-    CollectionsContainingNameCountResponse,
-    CollectionsContainingNameCountRequest,
-    CollectionsContainingNameRequest,
-    CollectionsContainingNameResponse,
+    CollectionsContainingLabelCountResponse,
+    CollectionsContainingLabelCountRequest,
+    CollectionsContainingLabelRequest,
+    CollectionsContainingLabelResponse,
     CollectionCountByStringRequest,
     Collection as CollectionModel,
     FetchCollectionMembersRequest,
@@ -129,7 +129,7 @@ def convert_to_suggestion_format(
         include_metadata: bool = True
 ) -> list[dict[str, str | dict]]:
     response = [{
-        'name': str(name),
+        'label': str(name),
         'tokenized_label': list(name.tokens)
     } for name in names]
 
@@ -263,7 +263,7 @@ def convert_to_grouped_suggestions_format(
 # ======== Endpoints for generator API ========
 
 @app.post("/", response_model=list[Suggestion], tags=['generator'])
-async def generate_names(name: NameRequest):
+async def generate_names(name: LabelRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -283,7 +283,7 @@ async def generate_names(name: NameRequest):
 
 
 @app.post("/grouped_by_category", response_model=GroupedSuggestions, tags=['generator'])
-async def grouped_by_category(name: NameRequest):
+async def grouped_by_category(name: LabelRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -306,7 +306,7 @@ async def grouped_by_category(name: NameRequest):
 
 
 @app.post("/suggestions_by_category", response_model=GroupedSuggestions, tags=['generator'])
-def suggestions_by_category(name: GroupedNameRequest):
+def suggestions_by_category(name: GroupedLabelRequest):
     seed_all(name.label)
     log_entry = LogEntry(generator.config)
     logger.debug(f'Request received: {name.label}')
@@ -341,12 +341,9 @@ def convert_to_collection_format(collections: list[Collection]):
             'collection_id': collection.collection_id,
             'title': collection.title,
             'owner': collection.owner,
-            'number_of_names': collection.number_of_names,
+            'number_of_labels': collection.number_of_names,
             'last_updated_timestamp': collection.modified_timestamp,
-            'top_names': [{
-                'name': name,
-                'namehash': namehash,
-            } for name, namehash in zip(collection.names, collection.namehashes)],
+            'top_labels': [{'label': label} for label in collection.names],
             'types': collection.name_types,
             'avatar_emoji': collection.avatar_emoji,
             'avatar_image': collection.avatar_image
@@ -474,7 +471,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
             sort_order=query.sort_order,
             name_diversity_ratio=query.name_diversity_ratio,
             max_per_type=query.max_per_type,
-            limit_names=query.limit_names,
+            limit_names=query.limit_labels,
         )
         related_collections = convert_to_collection_format(related_collections)
 
@@ -504,7 +501,7 @@ async def find_collections_by_string(query: CollectionSearchByString):
     return response
 
 
-@app.post("/count_collections_by_string", response_model=CollectionsContainingNameCountResponse, tags=['collections'])
+@app.post("/count_collections_by_string", response_model=CollectionsContainingLabelCountResponse, tags=['collections'])
 async def get_collections_count_by_string(query: CollectionCountByStringRequest):
     t_before = perf_counter()
 
@@ -545,7 +542,7 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         max_related_collections=query.max_related_collections,
         name_diversity_ratio=query.name_diversity_ratio,
         max_per_type=query.max_per_type,
-        limit_names=query.limit_names,
+        limit_names=query.limit_labels,
         sort_order=query.sort_order,
         offset=query.offset
     )
@@ -577,8 +574,8 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
     return response
 
 
-@app.post("/count_collections_by_member", response_model=CollectionsContainingNameCountResponse, tags=['collections'])
-async def get_collections_membership_count(request: CollectionsContainingNameCountRequest):
+@app.post("/count_collections_by_member", response_model=CollectionsContainingLabelCountResponse, tags=['collections'])
+async def get_collections_membership_count(request: CollectionsContainingLabelCountRequest):
     t_before = perf_counter()
 
     if not collections_matcher.active:
@@ -602,8 +599,8 @@ async def get_collections_membership_count(request: CollectionsContainingNameCou
     return {'count': count, 'metadata': metadata}
 
 
-@app.post("/find_collections_by_member", response_model=CollectionsContainingNameResponse, tags=['collections'])
-async def find_collections_membership_list(request: CollectionsContainingNameRequest):
+@app.post("/find_collections_by_member", response_model=CollectionsContainingLabelResponse, tags=['collections'])
+async def find_collections_membership_list(request: CollectionsContainingLabelRequest):
     t_before = perf_counter()
 
     if not collections_matcher.active:
@@ -615,7 +612,7 @@ async def find_collections_membership_list(request: CollectionsContainingNameReq
     else:
         collections_featuring_label, es_search_metadata = collections_matcher.get_collections_membership_list_for_name(
             request.label,
-            limit_names=request.limit_names,
+            limit_names=request.limit_labels,
             sort_order=request.sort_order,
             max_results=request.max_results,
             offset=request.offset,

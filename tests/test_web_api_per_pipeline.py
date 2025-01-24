@@ -65,7 +65,7 @@ class TestFlagAffix:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
 
         assert any(name.endswith(expected_suffix) for name in names)
 
@@ -82,7 +82,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -93,7 +93,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -104,7 +104,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -114,7 +114,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -123,7 +123,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -131,7 +131,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
     @mark.parametrize(
@@ -152,7 +152,7 @@ class TestFlagAffix:
         assert response.status_code == 200
 
         json = response.json()
-        names = [suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
+        names = [suggestion['label'] for category in json['categories'] for suggestion in category['suggestions']]
         assert any(name.endswith(expected_suffix) for name in names)
 
 
@@ -172,7 +172,7 @@ class TestEmoji:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         print(names)
 
         assert set(expected_names).intersection(names) == set(expected_names)
@@ -197,7 +197,7 @@ class TestOnlyPrimary:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
 
         assert len(names) == 1
         assert names[0] in {'glintpay', 'drbaher', '9852222', 'wanadoo',
@@ -219,21 +219,21 @@ class TestSubstringMatch:
         response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
+        names = [name['label'] for name in json]
         assert "akamaihd" in names
 
     def test_unnormalized(self, test_client):
         response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
+        names = [name['label'] for name in json]
         assert "あかまいhd" in names
 
     def test_emoji(self, test_client):
         response = test_client.post("/", json={"label": "💛"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
+        names = [name['label'] for name in json]
         assert "i💛you" in names
 
 
@@ -478,7 +478,7 @@ class TestGrouped:
         # no duplicated suggestions within categories
         related_suggestions = []
         for gcat in categories:
-            suggestions = [s['name'] for s in gcat['suggestions']]
+            suggestions = [s['label'] for s in gcat['suggestions']]
             print(gcat['type'], gcat['name'])
             print(suggestions)
             if gcat['type'] == 'related':
@@ -581,9 +581,9 @@ class TestGrouped:
         assert len(response_json) <= 10
 
         for item in response_json['suggestions']:
-            assert ''.join(item['tokenized_label']) == item['name']
-            if item['name'] in label2tokens:
-                assert tuple(item['tokenized_label']) == label2tokens[item['name']]
+            assert ''.join(item['tokenized_label']) == item['label']
+            if item['label'] in label2tokens:
+                assert tuple(item['tokenized_label']) == label2tokens[item['label']]
 
 
     @pytest.mark.xfail(reason="Enable when we move filtered collections to use a separate field") # TODO

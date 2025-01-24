@@ -37,7 +37,7 @@ def test_read_main(test_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
+    str_names = [name['label'] for name in json]
     assert "discharge" in str_names
 
 
@@ -59,7 +59,7 @@ def test_metadata_scheme(test_test_client, name: str):
     json = response.json()
 
     for generated_name in json:
-        assert sorted(generated_name.keys()) == sorted(["name", "tokenized_label", "metadata"])
+        assert sorted(generated_name.keys()) == sorted(['label', "tokenized_label", "metadata"])
         assert sorted(generated_name["metadata"].keys()) == sorted([
             'applied_strategies', 'cached_interesting_score', 'cached_status',
             'categories', 'interpretation', 'pipeline_name', 'collection_title', 'collection_id', 'grouping_category'
@@ -94,7 +94,7 @@ def test_metadata_applied_strategies(test_test_client,
     print(json)
     print('==='*20)
 
-    result = [name for name in json if name["name"] == expected_name]
+    result = [name for name in json if name['label'] == expected_name]
 
     assert len(result) == 1
 
@@ -148,7 +148,7 @@ def test_length_sorter(test_test_client, name: str):
     json = response.json()
     assert len(json) > 0
 
-    lengths = [len(gn["name"]) for gn in json]
+    lengths = [len(gn['label']) for gn in json]
     assert all([first <= second for first, second in zip(lengths, lengths[1:])])
 
 
@@ -170,7 +170,7 @@ def test_min_max_suggestions_parameters(test_test_client, name: str, min_suggest
     assert response.status_code == 200
 
     json = response.json()
-    unique_names = set([suggestion["name"] for suggestion in json])
+    unique_names = set([suggestion['label'] for suggestion in json])
     assert len(unique_names) == len(json)
 
     assert min_suggestions <= len(unique_names)
@@ -187,7 +187,7 @@ def test_min_primary_fraction(test_test_client):
 
     json = response.json()
     assert len(json) > 0
-    names = [suggestion["name"] for suggestion in json]
+    names = [suggestion['label'] for suggestion in json]
     assert 'iref' not in names
 
 
@@ -232,6 +232,6 @@ def test_person_name_generator(test_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
+    str_names = [name['label'] for name in json]
 
     assert "iamchris" in str_names
