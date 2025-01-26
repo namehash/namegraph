@@ -77,7 +77,7 @@ if __name__ == '__main__':
     with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(mapped_other_collections_records, f, indent=2, ensure_ascii=False)
 
-    # name-generator/data/collections_data/other_collections.json
+    # namegraph/data/collections_data/other_collections.json
 
     # No elastic ID for Q1322417 - Wealthiest historical figures
     # No elastic ID for Q1547772 - Stars for navigation
