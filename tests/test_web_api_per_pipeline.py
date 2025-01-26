@@ -65,9 +65,9 @@ class TestFlagAffix:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
 
-        assert any(name.endswith(expected_suffix + '.eth') for name in names)
+        assert any(name.endswith(expected_suffix) for name in names)
 
     def test_country_generator_parameter_no_country(self, test_client):
         client = test_client
@@ -82,7 +82,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -93,7 +93,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -104,7 +104,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -114,7 +114,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -123,7 +123,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
         response = client.post("/", json={
@@ -131,7 +131,7 @@ class TestFlagAffix:
         })
         assert response.status_code == 200
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         assert names
 
     @mark.parametrize(
@@ -152,8 +152,8 @@ class TestFlagAffix:
         assert response.status_code == 200
 
         json = response.json()
-        names = [suggestion["name"] for category in json['categories'] for suggestion in category['suggestions']]
-        assert any(name.endswith(expected_suffix + '.eth') for name in names)
+        names = [suggestion['label'] for category in json['categories'] for suggestion in category['suggestions']]
+        assert any(name.endswith(expected_suffix) for name in names)
 
 
 @mark.usefixtures("emoji_pipeline")
@@ -161,10 +161,10 @@ class TestEmoji:
     @mark.parametrize(
         "name, expected_names",
         [
-            ("adoreyoureyes", ["adoreyour👀.eth", "🥰youreyes.eth", "🥰your👀.eth"]),
-            ("prayforukraine", ["prayfor🇺🇦.eth", "🙏forukraine.eth", "🙏for🇺🇦.eth"]),
-            ("krakowdragon", ["krakow🐉.eth"]),
-            ("dragon", ["dragon🐉.eth"])
+            ("adoreyoureyes", ["adoreyour👀", "🥰youreyes", "🥰your👀"]),
+            ("prayforukraine", ["prayfor🇺🇦", "🙏forukraine", "🙏for🇺🇦"]),
+            ("krakowdragon", ["krakow🐉"]),
+            ("dragon", ["dragon🐉"])
         ]
     )
     def test_emoji_generator_api(self, test_client, name: str, expected_names: list[str]):
@@ -172,7 +172,7 @@ class TestEmoji:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
         print(names)
 
         assert set(expected_names).intersection(names) == set(expected_names)
@@ -197,11 +197,11 @@ class TestOnlyPrimary:
         assert response.status_code == 200
 
         json = response.json()
-        names: list[str] = [suggestion["name"] for suggestion in json]
+        names: list[str] = [suggestion['label'] for suggestion in json]
 
         assert len(names) == 1
-        assert names[0] in {'glintpay.eth', 'drbaher.eth', '9852222.eth', 'wanadoo.eth',
-                            'conio.eth', 'indulgente.eth', 'theclown.eth', 'taco.eth'}
+        assert names[0] in {'glintpay', 'drbaher', '9852222', 'wanadoo',
+                            'conio', 'indulgente', 'theclown', 'taco'}
 
 
 @pytest.fixture(scope='class')
@@ -219,22 +219,22 @@ class TestSubstringMatch:
         response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
-        assert "akamaihd.eth" in names
+        names = [name['label'] for name in json]
+        assert "akamaihd" in names
 
     def test_unnormalized(self, test_client):
         response = test_client.post("/", json={"label": "あかまい"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
-        assert "あかまいhd.eth" in names
+        names = [name['label'] for name in json]
+        assert "あかまいhd" in names
 
     def test_emoji(self, test_client):
         response = test_client.post("/", json={"label": "💛"})
         assert response.status_code == 200
         json = response.json()
-        names = [name["name"] for name in json]
-        assert "i💛you.eth" in names
+        names = [name['label'] for name in json]
+        assert "i💛you" in names
 
 
 @pytest.fixture(scope='class')
@@ -324,9 +324,9 @@ class TestGrouped:
         for label in ['pinkfloyd', 'spears', 'kyiv', 'ronaldo', 'bohr', 'buildings', 'births', 'deaths']:
             titles = []
             for diversity_parameters in [
-                {'name_diversity_ratio': 1.0, 'max_per_type': 1},
-                {'name_diversity_ratio': 0.5, 'max_per_type': 2},
-                {'name_diversity_ratio': None, 'max_per_type': None},
+                {'label_diversity_ratio': 1.0, 'max_per_type': 1},
+                {'label_diversity_ratio': 0.5, 'max_per_type': 2},
+                {'label_diversity_ratio': None, 'max_per_type': None},
             ]:
                 response = test_client.post("/suggestions_by_category", json={
                     "label": label,
@@ -374,7 +374,7 @@ class TestGrouped:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
                 "wordplay": {
                     "max_suggestions": 10,
@@ -478,7 +478,7 @@ class TestGrouped:
         # no duplicated suggestions within categories
         related_suggestions = []
         for gcat in categories:
-            suggestions = [s['name'] for s in gcat['suggestions']]
+            suggestions = [s['label'] for s in gcat['suggestions']]
             print(gcat['type'], gcat['name'])
             print(suggestions)
             if gcat['type'] == 'related':
@@ -501,7 +501,7 @@ class TestGrouped:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
             }
         }
@@ -567,10 +567,10 @@ class TestGrouped:
         client = test_client
         collection_id = 'ri2QqxnAqZT7'  # Music artists and bands from England
 
-        name2labeltokens = {
-            "dualipa.eth": ("dua", "lipa"),
-            "thebeatles.eth": ("the", "beatles"),
-            "davidbowie.eth": ("david", "bowie")
+        label2tokens = {
+            "dualipa": ("dua", "lipa"),
+            "thebeatles": ("the", "beatles"),
+            "davidbowie": ("david", "bowie")
         }
 
         response = client.post("/fetch_top_collection_members",
@@ -581,9 +581,9 @@ class TestGrouped:
         assert len(response_json) <= 10
 
         for item in response_json['suggestions']:
-            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
-            if item['name'] in name2labeltokens:
-                assert tuple(item['tokenized_label']) == name2labeltokens[item['name']]
+            assert ''.join(item['tokenized_label']) == item['label']
+            if item['label'] in label2tokens:
+                assert tuple(item['tokenized_label']) == label2tokens[item['label']]
 
 
     @pytest.mark.xfail(reason="Enable when we move filtered collections to use a separate field") # TODO

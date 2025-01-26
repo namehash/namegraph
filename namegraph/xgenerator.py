@@ -169,7 +169,7 @@ class Generator:
         params['categories_params'] = categories_params
         params['min_total_suggestions'] = min_total_suggestions
         params['max_suggestions'] = 200  # TODO used to limit generators
-        params['name_diversity_ratio'] = categories_params.related.name_diversity_ratio
+        params['label_diversity_ratio'] = categories_params.related.label_diversity_ratio
         params['max_per_type'] = categories_params.related.max_per_type
         params['enable_learning_to_rank'] = categories_params.related.enable_learning_to_rank
 

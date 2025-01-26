@@ -37,7 +37,7 @@ def find_collections_by_string(
         min_other_collections: int = 0,
         max_other_collections: int = 0,
         max_total_collections: int = 15,
-        name_diversity_ratio: float = 0.55,
+        label_diversity_ratio: float = 0.55,
         max_per_type: int = 3,
         limit_names: int = 10,
 ):
@@ -48,7 +48,7 @@ def find_collections_by_string(
         "min_other_collections": min_other_collections,
         "max_other_collections": max_other_collections,
         "max_total_collections": max_total_collections,
-        "name_diversity_ratio": name_diversity_ratio,
+        "label_diversity_ratio": label_diversity_ratio,
         "max_per_type": max_per_type,
         "limit_names": limit_names,
     }
@@ -77,7 +77,7 @@ def find_collections_by_collection(collection_id: str):
         "min_other_collections": 0,
         "max_other_collections": 0,
         "max_total_collections": 10,
-        "name_diversity_ratio": 0.5,
+        "label_diversity_ratio": 0.5,
         "max_per_type": 5,
         "limit_names": 10,
         "sort_order": "AI",
@@ -180,7 +180,7 @@ def benchmark_report(times: dict[str, dict[str, list[float]]]):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Benchmark the NameGenerator collections search API')
+    parser = ArgumentParser(description='Benchmark the NameGraph collections search API')
     parser.add_argument('--host', type=str, default='localhost', help='host')
     parser.add_argument('--port', type=int, default=8000, help='port')
     parser.add_argument('--repeats', type=int, default=15, help='repeats')

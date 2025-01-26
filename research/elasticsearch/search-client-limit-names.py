@@ -10,7 +10,7 @@ import numpy as np
 def request_generator_http(
         query: str,
         limit: int,
-        name_diversity_ratio: Optional[float],
+        label_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
         host: str = 'localhost',
@@ -22,7 +22,7 @@ def request_generator_http(
         "min_other_collections": 0,
         "max_other_collections": 0,
         "max_total_collections": limit,
-        "name_diversity_ratio": name_diversity_ratio,
+        "label_diversity_ratio": label_diversity_ratio,
         "max_per_type": max_per_type,
         "limit_names": limit_names,
     }
@@ -35,7 +35,7 @@ def request_generator_http(
 def search_by_all(
         query: str,
         limit: int,
-        name_diversity_ratio: Optional[float],
+        label_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
         host: str = 'localhost',
@@ -44,7 +44,7 @@ def search_by_all(
     response = request_generator_http(
         query,
         limit,
-        name_diversity_ratio,
+        label_diversity_ratio,
         max_per_type,
         limit_names,
         host=host,
@@ -58,7 +58,7 @@ def search_by_all(
 def search_with_latency(
         query: str,
         limit: int,
-        name_diversity_ratio: Optional[float],
+        label_diversity_ratio: Optional[float],
         max_per_type: Optional[int],
         limit_names: Optional[int],
         host: str = 'localhost',
@@ -67,7 +67,7 @@ def search_with_latency(
     results, latency, took = search_by_all(
         query,
         limit,
-        name_diversity_ratio,
+        label_diversity_ratio,
         max_per_type,
         limit_names,
         host=host,

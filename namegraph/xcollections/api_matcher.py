@@ -22,7 +22,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             max_related_collections: int = 3,
             offset: int = 0,
             sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
@@ -48,7 +48,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
         ]
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.public': True}) \
             .add_filter('term', {'data.archived': False}) \
@@ -94,7 +94,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 return collections[:max_related_collections], es_response_metadata
 
             diversified = self._apply_diversity(collections, max_related_collections,
-                                                name_diversity_ratio, max_per_type)
+                                                label_diversity_ratio, max_per_type)
             return diversified, es_response_metadata
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
@@ -137,7 +137,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             collection_id: str,
             max_related_collections: int = 3,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
             sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.RELEVANCE] = SortOrder.RELEVANCE,
@@ -177,7 +177,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.warning(f'more than 1 collection found with id {collection_id}')
 
         # search similar collections
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
@@ -216,7 +216,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         diversified = self._apply_diversity(
             [found_collection] + collections,
             max_related_collections + 1,
-            name_diversity_ratio,
+            label_diversity_ratio,
             max_per_type
         )
         diversified = [c for c in diversified if c.collection_id != found_collection.collection_id]

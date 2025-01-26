@@ -22,7 +22,7 @@ request_data = {
             "max_per_type": 2,
             "max_recursive_related_collections": 3,
             "max_related_collections": 6,
-            "name_diversity_ratio": 0.5
+            "label_diversity_ratio": 0.5
         },
         "wordplay": {
             "max_suggestions": 10,

@@ -81,8 +81,8 @@ def test_prod(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
-    assert "thefire.eth" in str_names
+    str_names = [name['label'] for name in json]
+    assert "thefire" in str_names
 
 
 @pytest.mark.execution_timeout(20)
@@ -117,7 +117,7 @@ def test_metadata(prod_test_client):
     json = response.json()
     assert len(json) > 0
     print(json)
-    catdog_result = [name for name in json if name["name"] == "catdog.eth"]
+    catdog_result = [name for name in json if name['label'] == "catdog"]
     assert len(catdog_result) == 1
 
 
@@ -139,7 +139,7 @@ def test_min_max_suggestions_parameters(prod_test_client, name: str, min_suggest
     assert response.status_code == 200
 
     json = response.json()
-    unique_names = set([suggestion["name"] for suggestion in json])
+    unique_names = set([suggestion['label'] for suggestion in json])
     assert len(unique_names) == len(json)
 
     assert min_suggestions <= len(unique_names)
@@ -170,7 +170,7 @@ def test_min_primary_fraction_parameters(prod_test_client, name: str, suggestion
 
     if response_code == 200:
         json = response.json()
-        unique_names = set([suggestion["name"] for suggestion in json])
+        unique_names = set([suggestion['label'] for suggestion in json])
         assert len(unique_names) == suggestions
 
 
@@ -204,9 +204,9 @@ def test_prod_leet(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
+    str_names = [name['label'] for name in json]
 
-    assert "h4ck3r.eth" in str_names
+    assert "h4ck3r" in str_names
 
 
 @pytest.mark.slow
@@ -222,17 +222,17 @@ def test_prod_flag(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
+    str_names = [name['label'] for name in json]
 
-    assert "firecar🇵🇱.eth" in str_names
-    assert "🇵🇱firecar.eth" in str_names
-    assert "_firecar.eth" in str_names
-    assert "$firecar.eth" in str_names
-    assert "fcar.eth" in str_names
-    assert "firec.eth" in str_names
-    assert "fire-car.eth" in str_names
-    # assert "🅵🅸🆁🅴🅲🅰🆁.eth" in str_names
-    assert "fir3c4r.eth" in str_names
+    assert "firecar🇵🇱" in str_names
+    assert "🇵🇱firecar" in str_names
+    assert "_firecar" in str_names
+    assert "$firecar" in str_names
+    assert "fcar" in str_names
+    assert "firec" in str_names
+    assert "fire-car" in str_names
+    # assert "🅵🅸🆁🅴🅲🅰🆁" in str_names
+    assert "fir3c4r" in str_names
 
 
 @pytest.mark.slow
@@ -247,7 +247,7 @@ def test_prod_short_suggestions(prod_test_client):
     assert response.status_code == 200
 
     json = response.json()
-    str_names = [name["name"] for name in json]
+    str_names = [name['label'] for name in json]
 
     assert all([len(name) >= 3 for name in str_names])
 
@@ -355,7 +355,7 @@ def test_no_joined_input_as_suggestion(prod_test_client, input_label: str, joine
     response = client.post("/", json={"label": input_label, "metadata": True, "params": {"mode": "full"}})
 
     assert response.status_code == 200
-    assert joined_label + '.eth' not in [name["name"] for name in response.json()]
+    assert joined_label not in [name['label'] for name in response.json()]
 
 
 @pytest.mark.slow
@@ -383,7 +383,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
                                      }})
 
         assert response.status_code == 200
-        str_names = [name["name"] for name in response.json()]
+        str_names = [name['label'] for name in response.json()]
         for name in str_names:
             assert is_ens_normalized(name), f'input name: "{input_name}"\tunnormalized suggestion: "{name}"'
 
@@ -534,7 +534,7 @@ class TestGroupedSuggestions:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
                 "wordplay": {
                     "max_suggestions": 10,
@@ -630,10 +630,10 @@ class TestGroupedSuggestions:
         # no duplicated suggestions within categories
         related_suggestions = []
         for gcat in categories:
-            suggestions = [s['name'] for s in gcat['suggestions']]
+            suggestions = [s['label'] for s in gcat['suggestions']]
 
             suggestion_tokens = [s['tokenized_label'] for s in gcat['suggestions']]
-            assert suggestions == list(map(lambda ts: ''.join(ts) + '.eth', suggestion_tokens))
+            assert suggestions == list(map(lambda ts: ''.join(ts), suggestion_tokens))
 
             print(gcat['type'], gcat['name'])
             print(suggestions)
@@ -667,7 +667,7 @@ class TestGroupedSuggestions:
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
-                    "name_diversity_ratio": 0.5
+                    "label_diversity_ratio": 0.5
                 },
                 "wordplay": {
                     "max_suggestions": 10,
@@ -710,7 +710,7 @@ class TestGroupedSuggestions:
         suggestions = []
         for gcat in categories:
             for suggestion in gcat['suggestions']:
-                suggestions.append(suggestion['name'])
+                suggestions.append(suggestion['label'])
 
         assert len(suggestions) == len(set(suggestions))
 
@@ -741,7 +741,7 @@ class TestGroupedSuggestions:
 
         for category in categories:
             print(category['name'])
-            print([s['name'] for s in category['suggestions']])
+            print([s['label'] for s in category['suggestions']])
             if category['type'] == 'emojify':
                 assert len(category['suggestions']) > 0  # Flag
             elif category['type'] == 'community':
@@ -885,10 +885,10 @@ def test_collection_members_sampling(prod_test_client, collection_id, max_sample
         assert name['metadata']['pipeline_name'] == 'sample_collection_members'
         assert name['metadata']['collection_id'] == collection_id
 
-        assert name['name'].removesuffix('.eth') == ''.join(name['tokenized_label'])
+        assert name['label'] == ''.join(name['tokenized_label'])
 
     # uniqueness
-    names = [name['name'] for name in response_json]
+    names = [name['label'] for name in response_json]
     assert len(names) == len(set(names))
 
 
@@ -934,7 +934,7 @@ class TestTokenScramble:
             assert name['metadata']['collection_id'] == collection_id
 
         # uniqueness
-        names = [name['name'] for name in response_json]
+        names = [name['label'] for name in response_json]
         assert len(names) == len(set(names))
 
     @pytest.mark.integration_test
@@ -957,14 +957,14 @@ class TestTokenScramble:
         # 3 bigrams + 2 unigrams, no max_suggestions -> no repeated tokens
         assert len(response_json) in (3, 4)  # (len can be 3 if 4th suggestion is an original name)
 
-        names = [name['name'] for name in response_json]
+        names = [name['label'] for name in response_json]
         assert len(names) == len(set(names))
 
         for s in names:
             if s.startswith('egg'):
-                assert s[3:] in ('avocado.eth', 'apple.eth', 'fruit.eth', 'coconut.eth')
-            elif s.endswith('apple.eth'):
-                assert s[:-len('apple.eth')] in ('avocado', 'jack', 'coconut', 'egg')
+                assert s[3:] in ('avocado', 'apple', 'fruit', 'coconut')
+            elif s.endswith('apple'):
+                assert s[:-len('apple')] in ('avocado', 'jack', 'coconut', 'egg')
 
     @pytest.mark.integration_test
     def test_full_shuffle(self, prod_test_client):
@@ -986,7 +986,7 @@ class TestTokenScramble:
         # 8 tokens -> 4 bigrams, max_suggestions=4 -> use repeated tokens if 4th suggestion is an original name
         assert len(response_json) == 4
 
-        names = [name['name'] for name in response_json]
+        names = [name['label'] for name in response_json]
         assert len(names) == len(set(names))
 
     @pytest.mark.integration_test
@@ -1006,7 +1006,7 @@ class TestTokenScramble:
         response_json = response.json()
         print(response_json)
 
-        names = [name['name'] for name in response_json]
+        names = [name['label'] for name in response_json]
         assert len(names) == len(set(names))
 
         assert len(names) == 40
@@ -1027,7 +1027,7 @@ class TestTokenScramble:
         assert response.status_code == 200
 
         for item in response.json():
-            assert ''.join(item['tokenized_label']) == item['name'].removesuffix('.eth')
+            assert ''.join(item['tokenized_label']) == item['label']
             assert len(item['tokenized_label']) == 2  # all scramble methods concatenate 2 tokens or multi-tokens
 
     @pytest.mark.integration_test
@@ -1057,10 +1057,10 @@ class TestTokenScramble:
 
         response = client.post("/scramble_collection_tokens", json=request_json)
         assert response.status_code == 200
-        names1 = [name['name'] for name in response.json()]
+        names1 = [name['label'] for name in response.json()]
 
         response = client.post("/scramble_collection_tokens", json=request_json)
         assert response.status_code == 200
-        names2 = [name['name'] for name in response.json()]
+        names2 = [name['label'] for name in response.json()]
 
         assert names1 == names2

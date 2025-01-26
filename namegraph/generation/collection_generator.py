@@ -43,7 +43,7 @@ class CollectionGenerator(NameGenerator):
         self.collection_matcher = CollectionMatcherForGenerator(config)
         self.collections_limit = config.collections.collections_limit
         self.suggestions_limit = config.collections.suggestions_limit
-        self.name_diversity_ratio = config.collections.name_diversity_ratio
+        self.label_diversity_ratio = config.collections.label_diversity_ratio
         self.max_per_type = config.collections.max_per_type
 
     def apply(self, name: InputName, interpretation: Interpretation) -> Iterable[GeneratedName]:
@@ -92,7 +92,7 @@ class CollectionGenerator(NameGenerator):
             tuple(tokens),
             name.strip_eth_namehash_unicode_long_name.strip(),
             max_related_collections=params.get('max_related_collections', self.collections_limit),
-            name_diversity_ratio=params.get('name_diversity_ratio', self.name_diversity_ratio),
+            label_diversity_ratio=params.get('label_diversity_ratio', self.label_diversity_ratio),
             max_per_type=params.get('max_per_type', self.max_per_type),
             limit_names=suggestions_limit,
             enable_learning_to_rank=params.get('enable_learning_to_rank', True),

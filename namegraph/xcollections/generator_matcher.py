@@ -22,7 +22,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             tokens: tuple[str, ...],
             max_related_collections: int = 5,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
             enable_learning_to_rank: bool = True,
@@ -46,7 +46,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
         ]
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.archived': False}) \
             .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
@@ -89,7 +89,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             diversified = self._apply_diversity(
                 collections,
                 max_related_collections,
-                name_diversity_ratio,
+                label_diversity_ratio,
                 max_per_type
             )
             return diversified, es_response_metadata
@@ -145,7 +145,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             tokens: tuple[str, ...],
             input_name: str,
             max_related_collections: int = 5,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
             enable_learning_to_rank: bool = True,
@@ -157,7 +157,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 self._search_for_generator,
                 tokens=tokens,
                 max_related_collections=max_related_collections,
-                name_diversity_ratio=name_diversity_ratio,
+                label_diversity_ratio=label_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names,
                 enable_learning_to_rank=enable_learning_to_rank

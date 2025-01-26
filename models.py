@@ -1,10 +1,11 @@
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, field_serializer, ConfigDict, field_validator, PositiveInt
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 from pydantic.networks import IPvAnyAddress
-from datetime import datetime
 
 from web_api import generator
 
+
+# ======== Shared models ========
 
 class UserInfo(BaseModel):
     user_wallet_addr: Optional[str] = Field(None, title='wallet (public) address of the user',
@@ -25,6 +26,42 @@ class UserInfo(BaseModel):
         return str(user_ip_addr)
 
 
+class Metadata(BaseModel):
+    pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
+    interpretation: list[str | None] = Field(title='interpretation tags',
+                                             description='list of interpretation tags based on which the '
+                                                         'suggestion has been generated')
+    cached_status: str = Field(title='cached status',
+                               description='label\'s status cached at the time of application startup')
+    categories: list[str] = Field(title='domain category',
+                                  description='can be either available, taken, recently released or on sale')
+    cached_sort_score: Optional[float] = Field(title='cached sort score',
+                                                      description='label\'s sort score cached at the time of '
+                                                                  'application startup')
+    applied_strategies: list[list[str]] = Field(
+        title="sequence of steps performed in every pipeline that generated the suggestion"
+    )
+    collection_title: Optional[str] = Field(
+        title='name of the collection',
+        description='if label has been generated using a collection, '
+                    'then this field would contains its name, else it is null'
+    )
+    collection_id: Optional[str] = Field(
+        title='id of the collection',
+        description='if label has been generated using a collection, '
+                    'then this field would contains its id, else it is null'
+    )
+    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
+
+
+class RecursiveRelatedCollection(BaseModel):
+    collection_id: str = Field(title='id of the collection')
+    collection_title: str = Field(title='title of the collection')
+    collection_members_count: int = Field(title='number of members in the collection')
+
+
+# ======== Generator models ========
+
 class Params(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     country: Optional[str] = Field(None, title='user country code',
@@ -37,7 +74,7 @@ class Params(BaseModel):
     enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
-    name_diversity_ratio: Optional[float] = \
+    label_diversity_ratio: Optional[float] = \
         Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
               description='adds penalty to collections with similar names to other collections\n'
                           'if null, then no penalty will be added')
@@ -64,6 +101,7 @@ class OtherCategoriesParams(BaseModel):
                                  title='maximal number of suggestions to generate in one specific category')
     model_config = ConfigDict(frozen=True)
 
+
 class OtherCategoryParams(BaseModel):
     min_suggestions: int = Field(6, ge=0, le=30,
                                  title='minimal number of suggestions to generate in one specific category. '
@@ -75,6 +113,7 @@ class OtherCategoryParams(BaseModel):
                                        title='if not enough suggestions then "fallback generator" should be placed into another new category type called "other"'
                                              'it may be not fulfilled because of `max_suggestions` limit')
     model_config = ConfigDict(frozen=True)
+
 
 class RelatedCategoryParams(BaseModel):
     max_related_collections: int = Field(6, ge=0, le=10,
@@ -91,7 +130,7 @@ class RelatedCategoryParams(BaseModel):
     enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
-    name_diversity_ratio: Optional[float] = \
+    label_diversity_ratio: Optional[float] = \
         Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
               description='adds penalty to collections with similar names to other collections\n'
                           'if null, then no penalty will be added')
@@ -100,6 +139,7 @@ class RelatedCategoryParams(BaseModel):
               description='adds penalty to collections with the same type as other collections\n'
                           'if null, then no penalty will be added')
     model_config = ConfigDict(frozen=True)
+
 
 class CategoriesParams(BaseModel):
     related: RelatedCategoryParams = Field(RelatedCategoryParams(), title='related category parameters')
@@ -112,7 +152,8 @@ class CategoriesParams(BaseModel):
     other: OtherCategoryParams = Field(OtherCategoryParams(), title='other category parameters')
     model_config = ConfigDict(frozen=True)
 
-class GroupedNameRequest(BaseModel):
+
+class GroupedLabelRequest(BaseModel):
     label: str = Field(title='input label', pattern='^[^.]*$', examples=['zeus'],
                        description='* cannot contain dots (.)'
                                    '\n* if enclosed in double quotes assuming label is pre-tokenized')
@@ -128,13 +169,7 @@ class GroupedNameRequest(BaseModel):
         title='controls the results of other categories than related (except for "Other Names")')
 
 
-class RecursiveRelatedCollection(BaseModel):
-    collection_id: str = Field(title='id of the collection')
-    collection_title: str = Field(title='title of the collection')
-    collection_members_count: int = Field(title='number of members in the collection')
-
-
-class NameRequest(BaseModel):
+class LabelRequest(BaseModel):
     label: str = Field(title='input label', description='cannot contain dots (.)',
                        pattern='^[^.]*$', examples=['zeus'])
     metadata: bool = Field(True, title='return all the metadata in response')
@@ -152,37 +187,9 @@ class NameRequest(BaseModel):
                                      description='includes all the parameters for all nodes of the pipeline')
 
 
-class Metadata(BaseModel):
-    pipeline_name: str = Field(title='name of the pipeline, which has produced this suggestion')
-    interpretation: list[str | None] = Field(title='interpretation tags',
-                                             description='list of interpretation tags based on which the '
-                                                         'suggestion has been generated')
-    cached_status: str = Field(title='cached status',
-                               description='name\'s status cached at the time of application startup')
-    categories: list[str] = Field(title='domain category',
-                                  description='can be either available, taken, recently released or on sale')
-    cached_interesting_score: Optional[float] = Field(title='cached interesting score',
-                                                      description='name\'s interesting score cached at the time of '
-                                                                  'application startup')
-    applied_strategies: list[list[str]] = Field(
-        title="sequence of steps performed in every pipeline that generated the suggestion"
-    )
-    collection_title: Optional[str] = Field(
-        title='name of the collection',
-        description='if name has been generated using a collection, '
-                    'then this field would contains its name, else it is null'
-    )
-    collection_id: Optional[str] = Field(  # todo: maybe bundle collection's title and id together
-        title='id of the collection',
-        description='if name has been generated using a collection, '
-                    'then this field would contains its id, else it is null'
-    )
-    grouping_category: Optional[str] = Field(title='grouping category to which this suggestion belongs')
-
-
 class Suggestion(BaseModel):
-    name: str = Field(title="suggested similar name (not label)")
-    tokenized_label: list[str] = Field(title="original tokenization of suggested name's label")
+    label: str = Field(title="suggested similar label")
+    tokenized_label: list[str] = Field(title="suggested tokenization of label")
     metadata: Optional[Metadata] = Field(None, title="information how suggestion was generated",
                                          description="if metadata=False this key is absent")
 
@@ -202,7 +209,6 @@ class CollectionCategory(GroupingCategory):
     related_collections: list[RecursiveRelatedCollection] = Field(title='related collections to this collection')
 
 
-
 class OtherCategory(GroupingCategory):
     type: Literal['wordplay', 'alternates', 'emojify', 'community', 'expand', 'gowild', 'other'] = \
         Field(title='category type',
@@ -215,69 +221,3 @@ class GroupedSuggestions(BaseModel):
         description='list of suggestions grouped by category type'
     )
     all_tokenizations: list[list[str]] = Field(title='all inferred tokenizations of input label')
-
-
-class SampleCollectionMembers(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to sample from', examples=['qdeq7I9z0_jv'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    max_sample_size: int = Field(title='the maximum number of members to sample', ge=1, le=100,
-                                 description='if the collection has less members than max_sample_size, '
-                                             'all the members will be returned', examples=[5])
-    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
-                      title='seed for random number generator',
-                      description='if not provided (but can\'t be null), random seed will be generated')
-
-
-class Top10CollectionMembersRequest(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to fetch names from', examples=['ri2QqxnAqZT7'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    max_recursive_related_collections: int = Field(3, ge=0, le=10,
-                                                   title='Set to 0 to disable the "recursive related collection search". '
-                                                         'When set to a value between 1 and 10, '
-                                                         'for each related collection we find, '
-                                                         'we also do a (depth 1 recursive) lookup for this many related collections '
-                                                         'to the related collection.')
-
-
-class ScrambleCollectionTokens(BaseModel):
-    user_info: Optional[UserInfo] = Field(None, title='information about user making request')
-    collection_id: str = Field(title='id of the collection to take tokens from', examples=['3OB_f2vmyuyp'])
-    metadata: bool = Field(True, title='return all the metadata in response')
-    method: Literal['left-right-shuffle', 'left-right-shuffle-with-unigrams', 'full-shuffle'] = \
-        Field('left-right-shuffle-with-unigrams', title='method used to scramble tokens and generate new suggestions',
-  description='* left-right-shuffle - tokenize names as bigrams and shuffle the right-side tokens (do not use unigrams)'
-              '\n* left-right-shuffle-with-unigrams - same as above, but with some tokens swapped with unigrams'
-              '\n* full-shuffle - shuffle all tokens from bigrams and unigrams and create random bigrams')
-    n_top_members: int = Field(25, title='number of collection\'s top members to include in scrambling', ge=1)
-    max_suggestions: Optional[PositiveInt] = Field(10, title='maximal number of suggestions to generate',
-  examples=[10], description='must be a positive integer or null\n* number of generated suggestions will be '
-                             '`max_suggestions` or less (exactly `max_suggestions` if there are enough names)\n'
-                             '* if null, no tokens are repeated')
-    seed: int = Field(default_factory=lambda: int(datetime.now().timestamp()),
-                      title='seed for random number generator',
-                      description='if not provided (but can\'t be null), random seed will be generated')
-
-
-class FetchCollectionMembersRequest(BaseModel):
-    collection_id: str = Field(
-        title='id of the collection to fetch members from',
-        examples=['ri2QqxnAqZT7']
-    )
-    offset: int = Field(
-        0,
-        title='number of members to skip',
-        description='used for pagination',
-        ge=0
-    )
-    limit: int = Field(
-        10,
-        title='maximum number of members to return',
-        description='used for pagination',
-        ge=1,
-    )
-    metadata: bool = Field(
-        True,
-        title='return all the metadata in response'
-    )
