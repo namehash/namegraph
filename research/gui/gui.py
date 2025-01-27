@@ -92,7 +92,7 @@ def call_suggestions_by_category(label: str,
         "categories": {
             "related": {
                 "enable_learning_to_rank": enable_learning_to_rank,
-                "max_names_per_related_collection": 10,
+                "max_labels_per_related_collection": 10,
                 "max_per_type": max_per_type,
                 "max_recursive_related_collections": max_recursive_related_collections,
                 "max_related_collections": max_related_collections,

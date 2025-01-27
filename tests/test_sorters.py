@@ -276,7 +276,7 @@ def test_weighted_sampling_sorter_weights():
 
 
 @mark.parametrize(
-    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    "overrides,input_labels,expected_strings,min_suggestions,max_suggestions",
     [
         (
                 #
@@ -309,19 +309,20 @@ def test_weighted_sampling_sorter_weights():
     ],
 )
 def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
-                                                                input_names: List[List[GeneratedName]],
+                                                                input_labels: List[List[GeneratedName]],
                                                                 expected_strings: List[str],
                                                                 min_suggestions: int,
                                                                 max_suggestions: int):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)
 
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels
+                                                                           )]
 
         params = {}
         params['min_suggestions'] = min_suggestions
@@ -342,7 +343,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
 
 
 @mark.parametrize(
-    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    "overrides,input_labels,expected_strings,min_suggestions,max_suggestions",
     [
         (
                 #
@@ -383,19 +384,19 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
     ]
 )
 def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
-                                                                         input_names: List[List[GeneratedName]],
+                                                                         input_labels: List[List[GeneratedName]],
                                                                          expected_strings: List[str],
                                                                          min_suggestions: int,
                                                                          max_suggestions: int):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)
 
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels)]
 
         params = {}
         params['min_suggestions'] = min_suggestions
@@ -416,7 +417,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
 
 
 @mark.parametrize(
-    "overrides,input_names,min_suggestions,max_suggestions,min_expected_available,max_expected_available",
+    "overrides,input_labels,min_suggestions,max_suggestions,min_expected_available,max_expected_available",
     [
         (
                 #
@@ -489,7 +490,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
 )
 def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
         overrides: List[str],
-        input_names: List[List[GeneratedName]],
+        input_labels: List[List[GeneratedName]],
         min_suggestions: int,
         max_suggestions: int,
         min_expected_available: int,
@@ -500,16 +501,16 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
 
         available_names_set = {
             str(name)
-            for sublist in input_names
+            for sublist in input_labels
             for name in sublist
             if name.status == 'available'
         }
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels)]
 
         params = {}
         params['min_suggestions'] = min_suggestions

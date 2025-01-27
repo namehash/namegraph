@@ -316,7 +316,7 @@ def suggestions_by_category(name: GroupedLabelRequest):
     related_suggestions, grouped_suggestions, all_tokenizations  = generator.generate_grouped_names(
         name.label,
         max_related_collections=name.categories.related.max_related_collections,
-        max_names_per_related_collection=name.categories.related.max_names_per_related_collection,
+        max_labels_per_related_collection=name.categories.related.max_labels_per_related_collection,
         max_recursive_related_collections=name.categories.related.max_recursive_related_collections,
         categories_params=name.categories,
         min_total_suggestions=name.categories.other.min_total_suggestions,

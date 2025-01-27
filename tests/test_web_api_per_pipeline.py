@@ -333,7 +333,7 @@ class TestGrouped:
                     "categories": {
                         "related": {
                                        "enable_learning_to_rank": True,
-                                       "max_names_per_related_collection": 10,
+                                       "max_labels_per_related_collection": 10,
                                        "max_recursive_related_collections": 0,
                                        "max_related_collections": 10,
                                    } | diversity_parameters,
@@ -370,7 +370,7 @@ class TestGrouped:
             "categories": {
                 "related": {
                     "enable_learning_to_rank": True,
-                    "max_names_per_related_collection": 10,
+                    "max_labels_per_related_collection": 10,
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
@@ -430,7 +430,7 @@ class TestGrouped:
             print(category['name'])
             if category['type'] == 'related':
                 assert len(category['suggestions']) <= request_data['categories'][category['type']][
-                    'max_names_per_related_collection']
+                    'max_labels_per_related_collection']
                 related_count += 1
             else:
                 if category['type'] != 'other':
@@ -497,7 +497,7 @@ class TestGrouped:
             "categories": {
                 "related": {
                     "enable_learning_to_rank": True,
-                    "max_names_per_related_collection": 10,
+                    "max_labels_per_related_collection": 10,
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
