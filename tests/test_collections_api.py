@@ -92,9 +92,8 @@ class TestCorrectConfiguration:
         es_time = response_json['metadata'].get('elasticsearch_processing_time_ms', 0)
         assert es_time <= response_json['metadata']['processing_time_ms'] <= (t1 - t0) * 1000
 
-    @mark.skip(reason='we return only labels, without the root name')
     @mark.integration_test
-    def test_collection_api_eth_suffix(self, test_test_client):
+    def test_collection_api_no_eth_suffix(self, test_test_client):
         response = test_test_client.post("/find_collections_by_string", json={
             "query": "australia",
             "mode": "instant",
@@ -109,7 +108,7 @@ class TestCorrectConfiguration:
         response_json = response.json()
 
         assert len(response_json['related_collections'] + response_json['other_collections']) <= 5
-        assert all([member_name['label']
+        assert all([not member_name['label'].endswith('.eth')
                     for collection in response_json['related_collections'] + response_json['other_collections']
                     for member_name in collection['top_labels']])
 
