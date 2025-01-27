@@ -75,8 +75,8 @@ class Params(BaseModel):
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
     label_diversity_ratio: Optional[float] = \
-        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
-              description='adds penalty to collections with similar names to other collections\n'
+        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on labels',
+              description='adds penalty to collections with similar labels to other collections\n'
                           'if null, then no penalty will be added')
     max_per_type: Optional[int] = \
         Field(2, examples=[2], ge=1, title='collection diversity parameter based on collection types',
@@ -119,8 +119,8 @@ class RelatedCategoryParams(BaseModel):
     max_related_collections: int = Field(6, ge=0, le=10,
                                          title='max number of related collections returned. '
                                                'If 0 it effectively turns off any related collection search.')
-    max_names_per_related_collection: int = Field(10, ge=1, le=10,
-                                                  title='max number of names returned in any related collection')
+    max_labels_per_related_collection: int = Field(10, ge=1, le=10,
+                                                  title='max number of labels returned in any related collection')
     max_recursive_related_collections: int = Field(3, ge=0, le=10,
                                                    title='Set to 0 to disable the "recursive related collection search". '
                                                          'When set to a value between 1 and 10, '
@@ -131,8 +131,8 @@ class RelatedCategoryParams(BaseModel):
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
     label_diversity_ratio: Optional[float] = \
-        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on names',
-              description='adds penalty to collections with similar names to other collections\n'
+        Field(0.5, examples=[0.5], ge=0.0, le=1.0, title='collection diversity parameter based on labels',
+              description='adds penalty to collections with similar labels to other collections\n'
                           'if null, then no penalty will be added')
     max_per_type: Optional[int] = \
         Field(2, examples=[2], ge=1, title='collection diversity parameter based on collection types',
@@ -158,10 +158,10 @@ class GroupedLabelRequest(BaseModel):
                        description='* cannot contain dots (.)'
                                    '\n* if enclosed in double quotes assuming label is pre-tokenized')
 
-    # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
+    # min_primary_fraction: float = Field(0.1, title='minimal fraction of primary labels',
     #                                     ge=0.0, le=1.0,
     #                                     description='ensures at least `min_suggestions * min_primary_fraction` '
-    #                                                 'primary names will be generated')
+    #                                                 'primary labels will be generated')
     params: GroupedParams = Field(GroupedParams(), title='pipeline parameters',
                                   description='includes all the parameters for all nodes of the pipeline')
 
@@ -179,10 +179,10 @@ class LabelRequest(BaseModel):
                                  ge=1, le=generator.config.generation.limit)
     max_suggestions: int = Field(100, title='maximal number of suggestions to generate',
                                  ge=1)
-    min_primary_fraction: float = Field(0.1, title='minimal fraction of primary names',
+    min_primary_fraction: float = Field(0.1, title='minimal fraction of primary labels',
                                         ge=0.0, le=1.0,
                                         description='ensures at least `min_suggestions * min_primary_fraction` '
-                                                    'primary names will be generated')
+                                                    'primary labels will be generated')
     params: Optional[Params] = Field(None, title='pipeline parameters',
                                      description='includes all the parameters for all nodes of the pipeline')
 

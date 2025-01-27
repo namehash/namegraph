@@ -86,7 +86,7 @@ class CollectionGenerator(NameGenerator):
             tokens.extend(emojis)
 
         params = name.params if name.params is not None else dict()
-        suggestions_limit = max(params.get('max_names_per_related_collection', 0), self.suggestions_limit)
+        suggestions_limit = max(params.get('max_labels_per_related_collection', 0), self.suggestions_limit)
         logger.info(f'CollectionGenerator query: {tokens}')
         collections, _ = self.collection_matcher.search_for_generator(
             tuple(tokens),

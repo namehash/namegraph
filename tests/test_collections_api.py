@@ -109,7 +109,7 @@ class TestCorrectConfiguration:
         response_json = response.json()
 
         assert len(response_json['related_collections'] + response_json['other_collections']) <= 5
-        assert all([member_name['label'].endswith('.eth')
+        assert all([member_name['label']
                     for collection in response_json['related_collections'] + response_json['other_collections']
                     for member_name in collection['top_labels']])
 

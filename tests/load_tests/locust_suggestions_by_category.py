@@ -18,7 +18,7 @@ request_data = {
     "categories": {
         "related": {
             "enable_learning_to_rank": True,
-            "max_names_per_related_collection": 10,
+            "max_labels_per_related_collection": 10,
             "max_per_type": 2,
             "max_recursive_related_collections": 3,
             "max_related_collections": 6,
@@ -56,7 +56,7 @@ request_data = {
     }
 }
 
-input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+input_labels = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
                'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
                'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
                'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
@@ -80,5 +80,5 @@ class WebsiteUser(HttpUser):
     @task(5)
     def suggestions_by_category(self):
         json = copy.deepcopy(request_data)
-        json['label'] = random.choice(input_names) + ' ' + str(random.randint(0, 1000000))
+        json['label'] = random.choice(input_labels) + ' ' + str(random.randint(0, 1000000))
         self.client.post(self.URL, name='suggestions_by_category', json=json)

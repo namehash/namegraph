@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 'country': 'pl'
             }})
 
-    input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+    input_labels = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
                    'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
                    'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
                    'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
@@ -139,12 +139,12 @@ span.i {
     request_times = collections.defaultdict(list)
     generators = {}
 
-    # input_names = input_names[:10]
+    # input_labels = input_labels[:10]
     for i in range(10):
-        for input_name in tqdm(input_names):
+        for input_label in tqdm(input_labels):
             # START INSTANT
             start_time = time.time()
-            instant_r = request_fn(input_name, {
+            instant_r = request_fn(input_label, {
                 'min_suggestions': 3,
                 'max_suggestions': 3,
                 "min_primary_fraction": 1.0,
@@ -154,11 +154,11 @@ span.i {
                 }}).json()
             request_time = time.time() - start_time
             request_times['instant'].append(request_time)
-            times[(input_name, 'instant')].append(request_time)
+            times[(input_label, 'instant')].append(request_time)
 
             # START NAME other ideas
             start_time = time.time()
-            name_r = request_fn(input_name, {
+            name_r = request_fn(input_label, {
                 'min_suggestions': 5,
                 'max_suggestions': 5,
                 "min_primary_fraction": 0.1,
@@ -168,11 +168,11 @@ span.i {
                 }}).json()
             request_time = time.time() - start_time
             request_times['top5'].append(request_time)
-            times[(input_name, 'top5')].append(request_time)
+            times[(input_label, 'top5')].append(request_time)
 
             # START 100
             start_time = time.time()
-            name_r = request_fn(input_name, {
+            name_r = request_fn(input_label, {
                 'min_suggestions': 100,
                 'max_suggestions': 100,
                 "min_primary_fraction": 0.1,
@@ -181,7 +181,7 @@ span.i {
                 }}).json()
             request_time = time.time() - start_time
             request_times['100'].append(request_time)
-            times[(input_name, '100')].append(request_time)
+            times[(input_label, '100')].append(request_time)
 
             name_generators = set()
             for i, s in enumerate(name_r):
@@ -190,7 +190,7 @@ span.i {
                         if 'Generator' in processor:
                             generator_name = processor.replace('Generator', '')
                             name_generators.add(generator_name)
-            generators[(input_name, '100')] = list(sorted(name_generators))
+            generators[(input_label, '100')] = list(sorted(name_generators))
 
     f.write(f'<h1>Average times</h1>')
     for mode, values in request_times.items():

@@ -361,7 +361,7 @@ def test_no_joined_input_as_suggestion(prod_test_client, input_label: str, joine
 @pytest.mark.slow
 def test_prod_normalization_with_ens_normalize(prod_test_client):
     client = prod_test_client
-    input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+    input_labels = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
                    'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
                    'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
                    'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
@@ -375,7 +375,7 @@ def test_prod_normalization_with_ens_normalize(prod_test_client):
                    'messi', 'kingmessi', 'abc', 'testing', 'superman', 'facebook', 'test', 'namehash', 'testb',
                    'happypeople', 'muscle', 'billybob', 'quo', 'circleci', 'bitcoinmine', 'poweroutage',
                    'shootingarrowatthesky']
-    for input_name in input_names:
+    for input_name in input_labels:
         response = client.post("/",
                                json={"label": input_name, "min_suggestions": 50, "max_suggestions": 50,
                                      "params": {
@@ -530,7 +530,7 @@ class TestGroupedSuggestions:
             "categories": {
                 "related": {
                     "enable_learning_to_rank": True,
-                    "max_names_per_related_collection": 10,
+                    "max_labels_per_related_collection": 10,
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,
@@ -582,7 +582,7 @@ class TestGroupedSuggestions:
             print(category['name'])
             if category['type'] == 'related':
                 assert len(category['suggestions']) <= request_data['categories'][category['type']][
-                    'max_names_per_related_collection']
+                    'max_labels_per_related_collection']
                 related_count += 1
             else:
                 if category['type'] != 'other':
@@ -663,7 +663,7 @@ class TestGroupedSuggestions:
             "categories": {
                 "related": {
                     "enable_learning_to_rank": True,
-                    "max_names_per_related_collection": 10,
+                    "max_labels_per_related_collection": 10,
                     "max_per_type": 2,
                     "max_recursive_related_collections": 3,
                     "max_related_collections": 6,

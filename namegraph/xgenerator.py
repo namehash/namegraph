@@ -154,7 +154,7 @@ class Generator:
             self,
             name: str,
             max_related_collections: int = 5,
-            max_names_per_related_collection: int = 5,
+            max_labels_per_related_collection: int = 5,
             max_recursive_related_collections: int = 5,
             categories_params=None,
             min_total_suggestions: int = 50,
@@ -164,7 +164,7 @@ class Generator:
         categories_params = categories_params or {}
 
         params['max_related_collections'] = max_related_collections
-        params['max_names_per_related_collection'] = max_names_per_related_collection
+        params['max_labels_per_related_collection'] = max_labels_per_related_collection
         params['max_recursive_related_collections'] = max_recursive_related_collections
         params['categories_params'] = categories_params
         params['min_total_suggestions'] = min_total_suggestions
@@ -201,7 +201,7 @@ class Generator:
                     max_suggestions = category_params.max_suggestions
                 except AttributeError:  # RelatedCategoryParams
                     min_suggestions = 0
-                    max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit) # 3 interpretations
+                    max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_labels_per_related_collection, self.config.collections.suggestions_limit) # 3 interpretations
 
                 # TODO should they use the same set of suggestions (for deduplications)
                 suggestions = meta_sampler.sample(name, 'weighted-sampling',
@@ -235,7 +235,7 @@ class Generator:
                         max_suggestions = category_params.max_suggestions
                     except AttributeError:  # RelatedCategoryParams
                         min_suggestions = 0
-                        max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_names_per_related_collection, self.config.collections.suggestions_limit)
+                        max_suggestions = 3 * category_params.max_related_collections * max(category_params.max_labels_per_related_collection, self.config.collections.suggestions_limit)
 
                     futures[executor.submit(meta_sampler.sample, name, 'weighted-sampling',
                                             min_suggestions=min_suggestions, max_suggestions=max_suggestions,
@@ -265,7 +265,7 @@ class Generator:
                     collections_id2related[suggestion.collection_id] = suggestion.related_collections or []
 
                 collection_suggestions = all_related_suggestions[suggestion.collection_id]
-                if len(collection_suggestions) < max_names_per_related_collection:
+                if len(collection_suggestions) < max_labels_per_related_collection:
                     collection_suggestions.append(suggestion)
             del grouped_suggestions['related']
 
@@ -319,7 +319,7 @@ class Generator:
 
         category_params = getattr(categories_params, 'related')
         for category, related_suggestions in all_related_suggestions.items():
-            max_suggestions = category_params.max_names_per_related_collection
+            max_suggestions = category_params.max_labels_per_related_collection
             related_suggestions.data = related_suggestions.data[:max_suggestions]
 
         # cap related collections to max_related_collections
