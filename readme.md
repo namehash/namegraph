@@ -97,7 +97,7 @@ Authorize to ECR:
 
 Push image to ECR:
 
-`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}`
 
 ## Deploy image on remote instance
 
