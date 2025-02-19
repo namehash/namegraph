@@ -4,30 +4,23 @@ from pathlib import Path
 
 import tarfile
 import boto3
+import botocore
 import hydra
 
-from dotenv import load_dotenv
 from omegaconf import DictConfig
 
 
 class S3Downloader:
     def __init__(self):
         self.s3_client = None
+        self.region_name = 'us-east-1'
         self.bucket = 'prod-name-generator-namegeneratori-inputss3bucket-c26jqo3twfxy'
 
     def get_client(self):
         if self.s3_client is None:
-            load_dotenv()
-
-            S3_ACCESS_KEY_ID = os.getenv('S3_ACCESS_KEY_ID')
-            S3_SECRET_ACCESS_KEY = os.getenv('S3_SECRET_ACCESS_KEY')
-            REGION_NAME = 'us-east-1'
-            self.s3_client = boto3.client('s3',
-                                          aws_access_key_id=S3_ACCESS_KEY_ID,
-                                          aws_secret_access_key=S3_SECRET_ACCESS_KEY,
-                                          region_name=REGION_NAME
-                                          )
-
+            self.s3_client = boto3.client(
+                's3', region_name=self.region_name, config=botocore.config.Config(signature_version=botocore.UNSIGNED)
+            )
         return self.s3_client
 
     def download_file(self, url, path, override=True):
