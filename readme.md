@@ -97,13 +97,13 @@ Authorize to ECR:
 
 Push image to ECR:
 
-`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}
+`docker push 571094861812.dkr.ecr.us-east-1.amazonaws.com/name-generator:${TAG}`
 
 ## Deploy image on remote instance
 
 Set image TAG:
 
-`export TAG=0.1.0
+`export TAG=0.1.0`
 
 Authorize EC2 instance in ECR:
 
@@ -142,6 +142,29 @@ In `conf/pipelines/prod_new.yaml` are defined pipelines. Each pipeline have:
 * `global_limits` for each mode, which can be integer (absolute number) or float (percentage of all results); also you can override values for `grouped_by_category` endpoint by adding prefix `grouped_` (e.g. `grouped_instant`, `grouped_domain_detail`, `grouped_full`)
 
 Setting `0` in `mode_weights_multiplier` or `global_limits` disables the pipeline in a given mode.
+
+### Modes
+
+NameGraph supports three modes for processing requests:
+
+- Instant Mode (`instant`):
+  - Fastest response time
+  - More basic name generations
+  - Some advanced generators like W2VGenerator are disabled (weight multiplier = 0)
+  - Often used for real-time suggestions
+
+- Domain Detail Mode (`domain_detail`):
+  - Intermediate between instant and full
+  - More comprehensive than instant, but still optimized for performance
+  - Some generators have reduced weights compared to full mode
+  - Expanded search window for collection ranking and sampling
+
+- Full Mode (`full`):
+  - Most comprehensive name generation
+  - Includes all enabled generators
+  - Uses full weights for most generators
+  - Accesses advanced generators like `Wikipedia2VGenerator` and `W2VGenerator`
+  - Takes longer to process, but provides the most diverse results
 
 ### Sampler
 

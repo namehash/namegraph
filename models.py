@@ -70,7 +70,11 @@ class Params(BaseModel):
                                    examples=['us'])
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
-                      description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
+                      description='modifies global limits and sampling weights of different generators:\n'
+                                  '* instant - fastest response, basic generators only\n'
+                                  '* domain_detail - balanced speed/quality, expanded search\n'
+                                  '* full - comprehensive generation with all generators (recommended)\n'
+                                  '(for /grouped_by_category endpoint this field will be prefixed with "grouped_")')
     enable_learning_to_rank: bool = Field(True, title='enable learning to rank',
                                           description='if true, the results will be sorted by '
                                                       'learning to rank algorithm')
@@ -88,7 +92,11 @@ class GroupedParams(BaseModel):
     user_info: Optional[UserInfo] = Field(None, title='information about user making request')
     mode: str = Field('full', title='request mode: instant, domain_detail, full',
                       pattern=r'^(instant|domain_detail|full)$',
-                      description='for /grouped_by_category endpoint this field will be prefixed with "grouped_"')
+                      description='modifies global limits and sampling weights of different generators:\n'
+                                  '* instant - fastest response, basic generators only\n'
+                                  '* domain_detail - balanced speed/quality, expanded search\n'
+                                  '* full - comprehensive generation with all generators (recommended)\n'
+                                  '(for /grouped_by_category endpoint this field will be prefixed with "grouped_")')
     metadata: bool = Field(True, title='return all the metadata in response')
 
 
