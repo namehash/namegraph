@@ -24,8 +24,6 @@ jobs:
       - name: build image
         run: |
           docker build \
-          --build-arg AWS_SECRET_ACCESS_KEY \
-          --build-arg AWS_ACCESS_KEY_ID \
           -t ${ECR_REPOSITORY}:commit_$(git rev-parse --short "$GITHUB_SHA") \
           -t ${ECR_REPOSITORY}:${PROD_IMAGE_TAG} \
           .
