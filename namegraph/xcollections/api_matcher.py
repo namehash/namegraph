@@ -100,7 +100,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-    def get_collections_count_by_string(self, query: str, mode: str) -> tuple[Union[int, str], dict]:
+    def get_collections_count_by_string(self, query: str) -> tuple[Union[int, str], dict]:
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'

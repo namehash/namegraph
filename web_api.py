@@ -512,8 +512,7 @@ async def get_collections_count_by_string(query: CollectionCountByStringRequest)
         count = 0
         es_response_metadata = {'n_total_hits': 0}
     else:
-        count, es_response_metadata = collections_matcher.get_collections_count_by_string(query.query,
-                                                                                          mode=query.mode)
+        count, es_response_metadata = collections_matcher.get_collections_count_by_string(query.query)
 
     time_elapsed = (perf_counter() - t_before) * 1000
 

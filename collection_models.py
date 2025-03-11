@@ -108,7 +108,9 @@ class CollectionSearchByString(BaseCollectionSearchWithOther):  # instant search
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
                        description='can not contain dots (.)',
                        pattern='^[^.]+$', examples=['zeus god'])
-    mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
+    mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$',
+                      description='* if instant - Learning to Rank is using a window size of 20\n'
+                                  '* if domain_detail - Learning to Rank is using a window size of 100')
     sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = Field(SortOrder.AI, title='order of the resulting collections',
                         description='* if A-Z or Z-A - sort by title (alphabetically ascending/descending)\n'
                                     '* if AI - use intelligent endpoint-specific ranking (with Learning to Rank for optimal results)\n'
@@ -129,7 +131,6 @@ class CollectionCountByStringRequest(BaseCollectionRequest):
     query: str = Field(title='input query (with or without spaces) which is used to search for template collections',
                        description='can not contain dots (.)',
                        pattern='^[^.]+$', examples=['zeus god'])
-    mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
 
 
 # ======== Collection Membership ========
@@ -145,7 +146,6 @@ class CollectionsContainingLabelCountResponse(BaseCollectionQueryResponse):
 
 class CollectionsContainingLabelRequest(BaseCollectionSearchLimitOffsetSort):
     label: str = Field(title='label for which membership will be checked for each collection', examples=['zeus'])
-    mode: str = Field('instant', title='request mode: instant, domain_detail', pattern=r'^(instant|domain_detail)$')
     max_results: int = Field(3, ge=0, title='max number of collections to return (for each page)',
                  description='return collections at [offset, offset + max_results) positions (order as in sort_order)')
     sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = Field(SortOrder.AI, title='order of the resulting collections',
