@@ -231,7 +231,7 @@ class AllFieldsSearch(Search):
         return "all-fields"
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='Search collections connecting to Elasticsearch')
     parser.add_argument('--queries', help='file with queries')
     parser.add_argument('--output', default='report.html', help="file with the output report")
     parser.add_argument('--scheme', default='https', help='elasticsearch scheme')

@@ -8,9 +8,9 @@ import numpy as np
 import regex
 from tqdm import tqdm
 
-from generator.domains import Domains
-from generator.generation.categories_generator import Categories
-from generator.collection import CollectionMatcher
+from namegraph.domains import Domains
+from namegraph.generation.categories_generator import Categories
+from namegraph.xcollections import CollectionMatcherForAPI
 from fastapi.testclient import TestClient
 
 
@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient
 def prod_test_client(config):
     Domains.remove_self()
     Categories.remove_self()
-    CollectionMatcher.remove_self()
+    CollectionMatcherForAPI.remove_self()
     os.environ['CONFIG_NAME'] = config
     # TODO lower generator log verbosity
     if 'web_api' not in sys.modules:
@@ -30,13 +30,13 @@ def prod_test_client(config):
         import importlib
         importlib.reload(web_api)
     client = TestClient(web_api.app)
-    client.get("/?name=aaa.eth")
+    client.get("/?name=aaa")
     return client
 
 
 def request_generator_client(name, override=None):
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,
@@ -55,7 +55,7 @@ import requests
 
 def request_generator_http(host, name, override=None):
     data = {
-        'name': name,
+        'label': name,
         'metadata': True,
         'min_suggestions': 100,
         'max_suggestions': 100,
@@ -119,7 +119,7 @@ if __name__ == "__main__":
                 'country': 'pl'
             }})
 
-    input_names = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'josiahadams',
+    input_labels = ['fire', 'funny', 'funnyshit', 'funnyshitass', 'funnyshitshit', 'lightwalker', 'johndoe',
                    'kwrobel', 'krzysztofwrobel', 'pikachu', 'mickey', 'adoreyoureyes', 'face', 'theman', 'goog',
                    'billycorgan', '[003fda97309fd6aa9d7753dcffa37da8bb964d0fb99eba99d0770e76fc5bac91]', 'a' * 101,
                    'dogcat', 'firepower', 'tubeyou', 'fireworks', 'hacker', 'firecar', '😊😊😊', 'anarchy',
@@ -170,7 +170,7 @@ span.i {
     times = []
 
     request_times = collections.defaultdict(list)
-    for input_name in tqdm(input_names):
+    for input_name in tqdm(input_labels):
         write(f'<h1>{input_name}</h1>')
 
         write(f'<section>')
@@ -297,11 +297,11 @@ span.i {
 
     write(f'<h1>Mean share</h1>', stats=True)
     for generator_name, values in sorted(stats.items(), key=lambda x: sum(x[1]), reverse=True):
-        write(f'<p>{(100 * sum(values) / len(input_names)):.2f}% {generator_name}</p>', stats=True)
+        write(f'<p>{(100 * sum(values) / len(input_labels)):.2f}% {generator_name}</p>', stats=True)
 
     write(f'<h1>MRR</h1>', stats=True)
     for generator_name, values in sorted(mrr.items(), key=lambda x: sum(x[1]), reverse=True):
-        write(f'<p>{(sum(values) / len(input_names)):.2f} {generator_name}</p>', stats=True)
+        write(f'<p>{(sum(values) / len(input_labels)):.2f} {generator_name}</p>', stats=True)
 
     write(f'<h1>First position</h1>', stats=True)
     for generator_name, values in sorted(first_position.items(), key=lambda x: sum(x[1]) / len(x[1]), reverse=False):
@@ -316,7 +316,7 @@ span.i {
             for i, position in enumerate(positions):
                 ap.append((i + 1) / position)
             map.append(sum(ap) / len(ap))
-        maps.append((sum(map) / len(input_names), generator_name))
+        maps.append((sum(map) / len(input_labels), generator_name))
 
     for map, generator_name in sorted(maps, reverse=True):
         write(f'<p>{map:.2f} {generator_name}</p>', stats=True)

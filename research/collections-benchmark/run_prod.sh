@@ -1,0 +1,1 @@
+python benchmark.py --host 54.89.196.85 --port 80 --repeats 3 > report.html

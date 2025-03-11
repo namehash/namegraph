@@ -3,9 +3,9 @@ from typing import List
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
-from generator.preprocessor import Preprocessor
-from generator.generation import (
+from namegraph.generation.categories_generator import MultiTokenCategoriesGenerator, Categories
+from namegraph.preprocessor import Preprocessor
+from namegraph.generation import (
     HyphenGenerator,
     AbbreviationGenerator,
     EmojiGenerator,
@@ -24,18 +24,25 @@ from generator.generation import (
     LeetGenerator,
     KeycapGenerator,
     PersonNameGenerator,
+    PersonNameEmojifyGenerator,
+    PersonNameExpandGenerator,
     SymbolGenerator,
     EasterEggGenerator,
     CollectionGenerator,
+    ReverseGenerator,
+    RhymesGenerator,
+    W2VGeneratorRocks,
+    Wikipedia2VGeneratorRocks
 )
-from generator.generated_name import GeneratedName
+from namegraph.generated_name import GeneratedName
 
 import pytest
 
-from generator.domains import Domains
-from generator.input_name import InputName
+from namegraph.domains import Domains
+from namegraph.input_name import InputName
 
-from generator.utils.suffixtree import HAS_SUFFIX_TREE
+from namegraph.utils.suffixtree import HAS_SUFFIX_TREE
+from namegraph.xcollections import CollectionMatcherForAPI, CollectionMatcherForGenerator
 
 needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree not available')
 
@@ -44,6 +51,8 @@ needs_suffix_tree = pytest.mark.skipif(not HAS_SUFFIX_TREE, reason='Suffix tree 
 def run_around_tests():
     Domains.remove_self()
     Categories.remove_self()
+    CollectionMatcherForAPI.remove_self()
+    CollectionMatcherForGenerator.remove_self()
     yield
 
 
@@ -178,7 +187,7 @@ def test_abbreviation_generator_order():
 def test_w2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = W2VGenerator(config)
+        strategy = W2VGeneratorRocks(config)
         tokenized_name = ('my', 'pikachu', '123')
         generated_names = list(strategy.generate(tokenized_name))
         assert ('your', 'pikachu', '123') in generated_names
@@ -419,10 +428,10 @@ def test_on_sale_matcher():
         tokenized_name = ('pay', 'fire', '123')
         generated_names = list(strategy.generate(tokenized_name))
         print(generated_names)
-        assert ('payshare',) in generated_names
-        assert ('payfix',) in generated_names
-        assert ('paygreen',) in generated_names
-        assert ('paytrust',) in generated_names
+        assert ('pay', 'share',) in generated_names
+        assert ('pay', 'fix',) in generated_names
+        assert ('pay', 'green',) in generated_names
+        assert ('pay', 'trust',) in generated_names
         assert ('fire',) in generated_names
 
 
@@ -459,11 +468,11 @@ def test_on_sale_matcher_sorting():
         generated_tokens = generated_names
 
         assert ('orange',) in generated_tokens  # intersting_score = 69.98
-        assert ('fieldmarshal',) in generated_tokens  # intersting_score = 300.0
+        assert ('field', 'marshal',) in generated_tokens  # intersting_score = 300.0
         assert ('fire',) in generated_tokens  # intersting_score = 190.5115
 
         orange_pos = generated_tokens.index(('orange',))
-        alibaba_pos = generated_tokens.index(('fieldmarshal',))
+        alibaba_pos = generated_tokens.index(('field', 'marshal',))
         fire_pos = generated_tokens.index(('fire',))
 
         assert alibaba_pos < fire_pos < orange_pos
@@ -472,7 +481,7 @@ def test_on_sale_matcher_sorting():
 def test_wikipedia2vsimilarity():
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new")
-        strategy = Wikipedia2VGenerator(config)
+        strategy = Wikipedia2VGeneratorRocks(config)
         tokenized_name = ('billy', 'corgan')
         generated_names = list(strategy.generate(tokenized_name))
         print(generated_names)
@@ -529,8 +538,8 @@ def test_substringmatchgenerator_sorting():
         generated_names = list(strategy.generate(tokenized_name))
         generated_tokens = generated_names
 
-        assert ('00042069',) in generated_tokens  # interesting_score = 988
-        assert ('0000042069',) in generated_tokens  # interesting_score = 227
+        assert ('00042069',) in generated_tokens  # sort_score = 988
+        assert ('0000042069',) in generated_tokens  # sort_score = 227
 
         longer_pos = generated_tokens.index(('0000042069',))
         shorter_pos = generated_tokens.index(('00042069',))
@@ -540,7 +549,7 @@ def test_substringmatchgenerator_sorting():
 
 @needs_suffix_tree
 def test_substringmatchgenerator_re_equals_tree():
-    from generator.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
+    from namegraph.generation.substringmatch_generator import SuffixTreeImpl, ReImpl, HAS_SUFFIX_TREE
 
     if not HAS_SUFFIX_TREE:
         pytest.skip()
@@ -603,8 +612,91 @@ def test_easteregg_generator():
 @pytest.mark.integration_test
 def test_collection_generator():
     with initialize(version_base=None, config_path="../conf/"):
-        config = compose(config_name="test_config_new")
+        config = compose(config_name="prod_config_new")
         strategy = CollectionGenerator(config)
         tokenized_name = ('pink', 'floyd')
         generated_names = list(strategy.generate(tokenized_name))
-        assert ('the', 'dark', 'side', 'of', 'the', 'moon') in generated_names
+        assert ('us', 'and', 'them') in generated_names
+
+
+def test_reverse_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = ReverseGenerator(config)
+        tokenized_name = ('piotrus',)
+        generated_names = list(strategy.generate(tokenized_name))
+        assert len(generated_names) == 1
+        assert generated_names[0] == ('surtoip',)
+
+
+def test_rhymes_generator():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        strategy = RhymesGenerator(config)
+
+        tokenized_name = ('caravan',)
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: ''.join(x), list(gen)))
+        expected_names = map(lambda s: tokenized_name[0] + s, (
+            "van", "fan", "sullivan", "ivan", "stefan", "evan",
+            "ativan", "donovan", "stephan", "orphan", "minivan", "sylvan")
+                             )
+        assert all([name in generated_names for name in expected_names])
+
+        tokenized_name = ('van', 'fan', 'sullivan')
+        gen = strategy.generate(tokenized_name)
+        generated_names = list(map(lambda x: ''.join(x), list(gen)))
+        discarded_names = map(lambda s: ''.join(tokenized_name) + s,
+                              ("van", "fan", "sullivan"))
+        assert all([name not in generated_names for name in discarded_names])
+
+
+@mark.skip(reason="not using dynamic grouping category anymore (PersonNameGenerator)")
+def test_person_name_dynamic_grouping_category():
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameGenerator(config)
+        assert pn.get_grouping_category(output_name=None) == 'expand'
+        assert pn.get_grouping_category(output_name='piotrbyczong') == 'expand'
+        assert pn.get_grouping_category(output_name='piotr🐂byczong') == 'emojify'
+        assert pn.get_grouping_category(output_name='piotrbyczońg') == 'emojify'  # non-ascii -> emojify
+
+
+@mark.parametrize(
+    "tokens, gender",
+    [
+        (('david', 'gilmour'), 'M'),
+        (('amy', 'whinehouse'), 'F'),
+        (('pink', 'floyd'), None),
+    ]
+)
+def test_person_name_emojify_generator(tokens: tuple[str, ...], gender: str):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameEmojifyGenerator(config)
+        assert pn.get_grouping_category() == 'emojify'
+
+        generated_names = list(pn.generate(tokens, gender))
+        for name_tokens in generated_names:
+            name = ''.join(name_tokens)
+            assert not name.isascii()
+
+
+@mark.parametrize(
+    "tokens, gender",
+    [
+        (('david', 'gilmour'), 'M'),
+        (('amy', 'whinehouse'), 'F'),
+        (('pink', 'floyd'), None),
+    ]
+)
+def test_person_name_expand_generator(tokens: tuple[str, ...], gender: str):
+    with initialize(version_base=None, config_path="../conf/"):
+        config = compose(config_name="test_config_new")
+        pn = PersonNameExpandGenerator(config)
+        assert pn.get_grouping_category() == 'expand'
+
+        generated_names = list(pn.generate(tokens, gender))
+        for name_tokens in generated_names:
+            name = ''.join(name_tokens)
+            assert name.isascii()

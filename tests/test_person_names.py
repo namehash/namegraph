@@ -2,9 +2,9 @@ import pytest
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.utils.person_names import PersonNames
-from generator.input_name import InputName
-from generator.classifier.person_name_classifier import PersonNameClassifier
+from namegraph.utils.person_names import PersonNames
+from namegraph.input_name import InputName
+from namegraph.classifier.person_name_classifier import PersonNameClassifier
 
 
 @pytest.fixture(scope="module")

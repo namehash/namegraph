@@ -5,12 +5,12 @@ import pytest
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.domains import Domains
-from generator.generated_name import GeneratedName
-from generator.input_name import InputName, Interpretation
-from generator.meta_sampler import MetaSampler
-from generator.pipeline.pipeline_results_iterator import PipelineResultsIterator
-from generator.sampling import RoundRobinSampler, WeightedSorterWithOrder, WeightedSorter
+from namegraph.domains import Domains
+from namegraph.generated_name import GeneratedName
+from namegraph.input_name import InputName, Interpretation
+from namegraph.meta_sampler import MetaSampler
+from namegraph.pipeline.pipeline_results_iterator import PipelineResultsIterator
+from namegraph.sampling import RoundRobinSampler, WeightedSorterWithOrder, WeightedSorter
 
 
 @pytest.fixture(autouse=True)
@@ -144,7 +144,9 @@ def test_round_robin_sorter_deduplication(input: List[List[GeneratedName]], expe
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'round-robin')
+        all_suggestions = metasampler.sample(input_name, 'round-robin', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
         sorted_expected_strings = sorted([str(gn) for gn in expected])
@@ -182,7 +184,9 @@ def test_weighted_sampling_sorter_deduplication(input: List[List[GeneratedName]]
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
         sorted_expected_strings = sorted([str(gn) for gn in expected])
@@ -196,7 +200,7 @@ def test_weighted_sampling_sorter_stress():
         config = compose(config_name="test_config_new", overrides=["app.suggestions=100"])
 
         with open('data/top_internet_names.csv', 'r', encoding='utf-8') as f:
-            words = [str(i) + d for i, d in enumerate(itertools.islice(iter(f), 49999))] + ['pumpkins']
+            words = [str(i) + d.strip() for i, d in enumerate(itertools.islice(iter(f), 49999))] + ['pumpkins']
 
         generated_names = []
         for (from_idx, to_idx), pipeline_name, generator_name in [((0, 10000), 'permute', 'PermuteGenerator'),
@@ -221,7 +225,9 @@ def test_weighted_sampling_sorter_stress():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
 
 
@@ -261,14 +267,16 @@ def test_weighted_sampling_sorter_weights():
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
         assert len(all_suggestions) == config.app.suggestions
 
         print(all_suggestions[:30])
 
 
 @mark.parametrize(
-    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    "overrides,input_labels,expected_strings,min_suggestions,max_suggestions",
     [
         (
                 #
@@ -301,19 +309,20 @@ def test_weighted_sampling_sorter_weights():
     ],
 )
 def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[str],
-                                                                input_names: List[List[GeneratedName]],
+                                                                input_labels: List[List[GeneratedName]],
                                                                 expected_strings: List[str],
                                                                 min_suggestions: int,
                                                                 max_suggestions: int):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)
 
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels
+                                                                           )]
 
         params = {}
         params['min_suggestions'] = min_suggestions
@@ -324,7 +333,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 
@@ -332,7 +343,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
 
 
 @mark.parametrize(
-    "overrides,input_names,expected_strings,min_suggestions,max_suggestions",
+    "overrides,input_labels,expected_strings,min_suggestions,max_suggestions",
     [
         (
                 #
@@ -373,19 +384,19 @@ def test_available_fraction_obligation_weighted_sampling_sorter(overrides: List[
     ]
 )
 def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrides: List[str],
-                                                                         input_names: List[List[GeneratedName]],
+                                                                         input_labels: List[List[GeneratedName]],
                                                                          expected_strings: List[str],
                                                                          min_suggestions: int,
                                                                          max_suggestions: int):
     with initialize(version_base=None, config_path="../conf/"):
         config = compose(config_name="test_config_new", overrides=overrides)
 
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels)]
 
         params = {}
         params['min_suggestions'] = min_suggestions
@@ -396,7 +407,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 
@@ -404,7 +417,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
 
 
 @mark.parametrize(
-    "overrides,input_names,min_suggestions,max_suggestions,min_expected_available,max_expected_available",
+    "overrides,input_labels,min_suggestions,max_suggestions,min_expected_available,max_expected_available",
     [
         (
                 #
@@ -477,7 +490,7 @@ def test_available_fraction_obligation_weighted_sampling_sorter_no_order(overrid
 )
 def test_available_fraction_obligation_weighted_sampling_sorter_available_names_number(
         overrides: List[str],
-        input_names: List[List[GeneratedName]],
+        input_labels: List[List[GeneratedName]],
         min_suggestions: int,
         max_suggestions: int,
         min_expected_available: int,
@@ -488,16 +501,16 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
 
         available_names_set = {
             str(name)
-            for sublist in input_names
+            for sublist in input_labels
             for name in sublist
             if name.status == 'available'
         }
-        for sublist in input_names:
+        for sublist in input_labels:
             for name in sublist:
                 if name.status != 'available':
                     Domains(config).taken[str(name)] = 1.0
 
-        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_names)]
+        pipelines = [PipelineMock(str(i), names) for i, names in enumerate(input_labels)]
 
         params = {}
         params['min_suggestions'] = min_suggestions
@@ -508,7 +521,9 @@ def test_available_fraction_obligation_weighted_sampling_sorter_available_names_
         input_name.add_type('ngram', 'en', 1.0)
         input_name.add_interpretation(Interpretation('ngram', 'en', ('asd',), 1.0))
         metasampler = MetaSampler(config, pipelines)
-        all_suggestions = metasampler.sample(input_name, 'weighted-sampling')
+        all_suggestions = metasampler.sample(input_name, 'weighted-sampling', min_suggestions=input_name.params[
+            'min_suggestions'], max_suggestions=input_name.params['max_suggestions'],
+                                             min_available_fraction=input_name.params['min_available_fraction'])
 
         sorted_strings = sorted([str(gn) for gn in all_suggestions])
 
