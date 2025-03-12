@@ -7,13 +7,12 @@
 <!-- LOGO -->
 
 <p align="center">
-  <!-- <a href="https://namegraph.dev">
+  <a href="https://namegraph.dev">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/media/logo-light.svg">
-      <img alt="NameGraph" src=".github/??" width="auto" height="60">
+      <source media="(prefers-color-scheme: dark)" srcset="docs/media/banner-dark.svg">
+      <img alt="NameGraph" src="docs/media/banner-light.svg" width="auto" height="auto">
     </picture>
-  </a> -->
-  <h1><center>NameGraph</center></h1>
+  </a>
 </p>
 
 <!-- TAGLINE -->
