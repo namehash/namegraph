@@ -34,3 +34,4 @@ research/avatars/*.xlsx
 .env
 data/w2v/
 data/wiki2v/
+
