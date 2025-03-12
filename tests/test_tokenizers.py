@@ -5,7 +5,7 @@ import pytest
 from pytest import mark
 from hydra import initialize, compose
 
-from generator.tokenization import (
+from namegraph.tokenization import (
     BigramTokenizer,
     WordNinjaTokenizer,
     BigramWordnetTokenizer,
@@ -15,7 +15,7 @@ from generator.tokenization import (
 )
 
 # repeatable, braverest, semisoft, chinamen
-from generator.tokenization.none_tokenizer import NoneTokenizer
+from namegraph.tokenization.none_tokenizer import NoneTokenizer
 
 
 def test_two_word_wordnet_tokenizer():

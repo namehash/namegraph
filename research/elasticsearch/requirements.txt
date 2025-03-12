@@ -1,3 +1,12 @@
 jsonlines==3.1.0
 elasticsearch==8.7.0
 tqdm==4.65.0
+numpy==1.24.3
+pandas==2.0.1
+matplotlib==3.7.1
+scikit_learn==1.2.2
+#ir_evaluation_py==1.0.0
+imbalanced_learn==0.10.1
+lightgbm==3.3.5
+xgboost==1.7.5
+elasticsearch_ltr @ git+https://github.com/apohllo/elasticsearch-ltr-py
