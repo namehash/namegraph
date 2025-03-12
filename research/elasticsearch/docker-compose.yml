@@ -1,0 +1,26 @@
+version: '3.5'
+volumes:
+  esdata_namehash:
+services:
+  elasticsearch:
+    build:
+      context: ./docker
+    container_name: elasticsearch
+    environment:
+      - node.name=activity
+      - discovery.type=single-node
+      - cluster.name=ws-es-data-cluster
+      - bootstrap.memory_lock=true
+      - ELASTIC_PASSWORD=espass
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata_namehash:/usr/share/elasticsearch/data
+    expose:
+      - "9200"
+      - "9300"
+    ports:
+      - "9200:9200"

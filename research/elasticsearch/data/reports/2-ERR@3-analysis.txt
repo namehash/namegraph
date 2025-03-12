@@ -1,0 +1,38 @@
+22, 2023 3:15:35 PM ciir.umass.edu.eval.Analyzer read
+Reading data/reports//2-ERR@3/baseline.report... 14 ranked lists
+Reading data/reports//2-ERR@3/8.report... 14 ranked lists
+Reading data/reports//2-ERR@3/6.report... 14 ranked lists
+Reading data/reports//2-ERR@3/4.report... 14 ranked lists
+Reading data/reports//2-ERR@3/1.report... 14 ranked lists
+Reading data/reports//2-ERR@3/5.report... 14 ranked lists
+Reading data/reports//2-ERR@3/0.report... 14 ranked lists
+Reading data/reports//2-ERR@3/3.report... 14 ranked lists
+Reading data/reports//2-ERR@3/7.report... 14 ranked lists
+Reading data/reports//2-ERR@3/2.report... 14 ranked lists
+Reading data/reports//2-ERR@3/9.report... 14 ranked lists
+Overall comparison
+System	Performance	Improvement	Win	Loss	p-value
+baseline.report [baseline]	0.2732
+8.report	0.3843	+0.1111 (+40.69%)	5	3	0.1319
+6.report	0.339	+0.0658 (+24.08%)	5	3	0.1272
+4.report	0.3201	+0.0469 (+17.17%)	6	2	0.2126
+1.report	0.2713	-0.0019 (-0.7%)	3	5	0.9556
+5.report	0.2666	-0.0065 (-2.39%)	1	7	0.9418
+0.report	0.3875	+0.1143 (+41.85%)	5	3	0.1152
+3.report	0.2767	+0.0035 (+1.3%)	4	3	0.721
+7.report	0.301	+0.0278 (+10.19%)	4	4	0.654
+2.report	0.387	+0.1139 (+41.68%)	6	1	0.0314
+9.report	0.2773	+0.0041 (+1.5%)	3	2	0.6216
+Detailed break down
+	[ < -100%)	[-100%, -75%)	[-75%, -50%)	[-50%, -25%)	[-25%, 0%)	(0%, +25%]	(+25%, +50%]	(+50%, +75%]	(+75%, +100%]	( > +100%]
+8.report	0	0	0	0	3	2	2	0	1	0
+6.report	0	0	0	0	3	3	2	0	0	0
+4.report	0	0	0	0	2	5	1	0	0	0
+1.report	0	0	0	1	4	2	1	0	0	0
+5.report	0	0	0	1	6	0	0	0	1	0
+0.report	0	0	0	0	3	2	2	0	1	0
+3.report	0	0	0	0	3	4	0	0	0	0
+7.report	0	0	0	0	4	3	1	0	0	0
+2.report	0	0	0	0	1	4	1	0	1	0
+9.report	0	0	0	0	2	3	0	0	0	0
+

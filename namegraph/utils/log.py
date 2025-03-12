@@ -61,5 +61,5 @@ class LogEntry:
             'normalized_price': '2.34',  # dummy
             'price_in_user_currency': '3.45',  # dummy
             'categories': self.categories.get_categories(str(suggestion)),
-            'cached_interesting_score': self.domains.get_interesting_score(suggestion)
+            'cached_sort_score': self.domains.get_sort_score(suggestion)
         }

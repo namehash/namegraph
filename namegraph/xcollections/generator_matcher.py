@@ -10,7 +10,7 @@ from fastapi import HTTPException
 
 from namegraph.xcollections.matcher import CollectionMatcher
 from namegraph.xcollections.collection import Collection
-from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder
+from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder, SortOrder
 from namegraph.utils import OrderedSet
 
 
@@ -22,7 +22,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             tokens: tuple[str, ...],
             max_related_collections: int = 5,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
             enable_learning_to_rank: bool = True,
@@ -46,7 +46,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
         ]
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.archived': False}) \
             .add_limit(max_related_collections if not apply_diversity else max_related_collections * 3) \
@@ -89,7 +89,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             diversified = self._apply_diversity(
                 collections,
                 max_related_collections,
-                name_diversity_ratio,
+                label_diversity_ratio,
                 max_per_type
             )
             return diversified, es_response_metadata
@@ -103,7 +103,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -114,8 +114,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             'template.collection_types', 'metadata.modified',
         ]
 
-        if sort_order == 'AI':
-            sort_order = 'AI-by-member'
+        if sort_order == SortOrder.AI:
+            sort_order = SortOrder.AI_BY_MEMBER
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
@@ -145,7 +145,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             tokens: tuple[str, ...],
             input_name: str,
             max_related_collections: int = 5,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
             enable_learning_to_rank: bool = True,
@@ -157,7 +157,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 self._search_for_generator,
                 tokens=tokens,
                 max_related_collections=max_related_collections,
-                name_diversity_ratio=name_diversity_ratio,
+                label_diversity_ratio=label_diversity_ratio,
                 max_per_type=max_per_type,
                 limit_names=limit_names,
                 enable_learning_to_rank=enable_learning_to_rank
@@ -167,7 +167,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
                 self._search_by_membership,
                 name_label=input_name,
                 limit_names=limit_names,
-                sort_order='AI',
+                sort_order=SortOrder.AI,
                 max_results=max_related_collections,
                 offset=0
             )
@@ -217,7 +217,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             max_sample_size: int = 10,
     ) -> tuple[dict, dict]:
 
-        fields = ['data.collection_name']
+        fields = ['data.collection_name', 'data.archived']
 
         sampling_script = """
             def number_of_names = params._source.data.names.size();
@@ -275,6 +275,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
         except IndexError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
 
+        if hit['fields']['data.archived'][0]:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
+
         result = {
             'collection_id': hit['_id'],
             'collection_title': hit['fields']['data.collection_name'][0],
@@ -302,9 +305,8 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [fetch top10 collection members]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        # TODO: as quick fix for filtering collections (e.g. nazi) with archived=True; needs to be activated when those collection will be marked in separated field
-        # if response['_source']['data']['archived']:
-        #     raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
+        if response['_source']['data']['archived']:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         es_response_metadata = {
             'n_total_hits': 1,
@@ -340,7 +342,7 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             seed: int
     ) -> tuple[dict, dict]:
 
-        fields = ['data.collection_name']
+        fields = ['data.collection_name', 'data.archived']
 
         query_params = ElasticsearchQueryBuilder() \
             .set_term('_id', collection_id) \
@@ -366,6 +368,9 @@ class CollectionMatcherForGenerator(CollectionMatcher):
             }
         except IndexError as ex:
             raise HTTPException(status_code=404, detail=f'Collection with id={collection_id} not found') from ex
+
+        if hit['fields']['data.archived'][0]:
+            raise HTTPException(status_code=410, detail=f'Collection with id={collection_id} is archived')
 
         name_tokens_tuples = [(r['normalized_name'], r['tokenized_name']) for r in hit['fields']['names_with_tokens']]
         token_scramble_tokenized_suggestions = self._get_suggestions_by_scrambling_tokens(

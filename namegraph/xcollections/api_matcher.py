@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 from namegraph.xcollections.matcher import CollectionMatcher
 from namegraph.xcollections.collection import Collection
-from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder
+from namegraph.xcollections.query_builder import ElasticsearchQueryBuilder, SortOrder
 from .utils import get_names_script, get_namehashes_script
 
 logger = logging.getLogger('namegraph')
@@ -21,8 +21,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             mode: str,
             max_related_collections: int = 3,
             offset: int = 0,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
-            name_diversity_ratio: Optional[float] = 0.5,
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: int = 10,
     ) -> tuple[list[Collection], dict]:
@@ -48,7 +48,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'data.collection_keywords^2', 'data.names.normalized_name', 'data.names.tokenized_name'
         ]
 
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
         query_builder = ElasticsearchQueryBuilder() \
             .add_filter('term', {'data.public': True}) \
             .add_filter('term', {'data.archived': False}) \
@@ -58,7 +58,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             .set_source(False) \
             .include_fields(include_fields)
 
-        if sort_order == 'AI':
+        if sort_order == SortOrder.AI:
             window_size = self.ltr_window_size.instant if mode == 'instant' else self.ltr_window_size.domain_detail
 
             query_params = query_builder \
@@ -94,13 +94,13 @@ class CollectionMatcherForAPI(CollectionMatcher):
                 return collections[:max_related_collections], es_response_metadata
 
             diversified = self._apply_diversity(collections, max_related_collections,
-                                                name_diversity_ratio, max_per_type)
+                                                label_diversity_ratio, max_per_type)
             return diversified, es_response_metadata
         except Exception as ex:
             logger.error(f'Elasticsearch search failed [by-string]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-    def get_collections_count_by_string(self, query: str, mode: str) -> tuple[Union[int, str], dict]:
+    def get_collections_count_by_string(self, query: str) -> tuple[Union[int, str], dict]:
         tokenized_query = ' '.join(self.tokenizer.tokenize(query)[0])
         if tokenized_query != query:
             query = f'{query} {tokenized_query}'
@@ -137,20 +137,18 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             collection_id: str,
             max_related_collections: int = 3,
-            name_diversity_ratio: Optional[float] = 0.5,
+            label_diversity_ratio: Optional[float] = 0.5,
             max_per_type: Optional[int] = 3,
             limit_names: Optional[int] = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.RELEVANCE] = SortOrder.RELEVANCE,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
-
-        if sort_order == 'AI':
-            sort_order = 'ES'
 
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image',
+            'data.archived'
         ]
 
         # find collection with specified collection_id
@@ -174,13 +172,20 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.error(f'could not find collection with id {collection_id}', exc_info=True)
             raise HTTPException(status_code=404, detail=f"Collection with id={collection_id} not found.")
 
+        if found_collection.archived != False:
+            if found_collection.archived is None:
+                logger.error(f'collection with id {collection_id} has no archived field')
+            else:
+                logger.error(f'collection with id {collection_id} is archived')
+            raise HTTPException(status_code=410, detail=f"Collection with id={collection_id} is archived.")
+
         es_time_first = es_response_metadata['took']
         es_comm_time_first = es_response_metadata['elasticsearch_communication_time']
         if es_response_metadata['n_total_hits'] > 1:
             logger.warning(f'more than 1 collection found with id {collection_id}')
 
         # search similar collections
-        apply_diversity = name_diversity_ratio is not None or max_per_type is not None
+        apply_diversity = label_diversity_ratio is not None or max_per_type is not None
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_query(found_collection.title, boolean_clause='should', type_='cross_fields',
@@ -219,7 +224,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
         diversified = self._apply_diversity(
             [found_collection] + collections,
             max_related_collections + 1,
-            name_diversity_ratio,
+            label_diversity_ratio,
             max_per_type
         )
         diversified = [c for c in diversified if c.collection_id != found_collection.collection_id]
@@ -252,7 +257,7 @@ class CollectionMatcherForAPI(CollectionMatcher):
             self,
             name_label: str,
             limit_names: int = 10,
-            sort_order: Literal['A-Z', 'Z-A', 'AI'] = 'AI',
+            sort_order: Literal[SortOrder.AZ, SortOrder.ZA, SortOrder.AI, SortOrder.RELEVANCE] = SortOrder.AI,
             max_results: int = 3,
             offset: int = 0
     ) -> tuple[list[Collection], dict]:
@@ -263,8 +268,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
             'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
         ]
 
-        if sort_order == 'AI':
-            sort_order = 'AI-by-member'
+        if sort_order == SortOrder.AI:
+            sort_order = SortOrder.AI_BY_MEMBER
 
         query_params = (ElasticsearchQueryBuilder()
                         .add_filter('term', {'data.names.normalized_name': name_label})
@@ -293,7 +298,8 @@ class CollectionMatcherForAPI(CollectionMatcher):
         fields = [
             'data.collection_name', 'template.collection_rank', 'metadata.owner',
             'metadata.members_count', 'template.top10_names.normalized_name', 'template.top10_names.namehash',
-            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image'
+            'template.collection_types', 'metadata.modified', 'data.avatar_emoji', 'data.avatar_image',
+            'data.archived'
         ]
 
         try:
@@ -310,4 +316,9 @@ class CollectionMatcherForAPI(CollectionMatcher):
             logger.error(f'Elasticsearch search failed [by-id_list]', exc_info=True)
             raise HTTPException(status_code=503, detail=str(ex)) from ex
 
-        return collections
+        filtered_collections = [c for c in collections if c.archived == False]
+
+        if len(filtered_collections) < len(collections):
+            logger.warning(f'{len(collections) - len(filtered_collections)} collections were archived')
+
+        return filtered_collections

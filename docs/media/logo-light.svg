@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="183.625" height="27.8125">
+    <!-- Main Text -->
+    <text x="0" y="20" font-family="Inter, sans-serif" font-size="22.683" font-weight="bold" fill="black" letter-spacing="-0.907">
+        NameGraph
+    </text>
+
+    <!-- Beta Badge -->
+    <rect x="130" y="5" width="30" height="15" rx="2.8" ry="2.8" fill="black"/>
+    <text x="136" y="16" font-family="Inter, sans-serif" font-size="6.857" font-weight="600" fill="white">
+        beta
+    </text>
+</svg>
+
