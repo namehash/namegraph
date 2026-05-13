@@ -51,11 +51,15 @@
 
 # Project Status
 
-NameGraph is currently in beta. We are excited to share our work with you and continue to build the greatest web of names in history!
+🧊 All development of NameGraph was suspended in 2025. 🧊
+
+🧊 This repo is retained only for archive purposes. 🧊
 
 # Overview
 
 NameGraph is a web service that generates name suggestions for a given input label. It is implemented using FastAPI and provides a variety of endpoints to generate suggestions in different modes and with different parameters.
+
+We are excited to share our work with you and continue to build the greatest web of names in history!
 
 ## Label Analysis
 
