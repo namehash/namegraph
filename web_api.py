@@ -328,7 +328,8 @@ def suggestions_by_category(name: GroupedLabelRequest):
     response['all_tokenizations'] = all_tokenizations
 
     logger.info(json.dumps(
-        log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})))
+        log_entry.create_grouped_log_entry(name.model_dump(), {**related_suggestions, **grouped_suggestions})
+    ))
 
     return response
 
@@ -497,6 +498,8 @@ async def find_collections_by_string(query: CollectionSearchByString):
         'other_collections': other_collections,
         'metadata': metadata
     }
+    
+    logger.info(json.dumps({'endpoint': 'find_collections_by_string', 'request': query.model_dump()}))
 
     return response
 
@@ -522,6 +525,8 @@ async def get_collections_count_by_string(query: CollectionCountByStringRequest)
         'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
         'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
     }
+
+    logger.info(json.dumps({'endpoint': 'count_collections_by_string', 'request': query.model_dump()}))
 
     return {'count': count, 'metadata': metadata}
 
@@ -570,6 +575,8 @@ async def find_collections_by_collection(query: CollectionSearchByCollection):
         'metadata': metadata
     }
 
+    logger.info(json.dumps({'endpoint': 'find_collections_by_collection', 'request': query.model_dump()}))
+
     return response
 
 
@@ -594,6 +601,8 @@ async def get_collections_membership_count(request: CollectionsContainingLabelCo
         'elasticsearch_processing_time_ms': es_response_metadata.get('took', None),
         'elasticsearch_communication_time_ms': es_response_metadata.get('elasticsearch_communication_time', None),
     }
+ 
+    logger.info(json.dumps({'endpoint': 'count_collections_by_member', 'request': request.model_dump()}))
 
     return {'count': count, 'metadata': metadata}
 
@@ -628,6 +637,8 @@ async def find_collections_membership_list(request: CollectionsContainingLabelRe
         'elasticsearch_communication_time_ms': es_search_metadata.get('elasticsearch_communication_time', None),
     }
 
+    logger.info(json.dumps({'endpoint': 'find_collections_by_member', 'request': request.model_dump()}))
+
     return {'collections': collections, 'metadata': metadata}
 
 
@@ -660,10 +671,7 @@ async def fetch_collection_members(fetch_command: FetchCollectionMembersRequest)
 
     response = convert_related_to_suggestions_from_collection_format(rs, include_metadata=fetch_command.metadata)
 
-    logger.info(json.dumps({
-        'endpoint': 'fetch_collection_members', 
-        'request': fetch_command.model_dump()
-    }))
+    logger.info(json.dumps({'endpoint': 'fetch_collection_members', 'request': fetch_command.model_dump()}))
 
     return response
 
@@ -685,7 +693,9 @@ async def get_collection_by_id(request: GetCollectionByIdRequest):
         return Response(status_code=404, content=f'Collection with id={request.collection_id} not found')
 
     collection = convert_to_collection_format(collections)[0]
-    
+
+    logger.info(json.dumps({'endpoint': 'get_collection_by_id', 'request': request.model_dump()}))
+
     return collection
 
 
