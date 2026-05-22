@@ -14,7 +14,7 @@ class S3Downloader:
     def __init__(self):
         self.s3_client = None
         self.region_name = 'us-east-1'
-        self.bucket = 'prod-name-generator-namegeneratori-inputss3bucket-c26jqo3twfxy'
+        self.bucket = 'prod-namegraph-namegeneratori-inputss3bucket-c26jqo3twfxy'
 
     def get_client(self):
         if self.s3_client is None:
